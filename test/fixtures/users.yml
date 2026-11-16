@@ -24,3 +24,14 @@ admin:
   last_name: Admin
   role: admin
   confirmed_at: <%= Time.current %>
+
+banned:
+  email_address: banned@example.com
+  password_digest: <%= BCrypt::Password.create("password") %>
+  username: banned
+  first_name: Banny
+  last_name: Banned
+  role: user
+  confirmed_at: <%= Time.current %>
+  banned_at: <%= Time.current - 1.day %>
+  ban_reason: Repeated policy violations

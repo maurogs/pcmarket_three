@@ -6,6 +6,8 @@ class Listing < ApplicationRecord
   MAX_PHOTOS = 12
   MAX_PHOTO_BYTES = 10.megabytes
   PHOTO_CONTENT_TYPES = %w[image/jpeg image/png image/webp].freeze
+  MAX_SELLER_TAGS = 5
+  POSTAL_CODE_FORMATS = { "ES" => /\A\d{5}\z/ }.freeze
 
   # Named variants for rendered photos: small WebP for cards/carousels,
   # wide WebP for the show-page gallery.
@@ -49,13 +51,19 @@ class Listing < ApplicationRecord
   validates :original_price_cents,
             numericality: { only_integer: true, greater_than: 0 },
             allow_nil: true
+  validate :original_price_above_current_price
   validates :quantity, numericality: { only_integer: true, greater_than: 0 }
   validates :shipping_price_cents,
             numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :currency, presence: true
   validates :country_code, presence: true
   validates :slug, presence: true, uniqueness: true
+  validate :postal_code_format
+  validate :region_known
   validate :specs_must_be_a_hash
+  validate :validate_specs
+  validate :validate_required_specs, on: :submission
+  validate :seller_tags_within_limit
   validate :photos_within_limit
   validate :photos_content_types_valid
   validate :photos_sizes_valid
@@ -132,8 +140,21 @@ class Listing < ApplicationRecord
 
   # --- State machine (guards raise Listing::InvalidTransition) -------------
 
+  # Drafts and rejected listings go through the normal publish flow. Approved
+  # listings may re-submit after material edits (see Listings::Update), which
+  # is why :approved is an allowed source here as well.
   def submit_for_review!
     ensure_transition!(from: [ :draft, :rejected ], to: :pending_review)
+    raise ActiveRecord::RecordInvalid, self unless valid?(:submission)
+
+    update!(status: :pending_review, rejection_reason: nil)
+  end
+
+  # Back to the review queue after an approved listing's material fields were
+  # edited (title, description, photos, specs, category). Price and shipping
+  # edits do NOT call this and leave the listing live.
+  def request_revalidation!
+    ensure_transition!(from: [ :approved ], to: :pending_review)
     update!(status: :pending_review, rejection_reason: nil)
   end
 
@@ -161,6 +182,30 @@ class Listing < ApplicationRecord
     update!(status: :sold, sold_at: Time.current)
   end
 
+  def archive!
+    ensure_transition!(from: [ :draft, :rejected, :approved ], to: :archived)
+    update!(status: :archived)
+  end
+
+  # Destroy is only offered for listings that were never (or are no longer)
+  # public: drafts, rejected and archived ones. Everything else is history.
+  def destroyable?
+    draft? || rejected? || archived?
+  end
+
+  # Per-tab counts for "My listings", from a single GROUP BY query:
+  # {"all" => total, "draft" => n, "pending_review" => n, …} for every status.
+  def self.status_counts(relation)
+    raw = relation.group(:status).count
+    counts = statuses.keys.index_with(0)
+    raw.each do |key, value|
+      name = key.is_a?(Integer) ? statuses.key(key) : key.to_s
+      counts[name] = value if counts.key?(name)
+    end
+    counts["all"] = raw.values.sum
+    counts
+  end
+
   private
 
   def ensure_transition!(from:, to:)
@@ -181,6 +226,95 @@ class Listing < ApplicationRecord
     return if specs.is_a?(Hash)
 
     errors.add(:specs, :invalid)
+  end
+
+  # Specs must belong to the category's attribute set (own + inherited) and
+  # their values must respect the attribute's input type. select and
+  # multi_select values are checked against the category's SpecOptions, so
+  # stray or hand-crafted keys/values surface as validation errors.
+  def validate_specs
+    return if specs.blank? || category.nil?
+
+    attributes = category.all_spec_attributes.index_by(&:key)
+    specs.each do |key, value|
+      attribute = attributes[key.to_s]
+      if attribute.nil?
+        errors.add(:specs, :spec_key_unknown, attribute: key.to_s.humanize)
+        next
+      end
+
+      validate_spec_value(attribute, value)
+    end
+  end
+
+  # Required spec attributes (per the category's CategorySpecAttribute rows)
+  # are enforced only when submitting for review, never while saving a draft.
+  def validate_required_specs
+    return if category.nil? || !specs.is_a?(Hash)
+
+    required_map = category.spec_attribute_required_map
+    category.all_spec_attributes.each do |attribute|
+      next unless required_map[attribute.id]
+
+      value = specs[attribute.key]
+      # A boolean false is a real answer; only nil/""/[] count as missing.
+      next if !value.nil? && (value == false || value.present?)
+
+      errors.add(:specs, :spec_required, attribute: attribute.name)
+    end
+  end
+
+  def validate_spec_value(attribute, value)
+    case attribute.input_type
+    when "select"
+      unless option_value?(attribute, value)
+        errors.add(:specs, :spec_value_invalid, attribute: attribute.name)
+      end
+    when "multi_select"
+      unless value.is_a?(Array) && value.all? { |v| option_value?(attribute, v) }
+        errors.add(:specs, :spec_value_invalid, attribute: attribute.name)
+      end
+    when "boolean"
+      unless [ true, false ].include?(value)
+        errors.add(:specs, :spec_value_boolean, attribute: attribute.name)
+      end
+    when "number"
+      unless value.to_s.match?(/\A-?\d+(?:\.\d+)?\z/)
+        errors.add(:specs, :spec_value_number, attribute: attribute.name)
+      end
+    else # text: any string is accepted
+      errors.add(:specs, :too_long, attribute: attribute.name, count: 200) if value.to_s.length > 200
+    end
+  end
+
+  def option_value?(attribute, value)
+    value.is_a?(String) && attribute.spec_options.any? { |option| option.value == value }
+  end
+
+  def seller_tags_within_limit
+    return if seller_tags.size <= MAX_SELLER_TAGS
+
+    errors.add(:seller_tags, :seller_tag_limit, count: MAX_SELLER_TAGS)
+  end
+
+  def original_price_above_current_price
+    return if original_price_cents.nil? || price_cents.nil?
+    return if original_price_cents > price_cents
+
+    errors.add(:original_price_cents, :original_price_below_price)
+  end
+
+  def postal_code_format
+    pattern = POSTAL_CODE_FORMATS[country_code.to_s]
+    return if postal_code.blank? || pattern.nil? || postal_code.match?(pattern)
+
+    errors.add(:postal_code, :invalid_postal_code)
+  end
+
+  def region_known
+    return if region.blank? || EsProvince.name?(region)
+
+    errors.add(:region, :province_unknown)
   end
 
   def photos_within_limit

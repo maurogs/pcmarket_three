@@ -257,6 +257,15 @@ de:
   activerecord:
     errors:
       messages:
+        spec_key_unknown: enthält eine unbekannte Angabe (%{attribute})
+        spec_required: '%{attribute} ist erforderlich'
+        spec_value_invalid: '%{attribute} hat einen ungültigen Wert'
+        spec_value_number: '%{attribute} muss eine Zahl sein'
+        spec_value_boolean: '%{attribute} muss Ja oder Nein sein'
+        original_price_below_price: muss höher als der aktuelle Preis sein
+        invalid_postal_code: muss eine gültige fünfstellige spanische Postleitzahl sein
+        seller_tag_limit: darf nicht mehr als %{count} Tags enthalten
+        province_unknown: ist keine bekannte spanische Provinz
         photo_limit_exceeded: darf nicht mehr als %{count} Fotos haben
         photo_content_type_invalid: muss ein JPEG-, PNG- oder WebP-Bild sein
         photo_too_large: darf höchstens %{max} MB wiegen
@@ -394,6 +403,7 @@ de:
         shipping_price_cents: Versandkosten
         free_shipping: Kostenloser Versand
         allow_offers: Angebote zulassen
+        seller_tags: Verkäufer-Tags
         featured_until: Hervorgehoben bis
         published_at: Veröffentlicht am
         sold_at: Verkauft am
@@ -549,6 +559,10 @@ de:
         banned_at: Gesperrt am
         ban_reason: Grund der Sperre
   shared:
+    error_summary:
+      title:
+        one: Bitte behebe %{count} Fehler
+        other: Bitte behebe %{count} Fehler
     listing_card:
       labels: Kennzeichnungen
       sold_out: Verkauft
@@ -595,3 +609,101 @@ de:
   date:
     formats:
       delivery: "%-d. %B"
+  sell:
+    banned_alert: Dein Konto ist gesperrt, daher kannst du keine Inserate verwalten.
+    form:
+      category_root: Kategorie
+      category_prompt: Kategorie auswählen…
+      category:
+        child_label: Unterkategorie
+        child_prompt: Unterkategorie auswählen…
+      specs:
+        title: Technische Daten
+        prompt: Auswählen…
+        required_note: Mit * markierte Felder müssen vor der Übermittlung zur Prüfung ausgefüllt sein.
+      sections:
+        category: Kategorie
+        basics: Details
+        pricing: Preis
+        photos: Fotos
+        location: Standort
+        shipping: Versand und Tags
+      condition_explanations:
+        brand_new: Neu, versiegelt und mit voller Garantie.
+        open_box: Unbenutzte Rücksendung oder Ausstellungsstück; Originalverpackung fehlt möglicherweise.
+        used_like_new: Kaum benutzt und in einwandfreiem Zustand.
+        used_good: Benutzt, aber voll funktionsfähig mit normalen Gebrauchsspuren.
+        for_parts: Defekt oder eingeschränkt funktionsfähig; Verkauf als Ersatzteil.
+      fields:
+        price: Preis (€)
+        original_price: Ursprünglicher Preis (optional)
+        original_price_hint: Durchgestrichener Referenzpreis
+        original_price_note: Muss höher als der aktuelle Preis sein.
+        follow_store: Standardeinstellung meines Shops übernehmen
+        province: Provinz
+        province_prompt: Provinz auswählen…
+        shipping_price: Versandkosten (€)
+        shipping_price_note: Leer lassen, um die Versandkosten an der Kasse zu berechnen.
+      photos:
+        hint: Bis zu %{count} Fotos (JPEG, PNG oder WebP), jeweils %{max} MB.
+        drop_title: Fotos hinzufügen
+        drop_hint: Klick zum Auswählen oder Dateien hierher ziehen
+        remove: Entfernen
+        too_many: Du kannst bis zu %{count} Fotos hochladen.
+        wrong_type: Nur JPEG-, PNG- und WebP-Bilder sind erlaubt.
+        too_large: Jedes Foto darf maximal %{max} MB groß sein.
+      tags:
+        title: Verkäufer-Tags
+        hint: Wähle bis zu %{count} Tags, damit Käufer dich leichter finden.
+        too_many: Du kannst bis zu %{count} Tags wählen.
+      submit_for_review: Zur Prüfung einreichen
+      save_draft: Entwurf speichern
+      cancel: Abbrechen
+    listings:
+      new:
+        title: Artikel verkaufen
+      edit:
+        title: Inserat bearbeiten
+        updated_at: Zuletzt aktualisiert vor %{time}
+        live_edit_warning: Änderungen an Titel, Beschreibung, Fotos oder technischen Daten schicken das Inserat erneut in die Prüfung. Preis- und Bestandsänderungen bleiben sofort online.
+      index:
+        title: Meine Inserate
+        subtitle: Erstelle, prüfe und verwalte, was du auf PCMarket verkaufst.
+        new_listing: Artikel verkaufen
+        empty: Du hast noch keine Inserate.
+        confirm_sold: Dieses Inserat als verkauft markieren?
+        confirm_delete: Dieses Inserat endgültig löschen?
+        tabs:
+          all: Alle
+          draft: Entwürfe
+          pending_review: In Prüfung
+          approved: Aktiv
+          rejected: Abgelehnt
+          sold: Verkauft
+          archived: Archiviert
+        actions:
+          edit: Bearbeiten
+          submit: Zur Prüfung einreichen
+          mark_sold: Als verkauft markieren
+          archive: Archivieren
+          delete: Löschen
+      create:
+        draft_saved: Entwurf gespeichert.
+        submitted: Dein Inserat wird jetzt geprüft.
+      update:
+        updated: Inserat aktualisiert.
+        re_reviewed: Inserat aktualisiert und erneut zur Prüfung eingereicht.
+        submitted: Dein Inserat wird jetzt geprüft.
+      destroy:
+        destroyed: Inserat gelöscht.
+        destroy_denied: Aktive oder laufende Inserate können nicht gelöscht werden. Archiviere sie zuerst.
+    submissions:
+      create:
+        submitted: Inserat zur Prüfung eingereicht.
+        invalid: "Das Inserat ist nicht bereit für die Prüfung: %{errors}"
+    archivals:
+      create:
+        archived: Inserat archiviert.
+    sale_marks:
+      create:
+        sold: Inserat als verkauft markiert.

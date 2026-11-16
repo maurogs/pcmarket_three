@@ -36,6 +36,7 @@ module ApplicationHelper
     box: '<path d="M3 8h18v12H3V8Zm0 0 3-4h12l3 4M9 12h6"/>',
     bolt: '<path d="M13 3 5 13h6l-1 8 9-11h-6l1-7Z"/>',
     eye: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.8"/>',
+    image: '<rect x="3" y="5" width="18" height="14" rx="1.5"/><circle cx="9" cy="10" r="1.6"/><path d="m5 17 4.5-4.5L12 15l3-3 4 4"/>',
     plus: '<path d="M12 5v14M5 12h14"/>'
   }.freeze
 

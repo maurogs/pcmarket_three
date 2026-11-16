@@ -4,9 +4,11 @@
 
 Marketplace for new and second-hand PC hardware (GPUs, CPUs, laptops, components).
 Phase 0 built the foundation (auth, i18n, Tailwind chrome), Phase 1 the domain layer,
-Phase 2a the reference-data seeds and Phase 2b **public browsing** — search results,
-category pages, listing pages and seller storefronts, all read-only. Listing create/edit
-(publish flow), cart/checkout and the admin/moderation UI come in later phases.
+Phase 2a the reference-data seeds, Phase 2b **public browsing** — search results,
+category pages, listing pages and seller storefronts, all read-only — and Phase 3a
+**seller listing management** (authenticated sellers create/edit their listings, photo
+upload, review submission, archiving, mark-sold). Cart/checkout and the admin/moderation
+UI come in later phases.
 
 ## Stack
 
@@ -120,7 +122,37 @@ category pages, listing pages and seller storefronts, all read-only. Listing cre
     `before_action :resume_session` and only then `require_authentication`; without that,
     public controllers (`allow_unauthenticated_access`) left `Current.user` nil, which
     broke cached-per-user fragments.
-- **i18n**: the 6 locale files currently share an identical tree of **481 keys**. Plurals
+- **Seller listings (Phase 3a)** — authenticated, seller-scoped:
+  - Routes: `namespace :sell` inside the locale scope — `resources :listings`
+    + singular POST-only `resource :submission`/`:archival`/`:sale_mark` and
+    `resources :category_fields, only: :show` (path param is the **category
+    slug**; helper is singular `sell_category_field_path`).
+    `Sell::BaseController` requires auth and bounces banned users to root.
+  - **Scoping**: every lookup is `current_user.listings.friendly.find` →
+    foreign listings 404. Index tabs `all|draft|pending_review|approved|
+    rejected|sold|archived`, counts from ONE `group(:status)` query
+    (`Listing.status_counts`), pagy via `results_pagination`.
+  - **Material vs price edits** (`Listings::Update`): title/description/
+    photos/specs/category changes on an APPROVED listing send it back to
+    `pending_review` (`request_revalidation!`, no :submission gate);
+    price/shipping/location/tag edits keep it live.
+  - **Validation contexts**: required spec attributes error only on
+    `:submission` (`valid?(:submission)` via `submit_for_review!`); unknown
+    spec keys/values are rejected in every context. `Listing#archive!` and
+    `#destroyable?` (draft/rejected/archived only, else 422).
+  - **Stores**: `Stores::EnsureFor` creates the seller's individual store
+    (name = username) on their first listing.
+  - **Admin notification**: `Listings::Submit` inserts one
+    `Notification(kind: "listing_submitted")` row per admin via
+    `insert_all`, in the same transaction as the status change.
+  - **Form**: one page + Stimulus `listing_form_controller.js`; two submit
+    buttons carry `name="intent" value="submit|draft"`. Photos:
+    multi + drag-drop, model validates max 12 / 10 MB / jpeg-png-webp;
+    server re-render skips non-persisted or non-image attachments
+    (`photo_variant_tag` cannot transform them). Price fields post EURO
+    strings as `listing[price]` etc. — `Listings::FormAttributes.euros_to_cents`
+    converts ("1.299,99" works); fields are `raw.key?`-guarded for PATCH.
+- **i18n**: the 6 locale files currently share an identical tree of **567 keys**. Plurals
   must be nested (`count: { one:, other: }`) — i18n 1.15.2 does not resolve flat
   `*_one`/`*_other` keys. Locale files are machine-merged (`YAML.dump` → alphabetical
   keys); regenerate rather than hand-splicing.
@@ -132,14 +164,15 @@ category pages, listing pages and seller storefronts, all read-only. Listing cre
 
 | Area | Files |
 | --- | --- |
-| Routes (locale-scoped) | `config/routes.rb` — root `pages#home`, `resources :listings, only: %i[index show]`, `resources :categories, only: :show, path: "c"`, `resources :stores, only: :show`, `get "search" → listings#index`, `resource :session`, `resources :passwords`, `resource :registration` |
+| Routes (locale-scoped) | `config/routes.rb` — root `pages#home`, `resources :listings, only: %i[index show]`, `resources :categories, only: :show, path: "c"`, `resources :stores, only: :show`, `get "search" → listings#index`, `namespace :sell { resources :listings + resource :submission/:archival/:sale_mark + resources :category_fields, only: :show }`, `resource :session`, `resources :passwords`, `resource :registration` |
 | Auth | `app/controllers/concerns/authentication.rb` (cookie resume, `Current.session`), `sessions_controller.rb`, `passwords_controller.rb`, `passwords_mailer.rb` |
 | Sign-up | `registrations_controller.rb` + `views/registrations/new` |
 | User model | `app/models/user.rb` — `email_address` (normalized downcase, uniq index), `username` (uniq index, `/\A[a-zA-Z0-9_\-]{3,30}\z/`), `first_name`, `last_name`, `phone`, `role` enum (user:0 admin:1), `locale` (default "es"), `country_code` (default "ES"), `confirmed_at`, `banned_at` (`banned?/ban!/unban!`), `display_name`; has_many: store, listings, sales/orders, favorites, follows, seller_follows, saved_searches, conversations, offers, carts, reviews, sent_messages, api_tokens |
 | Locale switching | `application_controller.rb`, `config/application.rb`, `config/locales/*.yml`, `script/lint_locale_keys.rb` |
 | Layout & chrome | `app/views/layouts/application.html.erb`, `_header.html.erb` (announcement, logo, search `GET /:locale?q=`, wishlist/notifications/cart icons, account dropdown, desktop mega menu + mobile slide-in menu, both cached per locale and busted by `Category.maximum(:updated_at)`), `_footer.html.erb` (newsletter, link columns, language switcher, copyright), `_flashes.html.erb` |
 | Design tokens | `app/assets/tailwind/application.css` (`--color-primary` #4f46e5, `--color-accent` #f97316, surface/surface-muted/text/muted/border; `.dark` overrides; component classes `btn-primary/secondary/ghost`, `card`, `chip`, `chip-choice`, `input`, `select`, `nav-link`, `icon-button`, `series-nav`, `filters-sheet`, `scroll-snap-row`) |
-| Stimulus | `app/javascript/controllers/{theme,menu,mega_menu,filters,gallery}_controller.js` — `mega-menu` hover/focus panels (Esc + focusout close), `filters` mobile `<dialog>` sheet + auto-submit, `gallery` swipe/keyboard carousel |
+| Stimulus | `app/javascript/controllers/{theme,menu,mega_menu,filters,gallery,listing_form}_controller.js` — `mega-menu` hover/focus panels (Esc + focusout close), `filters` mobile `<dialog>` sheet + auto-submit, `gallery` swipe/keyboard carousel, `listing_form` category-picker Turbo-Frame reload + title counter + photo drag-drop previews/client-side limits + tag limit |
+| Sell area (3a) | `app/controllers/sell/{base,listings,category_fields,submissions,archivals,sale_marks}_controller.rb`, `app/services/listings/{form_attributes,create,update,submit}.rb`, `app/services/stores/ensure_for.rb`, `app/models/es_province.rb` (+ `config/data/es_provinces.yml`), `app/views/sell/listings/{index,new,edit,_form}.html.erb`, `app/views/sell/category_fields/{show,_picker,_spec_fields}.html.erb`, `app/views/shared/_error_summary.html.erb`, `app/helpers/sell/listings_helper.rb` (status badges) |
 | Browse & search (2b) | `app/services/listing_search.rb` (`Result` struct, one facet-count query, `with_card_includes`), `app/controllers/{listings,categories,stores}_controller.rb` (skinny; `search_params` + `current_country_code` in `ApplicationController`), `app/helpers/listings_helper.rb` (`money`, `spec_value_label`, `stars`, `applied_filter_chips`, `facet_options*`, `listing_photo_tag`, `photo_variant_tag`, breadcrumbs, `url_without_filter`), `app/jobs/listing_view_job.rb` (view counter) |
 | Browse UI (2b) | `app/views/listings/{index,_browse,_filters,_results,show,_show_specs,_show_shipping}.html.erb` (also rendered by `CategoriesController#show` — no separate category template — and by `StoresController#show`), `app/views/shared/{_listing_card,_card_rail}.html.erb`, `app/views/stores/show.html.erb` (tabs `?tab=listings|about|reviews`), `app/views/pages/home.html.erb` + `app/views/pages/home/{hero,categories,deals,newest,gpus,saved,sold,trust,newsletter}.html.erb` |
 | Taxonomy | `category.rb` (self-referential `parent_id`, JSONB `names` locale maps, recursive CTEs `self_and_descendant_ids`/`self_and_ancestor_ids`, FriendlyId; NOTE `categories.listings_count` is a plain counter_cache of ALL listings including drafts/rejected — public per-category counts must query `Listing.published`/`visible`), `spec_attribute.rb` (`key`, JSONB names, `input_type` enum with `prefix: true`) + `spec_option.rb` + join `category_spec_attribute.rb` — spec attributes attach to any category and are inherited down the tree (`Category#all_spec_attributes`) |
@@ -151,13 +184,13 @@ category pages, listing pages and seller storefronts, all read-only. Listing cre
 | Seeds (Phase 2a) | `db/seeds.rb` (loads `db/seeds/support/seed_loader.rb` + one loader per concern, idempotent upserts), raw data `db/seeds/data/{categories,spec_attributes,category_spec_attributes,labels,seller_tags}.yml` — counts: 61 categories, 34 spec attributes, 293 options, 88 category attachments, 13 labels, 21 seller tags, 6 countries, 4 settings |
 | Seeds (Phase 2b, dev-only) | `db/seeds/sample_listings.rb` early-returns unless `Rails.env.development?`; seeds 5 sample sellers (store + user each), 41 listings across the taxonomy (labels, seller tags, JSONB specs, favorites/views counters, `status: sold` on a few indexes, `featured_until = 7.days.from_now` on the featured ones), 13 reviews through delivered orders, then attaches 80 generated 1200×900 placeholder photos (ImageMagick gradients cached in `tmp/sample_photos/` — no fonts on this box, so no text overlay). Idempotent: re-running creates 0 records. Dev DB after seeding: 42 listings (39 approved, 3 sold), 80 attachments, 13 reviews, 5 sample stores |
 | Migrations | Phase 0: `20261116205301…205400`. Phase 1 domain: `db/migrate/20261117090001`–`20261117090033` (countries, settings, stores, categories, spec_*, listings + tsv trigger/GIN, labels/tags/moderation, favorites/follows, saved_searches, conversations/messages/blocks, offers, carts/cart_items, addresses/orders/order_items, reviews, notifications, newsletter, legal_pages, api_tokens, user ban fields, active_storage). Schema dump: `db/structure.sql` (schema_format: sql in `config/database.yml`) |
-| Tests | `test/models/user_test.rb`, `test/models/{listing,category,setting,country,api_token,review,favorite}_test.rb`, `test/services/{commission_calculator,listing_search}_test.rb`, `test/controllers/{pages,listings,categories,stores,sessions,passwords}_controller_test.rb`, `test/helpers/listings_helper_test.rb`, `test/test_helpers/session_test_helper.rb` (`sign_in_as`); fixtures for users/countries/categories/spec_*/labels/seller_tags/stores/listings/orders/files. `test_helper.rb`: `I18n.default_locale = :en`, `routes.default_url_options[:locale] = :en`, and a **global** `setup { Listing.reindex_search_vectors! }` (fixture INSERTs do not fire `trg_listings_tsv`, which only fires on UPDATE of title/description). `listings_controller_test.rb` also guards against N+1 by counting `sql.active_record` notifications |
+| Tests | `test/models/user_test.rb`, `test/models/{listing,category,setting,country,api_token,review,favorite}_test.rb`, `test/services/{commission_calculator,listing_search}_test.rb`, `test/controllers/{pages,listings,categories,stores,sessions,passwords}_controller_test.rb`, `test/integration/sell_listings_test.rb` (3a: auth/banned, scoping 404s, tabs, draft+store, submit+admin notify, material vs price edits, photo/spec validation messages), `test/helpers/listings_helper_test.rb`, `test/test_helpers/session_test_helper.rb` (`sign_in_as`); fixtures for users (incl. `banned`)/countries/categories/spec_*/labels/seller_tags/stores/listings/orders/files. `test_helper.rb`: `I18n.default_locale = :en`, `routes.default_url_options[:locale] = :en`, and a **global** `setup { Listing.reindex_search_vectors! }` (fixture INSERTs do not fire `trg_listings_tsv`, which only fires on UPDATE of title/description). `listings_controller_test.rb` also guards against N+1 by counting `sql.active_record` notifications |
 
 ## Open items (next phases)
 
-- Seller dashboard phase: create/edit listing + publish flow (`submit_for_review!` →
-  admin approval), photo upload form, mark-sold, favourites/wishlist persistence.
-  Phase 2b left the buy/favourite/sell CTAs as `#` links or disabled buttons on purpose.
+- Seller follow-ups: favourites/wishlist persistence, per-listing edit of
+  labels, seller store settings UI. (Listing create/edit, publish flow,
+  photo upload, mark-sold and archiving shipped in Phase 3a.)
 - Cart/checkout (Stripe, flag `stripe_checkout`), "Sell to us" (flag `sell_to_us`), commissions (flag `commissions`, `CommissionCalculator` + `Order#apply_commission!` ready).
 - Google login (flag `google_login`), email confirmation (`confirmed_at` exists but is unused).
 - `/api/v1` namespace (`ApiToken.authenticate` ready), sitemap_generator config, meta-tags per-page SEO.

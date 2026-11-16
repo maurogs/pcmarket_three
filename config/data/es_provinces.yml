@@ -1,0 +1,56 @@
+# Spanish provinces for the listing location picker: the 50 provinces plus the
+# two autonomous cities (Ceuta and Melilla). `code` is the INE two-digit code;
+# `name` is the province name, a proper noun shared across all locales (same
+# approach as the seeded taxonomy's display strings). `region` groups
+# provinces by autonomous community so the select can use option groups.
+- { code: "15", name: A Coruña, region: Galicia }
+- { code: "01", name: Álava, region: País Vasco }
+- { code: "02", name: Albacete, region: Castilla-La Mancha }
+- { code: "03", name: Alicante, region: Comunidad Valenciana }
+- { code: "04", name: Almería, region: Andalucía }
+- { code: "33", name: Asturias, region: Asturias }
+- { code: "05", name: Ávila, region: Castilla y León }
+- { code: "06", name: Badajoz, region: Extremadura }
+- { code: "07", name: Illes Balears, region: Illes Balears }
+- { code: "08", name: Barcelona, region: Catalunya }
+- { code: "09", name: Burgos, region: Castilla y León }
+- { code: "10", name: Cáceres, region: Extremadura }
+- { code: "11", name: Cádiz, region: Andalucía }
+- { code: "12", name: Castellón, region: Comunidad Valenciana }
+- { code: "13", name: Ciudad Real, region: Castilla-La Mancha }
+- { code: "14", name: Córdoba, region: Andalucía }
+- { code: "16", name: Cuenca, region: Castilla-La Mancha }
+- { code: "17", name: Girona, region: Catalunya }
+- { code: "18", name: Granada, region: Andalucía }
+- { code: "19", name: Guadalajara, region: Castilla-La Mancha }
+- { code: "20", name: Guipúzcoa, region: País Vasco }
+- { code: "21", name: Huelva, region: Andalucía }
+- { code: "22", name: Huesca, region: Aragón }
+- { code: "23", name: Jaén, region: Andalucía }
+- { code: "26", name: La Rioja, region: La Rioja }
+- { code: "25", name: Lleida, region: Catalunya }
+- { code: "27", name: Lugo, region: Galicia }
+- { code: "28", name: Madrid, region: Comunidad de Madrid }
+- { code: "29", name: Málaga, region: Andalucía }
+- { code: "30", name: Murcia, region: Región de Murcia }
+- { code: "31", name: Navarra, region: Navarra }
+- { code: "32", name: Ourense, region: Galicia }
+- { code: "34", name: Palencia, region: Castilla y León }
+- { code: "35", name: Las Palmas, region: Canarias }
+- { code: "36", name: Pontevedra, region: Galicia }
+- { code: "37", name: Salamanca, region: Castilla y León }
+- { code: "38", name: Santa Cruz de Tenerife, region: Canarias }
+- { code: "39", name: Cantabria, region: Cantabria }
+- { code: "40", name: Segovia, region: Castilla y León }
+- { code: "41", name: Sevilla, region: Andalucía }
+- { code: "42", name: Soria, region: Castilla y León }
+- { code: "43", name: Tarragona, region: Catalunya }
+- { code: "44", name: Teruel, region: Aragón }
+- { code: "45", name: Toledo, region: Castilla-La Mancha }
+- { code: "46", name: Valencia, region: Comunidad Valenciana }
+- { code: "47", name: Valladolid, region: Castilla y León }
+- { code: "48", name: Vizcaya, region: País Vasco }
+- { code: "49", name: Zamora, region: Castilla y León }
+- { code: "50", name: Zaragoza, region: Aragón }
+- { code: "51", name: Ceuta, region: Ceuta }
+- { code: "52", name: Melilla, region: Melilla }

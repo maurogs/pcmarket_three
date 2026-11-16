@@ -78,7 +78,8 @@ draft:
   condition: used_good
   status: draft
   specs:
-    vram: 10GB
+    vram: 8GB
+    negotiable: true
 
 pending:
   user: one

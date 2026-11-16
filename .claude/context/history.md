@@ -1,5 +1,71 @@
 # History
 
+## 2026-11-16 — Phase 3a: seller listing management (sell namespace CRUD, review submission, photo upload)
+
+**What changed**
+
+- Routes: `namespace :sell { resources :listings }` plus singular POST-only
+  `resource :submission` / `:archival` / `:sale_mark` nested under listings and
+  `resources :category_fields, only: :show` (Turbo Frame endpoint, lookup by
+  **category** slug). All inside the locale scope; `Sell::BaseController`
+  requires authentication and redirects banned users (`User#banned?`) to root
+  with the suspension alert. Header CTAs ("List an item", mega-menu, mobile
+  menu) now link to `new_sell_listing_path` instead of `#`.
+- `Sell::ListingsController`: every lookup via
+  `current_user.listings.friendly.find` → other sellers' listings are 404.
+  Index has status tabs (all/draft/pending_review/approved/rejected/sold/
+  archived) with per-tab counts from ONE `group(:status)` query
+  (`Listing.status_counts`) and pagy (`results_pagination`). Destroy only for
+  draft/rejected/archived (`Listing#destroyable?`), otherwise 422 + inline
+  message.
+- Services: `Listings::FormAttributes` (euro-string → cents with ES thousand
+  separators, category slug resolution, spec normalisation/casting per
+  `input_type`, seller-tag slugs, allow_offers tri-state), `Listings::Create`
+  (auto-creates the seller's individual store via `Stores::EnsureFor` on first
+  listing, name = username), `Listings::Update` (MATERIAL columns + photo
+  changes on an APPROVED listing → `request_revalidation!` back to
+  pending_review; price/shipping/location edits keep it live; attach/purge
+  inside the transaction so failed saves roll photos back), `Listings::Submit`
+  (submit_for_review! + batched admin `Notification.insert_all` in one txn).
+- Model additions: `Listing#archive!`, `#request_revalidation!`,
+  `#destroyable?`, `.status_counts`; validations for postal code format
+  (`POSTAL_CODE_FORMATS`), ES province names (`EsProvince` + `config/data/
+  es_provinces.yml`), photo content types/sizes/count, seller-tag limit,
+  `validate_required_specs` on the `:submission` context only (unknown spec
+  keys/values rejected in ALL contexts; boolean `false` counts as present).
+- Form: single page (`sell/listings/_form`) driven by new Stimulus
+  `listing_form_controller.js` — category picker reloads `#spec_fields` Turbo
+  Frame from `sell_category_field_path(category_slug)`, title counter, photo
+  input + drag-drop with client-side I18n error messages, tag limit. Server
+  re-render only shows persisted, image-type attachments (rolled-back
+  attachments can't be varianted). "Save draft"/"Submit for review" are two
+  submit buttons distinguished by top-level `intent` param.
+- Errors: `shared/_error_summary` partial + `activerecord.errors.messages`
+  keys (spec_key_unknown, spec_required, spec_value_*, photo_*,
+  original_price_below_price, invalid_postal_code, province_unknown…).
+- Fixtures/tests: `users(:banned)` added; draft fixture specs fixed to match
+  category spec attributes. `test/integration/sell_listings_test.rb` (20
+  tests): auth + banned, index scoping/tabs, draft+store creation, submit +
+  admin notification, 404 across sell area for foreign listings, material vs
+  price-only edit rules, submission endpoint, archive/sold/destroy rules,
+  photo + spec validation messages, category_fields frame.
+
+**Gotchas learned**
+
+- `Listing.human_attribute_name(:condition)` raises — the node is a hash;
+  use `t("listings.filters.condition")` for the legend.
+- Form param names must match what the services read: form posts
+  `listing[price]` / `[original_price]` / `[shipping_price]` as EURO strings
+  (never the `_cents` columns), and `FormAttributes` guards every field with
+  `raw.key?(…)` so partial PATCHes don't nil out prices.
+- `permit(specs: {})` passes arbitrary scalar spec values through; unknown
+  keys surface as model validation errors rather than dropped params.
+- Controllers must rescue with `=> e` when re-raising message (submissions
+  `RecordInvalid` alert).
+
+**Verification**: 158 runs / 993 assertions / 0F / 0E; rubocop clean (152
+files); locale lint: 567 keys × 6 files; tailwind build clean. Not committed.
+
 ## 2026-11-16 — Fix: shared-cache leak on listing and store pages
 
 **What changed**

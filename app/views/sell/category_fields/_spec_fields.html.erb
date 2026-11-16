@@ -1,0 +1,78 @@
+<%# Dynamic spec fields for the category: one input per all_spec_attributes
+    entry (select / multi-select / number / text / boolean). Required ones
+    are marked; emptiness is only enforced on submission (model side). %>
+<% attributes = category.all_spec_attributes %>
+<% required_map = category.spec_attribute_required_map %>
+<% specs = (defined?(@listing) && @listing&.specs) || {} %>
+<% if attributes.any? %>
+  <fieldset class="mt-4 border-t border-border pt-4">
+    <legend class="text-sm font-semibold text-text"><%= t("sell.form.specs.title") %></legend>
+    <p class="mt-1 text-xs text-muted">
+      <span class="text-accent" aria-hidden="true">*</span> <%= t("sell.form.specs.required_note") %>
+    </p>
+    <div class="mt-3 grid gap-4 sm:grid-cols-2">
+      <% attributes.each do |attribute| %>
+        <% required = required_map[attribute.id] %>
+        <% value = specs[attribute.key] %>
+        <div>
+          <label class="block text-sm font-medium text-text" for="listing_spec_<%= attribute.key %>">
+            <%= attribute.name %>
+            <% if required %>
+              <span class="text-accent" aria-hidden="true">*</span>
+            <% end %>
+            <% if attribute.unit.present? %>
+              <span class="text-xs text-muted">(<%= attribute.unit %>)</span>
+            <% end %>
+          </label>
+
+          <% case attribute.input_type %>
+          <% when "select" %>
+            <%= select_tag "listing[specs][#{attribute.key}]",
+                  options_from_collection_for_select(attribute.spec_options, :value, :name, value),
+                  prompt: t("sell.form.specs.prompt"),
+                  id: "listing_spec_#{attribute.key}",
+                  class: "mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text focus:border-primary focus:outline-none" %>
+          <% when "multi_select" %>
+            <div class="mt-1 flex flex-wrap gap-x-4 gap-y-1" role="group" aria-labelledby="listing_spec_<%= attribute.key %>">
+              <%= hidden_field_tag "listing[specs][#{attribute.key}][]", "", id: nil %>
+              <% Array(value).each do |selected_value| %>
+                <% # keep values that are no longer offered visible, otherwise they'd vanish silently %>
+                <% unless attribute.spec_options.any? { |o| o.value == selected_value } %>
+                  <label class="inline-flex min-h-11 items-center gap-2 text-sm text-muted">
+                    <%= check_box_tag "listing[specs][#{attribute.key}][]", selected_value, true, class: "size-4 rounded border-border accent-primary" %>
+                    <%= selected_value %>
+                  </label>
+                <% end %>
+              <% end %>
+              <% attribute.spec_options.each do |option| %>
+                <label class="inline-flex min-h-11 items-center gap-2 text-sm text-text">
+                  <%= check_box_tag "listing[specs][#{attribute.key}][]", option.value,
+                        Array(value).include?(option.value),
+                        class: "size-4 rounded border-border accent-primary" %>
+                  <%= option.name %>
+                </label>
+              <% end %>
+            </div>
+          <% when "number" %>
+            <%= number_field_tag "listing[specs][#{attribute.key}]", value,
+                  step: "any",
+                  id: "listing_spec_#{attribute.key}",
+                  class: "mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text focus:border-primary focus:outline-none" %>
+          <% when "boolean" %>
+            <%= select_tag "listing[specs][#{attribute.key}]",
+                  options_for_select([[t("helpers.boolean.yes"), "true"], [t("helpers.boolean.no"), "false"]],
+                                     value.nil? ? nil : (value ? "true" : "false")),
+                  prompt: t("sell.form.specs.prompt"),
+                  id: "listing_spec_#{attribute.key}",
+                  class: "mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text focus:border-primary focus:outline-none" %>
+          <% else %>
+            <%= text_field_tag "listing[specs][#{attribute.key}]", value,
+                  maxlength: 200,
+                  id: "listing_spec_#{attribute.key}",
+                  class: "mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text focus:border-primary focus:outline-none" %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </fieldset>
+<% end %>

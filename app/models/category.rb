@@ -48,16 +48,14 @@ class Category < ApplicationRecord
   # Own spec attributes plus those inherited from every ancestor category
   # (one recursive CTE walking up the parent chain).
   def all_spec_attributes
-    rows = CategorySpecAttribute
-      .where(category_id: self_and_ancestor_ids)
-      .joins(:spec_attribute)
-      .order("spec_attributes.position ASC, category_spec_attributes.category_id ASC")
-    unique_by_spec = {}
-    rows.each do |row|
-      existing = unique_by_spec[row.spec_attribute_id]
-      unique_by_spec[row.spec_attribute_id] = row if existing.nil? || row.category_id == id
-    end
-    SpecAttribute.where(id: unique_by_spec.keys).includes(:spec_options).order(position: :asc, id: :asc).to_a
+    spec_attribute_rows
+      .then { |rows| SpecAttribute.where(id: rows.keys).includes(:spec_options).order(position: :asc, id: :asc).to_a }
+  end
+
+  # spec_attribute_id => required flag for every attribute usable in this
+  # category (own attachments win over inherited ones).
+  def spec_attribute_required_map
+    spec_attribute_rows.transform_values(&:required)
   end
 
   def leaf?
@@ -80,6 +78,23 @@ class Category < ApplicationRecord
   end
 
   private
+
+  # Join rows for every spec attribute attached to this category or an
+  # ancestor; own-category attachments override inherited ones.
+  def spec_attribute_rows
+    @spec_attribute_rows ||= begin
+      rows = CategorySpecAttribute
+        .where(category_id: self_and_ancestor_ids)
+        .joins(:spec_attribute)
+        .order("spec_attributes.position ASC, category_spec_attributes.category_id ASC")
+      unique_by_spec = {}
+      rows.each do |row|
+        existing = unique_by_spec[row.spec_attribute_id]
+        unique_by_spec[row.spec_attribute_id] = row if existing.nil? || row.category_id == id
+      end
+      unique_by_spec
+    end
+  end
 
   def translated(hash)
     locale = I18n.locale.to_s

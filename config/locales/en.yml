@@ -252,6 +252,15 @@ en:
   activerecord:
     errors:
       messages:
+        spec_key_unknown: contains an unknown specification (%{attribute})
+        spec_required: '%{attribute} is required'
+        spec_value_invalid: '%{attribute} has an invalid value'
+        spec_value_number: '%{attribute} must be a number'
+        spec_value_boolean: '%{attribute} must be yes or no'
+        original_price_below_price: must be higher than the current price
+        invalid_postal_code: must be a valid five-digit Spanish postcode
+        seller_tag_limit: cannot be more than %{count} tags
+        province_unknown: is not a known Spanish province
         photo_limit_exceeded: can't be more than %{count} photos
         photo_content_type_invalid: must be a JPEG, PNG or WebP image
         photo_too_large: must be %{max} MB or smaller
@@ -389,6 +398,7 @@ en:
         shipping_price_cents: Shipping price
         free_shipping: Free shipping
         allow_offers: Accept offers
+        seller_tags: Seller tags
         featured_until: Featured until
         published_at: Published at
         sold_at: Sold at
@@ -544,6 +554,10 @@ en:
         banned_at: Banned at
         ban_reason: Ban reason
   shared:
+    error_summary:
+      title:
+        one: Please fix %{count} problem
+        other: Please fix %{count} problems
     listing_card:
       labels: Tags
       sold_out: Sold out
@@ -590,3 +604,101 @@ en:
   date:
     formats:
       delivery: "%-d %B"
+  sell:
+    banned_alert: Your account is suspended, so you cannot manage listings.
+    form:
+      category_root: Category
+      category_prompt: Choose a category…
+      category:
+        child_label: Subcategory
+        child_prompt: Choose a subcategory…
+      specs:
+        title: Technical specifications
+        prompt: Choose…
+        required_note: Fields marked * must be filled in before submitting for review.
+      sections:
+        category: Category
+        basics: Details
+        pricing: Price
+        photos: Photos
+        location: Location
+        shipping: Delivery and tags
+      condition_explanations:
+        brand_new: Sealed, unused product with full warranty.
+        open_box: Unused return or ex-display unit; original packaging may be missing.
+        used_like_new: Barely used and in perfect working order.
+        used_good: Used but fully working, with normal signs of wear.
+        for_parts: Not working or partly working; sold for spare parts.
+      fields:
+        price: Price (€)
+        original_price: Original price (optional)
+        original_price_hint: Reference price shown crossed out
+        original_price_note: Must be higher than the current price.
+        follow_store: Use my store's default
+        province: Province
+        province_prompt: Choose a province…
+        shipping_price: Shipping cost (€)
+        shipping_price_note: Leave blank to calculate shipping at checkout.
+      photos:
+        hint: Up to %{count} photos (JPEG, PNG or WebP), %{max} MB each.
+        drop_title: Add photos
+        drop_hint: Click to browse or drag files here
+        remove: Remove
+        too_many: You can add up to %{count} photos.
+        wrong_type: Only JPEG, PNG and WebP images are allowed.
+        too_large: Each photo must be %{max} MB or smaller.
+      tags:
+        title: Seller tags
+        hint: Choose up to %{count} tags to help buyers find you.
+        too_many: You can choose up to %{count} tags.
+      submit_for_review: Submit for review
+      save_draft: Save as draft
+      cancel: Cancel
+    listings:
+      new:
+        title: List an item
+      edit:
+        title: Edit listing
+        updated_at: Last updated %{time} ago
+        live_edit_warning: Changing the title, description, photos or specifications sends the listing back to review. Price and stock updates stay live.
+      index:
+        title: My listings
+        subtitle: Create, review and manage everything you sell on PCMarket.
+        new_listing: List an item
+        empty: You have no listings here yet.
+        confirm_sold: Mark this listing as sold?
+        confirm_delete: Delete this listing for good?
+        tabs:
+          all: All
+          draft: Drafts
+          pending_review: In review
+          approved: Live
+          rejected: Rejected
+          sold: Sold
+          archived: Archived
+        actions:
+          edit: Edit
+          submit: Submit for review
+          mark_sold: Mark as sold
+          archive: Archive
+          delete: Delete
+      create:
+        draft_saved: Draft saved.
+        submitted: Your listing is now pending review.
+      update:
+        updated: Listing updated.
+        re_reviewed: Listing updated and sent back to review.
+        submitted: Your listing is now pending review.
+      destroy:
+        destroyed: Listing deleted.
+        destroy_denied: Live or pending listings cannot be deleted. Archive them first.
+    submissions:
+      create:
+        submitted: Listing submitted for review.
+        invalid: 'The listing is not ready for review: %{errors}'
+    archivals:
+      create:
+        archived: Listing archived.
+    sale_marks:
+      create:
+        sold: Listing marked as sold.

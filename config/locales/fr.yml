@@ -258,6 +258,15 @@ fr:
   activerecord:
     errors:
       messages:
+        spec_key_unknown: contient une caractéristique inconnue (%{attribute})
+        spec_required: '%{attribute} est obligatoire'
+        spec_value_invalid: '%{attribute} a une valeur invalide'
+        spec_value_number: '%{attribute} doit être un nombre'
+        spec_value_boolean: '%{attribute} doit être oui ou non'
+        original_price_below_price: doit être supérieur au prix actuel
+        invalid_postal_code: doit être un code postal espagnol à cinq chiffres
+        seller_tag_limit: ne peut pas dépasser %{count} étiquettes
+        province_unknown: n'est pas une province espagnole connue
         photo_limit_exceeded: ne peut pas dépasser %{count} photos
         photo_content_type_invalid: doit être une image JPEG, PNG ou WebP
         photo_too_large: doit peser au maximum %{max} Mo
@@ -395,6 +404,7 @@ fr:
         shipping_price_cents: Frais de livraison
         free_shipping: Livraison gratuite
         allow_offers: Accepter les offres
+        seller_tags: Étiquettes de vendeur
         featured_until: Mis en avant jusqu'au
         published_at: Publiée le
         sold_at: Vendue le
@@ -550,6 +560,10 @@ fr:
         banned_at: Suspendu le
         ban_reason: Motif de la suspension
   shared:
+    error_summary:
+      title:
+        one: "Veuillez corriger %{count} erreur"
+        other: "Veuillez corriger %{count} erreurs"
     listing_card:
       labels: Étiquettes
       sold_out: Vendu
@@ -596,3 +610,101 @@ fr:
   date:
     formats:
       delivery: "%-d %B"
+  sell:
+    banned_alert: Votre compte est suspendu ; vous ne pouvez pas gérer vos annonces.
+    form:
+      category_root: Catégorie
+      category_prompt: Choisir une catégorie…
+      category:
+        child_label: Sous-catégorie
+        child_prompt: Choisir une sous-catégorie…
+      specs:
+        title: Caractéristiques techniques
+        prompt: Choisir…
+        required_note: Les champs marqués d'un * sont obligatoires lors de la soumission en révision.
+      sections:
+        category: Catégorie
+        basics: Détails
+        pricing: Prix
+        photos: Photos
+        location: Lieu
+        shipping: Livraison et étiquettes
+      condition_explanations:
+        brand_new: Produit neuf, scellé et couvert par la garantie.
+        open_box: Retour jamais utilisé ou modèle d'exposition ; emballage d'origine parfois absent.
+        used_like_new: Très peu utilisé et en parfait état de fonctionnement.
+        used_good: Utilisé mais pleinement fonctionnel, avec l'usure normale d'usage.
+        for_parts: Ne fonctionne pas ou partiellement ; vendu pour pièces détachées.
+      fields:
+        price: Prix (€)
+        original_price: Prix d'origine (facultatif)
+        original_price_hint: Prix de référence barré
+        original_price_note: Doit être supérieur au prix actuel.
+        follow_store: Utiliser la valeur par défaut de ma boutique
+        province: Province
+        province_prompt: Choisir une province…
+        shipping_price: Frais de livraison (€)
+        shipping_price_note: Laisser vide pour calculer la livraison au paiement.
+      photos:
+        hint: Jusqu'à %{count} photos (JPEG, PNG ou WebP), %{max} Mo chacune.
+        drop_title: Ajouter des photos
+        drop_hint: Cliquez pour parcourir ou déposez vos fichiers ici
+        remove: Retirer
+        too_many: Vous pouvez ajouter %{count} photos au maximum.
+        wrong_type: Seules les images JPEG, PNG et WebP sont acceptées.
+        too_large: Chaque photo doit peser %{max} Mo ou moins.
+      tags:
+        title: Étiquettes de vendeur
+        hint: Choisissez jusqu'à %{count} étiquettes pour aider les acheteurs à vous trouver.
+        too_many: Vous pouvez choisir %{count} étiquettes au maximum.
+      submit_for_review: Soumettre en révision
+      save_draft: Enregistrer le brouillon
+      cancel: Annuler
+    listings:
+      new:
+        title: Vendre un article
+      edit:
+        title: Modifier l'annonce
+        updated_at: Dernière mise à jour il y a %{time}
+        live_edit_warning: Modifier le titre, la description, les photos ou les caractéristiques renvoie l'annonce en révision. Les changements de prix et de stock restent en ligne.
+      index:
+        title: Mes annonces
+        subtitle: Créez, révisez et gérez tout ce que vous vendez sur PCMarket.
+        new_listing: Vendre un article
+        empty: Vous n'avez aucune annonce pour le moment.
+        confirm_sold: Marquer cette annonce comme vendue ?
+        confirm_delete: Supprimer définitivement cette annonce ?
+        tabs:
+          all: Toutes
+          draft: Brouillons
+          pending_review: En révision
+          approved: En ligne
+          rejected: Refusées
+          sold: Vendues
+          archived: Archivées
+        actions:
+          edit: Modifier
+          submit: Soumettre en révision
+          mark_sold: Marquer comme vendue
+          archive: Archiver
+          delete: Supprimer
+      create:
+        draft_saved: Brouillon enregistré.
+        submitted: Votre annonce est en cours de révision.
+      update:
+        updated: Annonce mise à jour.
+        re_reviewed: Annonce mise à jour et renvoyée en révision.
+        submitted: Votre annonce est en cours de révision.
+      destroy:
+        destroyed: Annonce supprimée.
+        destroy_denied: Les annonces en ligne ou en révision ne peuvent pas être supprimées. Archivez-les d'abord.
+    submissions:
+      create:
+        submitted: Annonce soumise en révision.
+        invalid: "L'annonce n'est pas prête pour la révision : %{errors}"
+    archivals:
+      create:
+        archived: Annonce archivée.
+    sale_marks:
+      create:
+        sold: Annonce marquée comme vendue.

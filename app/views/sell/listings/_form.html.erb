@@ -1,0 +1,256 @@
+<%# Single-page seller listing form. Sections: category (Turbo Frame driven),
+    basics, pricing, photos, location, shipping and tags. The two submit
+    buttons carry name="intent" so the controller knows draft vs review. %>
+<%= form_with model: @listing,
+      url: @listing.persisted? ? sell_listing_path(@listing) : sell_listings_path,
+      html: {
+        multipart: true,
+        data: {
+          controller: "listing-form",
+          listing_form_category_fields_base_value: sell_category_field_path("PLACEHOLDER").sub("PLACEHOLDER", ""),
+          listing_form_max_photos_value: Listing::MAX_PHOTOS,
+          listing_form_max_bytes_value: Listing::MAX_PHOTO_BYTES,
+          listing_form_accept_value: Listing::PHOTO_CONTENT_TYPES.join(","),
+          listing_form_max_tags_value: Listing::MAX_SELLER_TAGS,
+          listing_form_msg_too_many_value: t("sell.form.photos.too_many", count: Listing::MAX_PHOTOS),
+          listing_form_msg_type_value: t("sell.form.photos.wrong_type"),
+          listing_form_msg_too_large_value: t("sell.form.photos.too_large", max: Listing::MAX_PHOTO_BYTES / 1.megabyte),
+          listing_form_msg_too_many_tags_value: t("sell.form.tags.too_many", count: Listing::MAX_SELLER_TAGS),
+          listing_form_msg_remove_value: t("sell.form.photos.remove"),
+          listing_form_title_max_value: 120
+        }
+      } do |form| %>
+
+  <%= render "shared/error_summary", resource: @listing %>
+
+  <%# --- Category + dynamic specs -------------------------------------- %>
+  <section class="card p-4 sm:p-6">
+    <h2 class="text-lg font-semibold text-text"><%= t("sell.form.sections.category") %></h2>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+      <div>
+        <%= form.label :category_root, t("sell.form.category_root"), class: "block text-sm font-medium text-text" %>
+        <%= select_tag "listing[category_root]",
+              options_from_collection_for_select(Category.roots.active.ordered, :slug, :name, @category_root),
+              prompt: t("sell.form.category_prompt"),
+              id: "listing_category_root",
+              class: "mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text focus:border-primary focus:outline-none",
+              data: { action: "listing-form#rootChanged", listing_form_target: "rootSelect" } %>
+      </div>
+    </div>
+
+    <turbo-frame id="spec_fields" data-listing-form-target="specFrame">
+      <% if @picker_category %>
+        <%= render "sell/category_fields/picker", category: @picker_category %>
+      <% end %>
+    </turbo-frame>
+  </section>
+
+  <%# --- Basics ---------------------------------------------------------- %>
+  <section class="card mt-4 p-4 sm:p-6">
+    <h2 class="text-lg font-semibold text-text"><%= t("sell.form.sections.basics") %></h2>
+
+    <div class="mt-4">
+      <%= form.label :title, class: "block text-sm font-medium text-text" %>
+      <%= form.text_field :title, required: true, maxlength: 120,
+            class: "mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-muted focus:border-primary focus:outline-none",
+            data: { action: "input->listing-form#updateCounter", listing_form_target: "titleInput" } %>
+      <p class="mt-1 text-xs text-muted">
+        <span data-listing-form-target="titleCounter">0</span> / 120
+      </p>
+    </div>
+
+    <div class="mt-4">
+      <%= form.label :description, class: "block text-sm font-medium text-text" %>
+      <%= form.text_area :description, rows: 6,
+            class: "mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-muted focus:border-primary focus:outline-none" %>
+    </div>
+
+    <fieldset class="mt-6">
+      <legend class="text-sm font-medium text-text"><%= t("listings.filters.condition") %></legend>
+      <div class="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        <% Listing.conditions.each_key do |name| %>
+          <label class="flex min-h-11 cursor-pointer items-start gap-3 rounded-lg border border-border bg-surface p-3 transition has-[:checked]:border-primary has-[:checked]:ring-1 has-[:checked]:ring-primary">
+            <%= form.radio_button :condition, name, class: "mt-1 size-4 accent-primary" %>
+            <span>
+              <span class="block text-sm font-medium text-text"><%= Listing.human_attribute_name("condition.#{name}") %></span>
+              <span class="mt-0.5 block text-xs text-muted"><%= t("sell.form.condition_explanations.#{name}") %></span>
+            </span>
+          </label>
+        <% end %>
+      </div>
+    </fieldset>
+  </section>
+
+  <%# --- Pricing --------------------------------------------------------- %>
+  <section class="card mt-4 p-4 sm:p-6">
+    <h2 class="text-lg font-semibold text-text"><%= t("sell.form.sections.pricing") %></h2>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div>
+        <%= form.label :price, t("sell.form.fields.price"), class: "block text-sm font-medium text-text" %>
+        <div class="relative mt-1">
+          <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-muted">€</span>
+          <% price_value = @listing.price_cents ? ("%.2f" % (BigDecimal(@listing.price_cents) / 100)) : nil %>
+          <%= number_field_tag "listing[price]", price_value, id: "listing_price", step: 0.01, min: 0.01, required: true,
+                class: "w-full rounded-md border border-border bg-surface py-2 pl-7 pr-3 text-sm text-text placeholder:text-muted focus:border-primary focus:outline-none" %>
+        </div>
+      </div>
+      <div>
+        <%= form.label :original_price, t("sell.form.fields.original_price"), class: "block text-sm font-medium text-text" %>
+        <div class="relative mt-1">
+          <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-muted">€</span>
+          <% original_value = @listing.original_price_cents ? ("%.2f" % (BigDecimal(@listing.original_price_cents) / 100)) : nil %>
+          <%= number_field_tag "listing[original_price]", original_value, id: "listing_original_price", step: 0.01, min: 0.01,
+                placeholder: t("sell.form.fields.original_price_hint"),
+                class: "w-full rounded-md border border-border bg-surface py-2 pl-7 pr-3 text-sm text-text placeholder:text-muted focus:border-primary focus:outline-none" %>
+        </div>
+        <p class="mt-1 text-xs text-muted"><%= t("sell.form.fields.original_price_note") %></p>
+      </div>
+      <div>
+        <%= form.label :quantity, class: "block text-sm font-medium text-text" %>
+        <%= form.number_field :quantity, min: 1, required: true,
+              class: "mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text focus:border-primary focus:outline-none" %>
+      </div>
+      <div>
+        <%= form.label :allow_offers, class: "block text-sm font-medium text-text" %>
+        <%= form.select :allow_offers,
+              [[t("helpers.boolean.yes"), "true"], [t("helpers.boolean.no"), "false"]],
+              include_blank: t("sell.form.fields.follow_store"),
+              class: "mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text focus:border-primary focus:outline-none" %>
+      </div>
+    </div>
+  </section>
+
+  <%# --- Photos ---------------------------------------------------------- %>
+  <section class="card mt-4 p-4 sm:p-6">
+    <h2 class="text-lg font-semibold text-text"><%= t("sell.form.sections.photos") %></h2>
+    <p class="mt-1 text-xs text-muted">
+      <%= t("sell.form.photos.hint", count: Listing::MAX_PHOTOS, max: Listing::MAX_PHOTO_BYTES / 1.megabyte) %>
+    </p>
+
+    <%# Only persisted, transformed-safe photos here: after a failed save the
+        rolled-back attachments would blow up in photo_variant_tag. %>
+    <% persisted_photos = @listing.photos.select do |photo| %>
+      <% photo.blob&.persisted? && Listing::PHOTO_CONTENT_TYPES.include?(photo.content_type) %>
+    <% end %>
+    <% if persisted_photos.any? %>
+      <ul class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
+        <% persisted_photos.each do |photo| %>
+          <li class="rounded-lg border border-border p-2">
+            <div class="aspect-square overflow-hidden rounded-md bg-surface-muted">
+              <%= photo_variant_tag(photo, variant: :card, alt: photo.filename.to_s) %>
+            </div>
+            <label class="mt-2 flex min-h-9 cursor-pointer items-center gap-2 text-xs text-muted">
+              <%= check_box_tag "listing[remove_photo_ids][]", photo.id, false,
+                    class: "size-4 rounded border-border accent-red-600" %>
+              <%= t("sell.form.photos.remove") %>
+            </label>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <div data-listing-form-target="dropzone"
+         data-action="dragover->listing-form#dragover dragleave->listing-form#dragleave drop->listing-form#drop click->listing-form#openPicker"
+         class="mt-4 flex min-h-32 cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border bg-surface-muted p-4 text-center transition hover:border-primary">
+      <%= inline_icon :image, classes: "size-8 text-muted" %>
+      <p class="text-sm font-medium text-text"><%= t("sell.form.photos.drop_title") %></p>
+      <p class="text-xs text-muted"><%= t("sell.form.photos.drop_hint") %></p>
+    </div>
+    <%= file_field_tag "listing[photos][]", multiple: true,
+          accept: Listing::PHOTO_CONTENT_TYPES.join(","),
+          class: "hidden",
+          data: { action: "change->listing-form#filesChanged", listing_form_target: "fileInput" } %>
+
+    <p class="mt-2 hidden text-sm text-red-600 dark:text-red-400" role="alert"
+       data-listing-form-target="photoError"></p>
+    <ul class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6"
+        data-listing-form-target="previews"></ul>
+  </section>
+
+  <%# --- Location -------------------------------------------------------- %>
+  <section class="card mt-4 p-4 sm:p-6">
+    <h2 class="text-lg font-semibold text-text"><%= t("sell.form.sections.location") %></h2>
+    <div class="mt-4 grid gap-4 sm:grid-cols-3">
+      <div>
+        <%= form.label :city, class: "block text-sm font-medium text-text" %>
+        <%= form.text_field :city,
+              class: "mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text focus:border-primary focus:outline-none" %>
+      </div>
+      <div>
+        <%= form.label :region, t("sell.form.fields.province"), class: "block text-sm font-medium text-text" %>
+        <% province_groups = EsProvince.grouped_by_region.map do |region, provinces|
+             [region, provinces.map { |p| [p.name, p.name] }]
+           end %>
+        <%= form.select :region, province_groups,
+              include_blank: t("sell.form.fields.province_prompt"),
+              class: "mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text focus:border-primary focus:outline-none" %>
+      </div>
+      <div>
+        <%= form.label :postal_code, class: "block text-sm font-medium text-text" %>
+        <%= form.text_field :postal_code, pattern: "\\d{5}", maxlength: 5, inputmode: "numeric",
+              class: "mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text focus:border-primary focus:outline-none" %>
+      </div>
+    </div>
+  </section>
+
+  <%# --- Shipping & tags --------------------------------------------------- %>
+  <section class="card mt-4 p-4 sm:p-6">
+    <h2 class="text-lg font-semibold text-text"><%= t("sell.form.sections.shipping") %></h2>
+    <div class="mt-4 grid gap-3 sm:grid-cols-3">
+      <label class="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-border p-3 text-sm text-text has-[:checked]:border-primary has-[:checked]:ring-1 has-[:checked]:ring-primary">
+        <%= form.check_box :shipping_available, class: "size-4 rounded accent-primary" %>
+        <%= Listing.human_attribute_name(:shipping_available) %>
+      </label>
+      <label class="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-border p-3 text-sm text-text has-[:checked]:border-primary has-[:checked]:ring-1 has-[:checked]:ring-primary">
+        <%= form.check_box :free_shipping, class: "size-4 rounded accent-primary" %>
+        <%= Listing.human_attribute_name(:free_shipping) %>
+      </label>
+      <label class="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-border p-3 text-sm text-text has-[:checked]:border-primary has-[:checked]:ring-1 has-[:checked]:ring-primary">
+        <%= form.check_box :local_pickup, class: "size-4 rounded accent-primary" %>
+        <%= Listing.human_attribute_name(:local_pickup) %>
+      </label>
+    </div>
+
+    <div class="mt-4 max-w-xs">
+      <%= form.label :shipping_price, t("sell.form.fields.shipping_price"), class: "block text-sm font-medium text-text" %>
+      <div class="relative mt-1">
+        <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-muted">€</span>
+        <%= number_field_tag "listing[shipping_price]",
+              (@listing.shipping_price_cents.to_i > 0 ? ("%.2f" % (BigDecimal(@listing.shipping_price_cents) / 100)) : nil),
+              id: "listing_shipping_price",
+              step: 0.01, min: 0,
+              class: "w-full rounded-md border border-border bg-surface py-2 pl-7 pr-3 text-sm text-text focus:border-primary focus:outline-none" %>
+      </div>
+      <p class="mt-1 text-xs text-muted"><%= t("sell.form.fields.shipping_price_note") %></p>
+    </div>
+
+    <div class="mt-6">
+      <h3 class="text-sm font-medium text-text"><%= t("sell.form.tags.title") %></h3>
+      <p class="mt-1 text-xs text-muted"><%= t("sell.form.tags.hint", count: Listing::MAX_SELLER_TAGS) %></p>
+      <div class="mt-2 flex flex-wrap gap-2" data-listing-form-target="tagGroup">
+        <% SellerTag.order(:slug).each do |tag| %>
+          <label class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full border border-border px-3 py-1.5 text-sm text-text transition has-[:checked]:border-primary has-[:checked]:bg-primary/5 has-[:checked]:text-primary">
+            <%= check_box_tag "listing[seller_tag_ids][]", tag.slug,
+                  @listing.seller_tags.include?(tag),
+                  class: "size-4 rounded accent-primary",
+                  data: { action: "listing-form#tagToggled" } %>
+            <%= tag.name %>
+          </label>
+        <% end %>
+      </div>
+      <p class="mt-2 hidden text-sm text-red-600 dark:text-red-400" role="alert"
+         data-listing-form-target="tagError"></p>
+    </div>
+  </section>
+
+  <%# --- Actions ---------------------------------------------------------- %>
+  <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+    <%= form.submit t("sell.form.submit_for_review"), name: "intent", value: "submit",
+          class: "min-h-11 cursor-pointer rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-hover" %>
+    <%= form.submit t("sell.form.save_draft"), name: "intent", value: "draft",
+          class: "min-h-11 cursor-pointer rounded-md border border-border bg-surface px-4 py-2 text-sm font-semibold text-text hover:bg-surface-muted" %>
+    <% if @listing.persisted? %>
+      <%= link_to t("sell.form.cancel"), sell_listings_path, class: "min-h-11 inline-flex items-center px-2 text-sm text-muted hover:text-text" %>
+    <% end %>
+  </div>
+<% end %>

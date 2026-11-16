@@ -1,0 +1,79 @@
+<% content_for :title, t(".title") %>
+
+<div class="mb-6 flex items-center justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-bold text-gray-900"><%= t(".title") %></h1>
+    <p class="mt-1 text-sm text-gray-500"><%= t(".subtitle") %></p>
+  </div>
+  <%= link_to t(".new_listing"), new_sell_listing_path, class: "btn-primary whitespace-nowrap" %>
+</div>
+
+<div class="mb-5 flex flex-wrap gap-1 border-b border-gray-200">
+  <% @tabs.each do |tab| %>
+    <% count = @counts[tab] %>
+    <%= link_to sell_listings_path(tab: tab == "all" ? nil : tab),
+          class: class_names(
+            "rounded-t-lg px-3 py-2 text-sm font-medium",
+            "border-b-2 border-brand-600 text-brand-700" => @tab == tab,
+            "text-gray-500 hover:text-gray-800" => @tab != tab,
+          ) do %>
+      <%= t(".tabs.#{tab}") %>
+      <span class="ml-1 rounded-full bg-gray-100 px-1.5 text-xs text-gray-500"><%= count %></span>
+    <% end %>
+  <% end %>
+</div>
+
+<% if @listings.empty? %>
+  <div class="card-static p-8 text-center">
+    <p class="text-sm text-gray-500"><%= t(".empty") %></p>
+    <%= link_to t(".new_listing"), new_sell_listing_path, class: "btn-primary mt-4 inline-flex" %>
+  </div>
+<% else %>
+  <div class="space-y-3">
+    <% @listings.each do |listing| %>
+      <div class="card-static p-4">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div class="flex min-w-0 items-start gap-4">
+            <div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+              <%= listing_photo_tag(listing) %>
+            </div>
+            <div class="min-w-0">
+              <%= link_to listing.title, listing_path(listing), class: "block truncate font-semibold text-gray-900 hover:text-brand-700" %>
+              <div class="mt-1 flex flex-wrap items-center gap-2 text-sm">
+                <span class="rounded-full px-2 py-0.5 text-xs font-medium <%= status_badge_class(listing.status) %>">
+                  <%= Listing.human_attribute_name("status/#{listing.status}") %>
+                </span>
+                <% if listing.status == "rejected" && listing.rejection_reason.present? %>
+                  <span class="text-xs text-rose-600"><%= listing.rejection_reason %></span>
+                <% end %>
+                <% if listing.category %>
+                  <span class="text-xs text-gray-400"><%= listing.category.name %></span>
+                <% end %>
+              </div>
+              <div class="mt-1 text-sm font-semibold text-gray-900"><%= money(listing.price_cents, listing.currency) %></div>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <%= link_to t(".actions.edit"), edit_sell_listing_path(listing), class: "btn-secondary" %>
+            <% case listing.status %>
+            <% when "draft", "rejected" %>
+              <%= button_to t(".actions.submit"), sell_listing_submission_path(listing), method: :post, class: "btn-primary" %>
+            <% when "approved" %>
+              <%= button_to t(".actions.mark_sold"), sell_listing_sale_mark_path(listing), method: :post,
+                    class: "btn-secondary", form: { data: { turbo_confirm: t(".confirm_sold") } } %>
+              <%= button_to t(".actions.archive"), sell_listing_archival_path(listing), method: :post, class: "btn-secondary" %>
+            <% when "sold" %>
+              <%= button_to t(".actions.archive"), sell_listing_archival_path(listing), method: :post, class: "btn-secondary" %>
+            <% end %>
+            <% if listing.destroyable? %>
+              <%= button_to t(".actions.delete"), sell_listing_path(listing), method: :delete, class: "btn-danger",
+                    form: { data: { turbo_confirm: t(".confirm_delete") } } %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mt-6"><%= results_pagination(@pagy) %></div>
+<% end %>

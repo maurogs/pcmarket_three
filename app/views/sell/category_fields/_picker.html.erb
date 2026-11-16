@@ -1,0 +1,25 @@
+<%# Category picker internals + dynamic spec fields for one category.
+    Rendered inline by the sell form and re-loaded into the #spec_fields
+    Turbo Frame by listing_form_controller.js when a select changes. %>
+<% if category.children.any? && category.parent.nil? %>
+  <div>
+    <%= label_tag "listing_category_child", t("sell.form.category.child_label"), class: "block text-sm font-medium text-text" %>
+    <%= select_tag "listing[category_child]",
+          options_from_collection_for_select(category.children, :slug, :name, nil),
+          prompt: t("sell.form.category.child_prompt"),
+          id: "listing_category_child",
+          class: "mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text focus:border-primary focus:outline-none",
+          data: { action: "listing-form#childChanged" } %>
+  </div>
+<% elsif category.parent %>
+  <div>
+    <%= label_tag "listing_category_child", t("sell.form.category.child_label"), class: "block text-sm font-medium text-text" %>
+    <%= select_tag "listing[category_child]",
+          options_from_collection_for_select(category.parent.children, :slug, :name, category.slug),
+          id: "listing_category_child",
+          class: "mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text focus:border-primary focus:outline-none",
+          data: { action: "listing-form#childChanged" } %>
+  </div>
+<% end %>
+
+<%= render "sell/category_fields/spec_fields", category: category %>

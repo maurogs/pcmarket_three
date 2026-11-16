@@ -256,6 +256,15 @@ pt:
   activerecord:
     errors:
       messages:
+        spec_key_unknown: contém uma especificação desconhecida (%{attribute})
+        spec_required: '%{attribute} é obrigatório'
+        spec_value_invalid: '%{attribute} tem um valor inválido'
+        spec_value_number: '%{attribute} deve ser um número'
+        spec_value_boolean: '%{attribute} deve ser sim ou não'
+        original_price_below_price: deve ser superior ao preço atual
+        invalid_postal_code: deve ser um código postal espanhol de cinco dígitos
+        seller_tag_limit: não pode ter mais de %{count} etiquetas
+        province_unknown: não é um distrito espanhol conhecido
         photo_limit_exceeded: não pode ter mais de %{count} fotografias
         photo_content_type_invalid: deve ser uma imagem JPEG, PNG ou WebP
         photo_too_large: deve pesar no máximo %{max} MB
@@ -393,6 +402,7 @@ pt:
         shipping_price_cents: Portes de envio
         free_shipping: Envio gratuito
         allow_offers: Aceitar ofertas
+        seller_tags: Etiquetas de vendedor
         featured_until: Destacado até
         published_at: Publicado em
         sold_at: Vendido em
@@ -548,6 +558,10 @@ pt:
         banned_at: Banido em
         ban_reason: Motivo do banimento
   shared:
+    error_summary:
+      title:
+        one: Corrija %{count} erro
+        other: Corrija %{count} erros
     listing_card:
       labels: Etiquetas
       sold_out: Esgotado
@@ -594,3 +608,101 @@ pt:
   date:
     formats:
       delivery: "%-d de %B"
+  sell:
+    banned_alert: A sua conta está suspensa, não pode gerir os seus anúncios.
+    form:
+      category_root: Categoria
+      category_prompt: Escolher uma categoria…
+      category:
+        child_label: Subcategoria
+        child_prompt: Escolher uma subcategoria…
+      specs:
+        title: Especificações técnicas
+        prompt: Escolher…
+        required_note: Os campos marcados com * são obrigatórios ao enviar para revisão.
+      sections:
+        category: Categoria
+        basics: Detalhes
+        pricing: Preço
+        photos: Fotos
+        location: Localização
+        shipping: Envio e etiquetas
+      condition_explanations:
+        brand_new: Produto novo, selado e com garantia completa.
+        open_box: Devolução sem uso ou peça de exposição; pode não ter a embalagem original.
+        used_like_new: Pouco usado e em perfeito funcionamento.
+        used_good: Usado mas totalmente funcional, com o desgaste normal do uso.
+        for_parts: Não funciona ou funciona parcialmente; vendido para peças.
+      fields:
+        price: Preço (€)
+        original_price: Preço original (opcional)
+        original_price_hint: Preço de referência riscado
+        original_price_note: Deve ser superior ao preço atual.
+        follow_store: Usar o padrão da minha loja
+        province: Distrito
+        province_prompt: Escolher um distrito…
+        shipping_price: Custo de envio (€)
+        shipping_price_note: Deixe em branco para calcular o envio no pagamento.
+      photos:
+        hint: Até %{count} fotos (JPEG, PNG ou WebP), %{max} MB cada.
+        drop_title: Adicionar fotos
+        drop_hint: Clique para escolher ou arraste os ficheiros para aqui
+        remove: Remover
+        too_many: Pode carregar no máximo %{count} fotos.
+        wrong_type: Só são permitidas imagens JPEG, PNG ou WebP.
+        too_large: Cada foto deve ter %{max} MB ou menos.
+      tags:
+        title: Etiquetas de vendedor
+        hint: Escolha até %{count} etiquetas para os compradores o encontrarem mais facilmente.
+        too_many: Pode escolher no máximo %{count} etiquetas.
+      submit_for_review: Enviar para revisão
+      save_draft: Guardar rascunho
+      cancel: Cancelar
+    listings:
+      new:
+        title: Vender um artigo
+      edit:
+        title: Editar anúncio
+        updated_at: Última atualização há %{time}
+        live_edit_warning: Alterar o título, a descrição, as fotos ou as especificações reenvia o anúncio para revisão. As alterações de preço e stock ficam publicadas diretamente.
+      index:
+        title: Os meus anúncios
+        subtitle: Crie, reveja e faça a gestão de tudo o que vende no PCMarket.
+        new_listing: Vender um artigo
+        empty: Ainda não tem anúncios.
+        confirm_sold: Marcar este anúncio como vendido?
+        confirm_delete: Eliminar definitivamente este anúncio?
+        tabs:
+          all: Todos
+          draft: Rascunhos
+          pending_review: Em revisão
+          approved: Ativos
+          rejected: Rejeitados
+          sold: Vendidos
+          archived: Arquivados
+        actions:
+          edit: Editar
+          submit: Enviar para revisão
+          mark_sold: Marcar como vendido
+          archive: Arquivar
+          delete: Eliminar
+      create:
+        draft_saved: Rascunho guardado.
+        submitted: O seu anúncio está em revisão.
+      update:
+        updated: Anúncio atualizado.
+        re_reviewed: Anúncio atualizado e reenviado para revisão.
+        submitted: O seu anúncio está em revisão.
+      destroy:
+        destroyed: Anúncio eliminado.
+        destroy_denied: Os anúncios ativos ou em revisão não podem ser eliminados. Archive-os primeiro.
+    submissions:
+      create:
+        submitted: Anúncio enviado para revisão.
+        invalid: "O anúncio não está pronto para revisão: %{errors}"
+    archivals:
+      create:
+        archived: Anúncio arquivado.
+    sale_marks:
+      create:
+        sold: Anúncio marcado como vendido.

@@ -17,5 +17,17 @@ Rails.application.routes.draw do
     resource :session
     resources :passwords, param: :token
     resource :registration, only: %i[new create]
+
+    # Seller area (Phase 3a): listing create/edit, review submission, archiving
+    # and mark-sold. Status changes are modelled as nested singular resources
+    # (POST creates a state transition) instead of custom member actions.
+    namespace :sell do
+      resources :listings do
+        resource :submission, only: :create
+        resource :archival, only: :create
+        resource :sale_mark, only: :create
+      end
+      resources :category_fields, only: :show
+    end
   end
 end
