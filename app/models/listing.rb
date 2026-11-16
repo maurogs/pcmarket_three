@@ -83,6 +83,12 @@ class Listing < ApplicationRecord
   scope :in_category_slug, ->(slug) { where(category: Category.where(slug: slug)) }
   scope :recently_sold, -> { where(status: :sold).order(sold_at: :desc, id: :desc) }
 
+  # Most recently rejected listings of one seller, for the dashboard's
+  # "Needs attention" list (rejection_reason carries the admin's note).
+  scope :recently_rejected_for, ->(user) {
+    where(user_id: user.id, status: :rejected).order(updated_at: :desc, id: :desc)
+  }
+
   # Everything a card needs in one round trip: photo attachments plus the
   # store/user/labels/category rendered on the card. Use on every relation that
   # renders cards.

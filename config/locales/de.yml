@@ -28,6 +28,11 @@ de:
     promo_finder_text: Tausende Angebote von Verkäufern im ganzen Land.
     promo_sell_title: Verkaufen Sie Ihre Hardware
     promo_sell_text: Gebrauchte Komponenten in zwei Minuten inserieren.
+    my_store: Mein Shop
+    my_store_dashboard: Dashboard
+    my_store_listings: Meine Angebote
+    my_store_sales: Meine Verkäufe
+    my_store_settings: Shop-Einstellungen
   footer:
     newsletter_title: Newsletter abonnieren
     newsletter_placeholder: Ihre E-Mail-Adresse
@@ -254,16 +259,19 @@ de:
       reviews_count:
         one: "%{count} Bewertung"
         other: "%{count} Bewertungen"
+      vacation_banner: "%{store} macht Urlaub — neue Bestellungen sind pausiert."
+      vacation_cta: Dieser Verkäufer ist derzeit im Urlaub.
   activerecord:
     errors:
       messages:
         spec_key_unknown: enthält eine unbekannte Angabe (%{attribute})
-        spec_required: '%{attribute} ist erforderlich'
-        spec_value_invalid: '%{attribute} hat einen ungültigen Wert'
-        spec_value_number: '%{attribute} muss eine Zahl sein'
-        spec_value_boolean: '%{attribute} muss Ja oder Nein sein'
+        spec_required: "%{attribute} ist erforderlich"
+        spec_value_invalid: "%{attribute} hat einen ungültigen Wert"
+        spec_value_number: "%{attribute} muss eine Zahl sein"
+        spec_value_boolean: "%{attribute} muss Ja oder Nein sein"
         original_price_below_price: muss höher als der aktuelle Preis sein
-        invalid_postal_code: muss eine gültige fünfstellige spanische Postleitzahl sein
+        invalid_postal_code: muss eine gültige fünfstellige spanische Postleitzahl
+          sein
         seller_tag_limit: darf nicht mehr als %{count} Tags enthalten
         province_unknown: ist keine bekannte spanische Provinz
         photo_limit_exceeded: darf nicht mehr als %{count} Fotos haben
@@ -271,6 +279,11 @@ de:
         photo_too_large: darf höchstens %{max} MB wiegen
         cannot_block_self: darf nicht Sie selbst sein
         not_purchasable: ist nicht kaufbar
+        spanish_tax_id_invalid: ist keine gültige spanische Steuer-ID (NIF/CIF/NIE)
+        logo_content_type_invalid: muss ein JPEG-, PNG- oder WebP-Bild sein
+        logo_too_large: muss %{max} MB oder kleiner sein
+        banner_content_type_invalid: muss ein JPEG-, PNG- oder WebP-Bild sein
+        banner_too_large: muss %{max} MB oder kleiner sein
     models:
       address: Adresse
       api_token: API-Token
@@ -463,7 +476,7 @@ de:
           completed: Abgeschlossen
           cancelled: Storniert
           refunded: Erstattet
-          disputed: Fallend
+          disputed: Im Streitfall
         subtotal_cents: Zwischensumme
         shipping_cents: Versand
         commission_cents: Provision
@@ -542,6 +555,12 @@ de:
         followers_count: Follower
         logo: Logo
         banner: Banner
+        city: Stadt
+        region: Provinz
+        returns_policy: Rückgaberichtlinie
+        shipping_policy: Versandrichtlinie
+        default_shipping_cents: Standardversandkosten
+        free_shipping_threshold_cents: Versandkostenfrei-Schwelle
       user:
         username: Benutzername
         email_address: E-Mail-Adresse
@@ -600,6 +619,8 @@ de:
       reviews_count:
         one: "%{count} Bewertung"
         other: "%{count} Bewertungen"
+      vacation_notice: Dieser Shop macht Urlaub. Angebote bleiben sichtbar, aber Käufe
+        sind pausiert.
   helpers:
     boolean:
       'yes': Ja
@@ -620,7 +641,8 @@ de:
       specs:
         title: Technische Daten
         prompt: Auswählen…
-        required_note: Mit * markierte Felder müssen vor der Übermittlung zur Prüfung ausgefüllt sein.
+        required_note: Mit * markierte Felder müssen vor der Übermittlung zur Prüfung
+          ausgefüllt sein.
       sections:
         category: Kategorie
         basics: Details
@@ -630,7 +652,8 @@ de:
         shipping: Versand und Tags
       condition_explanations:
         brand_new: Neu, versiegelt und mit voller Garantie.
-        open_box: Unbenutzte Rücksendung oder Ausstellungsstück; Originalverpackung fehlt möglicherweise.
+        open_box: Unbenutzte Rücksendung oder Ausstellungsstück; Originalverpackung
+          fehlt möglicherweise.
         used_like_new: Kaum benutzt und in einwandfreiem Zustand.
         used_good: Benutzt, aber voll funktionsfähig mit normalen Gebrauchsspuren.
         for_parts: Defekt oder eingeschränkt funktionsfähig; Verkauf als Ersatzteil.
@@ -665,7 +688,9 @@ de:
       edit:
         title: Inserat bearbeiten
         updated_at: Zuletzt aktualisiert vor %{time}
-        live_edit_warning: Änderungen an Titel, Beschreibung, Fotos oder technischen Daten schicken das Inserat erneut in die Prüfung. Preis- und Bestandsänderungen bleiben sofort online.
+        live_edit_warning: Änderungen an Titel, Beschreibung, Fotos oder technischen
+          Daten schicken das Inserat erneut in die Prüfung. Preis- und Bestandsänderungen
+          bleiben sofort online.
       index:
         title: Meine Inserate
         subtitle: Erstelle, prüfe und verwalte, was du auf PCMarket verkaufst.
@@ -696,14 +721,140 @@ de:
         submitted: Dein Inserat wird jetzt geprüft.
       destroy:
         destroyed: Inserat gelöscht.
-        destroy_denied: Aktive oder laufende Inserate können nicht gelöscht werden. Archiviere sie zuerst.
+        destroy_denied: Aktive oder laufende Inserate können nicht gelöscht werden.
+          Archiviere sie zuerst.
     submissions:
       create:
         submitted: Inserat zur Prüfung eingereicht.
-        invalid: "Das Inserat ist nicht bereit für die Prüfung: %{errors}"
+        invalid: 'Das Inserat ist nicht bereit für die Prüfung: %{errors}'
     archivals:
       create:
         archived: Inserat archiviert.
     sale_marks:
       create:
         sold: Inserat als verkauft markiert.
+    sidebar:
+      label: Verkäufermenü
+      dashboard: Dashboard
+      listings: Meine Angebote
+      sales: Meine Verkäufe
+      public_profile: Öffentliches Profil
+      settings: Shop-Einstellungen
+      vacation_on: Urlaubsmodus aktivieren
+      vacation_off: Urlaubsmodus beenden
+    dashboards:
+      show:
+        title: Verkäufer-Dashboard
+        subtitle: Übersicht für %{name}
+        conversion: "%{rate} Conversion (Abschlüsse in 30 Tagen / Aufrufe gesamt)"
+        kpis:
+          live_listings: Aktive Angebote
+          in_review: In Prüfung
+          views: Aufrufe gesamt
+          favorites: Neue Favoriten (30 Tage)
+          sales: Abschlüsse (30 Tage)
+          revenue: Umsatz (30 Tage)
+          revenue_hint: nach Plattformgebühr
+        chart:
+          title: Abschlüsse pro Woche
+          aria: Balkendiagramm der Abschlüsse der letzten %{weeks} Wochen
+          sales:
+            one: "%{count} Verkauf"
+            other: "%{count} Verkäufe"
+        attention:
+          title: Handlungsbedarf
+          rejected: 'Abgelehnt: %{reason}'
+          rejected_generic: Kein Grund angegeben
+          pending_offers:
+            one: "%{count} offenes Angebot"
+            other: "%{count} offene Angebote"
+          offer_line: "%{listing}: Angebot über %{amount}"
+          unanswered:
+            one: "%{count} unbeantwortete Nachricht"
+            other: "%{count} unbeantwortete Nachrichten"
+          all_clear: Alles in Ordnung.
+        top:
+          title: Meistgesehene Angebote
+          views:
+            one: "%{count} Aufruf"
+            other: "%{count} Aufrufe"
+          empty: Noch keine Angebote.
+    stores:
+      edit:
+        title: Shop-Einstellungen
+        subtitle: Öffentliches Profil, Versandkosten und Richtlinien
+        back_to_dashboard: Zurück zum Dashboard
+        sections:
+          profile: Shop-Profil
+          appearance: Darstellung
+          sales: Verkaufseinstellungen
+          shipping: Standardversand
+          payouts: Auszahlungen
+        labels:
+          store_type: Shoptyp
+          logo: Logo
+          current_logo: Aktuelles Logo
+          banner: Banner
+          current_banner: Aktuelles Banner
+          allow_offers: Preisvorschläge standardmäßig erlauben
+          default_shipping: Standardversandkosten
+          free_shipping_threshold: Versandkostenfrei-Schwelle
+        store_types:
+          individual: Privatperson
+          business: Gewerbe
+        hints:
+          name: Öffentlich sichtbar. Eine Namensänderung aktualisiert die Shop-Adresse.
+          description: Bis zu %{max} Zeichen.
+          region: Spanische Provinz
+          store_type_business: Gewerbeshops müssen eine gültige spanische Steuer-ID
+            (NIF/CIF/NIE) angeben.
+          vat_number: 'Spanische Steuer-ID: NIF, CIF oder NIE.'
+          logo: JPG, PNG oder WebP, bis %{size} MB. Wird quadratisch angezeigt.
+          banner: JPG, PNG oder WebP, bis %{size} MB. Breites Titelbild (1600×400).
+          allow_offers: Neue Angebote starten mit aktiven Preisvorschlägen; je Angebot
+            änderbar.
+          default_shipping: Vorausgefüllt beim Anlegen eines Angebots.
+          free_shipping_threshold: Bestellungen über diesem Betrag sind versandkostenfrei.
+            Leer lassen zum Deaktivieren.
+        payouts:
+          manage_hint: Dein Auszahlungskonto erscheint hier, sobald Zahlungen aktiviert
+            sind.
+          coming_soon: Zahlungen und Auszahlungen folgen bald.
+        save: Speichern
+        cancel: Abbrechen
+      update:
+        updated: Shop-Einstellungen gespeichert.
+    sales:
+      index:
+        title: Meine Verkäufe
+        net: Netto %{amount}
+        more_items:
+          one: und %{count} weiteres
+          other: und %{count} weitere
+        empty:
+          title: Noch keine Verkäufe
+          hint: Abgeschlossene Bestellungen erscheinen hier.
+          cta: Angebot erstellen
+      show:
+        title: Verkauf %{number}
+        back: Zurück zu Verkäufen
+        placed_on: Bestellt am
+        buyer: Käufer
+        tracking: Sendungsverfolgung
+        items: Artikel
+        quantity:
+          one: "%{count} Stück"
+          other: "%{count} Stück"
+        totals: Summen
+        subtotal: Zwischensumme
+        shipping: Versand
+        free_shipping: Kostenlos
+        commission: Plattformgebühr
+        total: Gesamt
+        net_revenue: Dein Umsatz
+        shipping_actions_hint: Versandaktionen folgen in der nächsten Phase.
+    vacations:
+      create:
+        enabled: Urlaubsmodus aktiv. Deine Angebote bleiben sichtbar, Käufe sind pausiert.
+      destroy:
+        disabled: Urlaubsmodus beendet — du bist wieder verfügbar.

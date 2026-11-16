@@ -7,6 +7,14 @@ class StoresController < ApplicationController
   # Public seller storefront: /stores/:id with Listings / About / Reviews tabs.
   def show
     @store = Store.friendly.find(params[:id])
+
+    # Renamed stores: FriendlyId :history resolves the old slug, then we 301
+    # to the canonical URL so backlinks and SEO value survive the rename.
+    if @store.slug != params[:id]
+      redirect_to store_path(@store, tab: params[:tab].presence_in(TABS)),
+                  status: :moved_permanently and return
+    end
+
     @tab = params[:tab].presence_in(TABS) || "listings"
 
     if @tab == "reviews"

@@ -210,6 +210,44 @@ class Sell::ListingsTest < ActionDispatch::IntegrationTest
     assert_match "must be 10 MB or smaller", response.body
   end
 
+  # Regression: photo removal used to `purge` inside the transaction, so a
+  # rolled-back save deleted the stored file while the attachment row survived.
+  # Removals are now purged (async) only after the transaction commits.
+  test "a failed update keeps photos marked for removal attached" do
+    sign_in_as users(:two)
+    listing = listings(:as_new)
+    blob = ActiveStorage::Blob.create_and_upload!(io: StringIO.new("jpeg-bytes"),
+                                                  filename: "photo.jpg", content_type: "image/jpeg")
+    listing.photos.attach(blob)
+    attachment_id = listing.photos.attachments.last.id
+
+    patch sell_listing_path(listing),
+          params: form_params(listing: { title: "no", remove_photo_ids: [ attachment_id ] })
+    assert_response :unprocessable_entity
+
+    listing.reload
+    assert_equal [ attachment_id ], listing.photos.attachments.map(&:id)
+    assert blob.service.exist?(blob.key), "the stored file must survive the rolled-back update"
+    assert_no_enqueued_jobs only: ActiveStorage::PurgeJob
+  end
+
+  test "a successful update purges removed photos only after the commit" do
+    sign_in_as users(:two)
+    listing = listings(:as_new)
+    blob = ActiveStorage::Blob.create_and_upload!(io: StringIO.new("jpeg-bytes"),
+                                                  filename: "photo.jpg", content_type: "image/jpeg")
+    listing.photos.attach(blob)
+    attachment_id = listing.photos.attachments.last.id
+
+    assert_enqueued_jobs 1, only: ActiveStorage::PurgeJob do
+      patch sell_listing_path(listing),
+            params: form_params(listing: { remove_photo_ids: [ attachment_id ] })
+      assert_response :redirect
+    end
+
+    assert_empty listing.reload.photos
+  end
+
   # --- spec validation --------------------------------------------------------
 
   test "unknown spec keys are rejected even for drafts" do

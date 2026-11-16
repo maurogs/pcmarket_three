@@ -28,6 +28,11 @@ fr:
     promo_finder_text: Des milliers d'annonces de vendeurs dans tout le pays.
     promo_sell_title: Vendez votre matériel
     promo_sell_text: Publiez vos composants d'occasion en deux minutes.
+    my_store: Ma boutique
+    my_store_dashboard: Tableau de bord
+    my_store_listings: Mes annonces
+    my_store_sales: Mes ventes
+    my_store_settings: Paramètres de la boutique
   footer:
     newsletter_title: Abonnez-vous à notre newsletter
     newsletter_placeholder: Votre adresse e-mail
@@ -255,14 +260,17 @@ fr:
       reviews_count:
         one: "%{count} avis"
         other: "%{count} avis"
+      vacation_banner: "%{store} est en vacances — les nouvelles commandes sont en
+        pause."
+      vacation_cta: Ce vendeur est actuellement en vacances.
   activerecord:
     errors:
       messages:
         spec_key_unknown: contient une caractéristique inconnue (%{attribute})
-        spec_required: '%{attribute} est obligatoire'
-        spec_value_invalid: '%{attribute} a une valeur invalide'
-        spec_value_number: '%{attribute} doit être un nombre'
-        spec_value_boolean: '%{attribute} doit être oui ou non'
+        spec_required: "%{attribute} est obligatoire"
+        spec_value_invalid: "%{attribute} a une valeur invalide"
+        spec_value_number: "%{attribute} doit être un nombre"
+        spec_value_boolean: "%{attribute} doit être oui ou non"
         original_price_below_price: doit être supérieur au prix actuel
         invalid_postal_code: doit être un code postal espagnol à cinq chiffres
         seller_tag_limit: ne peut pas dépasser %{count} étiquettes
@@ -272,6 +280,11 @@ fr:
         photo_too_large: doit peser au maximum %{max} Mo
         cannot_block_self: ne peut pas être vous-même
         not_purchasable: n'est pas disponible à l'achat
+        spanish_tax_id_invalid: n'est pas un identifiant fiscal espagnol valide (NIF/CIF/NIE)
+        logo_content_type_invalid: doit être une image JPEG, PNG ou WebP
+        logo_too_large: doit faire %{max} Mo ou moins
+        banner_content_type_invalid: doit être une image JPEG, PNG ou WebP
+        banner_too_large: doit faire %{max} Mo ou moins
     models:
       address: Adresse
       api_token: Jeton d'API
@@ -543,6 +556,12 @@ fr:
         followers_count: Abonnés
         logo: Logo
         banner: Bannière
+        city: Ville
+        region: Province
+        returns_policy: Politique de retours
+        shipping_policy: Politique de livraison
+        default_shipping_cents: Frais de port par défaut
+        free_shipping_threshold_cents: Seuil de livraison gratuite
       user:
         username: Nom d'utilisateur
         email_address: Adresse e-mail
@@ -562,8 +581,8 @@ fr:
   shared:
     error_summary:
       title:
-        one: "Veuillez corriger %{count} erreur"
-        other: "Veuillez corriger %{count} erreurs"
+        one: Veuillez corriger %{count} erreur
+        other: Veuillez corriger %{count} erreurs
     listing_card:
       labels: Étiquettes
       sold_out: Vendu
@@ -601,6 +620,8 @@ fr:
       reviews_count:
         one: "%{count} avis"
         other: "%{count} avis"
+      vacation_notice: Cette boutique est en vacances. Les annonces restent visibles,
+        mais les achats sont en pause.
   helpers:
     boolean:
       'yes': Oui
@@ -621,7 +642,8 @@ fr:
       specs:
         title: Caractéristiques techniques
         prompt: Choisir…
-        required_note: Les champs marqués d'un * sont obligatoires lors de la soumission en révision.
+        required_note: Les champs marqués d'un * sont obligatoires lors de la soumission
+          en révision.
       sections:
         category: Catégorie
         basics: Détails
@@ -631,7 +653,8 @@ fr:
         shipping: Livraison et étiquettes
       condition_explanations:
         brand_new: Produit neuf, scellé et couvert par la garantie.
-        open_box: Retour jamais utilisé ou modèle d'exposition ; emballage d'origine parfois absent.
+        open_box: Retour jamais utilisé ou modèle d'exposition ; emballage d'origine
+          parfois absent.
         used_like_new: Très peu utilisé et en parfait état de fonctionnement.
         used_good: Utilisé mais pleinement fonctionnel, avec l'usure normale d'usage.
         for_parts: Ne fonctionne pas ou partiellement ; vendu pour pièces détachées.
@@ -655,7 +678,8 @@ fr:
         too_large: Chaque photo doit peser %{max} Mo ou moins.
       tags:
         title: Étiquettes de vendeur
-        hint: Choisissez jusqu'à %{count} étiquettes pour aider les acheteurs à vous trouver.
+        hint: Choisissez jusqu'à %{count} étiquettes pour aider les acheteurs à vous
+          trouver.
         too_many: Vous pouvez choisir %{count} étiquettes au maximum.
       submit_for_review: Soumettre en révision
       save_draft: Enregistrer le brouillon
@@ -666,7 +690,9 @@ fr:
       edit:
         title: Modifier l'annonce
         updated_at: Dernière mise à jour il y a %{time}
-        live_edit_warning: Modifier le titre, la description, les photos ou les caractéristiques renvoie l'annonce en révision. Les changements de prix et de stock restent en ligne.
+        live_edit_warning: Modifier le titre, la description, les photos ou les caractéristiques
+          renvoie l'annonce en révision. Les changements de prix et de stock restent
+          en ligne.
       index:
         title: Mes annonces
         subtitle: Créez, révisez et gérez tout ce que vous vendez sur PCMarket.
@@ -697,14 +723,143 @@ fr:
         submitted: Votre annonce est en cours de révision.
       destroy:
         destroyed: Annonce supprimée.
-        destroy_denied: Les annonces en ligne ou en révision ne peuvent pas être supprimées. Archivez-les d'abord.
+        destroy_denied: Les annonces en ligne ou en révision ne peuvent pas être supprimées.
+          Archivez-les d'abord.
     submissions:
       create:
         submitted: Annonce soumise en révision.
-        invalid: "L'annonce n'est pas prête pour la révision : %{errors}"
+        invalid: 'L''annonce n''est pas prête pour la révision : %{errors}'
     archivals:
       create:
         archived: Annonce archivée.
     sale_marks:
       create:
         sold: Annonce marquée comme vendue.
+    sidebar:
+      label: Menu vendeur
+      dashboard: Tableau de bord
+      listings: Mes annonces
+      sales: Mes ventes
+      public_profile: Profil public
+      settings: Paramètres de la boutique
+      vacation_on: Activer les vacances
+      vacation_off: Désactiver les vacances
+    dashboards:
+      show:
+        title: Tableau de bord vendeur
+        subtitle: Vue d'ensemble de %{name}
+        conversion: "%{rate} de conversion (ventes terminées sur 30 jours / vues totales)"
+        kpis:
+          live_listings: Annonces en ligne
+          in_review: En révision
+          views: Vues totales
+          favorites: Nouveaux favoris (30 jours)
+          sales: Ventes terminées (30 jours)
+          revenue: Revenus (30 jours)
+          revenue_hint: hors commission plateforme
+        chart:
+          title: Ventes terminées par semaine
+          aria: Graphique des ventes terminées des %{weeks} dernières semaines
+          sales:
+            one: "%{count} vente"
+            other: "%{count} ventes"
+        attention:
+          title: À traiter
+          rejected: 'Refusée : %{reason}'
+          rejected_generic: Aucune raison indiquée
+          pending_offers:
+            one: "%{count} offre en attente"
+            other: "%{count} offres en attente"
+          offer_line: "%{listing} : offre de %{amount}"
+          unanswered:
+            one: "%{count} message sans réponse"
+            other: "%{count} messages sans réponse"
+          all_clear: Tout est en ordre.
+        top:
+          title: Annonces les plus vues
+          views:
+            one: "%{count} vue"
+            other: "%{count} vues"
+          empty: Aucune annonce pour le moment.
+    stores:
+      edit:
+        title: Paramètres de la boutique
+        subtitle: Profil public, frais de port et conditions
+        back_to_dashboard: Retour au tableau de bord
+        sections:
+          profile: Profil de la boutique
+          appearance: Apparence
+          sales: Préférences de vente
+          shipping: Frais de port par défaut
+          payouts: Paiements
+        labels:
+          store_type: Type de boutique
+          logo: Logo
+          current_logo: Logo actuel
+          banner: Bannière
+          current_banner: Bannière actuelle
+          allow_offers: Accepter les offres par défaut
+          default_shipping: Frais de port par défaut
+          free_shipping_threshold: Seuil de livraison gratuite
+        store_types:
+          individual: Particulier
+          business: Professionnel
+        hints:
+          name: Affiché publiquement. Changer le nom met à jour l'adresse web de votre
+            boutique.
+          description: Jusqu'à %{max} caractères.
+          region: Province espagnole
+          store_type_business: Les boutiques professionnelles doivent fournir un identifiant
+            fiscal espagnol valide (NIF/CIF/NIE).
+          vat_number: 'Identifiant fiscal espagnol : NIF, CIF ou NIE.'
+          logo: JPG, PNG ou WebP, jusqu'à %{size} Mo. Affiché en carré.
+          banner: JPG, PNG ou WebP, jusqu'à %{size} Mo. Bannière large (1600×400).
+          allow_offers: Les nouvelles annonces acceptent les offres par défaut ; modifiable
+            par annonce.
+          default_shipping: Pré-rempli à la création d'une annonce.
+          free_shipping_threshold: Les commandes au-delà de ce montant sont livrées
+            gratuitement. Laisser vide pour désactiver.
+        payouts:
+          manage_hint: Votre compte de paiements apparaîtra ici une fois les paiements
+            activés.
+          coming_soon: Les paiements arrivent bientôt.
+        save: Enregistrer
+        cancel: Annuler
+      update:
+        updated: Paramètres de la boutique enregistrés.
+    sales:
+      index:
+        title: Mes ventes
+        net: Net %{amount}
+        more_items:
+          one: et %{count} de plus
+          other: et %{count} de plus
+        empty:
+          title: Aucune vente pour le moment
+          hint: Les commandes terminées s'afficheront ici.
+          cta: Créer une annonce
+      show:
+        title: Vente %{number}
+        back: Retour aux ventes
+        placed_on: Passée le
+        buyer: Acheteur
+        tracking: Suivi
+        items: Articles
+        quantity:
+          one: "%{count} unité"
+          other: "%{count} unités"
+        totals: Totaux
+        subtotal: Sous-total
+        shipping: Livraison
+        free_shipping: Gratuite
+        commission: Commission plateforme
+        total: Total
+        net_revenue: Votre revenu
+        shipping_actions_hint: Les actions d'expédition seront disponibles dans la
+          prochaine phase.
+    vacations:
+      create:
+        enabled: Mode vacances activé. Vos annonces restent visibles, mais les achats
+          sont en pause.
+      destroy:
+        disabled: Mode vacances désactivé — vous êtes de nouveau actif.

@@ -28,6 +28,11 @@ pt:
     promo_finder_text: Milhares de anúncios de vendedores de todo o país.
     promo_sell_title: Venda o seu hardware
     promo_sell_text: Anuncie os seus componentes usados em dois minutos.
+    my_store: Minha loja
+    my_store_dashboard: Painel
+    my_store_listings: Meus anúncios
+    my_store_sales: Minhas vendas
+    my_store_settings: Configurações da loja
   footer:
     newsletter_title: Subscreva a nossa newsletter
     newsletter_placeholder: O seu endereço de e-mail
@@ -253,14 +258,16 @@ pt:
       reviews_count:
         one: "%{count} avaliação"
         other: "%{count} avaliações"
+      vacation_banner: "%{store} está de férias — novos pedidos estão pausados."
+      vacation_cta: Este vendedor está de férias no momento.
   activerecord:
     errors:
       messages:
         spec_key_unknown: contém uma especificação desconhecida (%{attribute})
-        spec_required: '%{attribute} é obrigatório'
-        spec_value_invalid: '%{attribute} tem um valor inválido'
-        spec_value_number: '%{attribute} deve ser um número'
-        spec_value_boolean: '%{attribute} deve ser sim ou não'
+        spec_required: "%{attribute} é obrigatório"
+        spec_value_invalid: "%{attribute} tem um valor inválido"
+        spec_value_number: "%{attribute} deve ser um número"
+        spec_value_boolean: "%{attribute} deve ser sim ou não"
         original_price_below_price: deve ser superior ao preço atual
         invalid_postal_code: deve ser um código postal espanhol de cinco dígitos
         seller_tag_limit: não pode ter mais de %{count} etiquetas
@@ -270,6 +277,11 @@ pt:
         photo_too_large: deve pesar no máximo %{max} MB
         cannot_block_self: não pode ser você mesmo
         not_purchasable: não está disponível para compra
+        spanish_tax_id_invalid: não é um identificador fiscal espanhol válido (NIF/CIF/NIE)
+        logo_content_type_invalid: deve ser uma imagem JPEG, PNG ou WebP
+        logo_too_large: deve ter %{max} MB ou menos
+        banner_content_type_invalid: deve ser uma imagem JPEG, PNG ou WebP
+        banner_too_large: deve ter %{max} MB ou menos
     models:
       address: Morada
       api_token: Token de API
@@ -541,6 +553,12 @@ pt:
         followers_count: Seguidores
         logo: Logótipo
         banner: Banner
+        city: Cidade
+        region: Distrito
+        returns_policy: Política de devoluções
+        shipping_policy: Política de envios
+        default_shipping_cents: Frete padrão
+        free_shipping_threshold_cents: Limite de frete grátis
       user:
         username: Nome de utilizador
         email_address: Endereço de e-mail
@@ -599,6 +617,8 @@ pt:
       reviews_count:
         one: "%{count} avaliação"
         other: "%{count} avaliações"
+      vacation_notice: Esta loja está de férias. Os anúncios continuam visíveis, mas
+        as compras estão pausadas.
   helpers:
     boolean:
       'yes': Sim
@@ -629,7 +649,8 @@ pt:
         shipping: Envio e etiquetas
       condition_explanations:
         brand_new: Produto novo, selado e com garantia completa.
-        open_box: Devolução sem uso ou peça de exposição; pode não ter a embalagem original.
+        open_box: Devolução sem uso ou peça de exposição; pode não ter a embalagem
+          original.
         used_like_new: Pouco usado e em perfeito funcionamento.
         used_good: Usado mas totalmente funcional, com o desgaste normal do uso.
         for_parts: Não funciona ou funciona parcialmente; vendido para peças.
@@ -653,7 +674,8 @@ pt:
         too_large: Cada foto deve ter %{max} MB ou menos.
       tags:
         title: Etiquetas de vendedor
-        hint: Escolha até %{count} etiquetas para os compradores o encontrarem mais facilmente.
+        hint: Escolha até %{count} etiquetas para os compradores o encontrarem mais
+          facilmente.
         too_many: Pode escolher no máximo %{count} etiquetas.
       submit_for_review: Enviar para revisão
       save_draft: Guardar rascunho
@@ -664,7 +686,9 @@ pt:
       edit:
         title: Editar anúncio
         updated_at: Última atualização há %{time}
-        live_edit_warning: Alterar o título, a descrição, as fotos ou as especificações reenvia o anúncio para revisão. As alterações de preço e stock ficam publicadas diretamente.
+        live_edit_warning: Alterar o título, a descrição, as fotos ou as especificações
+          reenvia o anúncio para revisão. As alterações de preço e stock ficam publicadas
+          diretamente.
       index:
         title: Os meus anúncios
         subtitle: Crie, reveja e faça a gestão de tudo o que vende no PCMarket.
@@ -695,14 +719,141 @@ pt:
         submitted: O seu anúncio está em revisão.
       destroy:
         destroyed: Anúncio eliminado.
-        destroy_denied: Os anúncios ativos ou em revisão não podem ser eliminados. Archive-os primeiro.
+        destroy_denied: Os anúncios ativos ou em revisão não podem ser eliminados.
+          Archive-os primeiro.
     submissions:
       create:
         submitted: Anúncio enviado para revisão.
-        invalid: "O anúncio não está pronto para revisão: %{errors}"
+        invalid: 'O anúncio não está pronto para revisão: %{errors}'
     archivals:
       create:
         archived: Anúncio arquivado.
     sale_marks:
       create:
         sold: Anúncio marcado como vendido.
+    sidebar:
+      label: Menu do vendedor
+      dashboard: Painel
+      listings: Meus anúncios
+      sales: Minhas vendas
+      public_profile: Perfil público
+      settings: Configurações da loja
+      vacation_on: Ativar férias
+      vacation_off: Desativar férias
+    dashboards:
+      show:
+        title: Painel do vendedor
+        subtitle: Visão geral de %{name}
+        conversion: "%{rate} de conversão (vendas concluídas em 30 dias / visualizações
+          totais)"
+        kpis:
+          live_listings: Anúncios ativos
+          in_review: Em revisão
+          views: Visualizações totais
+          favorites: Novos favoritos (30 dias)
+          sales: Vendas concluídas (30 dias)
+          revenue: Receita (30 dias)
+          revenue_hint: após a comissão da plataforma
+        chart:
+          title: Vendas concluídas por semana
+          aria: Gráfico de barras das vendas concluídas das últimas %{weeks} semanas
+          sales:
+            one: "%{count} venda"
+            other: "%{count} vendas"
+        attention:
+          title: Requer atenção
+          rejected: 'Recusado: %{reason}'
+          rejected_generic: Sem motivo indicado
+          pending_offers:
+            one: "%{count} oferta pendente"
+            other: "%{count} ofertas pendentes"
+          offer_line: "%{listing}: oferta de %{amount}"
+          unanswered:
+            one: "%{count} mensagem sem resposta"
+            other: "%{count} mensagens sem resposta"
+          all_clear: Tudo em ordem.
+        top:
+          title: Anúncios mais vistos
+          views:
+            one: "%{count} visualização"
+            other: "%{count} visualizações"
+          empty: Ainda sem anúncios.
+    stores:
+      edit:
+        title: Configurações da loja
+        subtitle: Perfil público, frete padrão e políticas
+        back_to_dashboard: Voltar ao painel
+        sections:
+          profile: Perfil da loja
+          appearance: Aparência
+          sales: Preferências de venda
+          shipping: Frete padrão
+          payouts: Pagamentos
+        labels:
+          store_type: Tipo de loja
+          logo: Logotipo
+          current_logo: Logotipo atual
+          banner: Banner
+          current_banner: Banner atual
+          allow_offers: Aceitar ofertas por padrão
+          default_shipping: Frete padrão
+          free_shipping_threshold: Limite de frete grátis
+        store_types:
+          individual: Pessoal
+          business: Empresa
+        hints:
+          name: Exibido publicamente. Alterar o nome atualiza o endereço web da loja.
+          description: Até %{max} caracteres.
+          region: Distrito espanhol
+          store_type_business: Lojas empresariais devem indicar um identificador fiscal
+            espanhol válido (NIF/CIF/NIE).
+          vat_number: 'Identificador fiscal espanhol: NIF, CIF ou NIE.'
+          logo: JPG, PNG ou WebP, até %{size} MB. Exibido como quadrado.
+          banner: JPG, PNG ou WebP, até %{size} MB. Cabeçalho largo (1600×400).
+          allow_offers: Novos anúncios começam com ofertas ativas; alterável por anúncio.
+          default_shipping: Preenchido ao criar um anúncio.
+          free_shipping_threshold: Pedidos acima deste valor têm frete grátis. Deixe
+            vazio para desativar.
+        payouts:
+          manage_hint: Sua conta de pagamentos aparecerá aqui quando os pagamentos
+            forem ativados.
+          coming_soon: Pagamentos em breve.
+        save: Guardar alterações
+        cancel: Cancelar
+      update:
+        updated: Configurações da loja guardadas.
+    sales:
+      index:
+        title: Minhas vendas
+        net: Líquido %{amount}
+        more_items:
+          one: e %{count} a mais
+          other: e %{count} a mais
+        empty:
+          title: Ainda sem vendas
+          hint: Pedidos concluídos aparecerão aqui.
+          cta: Criar um anúncio
+      show:
+        title: Venda %{number}
+        back: Voltar às vendas
+        placed_on: Realizado em
+        buyer: Comprador
+        tracking: Rastreio
+        items: Itens
+        quantity:
+          one: "%{count} unidade"
+          other: "%{count} unidades"
+        totals: Totais
+        subtotal: Subtotal
+        shipping: Frete
+        free_shipping: Grátis
+        commission: Comissão da plataforma
+        total: Total
+        net_revenue: Sua receita
+        shipping_actions_hint: As ações de envio estarão disponíveis na próxima fase.
+    vacations:
+      create:
+        enabled: Modo férias ativado. Seus anúncios continuam visíveis, mas as compras
+          estão pausadas.
+      destroy:
+        disabled: 'Modo férias desativado: você voltou.'

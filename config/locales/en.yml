@@ -27,6 +27,11 @@ en:
     promo_finder_text: Search thousands of listings from sellers across the country.
     promo_sell_title: Sell your spare gear
     promo_sell_text: List used components in a couple of minutes.
+    my_store: My store
+    my_store_dashboard: Dashboard
+    my_store_listings: My listings
+    my_store_sales: My sales
+    my_store_settings: Store settings
   footer:
     newsletter_title: Subscribe to our newsletter
     newsletter_placeholder: Your email address
@@ -249,14 +254,16 @@ en:
       reviews_count:
         one: "%{count} review"
         other: "%{count} reviews"
+      vacation_banner: "%{store} is on vacation — new orders are paused."
+      vacation_cta: This seller is currently on vacation.
   activerecord:
     errors:
       messages:
         spec_key_unknown: contains an unknown specification (%{attribute})
-        spec_required: '%{attribute} is required'
-        spec_value_invalid: '%{attribute} has an invalid value'
-        spec_value_number: '%{attribute} must be a number'
-        spec_value_boolean: '%{attribute} must be yes or no'
+        spec_required: "%{attribute} is required"
+        spec_value_invalid: "%{attribute} has an invalid value"
+        spec_value_number: "%{attribute} must be a number"
+        spec_value_boolean: "%{attribute} must be yes or no"
         original_price_below_price: must be higher than the current price
         invalid_postal_code: must be a valid five-digit Spanish postcode
         seller_tag_limit: cannot be more than %{count} tags
@@ -266,6 +273,11 @@ en:
         photo_too_large: must be %{max} MB or smaller
         cannot_block_self: can't be yourself
         not_purchasable: is not available for purchase
+        spanish_tax_id_invalid: is not a valid Spanish tax ID (NIF/CIF/NIE)
+        logo_content_type_invalid: must be a JPEG, PNG or WebP image
+        logo_too_large: must be %{max} MB or smaller
+        banner_content_type_invalid: must be a JPEG, PNG or WebP image
+        banner_too_large: must be %{max} MB or smaller
     models:
       address: Address
       api_token: API token
@@ -537,6 +549,12 @@ en:
         followers_count: Followers
         logo: Logo
         banner: Banner
+        city: City
+        region: Province
+        returns_policy: Returns policy
+        shipping_policy: Shipping policy
+        default_shipping_cents: Default shipping cost
+        free_shipping_threshold_cents: Free shipping threshold
       user:
         username: Username
         email_address: Email address
@@ -595,6 +613,8 @@ en:
       reviews_count:
         one: "%{count} review"
         other: "%{count} reviews"
+      vacation_notice: This store is on vacation. Listings stay visible, but buying
+        is paused.
   helpers:
     boolean:
       'yes': 'Yes'
@@ -660,7 +680,8 @@ en:
       edit:
         title: Edit listing
         updated_at: Last updated %{time} ago
-        live_edit_warning: Changing the title, description, photos or specifications sends the listing back to review. Price and stock updates stay live.
+        live_edit_warning: Changing the title, description, photos or specifications
+          sends the listing back to review. Price and stock updates stay live.
       index:
         title: My listings
         subtitle: Create, review and manage everything you sell on PCMarket.
@@ -702,3 +723,129 @@ en:
     sale_marks:
       create:
         sold: Listing marked as sold.
+    sidebar:
+      label: Seller menu
+      dashboard: Dashboard
+      listings: My listings
+      sales: My sales
+      public_profile: Public profile
+      settings: Store settings
+      vacation_on: Turn on vacation
+      vacation_off: Turn off vacation
+    dashboards:
+      show:
+        title: Seller dashboard
+        subtitle: Overview for %{name}
+        conversion: "%{rate} conversion (completed sales in the last 30 days over
+          total views)"
+        kpis:
+          live_listings: Live listings
+          in_review: In review
+          views: Total views
+          favorites: New favorites (30 days)
+          sales: Completed sales (30 days)
+          revenue: Revenue (30 days)
+          revenue_hint: after platform commission
+        chart:
+          title: Completed sales per week
+          aria: Bar chart of completed sales for the last %{weeks} weeks
+          sales:
+            one: "%{count} sale"
+            other: "%{count} sales"
+        attention:
+          title: Needs attention
+          rejected: 'Rejected: %{reason}'
+          rejected_generic: No reason provided
+          pending_offers:
+            one: "%{count} pending offer"
+            other: "%{count} pending offers"
+          offer_line: "%{listing}: offer of %{amount}"
+          unanswered:
+            one: "%{count} unanswered message"
+            other: "%{count} unanswered messages"
+          all_clear: Everything looks good.
+        top:
+          title: Most viewed listings
+          views:
+            one: "%{count} view"
+            other: "%{count} views"
+          empty: No listings yet.
+    stores:
+      edit:
+        title: Store settings
+        subtitle: Public profile, shipping defaults and policies
+        back_to_dashboard: Back to dashboard
+        sections:
+          profile: Store profile
+          appearance: Appearance
+          sales: Sales preferences
+          shipping: Shipping defaults
+          payouts: Payouts
+        labels:
+          store_type: Store type
+          logo: Logo
+          current_logo: Current logo
+          banner: Banner
+          current_banner: Current banner
+          allow_offers: Accept offers by default
+          default_shipping: Default shipping cost
+          free_shipping_threshold: Free shipping threshold
+        store_types:
+          individual: Individual
+          business: Business
+        hints:
+          name: Shown publicly. Changing the name updates your store's web address.
+          description: Up to %{max} characters.
+          region: Spanish province
+          store_type_business: Business stores must provide a valid Spanish tax ID
+            (NIF/CIF/NIE).
+          vat_number: 'Spanish tax ID: NIF, CIF or NIE.'
+          logo: JPG, PNG or WebP, up to %{size} MB. Displayed as a square.
+          banner: JPG, PNG or WebP, up to %{size} MB. Wide header image (1600×400).
+          allow_offers: New listings start with offers enabled; you can change this
+            per listing.
+          default_shipping: Pre-filled when you create a listing.
+          free_shipping_threshold: Orders above this amount ship free. Leave blank
+            for none.
+        payouts:
+          manage_hint: Your payouts account will appear here once payments are enabled.
+          coming_soon: Payments and payouts are coming soon.
+        save: Save changes
+        cancel: Cancel
+      update:
+        updated: Store settings saved.
+    sales:
+      index:
+        title: My sales
+        net: Net %{amount}
+        more_items:
+          one: and %{count} more
+          other: and %{count} more
+        empty:
+          title: No sales yet
+          hint: Completed orders will show up here.
+          cta: Create a listing
+      show:
+        title: Sale %{number}
+        back: Back to sales
+        placed_on: Placed on
+        buyer: Buyer
+        tracking: Tracking
+        items: Items
+        quantity:
+          one: "%{count} unit"
+          other: "%{count} units"
+        totals: Totals
+        subtotal: Subtotal
+        shipping: Shipping
+        free_shipping: Free
+        commission: Platform commission
+        total: Total
+        net_revenue: Your revenue
+        shipping_actions_hint: Shipping and fulfilment actions will be available with
+          the next phase.
+    vacations:
+      create:
+        enabled: Vacation mode is on. Your listings stay visible, but buying is paused.
+      destroy:
+        disabled: Vacation mode is off — you are back open.

@@ -10,6 +10,15 @@ class Offer < ApplicationRecord
   scope :active, -> { where(status: :pending) }
   scope :not_expired, -> { where("expires_at IS NULL OR expires_at > ?", Time.current) }
 
+  # Pending, unexpired offers on one seller's listings (dashboard
+  # "Needs attention").
+  scope :pending_for_seller, ->(user) {
+    joins(:listing)
+      .where(listings: { user_id: user.id })
+      .active
+      .not_expired
+  }
+
   # Time-based expiry (distinct from the `expired` status enum value).
   def time_expired?
     !expires_at.nil? && expires_at <= Time.current

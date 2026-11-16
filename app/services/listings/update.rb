@@ -36,11 +36,18 @@ module Listings
       re_reviewed = false
       submitted = false
 
+      # Removed photo attachments are purged only once the transaction has
+      # committed: `purge`/`purge_later` delete the stored file immediately, so
+      # purging inside the transaction would lose the photo on a rolled-back
+      # save. Collect the ids instead and purge after commit.
+      purge_attachment_ids = []
+      committed = false
+
       Listing.transaction do
         @listing.seller_tag_ids = FormAttributes.seller_tag_ids(@raw) if @raw.key?(:seller_tag_ids)
-        # Inside the transaction so a failed save rolls the new attachments
-        # back instead of stranding them on the listing.
-        photos_changed = apply_photo_changes
+        # Attachments added here roll back with the save; only removals need
+        # the deferred purge above.
+        photos_changed = apply_photo_changes(purge_attachment_ids)
         raise ActiveRecord::Rollback unless @listing.save
 
         if was_approved && (material_changed || photos_changed)
@@ -53,7 +60,14 @@ module Listings
           Listings::Submit.new(@listing).call
           submitted = true
         end
+        committed = true
       end
+
+      unless committed
+        return Result.new(listing: @listing, saved: false, re_reviewed: false, submitted: false)
+      end
+
+      purge_removed_photos(purge_attachment_ids)
 
       Result.new(listing: @listing, saved: true, re_reviewed: re_reviewed, submitted: submitted)
     rescue ActiveRecord::RecordInvalid
@@ -69,18 +83,29 @@ module Listings
 
     private
 
-    def apply_photo_changes
-      removed = 0
+    # Records the ids of the attachments being removed (rows stay untouched —
+    # see the deferred purge in #call) and attaches any new uploads.
+    def apply_photo_changes(purge_attachment_ids)
       remove_ids = Array(@raw[:remove_photo_ids]).reject(&:blank?)
+      removed = 0
       if remove_ids.any?
-        @listing.photos.attachments.where(id: remove_ids).find_each(&:purge)
-        removed = remove_ids.size
+        ids = @listing.photos.attachments.where(id: remove_ids).pluck(:id)
+        purge_attachment_ids.concat(ids)
+        removed = ids.size
       end
 
       uploaded = FormAttributes.uploaded_photos(@raw)
       @listing.photos.attach(uploaded) if uploaded.any?
 
       removed.positive? || uploaded.any?
+    end
+
+    # Post-commit cleanup: `purge_later` removes the attachment rows right
+    # away and defers the blob/file deletion to ActiveStorage::PurgeJob.
+    def purge_removed_photos(attachment_ids)
+      attachment_ids.each do |id|
+        ActiveStorage::Attachment.find_by(id: id)&.purge_later
+      end
     end
 
     def apply_form_errors(category_error:, invalid_prices:)

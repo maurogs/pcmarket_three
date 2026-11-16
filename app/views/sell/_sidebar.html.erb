@@ -1,0 +1,46 @@
+<%# Sell-area navigation: store card + nav links. The nav row scrolls
+    horizontally on mobile and becomes a vertical rail from lg up. %>
+<% store = current_user.store %>
+<aside class="min-w-0">
+  <div class="hidden rounded-lg border border-border bg-surface p-4 lg:block">
+    <div class="flex items-center gap-3">
+      <span class="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-surface-muted text-sm font-bold text-primary">
+        <% logo_url = store_logo_url(store, :thumb) %>
+        <% if logo_url %>
+          <%= image_tag logo_url, alt: "", class: "size-full object-cover",
+                loading: "lazy", decoding: "async", width: 256, height: 256 %>
+        <% else %>
+          <%= (store&.name || current_user.username)[0, 2].upcase %>
+        <% end %>
+      </span>
+      <div class="min-w-0">
+        <p class="flex items-center gap-1.5 truncate text-sm font-semibold text-text">
+          <span class="truncate"><%= store&.name || current_user.username %></span>
+          <%= verified_badge(store, classes: "size-4") %>
+        </p>
+        <p class="truncate text-xs text-muted">@<%= current_user.username %></p>
+      </div>
+    </div>
+  </div>
+
+  <nav class="<%= "mt-4 " %>flex gap-1 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible"
+       aria-label="<%= t("sell.sidebar.label") %>">
+    <%= link_to t("sell.sidebar.dashboard"), sell_dashboard_path, class: sell_nav_class(sell_dashboard_path) %>
+    <%= link_to t("sell.sidebar.listings"), sell_listings_path, class: sell_nav_class(sell_listings_path) %>
+    <%= link_to t("sell.sidebar.sales"), sell_sales_path, class: sell_nav_class(sell_sales_path) %>
+    <% if store %>
+      <%= link_to t("sell.sidebar.public_profile"), store_path(store), class: sell_nav_class(store_path(store)) %>
+    <% end %>
+    <%= link_to t("sell.sidebar.settings"), edit_sell_store_path, class: sell_nav_class(edit_sell_store_path) %>
+
+    <%# Vacation mode is a state toggle modelled as create/destroy on a
+        singular resource. button_to keeps it a safe POST/DELETE. %>
+    <% if store&.vacation_mode? %>
+      <%= button_to t("sell.sidebar.vacation_off"), sell_vacation_path, method: :delete,
+            class: "#{sell_nav_class(sell_dashboard_path)} cursor-pointer border border-border font-medium" %>
+    <% else %>
+      <%= button_to t("sell.sidebar.vacation_on"), sell_vacation_path, method: :post,
+            class: "#{sell_nav_class(sell_dashboard_path)} cursor-pointer border border-border font-medium" %>
+    <% end %>
+  </nav>
+</aside>

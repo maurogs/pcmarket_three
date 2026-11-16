@@ -9,6 +9,19 @@ class Conversation < ApplicationRecord
 
   scope :recent, -> { order(last_message_at: :desc, id: :desc) }
 
+  # Threads a seller started with but never replied to (no message from the
+  # seller) — the dashboard "Needs attention" count. One NOT EXISTS query.
+  scope :unanswered_for_seller, ->(user) {
+    where(seller_id: user.id)
+      .where(<<~SQL.squish)
+        NOT EXISTS (
+          SELECT 1 FROM messages
+          WHERE messages.conversation_id = conversations.id
+            AND messages.sender_id = conversations.seller_id
+        )
+      SQL
+  }
+
   def other_party(user)
     user == buyer ? seller : buyer
   end

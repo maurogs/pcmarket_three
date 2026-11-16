@@ -1,0 +1,107 @@
+<% content_for :title, t(".title") %>
+
+<h1 class="mb-4 text-lg font-bold"><%= t(".title") %></h1>
+<p class="mb-6 text-sm text-muted"><%= t(".subtitle", name: current_user.display_name) %></p>
+
+<%# Every number comes from Sell::DashboardStats; the whole fragment is
+    cached five minutes per seller so repeated visits skip the aggregates. %>
+<%= cache [ "sell_dashboard", current_user.id, I18n.locale ], expires_in: 5.minutes do %>
+  <%# --- KPI tiles ------------------------------------------------------- %>
+  <div class="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+    <% tiles = [
+         [ t(".kpis.live_listings"), @stats.live_listings.to_s, nil ],
+         [ t(".kpis.in_review"), @stats.in_review.to_s, nil ],
+         [ t(".kpis.views"), @stats.total_views.to_s, nil ],
+         [ t(".kpis.favorites"), @stats.favorites_received.to_s, nil ],
+         [ t(".kpis.sales"), @stats.sales_count.to_s, nil ],
+         [ t(".kpis.revenue"), money(@stats.revenue_cents), t(".kpis.revenue_hint") ]
+       ] %>
+    <% tiles.each do |label, value, hint| %>
+      <div class="border border-border bg-surface px-3 py-3">
+        <p class="truncate text-xs font-medium text-muted"><%= label %></p>
+        <p class="mt-1 text-xl font-bold text-text"><%= value %></p>
+        <% if hint %>
+          <p class="mt-0.5 text-[10px] text-muted"><%= hint %></p>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mb-6 text-xs text-muted">
+    <%= t(".conversion", rate: number_to_percentage(@stats.conversion_rate * 100, precision: 1)) %>
+  </div>
+
+  <%# --- weekly sales chart (pure HTML/CSS bars) -------------------------- %>
+  <section class="mb-6 border border-border bg-surface p-4">
+    <h2 class="mb-3 text-sm font-semibold"><%= t(".chart.title") %></h2>
+    <% max = @stats.weekly_max %>
+    <div class="flex h-32 items-end gap-1" role="img"
+         aria-label="<%= t(".chart.aria", weeks: Sell::DashboardStats::CHART_WEEKS) %>">
+      <% @stats.weekly_sales.each do |week| %>
+        <% height = max.positive? ? [(week[:count].fdiv(max) * 100).round, 4].max : 0 %>
+        <div class="group flex h-full flex-1 flex-col justify-end">
+          <div class="w-full rounded-t bg-primary/70 group-hover:bg-primary"
+               style="height: <%= height %>%"
+               title="<%= l(week[:week_start], format: :delivery) %>: <%= t(".chart.sales", count: week[:count]) %>"></div>
+        </div>
+      <% end %>
+    </div>
+    <div class="mt-2 flex justify-between text-[10px] text-muted">
+      <span><%= l(@stats.weekly_sales.first[:week_start], format: :delivery) %></span>
+      <span><%= l(@stats.weekly_sales.last[:week_start], format: :delivery) %></span>
+    </div>
+  </section>
+
+  <div class="grid gap-6 lg:grid-cols-2">
+    <%# --- needs attention ------------------------------------------------ %>
+    <section class="border border-border bg-surface p-4">
+      <h2 class="mb-3 text-sm font-semibold"><%= t(".attention.title") %></h2>
+      <ul class="space-y-3 text-sm">
+        <% @stats.rejected_listings.each do |listing| %>
+          <li class="border-l-2 border-red-500 pl-3">
+            <%= link_to listing.title, edit_sell_listing_path(listing), class: "font-medium hover:text-primary hover:underline" %>
+            <p class="mt-0.5 text-xs text-muted"><%= t(".attention.rejected", reason: listing.rejection_reason.presence || t(".attention.rejected_generic")) %></p>
+          </li>
+        <% end %>
+
+        <% if @stats.pending_offers_count.positive? %>
+          <li>
+            <p class="font-medium"><%= t(".attention.pending_offers", count: @stats.pending_offers_count) %></p>
+            <ul class="mt-1 space-y-1 text-xs text-muted">
+              <% @stats.pending_offers.each do |offer| %>
+                <li><%= t(".attention.offer_line", listing: offer.listing.title, amount: money(offer.amount_cents)) %></li>
+              <% end %>
+            </ul>
+          </li>
+        <% end %>
+
+        <% if @stats.unanswered_conversations_count.positive? %>
+          <li class="text-muted"><%= t(".attention.unanswered", count: @stats.unanswered_conversations_count) %></li>
+        <% end %>
+      </ul>
+      <% if @stats.rejected_listings.empty? && @stats.pending_offers_count.zero? && @stats.unanswered_conversations_count.zero? %>
+        <p class="text-sm text-muted"><%= t(".attention.all_clear") %></p>
+      <% end %>
+    </section>
+
+    <%# --- top listings --------------------------------------------------- %>
+    <section class="border border-border bg-surface p-4">
+      <h2 class="mb-3 text-sm font-semibold"><%= t(".top.title") %></h2>
+      <% if @stats.top_listings.any? %>
+        <ol class="space-y-2 text-sm">
+          <% @stats.top_listings.each_with_index do |listing, index| %>
+            <li class="flex items-center gap-3">
+              <span class="w-4 shrink-0 text-xs font-semibold text-muted"><%= index + 1 %></span>
+              <span class="min-w-0 flex-1 truncate">
+                <%= link_to listing.title, listing_path(listing), class: "font-medium hover:text-primary hover:underline" %>
+              </span>
+              <span class="shrink-0 text-xs text-muted"><%= t(".top.views", count: listing.views_count) %></span>
+            </li>
+          <% end %>
+        </ol>
+      <% else %>
+        <p class="text-sm text-muted"><%= t(".top.empty") %></p>
+      <% end %>
+    </section>
+  </div>
+<% end %>

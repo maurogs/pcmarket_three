@@ -1,0 +1,73 @@
+<% content_for :title, t(".title", number: @sale.number) %>
+
+<div class="mx-auto max-w-2xl">
+  <div class="mb-4 flex flex-wrap items-center gap-3">
+    <h1 class="min-w-0 flex-1 text-xl font-bold tracking-tight sm:text-2xl">
+      <%= t(".title", number: @sale.number) %>
+    </h1>
+    <%= order_status_badge(@sale) %>
+  </div>
+  <p class="mb-4"><%= link_to t(".back"), sell_sales_path, class: "text-sm font-medium text-primary hover:underline" %></p>
+
+  <div class="card px-4 py-3">
+    <dl class="grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
+      <div class="flex justify-between gap-3 sm:justify-start">
+        <dt class="shrink-0 text-muted"><%= t(".placed_on") %></dt>
+        <dd class="text-text"><%= l(@sale.created_at, format: :long) %></dd>
+      </div>
+      <div class="flex justify-between gap-3 sm:justify-start">
+        <dt class="shrink-0 text-muted"><%= t(".buyer") %></dt>
+        <dd class="text-text"><%= @sale.buyer.display_name %></dd>
+      </div>
+      <% if @sale.tracking_number.present? %>
+        <div class="flex justify-between gap-3 sm:justify-start">
+          <dt class="shrink-0 text-muted"><%= t(".tracking") %></dt>
+          <dd class="text-text"><%= @sale.tracking_number %></dd>
+        </div>
+      <% end %>
+    </dl>
+  </div>
+
+  <h2 class="mt-6 text-lg font-semibold text-text"><%= t(".items") %></h2>
+  <ul class="card mt-2 divide-y divide-border">
+    <% @sale.order_items.each do |item| %>
+      <li class="flex items-center gap-3 px-4 py-3">
+        <div class="min-w-0 flex-1">
+          <% if item.listing %>
+            <%= link_to item.title, listing_path(item.listing), class: "text-sm font-medium text-text hover:text-primary hover:underline" %>
+          <% else %>
+            <span class="text-sm font-medium text-text"><%= item.title %></span>
+          <% end %>
+          <p class="mt-0.5 text-xs text-muted"><%= t(".quantity", count: item.quantity) %></p>
+        </div>
+        <p class="text-sm font-semibold text-text"><%= money(item.line_total_cents, @sale.currency) %></p>
+      </li>
+    <% end %>
+  </ul>
+
+  <h2 class="mt-6 text-lg font-semibold text-text"><%= t(".totals") %></h2>
+  <dl class="card mt-2 divide-y divide-border text-sm">
+    <div class="flex justify-between px-4 py-2.5">
+      <dt class="text-muted"><%= t(".subtotal") %></dt>
+      <dd class="text-text"><%= money(@sale.subtotal_cents, @sale.currency) %></dd>
+    </div>
+    <div class="flex justify-between px-4 py-2.5">
+      <dt class="text-muted"><%= t(".shipping") %></dt>
+      <dd class="text-text"><%= @sale.shipping_cents.zero? ? t(".free_shipping") : money(@sale.shipping_cents, @sale.currency) %></dd>
+    </div>
+    <div class="flex justify-between px-4 py-2.5">
+      <dt class="text-muted"><%= t(".commission") %></dt>
+      <dd class="text-text"><%= money(@sale.commission_cents, @sale.currency) %></dd>
+    </div>
+    <div class="flex justify-between px-4 py-2.5 font-semibold text-text">
+      <dt><%= t(".total") %></dt>
+      <dd><%= money(@sale.total_cents, @sale.currency) %></dd>
+    </div>
+    <div class="flex justify-between bg-emerald-50 px-4 py-2.5 font-semibold text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+      <dt><%= t(".net_revenue") %></dt>
+      <dd><%= money(@sale.net_revenue_cents, @sale.currency) %></dd>
+    </div>
+  </dl>
+
+  <p class="mt-4 text-xs text-muted"><%= t(".shipping_actions_hint") %></p>
+</div>

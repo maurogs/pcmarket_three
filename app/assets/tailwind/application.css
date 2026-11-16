@@ -40,6 +40,13 @@
 }
 
 @layer components {
+  /* Plain panel used across the sell area (forms, dashboard tiles). */
+  .card {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-surface);
+  }
+
   .icon-button {
     display: inline-flex;
     align-items: center;

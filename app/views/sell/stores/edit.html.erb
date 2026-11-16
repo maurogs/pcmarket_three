@@ -1,0 +1,154 @@
+<% content_for :title, t(".title") %>
+
+<%= link_to t(".back_to_dashboard"), sell_dashboard_path, class: "text-sm font-medium text-primary hover:underline" %>
+<h1 class="mt-2 text-xl font-bold tracking-tight sm:text-2xl"><%= t(".title") %></h1>
+<p class="mt-1 text-sm text-muted"><%= t(".subtitle") %></p>
+
+<% input = "mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-muted focus:border-primary focus:outline-none" %>
+<% label = "block text-sm font-medium text-text" %>
+<% hint = "mt-1 text-xs text-muted" %>
+
+<%= form_with model: @store, url: sell_store_path, method: :patch, html: { multipart: true } do |f| %>
+  <div class="card mt-4 p-4 sm:p-6">
+    <%= render "shared/error_summary", resource: @store %>
+
+    <%# --- store profile -------------------------------------------------- %>
+    <h2 class="text-lg font-semibold text-text"><%= t(".sections.profile") %></h2>
+
+    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+      <div class="sm:col-span-2">
+        <%= f.label :name, class: label %>
+        <%= f.text_field :name, required: true, minlength: 2, maxlength: 60, class: input %>
+        <p class="<%= hint %>"><%= t(".hints.name") %></p>
+      </div>
+
+      <div class="sm:col-span-2">
+        <%= f.label :description, class: label %>
+        <%= f.text_area :description, rows: 4, maxlength: 2000, class: input %>
+        <p class="<%= hint %>"><%= t(".hints.description", max: 2000) %></p>
+      </div>
+
+      <div>
+        <%= f.label :city, class: label %>
+        <%= f.text_field :city, maxlength: 60, class: input %>
+      </div>
+      <div>
+        <%= f.label :region, class: label %>
+        <%= f.select :region, options_for_select(EsProvince.names, @store.region),
+              { include_blank: true }, class: input %>
+        <p class="<%= hint %>"><%= t(".hints.region") %></p>
+      </div>
+
+      <div class="sm:col-span-2">
+        <span class="<%= label %>"><%= t(".labels.store_type") %></span>
+        <div class="mt-2 grid gap-2 sm:grid-cols-2">
+          <% Store.store_types.each_key do |type| %>
+            <label class="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-border bg-surface p-3 text-sm text-text transition has-[:checked]:border-primary has-[:checked]:ring-1 has-[:checked]:ring-primary">
+              <%= f.radio_button :store_type, type, class: "size-4 accent-primary" %>
+              <span><%= t(".store_types.#{type}") %></span>
+            </label>
+          <% end %>
+        </div>
+        <p class="<%= hint %>"><%= t(".hints.store_type_business") %></p>
+      </div>
+
+      <div class="sm:col-span-2">
+        <%= f.label :vat_number, class: label %>
+        <%= f.text_field :vat_number, maxlength: 20, autocomplete: "off", class: input %>
+        <p class="<%= hint %>"><%= t(".hints.vat_number") %></p>
+      </div>
+    </div>
+
+    <%# --- appearance ------------------------------------------------------ %>
+    <h2 class="mt-6 text-lg font-semibold text-text"><%= t(".sections.appearance") %></h2>
+
+    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+      <div>
+        <span class="<%= label %>"><%= t(".labels.logo") %></span>
+        <%# persisted? guard: a rejected upload sits in memory only, and an
+            unsaved attachment has no signed_id to build a variant URL from. %>
+        <% if @store.logo.attached? && @store.logo.persisted? %>
+          <span class="mt-2 flex items-center gap-3">
+            <%= image_tag store_logo_url(@store, :thumb), alt: "",
+                  class: "size-14 rounded-lg border border-border bg-white object-cover",
+                  width: 256, height: 256, loading: "lazy", decoding: "async" %>
+            <span class="text-xs text-muted"><%= t(".labels.current_logo") %></span>
+          </span>
+        <% end %>
+        <%= f.file_field :logo, accept: Store::IMAGE_CONTENT_TYPES.join(","),
+              class: "mt-2 block w-full text-sm text-muted file:mr-3 file:min-h-9 file:cursor-pointer file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-white" %>
+        <p class="<%= hint %>"><%= t(".hints.logo", size: Store::LOGO_MAX_BYTES / 1.megabyte) %></p>
+      </div>
+
+      <div>
+        <span class="<%= label %>"><%= t(".labels.banner") %></span>
+        <% if @store.banner.attached? && @store.banner.persisted? %>
+          <span class="mt-2 flex items-center gap-3">
+            <%= image_tag store_banner_url(@store, :display), alt: "",
+                  class: "h-14 w-56 rounded-md border border-border bg-surface-muted object-cover",
+                  loading: "lazy", decoding: "async" %>
+            <span class="text-xs text-muted"><%= t(".labels.current_banner") %></span>
+          </span>
+        <% end %>
+        <%= f.file_field :banner, accept: Store::IMAGE_CONTENT_TYPES.join(","),
+              class: "mt-2 block w-full text-sm text-muted file:mr-3 file:min-h-9 file:cursor-pointer file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-white" %>
+        <p class="<%= hint %>"><%= t(".hints.banner", size: Store::BANNER_MAX_BYTES / 1.megabyte) %></p>
+      </div>
+    </div>
+
+    <%# --- sales preferences ------------------------------------------------ %>
+    <h2 class="mt-6 text-lg font-semibold text-text"><%= t(".sections.sales") %></h2>
+
+    <label class="mt-4 flex min-h-11 cursor-pointer items-start gap-3 rounded-lg border border-border bg-surface p-3 text-sm text-text">
+      <%= f.check_box :allow_offers_default, class: "mt-0.5 size-4 accent-primary" %>
+      <span>
+        <span class="block font-medium"><%= t(".labels.allow_offers") %></span>
+        <span class="mt-0.5 block text-xs text-muted"><%= t(".hints.allow_offers") %></span>
+      </span>
+    </label>
+
+    <%# --- shipping defaults ------------------------------------------------ %>
+    <h2 class="mt-6 text-lg font-semibold text-text"><%= t(".sections.shipping") %></h2>
+
+    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+      <% default_value = @store.default_shipping_cents ? ("%.2f" % (BigDecimal(@store.default_shipping_cents) / 100)) : nil %>
+      <div>
+        <%= label_tag "store_default_shipping", t(".labels.default_shipping"), class: label %>
+        <%= number_field_tag "store[default_shipping]", default_value,
+              id: "store_default_shipping", step: 0.01, min: 0, class: input %>
+        <p class="<%= hint %>"><%= t(".hints.default_shipping") %></p>
+      </div>
+      <% threshold_value = @store.free_shipping_threshold_cents ? ("%.2f" % (BigDecimal(@store.free_shipping_threshold_cents) / 100)) : nil %>
+      <div>
+        <%= label_tag "store_free_shipping_threshold", t(".labels.free_shipping_threshold"), class: label %>
+        <%= number_field_tag "store[free_shipping_threshold]", threshold_value,
+              id: "store_free_shipping_threshold", step: 0.01, min: 0, class: input %>
+        <p class="<%= hint %>"><%= t(".hints.free_shipping_threshold") %></p>
+      </div>
+
+      <div class="sm:col-span-2">
+        <%= f.label :shipping_policy, class: label %>
+        <%= f.text_area :shipping_policy, rows: 3, maxlength: 5000, class: input %>
+      </div>
+      <div class="sm:col-span-2">
+        <%= f.label :returns_policy, class: label %>
+        <%= f.text_area :returns_policy, rows: 3, maxlength: 5000, class: input %>
+      </div>
+    </div>
+
+    <%# --- payouts (same feature flag as checkout) -------------------------- %>
+    <h2 class="mt-6 text-lg font-semibold text-text"><%= t(".sections.payouts") %></h2>
+    <% if Flipper.enabled?(:stripe_checkout) %>
+      <p class="mt-4 text-sm text-muted"><%= t(".payouts.manage_hint") %></p>
+    <% else %>
+      <p class="mt-4 rounded-md border border-border bg-surface-muted px-3 py-2.5 text-sm text-muted">
+        <%= t(".payouts.coming_soon") %>
+      </p>
+    <% end %>
+
+    <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+      <%= f.submit t(".save"), class: "min-h-11 cursor-pointer rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-hover" %>
+      <%= link_to t(".cancel"), sell_dashboard_path, class: "min-h-11 inline-flex items-center px-2 text-sm text-muted hover:text-text" %>
+    </div>
+  </div>
+<% end %>

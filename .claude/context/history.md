@@ -1,5 +1,68 @@
 # History
 
+## 2026-11-17 — Phase 3b: seller dashboard, store settings, vacation mode (+ photo-purge bugfix)
+
+**What changed**
+
+- Bugfix first: `Listings::Update#call` wrapped save+purge so ActiveStorage
+  purges (`attachment.purge_later`) run only AFTER commit — a failed update
+  with `remove_photo_ids` keeps the photos attached (also fixes a latent
+  `saved: true` after rollback). Regression tests in
+  `test/integration/sell_listings_test.rb`.
+- Routes: `namespace :sell` gains `resource :dashboard, only: :show` (+
+  `root to: "dashboards#show", as: :sell_root`), `resource :store, only:
+  %i[edit update]`, `resource :vacation, only: %i[create destroy]` and
+  `resources :sales, only: %i[index show]` (read-only; shipping actions are
+  Phase 4).
+- Sell chrome: `Sell::BaseController` uses `layout "sell"`
+  (`app/views/layouts/sell.html.erb`, noindex) with the `sell/_sidebar`
+  partial — store card (logo or 2-letter initials, name, @username) + nav
+  (Dashboard / My listings / My sales / Public profile / Store settings /
+  Vacation toggle). Nav row scrolls horizontally on mobile, vertical rail
+  from `lg`. Header account dropdown + mobile menu gained "My store" links.
+- Dashboard (`Sell::DashboardsController` + `Sell::DashboardStats`): every
+  number from aggregate queries only (one per metric). KPIs: live/in-review
+  listings and lifetime views (current), favorites/sales/revenue windowed
+  to 30 days (revenue = `SUM(total_cents − commission_cents)` on completed
+  only, via new `Order#net_revenue_cents`), zero-guarded conversion. 12-week
+  pure HTML/CSS bar chart from ONE `date_trunc('week', …)` GROUP BY,
+  zero-filled oldest-first (`Result#weekly_max`). "Needs attention" =
+  recently rejected + reasons (`Listing.recently_rejected_for`), pending
+  offers (`Offer.pending_for_seller`), unanswered threads
+  (`Conversation.unanswered_for_seller` = NOT EXISTS seller message). Top 5
+  by views. Stats fragment cached 5 min per store.
+- Store settings (`Stores::UpdateSettings` + singular `resource :store`):
+  name unique 2..60, description ≤2000, store_type enum individual/business
+  (business requires `vat_number` validated by new
+  `app/validators/spanish_tax_id_validator.rb` — NIF/NIE/CIF checksums incl.
+  CIF control-char table `JABCDEFGHI`), city + `region` (EsProvince),
+  returns/shipping policies, shipping defaults posted as euro strings
+  (`store[default_shipping]` → cents), logo/banner uploads (jpeg/png/webp,
+  5 MB/8 MB model validations, variants: logo thumb 256²/card 400², banner
+  display 1600×400). FriendlyId `:history`: renaming regenerates the slug
+  and public `StoresController#show` 301-redirects old slugs.
+  New migrations `20261117200001` (settings), `…200002`
+  (friendly_id_slugs), `…200003` (stores.city/region).
+- Vacation mode: `Store#enable_vacation!`/`disable_vacation!` via
+  `Sell::VacationsController` (POST/DELETE /sell/vacation). Listings stay
+  visible in search (ListingSearch untouched) but public listing pages show
+  a "seller on vacation" notice and buy/offer CTAs are disabled; store page
+  gets a vacation banner.
+- My sales: `Sell::SalesController#index/show` — seller-scoped orders
+  (`Order#net_revenue_cents`), status badges via `Sell::SalesHelper`,
+  read-only show for now. New `test/fixtures/order_items.yml` links
+  fixture orders to listings.
+- Gotchas learned: FriendlyId `:history` `after_save :create_slug` records
+  the CURRENT slug — fixture INSERTs create no history rows, so tests that
+  exercise old-slug resolution must seed `store.slugs.create!(slug:)` or
+  create stores through the model. Lazy attachment assignment
+  (`store.logo = file`) is deferred until save: on a 422 re-render the
+  in-memory attachment has no `signed_id`, so `store_logo_url`/
+  `store_banner_url` require `attached? && persisted?` (and note
+  `store&.logo.attached?` only guards `logo` — use `&.attached?`).
+- Locales: 6 files merged to an identical tree of **679 keys**
+  (`ruby script/lint_locale_keys.rb` green).
+
 ## 2026-11-16 — Phase 3a: seller listing management (sell namespace CRUD, review submission, photo upload)
 
 **What changed**

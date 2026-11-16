@@ -1,5 +1,8 @@
 module Sell
   class BaseController < ApplicationController
+    # Chrome for the whole sell area: sidebar + content grid (see
+    # app/views/layouts/sell.html.erb and sell/_sidebar).
+    layout "sell"
     before_action :redirect_banned_users
 
     private

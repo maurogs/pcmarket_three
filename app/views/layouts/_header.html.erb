@@ -41,6 +41,13 @@
             <div class="px-2 py-1 text-sm text-muted">
               <%= Current.user.email_address %>
             </div>
+            <hr class="my-2 border-border">
+            <p class="px-2 pb-1 text-xs font-semibold uppercase tracking-wide text-muted"><%= t("nav.my_store") %></p>
+            <%= link_to t("nav.my_store_dashboard"), sell_dashboard_path, class: "block rounded-md px-2 py-1.5 text-sm text-text hover:bg-surface-muted" %>
+            <%= link_to t("nav.my_store_listings"), sell_listings_path, class: "block rounded-md px-2 py-1.5 text-sm text-text hover:bg-surface-muted" %>
+            <%= link_to t("nav.my_store_sales"), sell_sales_path, class: "block rounded-md px-2 py-1.5 text-sm text-text hover:bg-surface-muted" %>
+            <%= link_to t("nav.my_store_settings"), edit_sell_store_path, class: "block rounded-md px-2 py-1.5 text-sm text-text hover:bg-surface-muted" %>
+            <hr class="my-2 border-border">
             <%= button_to t("nav.log_out"), session_path, method: :delete, class: "mt-1 w-full rounded-md px-2 py-1.5 text-left text-sm text-text hover:bg-surface-muted" %>
           </div>
         </details>
@@ -184,6 +191,12 @@
       <%= link_to t("nav.cart"), "#", class: "rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
       <hr class="my-2 border-border">
       <% if authenticated? %>
+        <p class="px-3 pt-1 text-xs font-semibold uppercase tracking-wide text-muted"><%= t("nav.my_store") %></p>
+        <%= link_to t("nav.my_store_dashboard"), sell_dashboard_path, class: "block rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
+        <%= link_to t("nav.my_store_listings"), sell_listings_path, class: "block rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
+        <%= link_to t("nav.my_store_sales"), sell_sales_path, class: "block rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
+        <%= link_to t("nav.my_store_settings"), edit_sell_store_path, class: "block rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
+        <hr class="my-2 border-border">
         <%= button_to t("nav.log_out"), session_path, method: :delete, class: "w-full min-h-11 rounded-md px-3 py-2.5 text-left text-sm text-text hover:bg-surface-muted" %>
       <% else %>
         <%= link_to t("nav.log_in"), new_session_path, class: "rounded-md px-3 py-2.5 hover:bg-surface-muted" %>

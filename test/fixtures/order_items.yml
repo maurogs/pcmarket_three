@@ -1,0 +1,13 @@
+one:
+  order: one
+  listing: as_new
+  title: Barely used RTX 4060
+  price_cents: 50000
+  quantity: 1
+
+two:
+  order: two
+  listing: gigabyte
+  title: Gigabyte RTX 4070 Gaming OC
+  price_cents: 20000
+  quantity: 1

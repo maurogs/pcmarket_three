@@ -583,6 +583,39 @@ ALTER SEQUENCE public.follows_id_seq OWNED BY public.follows.id;
 
 
 --
+-- Name: friendly_id_slugs; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.friendly_id_slugs (
+    id bigint NOT NULL,
+    slug character varying NOT NULL,
+    sluggable_id integer NOT NULL,
+    sluggable_type character varying(50),
+    scope character varying,
+    created_at timestamp(6) without time zone
+);
+
+
+--
+-- Name: friendly_id_slugs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.friendly_id_slugs_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: friendly_id_slugs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.friendly_id_slugs_id_seq OWNED BY public.friendly_id_slugs.id;
+
+
+--
 -- Name: labels; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1311,7 +1344,13 @@ CREATE TABLE public.stores (
     reviews_count integer DEFAULT 0 NOT NULL,
     followers_count integer DEFAULT 0 NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    returns_policy text,
+    shipping_policy text,
+    default_shipping_cents integer DEFAULT 0 NOT NULL,
+    free_shipping_threshold_cents integer,
+    city character varying,
+    region character varying
 );
 
 
@@ -1486,6 +1525,13 @@ ALTER TABLE ONLY public.flipper_gates ALTER COLUMN id SET DEFAULT nextval('publi
 --
 
 ALTER TABLE ONLY public.follows ALTER COLUMN id SET DEFAULT nextval('public.follows_id_seq'::regclass);
+
+
+--
+-- Name: friendly_id_slugs id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.friendly_id_slugs ALTER COLUMN id SET DEFAULT nextval('public.friendly_id_slugs_id_seq'::regclass);
 
 
 --
@@ -1772,6 +1818,14 @@ ALTER TABLE ONLY public.follows
 
 
 --
+-- Name: friendly_id_slugs friendly_id_slugs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.friendly_id_slugs
+    ADD CONSTRAINT friendly_id_slugs_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: labels labels_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1952,6 +2006,13 @@ ALTER TABLE ONLY public.users
 --
 
 CREATE UNIQUE INDEX idx_on_category_id_spec_attribute_id_776608a8ce ON public.category_spec_attributes USING btree (category_id, spec_attribute_id);
+
+
+--
+-- Name: idx_on_slug_sluggable_type_sluggable_id_346c76cf7f; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_on_slug_sluggable_type_sluggable_id_346c76cf7f ON public.friendly_id_slugs USING btree (slug, sluggable_type, sluggable_id);
 
 
 --
@@ -2176,6 +2237,27 @@ CREATE UNIQUE INDEX index_follows_on_follower_id_and_store_id ON public.follows 
 --
 
 CREATE INDEX index_follows_on_store_id ON public.follows USING btree (store_id);
+
+
+--
+-- Name: index_friendly_id_slugs_on_slug_and_sluggable_type; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_friendly_id_slugs_on_slug_and_sluggable_type ON public.friendly_id_slugs USING btree (slug, sluggable_type);
+
+
+--
+-- Name: index_friendly_id_slugs_on_sluggable_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_friendly_id_slugs_on_sluggable_id ON public.friendly_id_slugs USING btree (sluggable_id);
+
+
+--
+-- Name: index_friendly_id_slugs_on_sluggable_type_and_sluggable_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_friendly_id_slugs_on_sluggable_type_and_sluggable_id ON public.friendly_id_slugs USING btree (sluggable_type, sluggable_id);
 
 
 --
@@ -2931,6 +3013,9 @@ ALTER TABLE ONLY public.moderation_events
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261117200003'),
+('20261117200002'),
+('20261117200001'),
 ('20261117090033'),
 ('20261117090032'),
 ('20261117090031'),

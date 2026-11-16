@@ -19,6 +19,12 @@ class Order < ApplicationRecord
 
   scope :recent, -> { order(created_at: :desc, id: :desc) }
 
+  # What the seller keeps: the platform commission is charged on top of the
+  # total, so it is not part of the seller's revenue.
+  def net_revenue_cents
+    total_cents - commission_cents
+  end
+
   # Applies the configured platform commission (0 unless the commissions
   # flag is on — see CommissionCalculator).
   def apply_commission!

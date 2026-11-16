@@ -18,16 +18,27 @@ Rails.application.routes.draw do
     resources :passwords, param: :token
     resource :registration, only: %i[new create]
 
-    # Seller area (Phase 3a): listing create/edit, review submission, archiving
-    # and mark-sold. Status changes are modelled as nested singular resources
-    # (POST creates a state transition) instead of custom member actions.
+    # Seller area (Phase 3a/3b): listing create/edit, review submission,
+    # archiving and mark-sold, plus the Phase 3b dashboard, store settings,
+    # vacation toggle and sales. Status changes are modelled as nested
+    # singular resources (POST creates a state transition) instead of custom
+    # member actions.
     namespace :sell do
+      # The dashboard is the landing page of the sell area (/sell).
+      root to: "dashboards#show", as: :sell_root
+
+      resource :dashboard, only: :show
+
       resources :listings do
         resource :submission, only: :create
         resource :archival, only: :create
         resource :sale_mark, only: :create
       end
       resources :category_fields, only: :show
+
+      resource :store, only: %i[edit update]
+      resource :vacation, only: %i[create destroy]
+      resources :sales, only: %i[index show]
     end
   end
 end

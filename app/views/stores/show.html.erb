@@ -4,15 +4,15 @@
 <header class="overflow-hidden rounded-lg border border-border bg-surface">
   <div class="h-28 bg-gradient-to-r from-primary/80 via-primary to-accent sm:h-36">
     <% if store.banner.attached? %>
-      <%= image_tag variant_url(store.banner, :gallery), alt: "", class: "size-full object-cover",
-            loading: "lazy", decoding: "async", width: 1200, height: 400 %>
+      <%= image_tag store_banner_url(store, :display), alt: "", class: "size-full object-cover",
+            loading: "lazy", decoding: "async", width: 1600, height: 400 %>
     <% end %>
   </div>
 
   <div class="flex flex-wrap items-end gap-4 p-4">
     <div class="-mt-10 flex size-20 shrink-0 items-center justify-center rounded-lg border border-border bg-surface text-xl font-bold text-primary sm:size-24 sm:text-2xl">
       <% if store.logo.attached? %>
-        <%= image_tag variant_url(store.logo, :card), alt: "", class: "size-full rounded-lg object-cover",
+        <%= image_tag store_logo_url(store, :card), alt: "", class: "size-full rounded-lg object-cover",
               loading: "lazy", decoding: "async", width: 400, height: 400 %>
       <% else %>
         <%= store.name[0, 2].upcase %>
@@ -69,6 +69,16 @@
     </div>
   </dl>
 </header>
+
+<%# Vacation mode: the store keeps selling nothing while away, but the
+    catalogue stays browsable (ListingSearch does not exclude it). %>
+<% if store.vacation_mode? %>
+  <p class="mt-4 flex items-center gap-2 rounded-md border border-border bg-surface-muted px-3 py-2.5 text-sm font-medium text-muted"
+     role="status">
+    <%= inline_icon :clock, classes: "size-5 shrink-0" %>
+    <%= t(".vacation_notice") %>
+  </p>
+<% end %>
 
 <%# --- tabs --------------------------------------------------------------- %>
 <nav aria-label="<%= t(".tabs_label") %>" class="mt-6 flex gap-1 border-b border-border">
