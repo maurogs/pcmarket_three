@@ -1,0 +1,107 @@
+it:
+  site:
+    name: PCMarket
+  layouts:
+    announcement: "Novità: PCMarket è ora disponibile in Spagna. Compra e vendi hardware per PC nuovo e usato."
+  nav:
+    search_placeholder: "Cerca schede video, processori, portatili…"
+    search_submit: "Cerca"
+    list_item: "Pubblica un annuncio"
+    sell_to_us: "Vendi a noi"
+    wishlist: "Lista dei desideri"
+    notifications: "Notifiche"
+    cart: "Carrello"
+    account: "Account"
+    log_in: "Accedi"
+    log_out: "Esci"
+    sign_up: "Registrati"
+    menu: "Menu"
+    close_menu: "Chiudi menu"
+    toggle_theme: "Passa dalla modalità chiara a quella scura"
+  footer:
+    newsletter_title: "Iscriviti alla nostra newsletter"
+    newsletter_placeholder: "Il tuo indirizzo e-mail"
+    newsletter_submit: "Iscriviti"
+    about: "Chi siamo"
+    help: "Assistenza"
+    buying_selling: "Acquisto e vendita"
+    about_us: "L'azienda"
+    careers: "Lavora con noi"
+    press: "Stampa"
+    contact: "Contatti"
+    faq: "Centro assistenza"
+    shipping: "Spedizione e resi"
+    how_to_sell: "Come vendere"
+    how_to_buy: "Come comprare"
+    selling_requirements: "Requisiti di vendita"
+    language: "Lingua"
+    copyright: "© %{year} %{brand}. Tutti i diritti riservati."
+  locales:
+    es: "Español"
+    en: "English"
+    fr: "Français"
+    de: "Deutsch"
+    it: "Italiano"
+    pt: "Português"
+  pages:
+    home:
+      hero:
+        title: "Compra e vendi hardware per PC in tutta sicurezza"
+        subtitle: "Il marketplace spagnolo per componenti PC nuovi e usati, creato da appassionati."
+        cta_primary: "Pubblica un annuncio"
+        cta_secondary: "Sfoglia le categorie"
+  sessions:
+    new:
+      title: "Accedi"
+      submit: "Accedi"
+      forgot_password: "Password dimenticata?"
+      no_account: "Non hai ancora un account?"
+    create:
+      invalid_credentials: "Prova un altro indirizzo e-mail o un'altra password."
+      rate_limited: "Riprova più tardi."
+  passwords:
+    new:
+      title: "Password dimenticata?"
+      submit: "Invia istruzioni per il reimpostamento"
+    create:
+      mailed: "Istruzioni per il reimpostamento inviate (se esiste un account con questo indirizzo e-mail)."
+      rate_limited: "Riprova più tardi."
+    edit:
+      title: "Aggiorna la password"
+      submit: "Salva"
+      password_placeholder: "Inserisci la nuova password"
+      password_confirmation_placeholder: "Ripeti la nuova password"
+      invalid_token: "Il link per il reimpostamento non è valido o è scaduto."
+    update:
+      success: "La password è stata reimpostata."
+      mismatch: "Le password non coincidono."
+  registrations:
+    new:
+      title: "Crea un account"
+      submit: "Crea l'account"
+      already_have_account: "Hai già un account?"
+      phone_hint: "Facoltativo"
+      username_hint: "Da 3 a 30 caratteri: lettere, numeri, trattini bassi e trattini."
+    create:
+      success: "Benvenuto! Il tuo account è stato creato."
+      rate_limited: "Riprova più tardi."
+  passwords_mailer:
+    reset:
+      subject: "Reimposta la password"
+      intro: "Usa il link seguente per reimpostare la password."
+      link_text: "Reimposta la password"
+      expires_in: "Questo link scadrà tra %{duration}."
+  activerecord:
+    models:
+      user: "Utente"
+    attributes:
+      user:
+        username: "Nome utente"
+        email_address: "Indirizzo e-mail"
+        password: "Password"
+        password_confirmation: "Conferma password"
+        first_name: "Nome"
+        last_name: "Cognome"
+        phone: "Numero di telefono"
+        role: "Ruolo"
+        locale: "Lingua"

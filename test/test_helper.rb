@@ -1,6 +1,7 @@
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
+require_relative "test_helpers/session_test_helper"
 
 module ActiveSupport
   class TestCase
@@ -10,6 +11,13 @@ module ActiveSupport
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
 
-    # Add more helper methods to be used by all tests here...
+    # Add more helper methods to be used all tests here...
   end
 end
+
+# All routes live under an optional /(:locale) segment. Integration test URL
+# helpers merge this into url_options, so every helper-built path is /en/...
+# and positional segment args (e.g. password_path(token)) bind to the right
+# key. :en keeps the generated auth tests' English flash assertions working
+# (the app default locale is :es).
+Rails.application.routes.default_url_options[:locale] = :en

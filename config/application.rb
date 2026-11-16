@@ -23,5 +23,10 @@ module AppTestThree
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # I18n: Spanish-first marketplace, English fallback (see config/locales/*.yml).
+    config.i18n.available_locales = %i[es en fr de it pt]
+    config.i18n.default_locale = :es
+    config.i18n.fallbacks = [ :en ]
   end
 end

@@ -1,0 +1,107 @@
+fr:
+  site:
+    name: PCMarket
+  layouts:
+    announcement: "Nouveau : PCMarket est désormais disponible en Espagne. Achetez et vendez du matériel informatique neuf et d'occasion."
+  nav:
+    search_placeholder: "Recherchez cartes graphiques, processeurs, ordinateurs portables…"
+    search_submit: "Rechercher"
+    list_item: "Déposer une annonce"
+    sell_to_us: "Vendez-nous votre matériel"
+    wishlist: "Liste de souhaits"
+    notifications: "Notifications"
+    cart: "Panier"
+    account: "Compte"
+    log_in: "Se connecter"
+    log_out: "Se déconnecter"
+    sign_up: "Créer un compte"
+    menu: "Menu"
+    close_menu: "Fermer le menu"
+    toggle_theme: "Basculer entre mode clair et mode sombre"
+  footer:
+    newsletter_title: "Abonnez-vous à notre newsletter"
+    newsletter_placeholder: "Votre adresse e-mail"
+    newsletter_submit: "S'abonner"
+    about: "À propos"
+    help: "Aide"
+    buying_selling: "Acheter et vendre"
+    about_us: "Qui sommes-nous"
+    careers: "Recrutement"
+    press: "Presse"
+    contact: "Contact"
+    faq: "Centre d'aide"
+    shipping: "Livraison et retours"
+    how_to_sell: "Comment vendre"
+    how_to_buy: "Comment acheter"
+    selling_requirements: "Conditions de vente"
+    language: "Langue"
+    copyright: "© %{year} %{brand}. Tous droits réservés."
+  locales:
+    es: "Español"
+    en: "English"
+    fr: "Français"
+    de: "Deutsch"
+    it: "Italiano"
+    pt: "Português"
+  pages:
+    home:
+      hero:
+        title: "Achetez et vendez du matériel informatique en toute confiance"
+        subtitle: "La marketplace espagnole des composants PC neufs et d'occasion, créée par des passionnés."
+        cta_primary: "Déposer une annonce"
+        cta_secondary: "Parcourir les catégories"
+  sessions:
+    new:
+      title: "Se connecter"
+      submit: "Se connecter"
+      forgot_password: "Mot de passe oublié ?"
+      no_account: "Pas encore de compte ?"
+    create:
+      invalid_credentials: "Essayez une autre adresse e-mail ou un autre mot de passe."
+      rate_limited: "Réessayez plus tard."
+  passwords:
+    new:
+      title: "Mot de passe oublié ?"
+      submit: "Envoyer les instructions de réinitialisation"
+    create:
+      mailed: "Instructions de réinitialisation envoyées (si un compte existe avec cette adresse e-mail)."
+      rate_limited: "Réessayez plus tard."
+    edit:
+      title: "Mettez à jour votre mot de passe"
+      submit: "Enregistrer"
+      password_placeholder: "Saisissez le nouveau mot de passe"
+      password_confirmation_placeholder: "Répétez le nouveau mot de passe"
+      invalid_token: "Le lien de réinitialisation est invalide ou a expiré."
+    update:
+      success: "Le mot de passe a été réinitialisé."
+      mismatch: "Les mots de passe ne correspondent pas."
+  registrations:
+    new:
+      title: "Créer un compte"
+      submit: "Créer le compte"
+      already_have_account: "Vous avez déjà un compte ?"
+      phone_hint: "Facultatif"
+      username_hint: "3 à 30 caractères : lettres, chiffres, tirets bas et tirets."
+    create:
+      success: "Bienvenue ! Votre compte a été créé."
+      rate_limited: "Réessayez plus tard."
+  passwords_mailer:
+    reset:
+      subject: "Réinitialisez votre mot de passe"
+      intro: "Utilisez le lien ci-dessous pour réinitialiser votre mot de passe."
+      link_text: "Réinitialiser le mot de passe"
+      expires_in: "Ce lien expirera dans %{duration}."
+  activerecord:
+    models:
+      user: "Utilisateur"
+    attributes:
+      user:
+        username: "Nom d'utilisateur"
+        email_address: "Adresse e-mail"
+        password: "Mot de passe"
+        password_confirmation: "Confirmation du mot de passe"
+        first_name: "Prénom"
+        last_name: "Nom"
+        phone: "Numéro de téléphone"
+        role: "Rôle"
+        locale: "Langue"

@@ -1,0 +1,107 @@
+es:
+  site:
+    name: PCMarket
+  layouts:
+    announcement: "¡Nuevo! PCMarket ya está disponible en España. Compra y vende hardware de PC nuevo y de segunda mano."
+  nav:
+    search_placeholder: "Busca tarjetas gráficas, procesadores, portátiles…"
+    search_submit: "Buscar"
+    list_item: "Publicar un anuncio"
+    sell_to_us: "Véndenos tu hardware"
+    wishlist: "Lista de deseos"
+    notifications: "Notificaciones"
+    cart: "Cesta"
+    account: "Cuenta"
+    log_in: "Iniciar sesión"
+    log_out: "Cerrar sesión"
+    sign_up: "Crear cuenta"
+    menu: "Menú"
+    close_menu: "Cerrar menú"
+    toggle_theme: "Cambiar entre modo claro y oscuro"
+  footer:
+    newsletter_title: "Suscríbete a nuestra newsletter"
+    newsletter_placeholder: "Tu correo electrónico"
+    newsletter_submit: "Suscribirse"
+    about: "Acerca de"
+    help: "Ayuda"
+    buying_selling: "Comprar y vender"
+    about_us: "Quiénes somos"
+    careers: "Trabaja con nosotros"
+    press: "Prensa"
+    contact: "Contacto"
+    faq: "Centro de ayuda"
+    shipping: "Envíos y devoluciones"
+    how_to_sell: "Cómo vender"
+    how_to_buy: "Cómo comprar"
+    selling_requirements: "Requisitos para vender"
+    language: "Idioma"
+    copyright: "© %{year} %{brand}. Todos los derechos reservados."
+  locales:
+    es: "Español"
+    en: "English"
+    fr: "Français"
+    de: "Deutsch"
+    it: "Italiano"
+    pt: "Português"
+  pages:
+    home:
+      hero:
+        title: "Compra y vende hardware de PC con confianza"
+        subtitle: "El mercado español de componentes de PC nuevos y de segunda mano, creado por entusiastas."
+        cta_primary: "Publicar un anuncio"
+        cta_secondary: "Ver categorías"
+  sessions:
+    new:
+      title: "Iniciar sesión"
+      submit: "Iniciar sesión"
+      forgot_password: "¿Has olvidado tu contraseña?"
+      no_account: "¿Aún no tienes cuenta?"
+    create:
+      invalid_credentials: "Prueba con otro correo electrónico o contraseña."
+      rate_limited: "Inténtalo de nuevo más tarde."
+  passwords:
+    new:
+      title: "¿Has olvidado tu contraseña?"
+      submit: "Envíame instrucciones de restablecimiento"
+    create:
+      mailed: "Te hemos enviado instrucciones de restablecimiento (si existe una cuenta con ese correo electrónico)."
+      rate_limited: "Inténtalo de nuevo más tarde."
+    edit:
+      title: "Actualiza tu contraseña"
+      submit: "Guardar"
+      password_placeholder: "Introduce la nueva contraseña"
+      password_confirmation_placeholder: "Repite la nueva contraseña"
+      invalid_token: "El enlace de restablecimiento no es válido o ha caducado."
+    update:
+      success: "La contraseña se ha restablecido correctamente."
+      mismatch: "Las contraseñas no coinciden."
+  registrations:
+    new:
+      title: "Crear una cuenta"
+      submit: "Crear cuenta"
+      already_have_account: "¿Ya tienes una cuenta?"
+      phone_hint: "Opcional"
+      username_hint: "Entre 3 y 30 caracteres: letras, números, guiones bajos y guiones."
+    create:
+      success: "¡Te damos la bienvenida! Tu cuenta se ha creado."
+      rate_limited: "Inténtalo de nuevo más tarde."
+  passwords_mailer:
+    reset:
+      subject: "Restablece tu contraseña"
+      intro: "Usa el siguiente enlace para restablecer tu contraseña."
+      link_text: "Restablecer la contraseña"
+      expires_in: "Este enlace caducará en %{duration}."
+  activerecord:
+    models:
+      user: "Usuario"
+    attributes:
+      user:
+        username: "Nombre de usuario"
+        email_address: "Correo electrónico"
+        password: "Contraseña"
+        password_confirmation: "Confirmación de contraseña"
+        first_name: "Nombre"
+        last_name: "Apellidos"
+        phone: "Teléfono"
+        role: "Rol"
+        locale: "Idioma"

@@ -1,0 +1,91 @@
+<div class="border-b border-border bg-surface" data-controller="menu theme">
+  <div class="bg-accent px-4 py-1.5 text-center text-sm font-medium text-white">
+    <%= t("layouts.announcement") %>
+  </div>
+
+  <div class="flex items-center gap-3 px-4 py-3">
+    <%= link_to root_path, class: "flex items-center gap-2 text-xl font-bold text-primary", aria: { label: t("site.name") } do %>
+      <%= inline_icon :chip %>
+      <span><%= t("site.name") %></span>
+    <% end %>
+
+    <%= form_with url: root_path, method: :get, class: "hidden md:flex min-w-0 flex-1 items-center gap-2" do |form| %>
+      <%= form.search_field :q, placeholder: t("nav.search_placeholder"), class: "w-full max-w-xl rounded-md border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-muted focus:border-primary focus:outline-none", aria: { label: t("nav.search_submit") } %>
+      <%= form.submit t("nav.search_submit"), class: "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90 cursor-pointer" %>
+    <% end %>
+
+    <div class="ml-auto flex items-center gap-2">
+      <%= link_to "#", class: "hidden md:inline-block rounded-md bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent/90" do %>
+        <%= t("nav.list_item") %>
+      <% end %>
+      <%= link_to "#", class: "hidden md:inline-block rounded-md border border-border px-3 py-2 text-sm font-medium text-text hover:bg-surface-muted" do %>
+        <%= t("nav.sell_to_us") %>
+      <% end %>
+
+      <%= link_to "#", class: "icon-button", aria: { label: t("nav.wishlist") } do %>
+        <%= inline_icon :heart %>
+      <% end %>
+      <%= link_to "#", class: "icon-button", aria: { label: t("nav.notifications") } do %>
+        <%= inline_icon :bell %>
+      <% end %>
+      <%= link_to "#", class: "icon-button", aria: { label: t("nav.cart") } do %>
+        <%= inline_icon :cart %>
+      <% end %>
+
+      <% if authenticated? %>
+        <details class="relative">
+          <summary class="icon-button list-none cursor-pointer" aria-label="<%= t("nav.account") %>">
+            <%= inline_icon :user %>
+          </summary>
+          <div class="absolute right-0 z-50 mt-2 w-44 rounded-md border border-border bg-surface p-2 shadow-lg">
+            <div class="px-2 py-1 text-sm text-muted">
+              <%= Current.user.email_address %>
+            </div>
+            <%= button_to t("nav.log_out"), session_path, method: :delete, class: "mt-1 w-full rounded-md px-2 py-1.5 text-left text-sm text-text hover:bg-surface-muted" %>
+          </div>
+        </details>
+      <% else %>
+        <%= link_to t("nav.log_in"), new_session_path, class: "icon-button", aria: { label: t("nav.log_in") } %>
+      <% end %>
+
+      <button type="button" data-action="theme#toggle" class="icon-button" aria: { label: t("nav.toggle_theme") }>
+        <svg class="hidden size-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v2m0 14v2M5.6 5.6l1.4 1.4m9.9 9.9 1.4 1.4M3 12h2m14 0h2M5.6 18.4l1.4-1.4m9.9-9.9 1.4-1.4"/><circle cx="12" cy="12" r="4"/></svg>
+        <svg class="block size-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+      </button>
+
+      <button type="button" data-action="menu#toggle" data-menu-target="button" class="icon-button md:hidden" aria: { label: t("nav.menu"), expanded: "false" }>
+        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div data-menu-target="backdrop" class="fixed inset-0 z-40 hidden bg-black/50 md:hidden" data-action="menu#close"></div>
+
+  <div data-menu-target="panel" class="fixed inset-y-0 left-0 z-50 w-72 -translate-x-full transform bg-surface p-4 transition-transform md:hidden" role="dialog" aria-modal="true" aria: { label: t("nav.menu") }>
+    <div class="flex items-center justify-between">
+      <span class="text-lg font-bold text-primary"><%= t("site.name") %></span>
+      <button type="button" data-action="menu#close" class="icon-button" aria: { label: t("nav.close_menu") }>&times;</button>
+    </div>
+
+    <%= form_with url: root_path, method: :get, class: "mt-4 flex items-center gap-2" do |form| %>
+      <%= form.search_field :q, placeholder: t("nav.search_placeholder"), class: "w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-muted focus:border-primary focus:outline-none", aria: { label: t("nav.search_submit") } %>
+      <%= form.submit t("nav.search_submit"), class: "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90 cursor-pointer" %>
+    <% end %>
+
+    <nav class="mt-4 flex flex-col gap-1 text-sm">
+      <%= link_to t("nav.list_item"), "#", class: "rounded-md bg-accent px-3 py-2 text-center font-medium text-white hover:bg-accent/90" %>
+      <%= link_to t("nav.sell_to_us"), "#", class: "rounded-md border border-border px-3 py-2 text-center font-medium text-text hover:bg-surface-muted" %>
+      <hr class="my-2 border-border">
+      <%= link_to t("nav.wishlist"), "#", class: "rounded-md px-3 py-2 hover:bg-surface-muted" %>
+      <%= link_to t("nav.notifications"), "#", class: "rounded-md px-3 py-2 hover:bg-surface-muted" %>
+      <%= link_to t("nav.cart"), "#", class: "rounded-md px-3 py-2 hover:bg-surface-muted" %>
+      <hr class="my-2 border-border">
+      <% if authenticated? %>
+        <%= button_to t("nav.log_out"), session_path, method: :delete, class: "w-full rounded-md px-3 py-2 text-left text-sm text-text hover:bg-surface-muted" %>
+      <% else %>
+        <%= link_to t("nav.log_in"), new_session_path, class: "rounded-md px-3 py-2 hover:bg-surface-muted" %>
+        <%= link_to t("nav.sign_up"), new_registration_path, class: "rounded-md px-3 py-2 hover:bg-surface-muted" %>
+      <% end %>
+    </nav>
+  </div>
+</div>

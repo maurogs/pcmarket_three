@@ -1,0 +1,12 @@
+<div class="mx-auto w-full max-w-md">
+  <h1 class="text-3xl font-bold"><%= t(".title") %></h1>
+
+  <%= form_with url: passwords_path, class: "mt-6 space-y-4" do |form| %>
+    <div>
+      <%= form.label :email_address, class: "block text-sm font-medium text-text" %>
+      <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: t("activerecord.attributes.user.email_address"), value: params[:email_address], class: "mt-2 w-full rounded-md border border-border bg-surface px-3 py-2 text-text placeholder:text-muted focus:border-primary focus:outline-none" %>
+    </div>
+
+    <%= form.submit t(".submit"), class: "rounded-md bg-primary px-4 py-2.5 font-medium text-white hover:bg-primary/90 cursor-pointer" %>
+  <% end %>
+</div>

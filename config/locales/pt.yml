@@ -1,0 +1,107 @@
+pt:
+  site:
+    name: PCMarket
+  layouts:
+    announcement: "Novidade: o PCMarket já está disponível em Espanha. Compre e venda hardware para PC novo e usado."
+  nav:
+    search_placeholder: "Pesquisar placas gráficas, processadores, portáteis…"
+    search_submit: "Pesquisar"
+    list_item: "Publicar um anúncio"
+    sell_to_us: "Venda-nos o seu hardware"
+    wishlist: "Lista de desejos"
+    notifications: "Notificações"
+    cart: "Carrinho"
+    account: "Conta"
+    log_in: "Iniciar sessão"
+    log_out: "Terminar sessão"
+    sign_up: "Criar conta"
+    menu: "Menu"
+    close_menu: "Fechar menu"
+    toggle_theme: "Alternar entre modo claro e escuro"
+  footer:
+    newsletter_title: "Subscreva a nossa newsletter"
+    newsletter_placeholder: "O seu endereço de e-mail"
+    newsletter_submit: "Subscrever"
+    about: "Sobre"
+    help: "Ajuda"
+    buying_selling: "Comprar e vender"
+    about_us: "A empresa"
+    careers: "Carreiras"
+    press: "Imprensa"
+    contact: "Contactos"
+    faq: "Centro de ajuda"
+    shipping: "Envios e devoluções"
+    how_to_sell: "Como vender"
+    how_to_buy: "Como comprar"
+    selling_requirements: "Requisitos de venda"
+    language: "Idioma"
+    copyright: "© %{year} %{brand}. Todos os direitos reservados."
+  locales:
+    es: "Español"
+    en: "English"
+    fr: "Français"
+    de: "Deutsch"
+    it: "Italiano"
+    pt: "Português"
+  pages:
+    home:
+      hero:
+        title: "Compre e venda hardware para PC com confiança"
+        subtitle: "O marketplace espanhol para componentes de PC novos e usados, criado por entusiastas."
+        cta_primary: "Publicar um anúncio"
+        cta_secondary: "Ver categorias"
+  sessions:
+    new:
+      title: "Iniciar sessão"
+      submit: "Iniciar sessão"
+      forgot_password: "Esqueceu-se da palavra-passe?"
+      no_account: "Ainda não tem conta?"
+    create:
+      invalid_credentials: "Tente outro endereço de e-mail ou outra palavra-passe."
+      rate_limited: "Tente novamente mais tarde."
+  passwords:
+    new:
+      title: "Esqueceu-se da palavra-passe?"
+      submit: "Enviar instruções de reposição"
+    create:
+      mailed: "Instruções de reposição enviadas (se existir uma conta com este endereço de e-mail)."
+      rate_limited: "Tente novamente mais tarde."
+    edit:
+      title: "Atualizar a palavra-passe"
+      submit: "Guardar"
+      password_placeholder: "Introduza a nova palavra-passe"
+      password_confirmation_placeholder: "Repita a nova palavra-passe"
+      invalid_token: "A ligação de reposição é inválida ou expirou."
+    update:
+      success: "A palavra-passe foi reposta."
+      mismatch: "As palavras-passe não coincidem."
+  registrations:
+    new:
+      title: "Criar uma conta"
+      submit: "Criar conta"
+      already_have_account: "Já tem uma conta?"
+      phone_hint: "Opcional"
+      username_hint: "Entre 3 e 30 caracteres: letras, números, underscores e hífenes."
+    create:
+      success: "Bem-vindo! A sua conta foi criada."
+      rate_limited: "Tente novamente mais tarde."
+  passwords_mailer:
+    reset:
+      subject: "Redefinir a palavra-passe"
+      intro: "Utilize a ligação abaixo para repor a palavra-passe."
+      link_text: "Repor a palavra-passe"
+      expires_in: "Esta ligação expira em %{duration}."
+  activerecord:
+    models:
+      user: "Utilizador"
+    attributes:
+      user:
+        username: "Nome de utilizador"
+        email_address: "Endereço de e-mail"
+        password: "Palavra-passe"
+        password_confirmation: "Confirmação da palavra-passe"
+        first_name: "Nome"
+        last_name: "Apelido"
+        phone: "Número de telefone"
+        role: "Função"
+        locale: "Idioma"

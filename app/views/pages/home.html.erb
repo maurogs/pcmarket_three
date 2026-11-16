@@ -1,0 +1,12 @@
+<section class="rounded-xl border border-border bg-surface-muted px-6 py-14 text-center md:px-12 md:py-20">
+  <h1 class="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-text md:text-5xl">
+    <%= t(".hero.title") %>
+  </h1>
+  <p class="mx-auto mt-4 max-w-xl text-base text-muted md:text-lg">
+    <%= t(".hero.subtitle") %>
+  </p>
+  <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+    <%= link_to t(".hero.cta_primary"), "#", class: "rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary/90" %>
+    <%= link_to t(".hero.cta_secondary"), "#", class: "rounded-md border border-border bg-surface px-5 py-2.5 text-sm font-semibold text-text hover:bg-surface-muted" %>
+  </div>
+</section>

@@ -1,0 +1,107 @@
+de:
+  site:
+    name: PCMarket
+  layouts:
+    announcement: "Neu: PCMarket ist jetzt in Spanien verfügbar. Kaufen und verkaufen Sie neue und gebrauchte PC-Hardware."
+  nav:
+    search_placeholder: "Grafikkarten, Prozessoren, Laptops suchen…"
+    search_submit: "Suchen"
+    list_item: "Angebot einstellen"
+    sell_to_us: "An uns verkaufen"
+    wishlist: "Merkzettel"
+    notifications: "Benachrichtigungen"
+    cart: "Warenkorb"
+    account: "Konto"
+    log_in: "Anmelden"
+    log_out: "Abmelden"
+    sign_up: "Registrieren"
+    menu: "Menü"
+    close_menu: "Menü schließen"
+    toggle_theme: "Zwischen hellem und dunklem Modus wechseln"
+  footer:
+    newsletter_title: "Newsletter abonnieren"
+    newsletter_placeholder: "Ihre E-Mail-Adresse"
+    newsletter_submit: "Abonnieren"
+    about: "Über uns"
+    help: "Hilfe"
+    buying_selling: "Kaufen und verkaufen"
+    about_us: "Unternehmen"
+    careers: "Karriere"
+    press: "Presse"
+    contact: "Kontakt"
+    faq: "Hilfecenter"
+    shipping: "Versand und Rückgabe"
+    how_to_sell: "Verkaufen"
+    how_to_buy: "Kaufen"
+    selling_requirements: "Voraussetzungen für Verkäufer"
+    language: "Sprache"
+    copyright: "© %{year} %{brand}. Alle Rechte vorbehalten."
+  locales:
+    es: "Español"
+    en: "English"
+    fr: "Français"
+    de: "Deutsch"
+    it: "Italiano"
+    pt: "Português"
+  pages:
+    home:
+      hero:
+        title: "PC-Hardware sicher kaufen und verkaufen"
+        subtitle: "Der spanische Marktplatz für neue und gebrauchte PC-Komponenten – von Enthusiasten für Enthusiasten."
+        cta_primary: "Angebot einstellen"
+        cta_secondary: "Kategorien ansehen"
+  sessions:
+    new:
+      title: "Anmelden"
+      submit: "Anmelden"
+      forgot_password: "Passwort vergessen?"
+      no_account: "Noch kein Konto?"
+    create:
+      invalid_credentials: "Versuchen Sie eine andere E-Mail-Adresse oder ein anderes Passwort."
+      rate_limited: "Versuchen Sie es später erneut."
+  passwords:
+    new:
+      title: "Passwort vergessen?"
+      submit: "Anweisungen zum Zurücksetzen senden"
+    create:
+      mailed: "Anweisungen zum Zurücksetzen gesendet (falls ein Konto mit dieser E-Mail-Adresse existiert)."
+      rate_limited: "Versuchen Sie es später erneut."
+    edit:
+      title: "Passwort aktualisieren"
+      submit: "Speichern"
+      password_placeholder: "Neues Passwort eingeben"
+      password_confirmation_placeholder: "Neues Passwort wiederholen"
+      invalid_token: "Der Link zum Zurücksetzen ist ungültig oder abgelaufen."
+    update:
+      success: "Das Passwort wurde zurückgesetzt."
+      mismatch: "Die Passwörter stimmen nicht überein."
+  registrations:
+    new:
+      title: "Konto erstellen"
+      submit: "Konto erstellen"
+      already_have_account: "Sie haben bereits ein Konto?"
+      phone_hint: "Optional"
+      username_hint: "3–30 Zeichen: Buchstaben, Zahlen, Unterstriche und Bindestriche."
+    create:
+      success: "Willkommen! Ihr Konto wurde erstellt."
+      rate_limited: "Versuchen Sie es später erneut."
+  passwords_mailer:
+    reset:
+      subject: "Passwort zurücksetzen"
+      intro: "Verwenden Sie den folgenden Link, um Ihr Passwort zurückzusetzen."
+      link_text: "Passwort zurücksetzen"
+      expires_in: "Dieser Link läuft in %{duration} ab."
+  activerecord:
+    models:
+      user: "Benutzer"
+    attributes:
+      user:
+        username: "Benutzername"
+        email_address: "E-Mail-Adresse"
+        password: "Passwort"
+        password_confirmation: "Passwortbestätigung"
+        first_name: "Vorname"
+        last_name: "Nachname"
+        phone: "Telefonnummer"
+        role: "Rolle"
+        locale: "Sprache"

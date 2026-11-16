@@ -18,7 +18,41 @@ gem "stimulus-rails"
 gem "jbuilder"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
-# gem "bcrypt", "~> 3.1.7"
+gem "bcrypt", "~> 3.1.7"
+
+# Tailwind CSS via the Rails asset pipeline
+gem "tailwindcss-rails"
+
+# Pagination
+gem "pagy"
+
+# Sluggable models (listings, categories)
+gem "friendly_id"
+
+# Postgres full-text search for listings
+gem "pg_search"
+
+# Feature flags (commissions, featured_listings, stripe_checkout, sell_to_us, google_login)
+gem "flipper"
+gem "flipper-active_record"
+
+# SEO meta tags
+gem "meta-tags"
+
+# XML sitemaps
+gem "sitemap_generator"
+
+# Throttle/protect requests against abusive clients
+gem "rack-attack"
+
+# Locale data (dates, numbers, activerecord errors) for es/en/fr/de/it/pt
+gem "rails-i18n"
+
+# Payments
+gem "stripe"
+
+# Seed + test data
+gem "faker"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]

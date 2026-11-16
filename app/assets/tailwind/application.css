@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+/* Dark mode uses the `class` strategy: .dark on <html>, applied by
+   app/javascript/controllers/theme_controller.js. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* PCMarket design tokens. Light values live in :root (via @theme);
+   .dark overrides the themeable ones. Utilities like `bg-surface` resolve
+   these variables at runtime, so the switch is instant. */
+@theme {
+  --color-primary: #4f46e5; /* indigo-600 */
+  --color-primary-hover: #4338ca; /* indigo-700 */
+  --color-accent: #f97316; /* orange-500 */
+  --color-accent-hover: #ea580c; /* orange-600 */
+
+  --color-surface: #ffffff;
+  --color-surface-muted: #f8fafc; /* slate-50 */
+  --color-text: #111827; /* gray-900 */
+  --color-muted: #6b7280; /* gray-500 */
+  --color-border: #e5e7eb; /* gray-200 */
+}
+
+:root {
+  color-scheme: light;
+}
+
+.dark {
+  --color-primary: #6366f1; /* indigo-500, brighter for dark surfaces */
+  --color-primary-hover: #818cf8;
+  --color-accent: #fb923c; /* orange-400 */
+  --color-accent-hover: #f97316;
+
+  --color-surface: #0f172a; /* slate-900 */
+  --color-surface-muted: #1e293b; /* slate-800 */
+  --color-text: #f1f5f9; /* slate-100 */
+  --color-muted: #94a3b8; /* slate-400 */
+  --color-border: #334155; /* slate-700 */
+
+  color-scheme: dark;
+}
+
+@layer components {
+  .icon-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    padding: 0.5rem;
+    color: var(--color-muted);
+  }
+
+  .icon-button:hover {
+    background-color: var(--color-surface-muted);
+    color: var(--color-text);
+  }
+}
