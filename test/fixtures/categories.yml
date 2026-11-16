@@ -1,0 +1,14 @@
+gpus:
+  slug: graphics-cards
+  names:
+    en: Graphics Cards
+    es: Tarjetas gráficas
+  position: 1
+
+rtx:
+  slug: rtx-series
+  names:
+    en: RTX Series
+    es: Serie RTX
+  parent: gpus
+  position: 1

@@ -1,0 +1,15 @@
+es:
+  code: ES
+  name_key: countries.es
+  currency: EUR
+  default_locale: es
+  enabled: true
+  vat_rate: 21.00
+
+gb:
+  code: GB
+  name_key: countries.gb
+  currency: GBP
+  default_locale: en
+  enabled: false
+  vat_rate: 20.00

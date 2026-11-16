@@ -1,0 +1,15 @@
+vram:
+  key: vram
+  names:
+    en: VRAM
+    es: VRAM
+  input_type: select
+  position: 1
+
+negotiable:
+  key: negotiable
+  names:
+    en: Negotiable
+    es: Negociable
+  input_type: boolean
+  position: 2

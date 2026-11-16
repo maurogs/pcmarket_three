@@ -1,0 +1,15 @@
+one:
+  number: PCM-2026-000001
+  buyer: one
+  seller: two
+  status: completed
+  subtotal_cents: 50000
+  total_cents: 50000
+
+two:
+  number: PCM-2026-000002
+  buyer: two
+  seller: one
+  status: completed
+  subtotal_cents: 20000
+  total_cents: 20000

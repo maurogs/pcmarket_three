@@ -1,0 +1,9 @@
+vram_gpus:
+  category: gpus
+  spec_attribute: vram
+  position: 1
+
+negotiable_gpus:
+  category: gpus
+  spec_attribute: negotiable
+  required: true

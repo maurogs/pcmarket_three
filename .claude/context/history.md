@@ -1,5 +1,82 @@
 # History
 
+## 2026-11-17 — Phase 1: domain layer (full model layer, associations, I18n)
+
+**What was built**
+
+- Complete domain model layer (no controllers/views yet): 33 new migrations
+  (`db/migrate/20261117090001`–`20261117090033`), 25 new models + `Money` value
+  object + `CommissionCalculator` service; `User` extended (associations,
+  `display_name`, `banned?/ban!/unban!`). Full I18n model/attribute/enum trees in
+  all 6 locale files (330 shared keys, lint green). Tests: 66 runs / 180
+  assertions green; rubocop clean.
+- **Schema format switched to :sql** (`schema_format: sql` in `config/database.yml`,
+  `db/structure.sql` replaces `db/schema.rb`) — the Ruby schema dumper drops
+  triggers, so `db:test:prepare` was silently losing the listings tsvector trigger.
+
+**Key decisions**
+
+- Migrations only, never hand-edit `db/structure.sql`; every migration reversible
+  (`db:migrate VERSION=0` + redo exercised in dev).
+- Search: `listings.tsv` tsvector column + trigger (`listings_tsv_trigger` /
+  `trg_listings_tsv`, `simple` config, title weight A, description B) + GIN index;
+  `Listing.search_text` via pg_search (`tsearch: { tsvector_column: "tsv", dictionary: "simple" }`).
+- Slugs: FriendlyId on Listing/Category/Store (`:slugged`, Listing also
+  `:sequentially_slugged` with `slug_candidates [:title, [:title, :id]]`).
+- Order numbers: Postgres sequence `order_number_seq` created in the orders
+  migration (dropped in `down`); format `PCM-YYYY-NNNNNN`, assigned in
+  `Order#assign_number` when blank.
+- Money: integer-cent columns everywhere + `Money` value object
+  (`app/models/money.rb`: `cents`, `currency`, `amount` BigDecimal, `to_s`);
+  `Listing#price` returns `Money.new(price_cents, currency)`; orders keep
+  subtotal/shipping/commission/total cents and `before_validation :recalculate_total`.
+- `Listing` state machine (statuses: draft, pending_review, approved, rejected,
+  sold, archived, reserved): `submit_for_review!`, `approve!(admin)` (records a
+  `ModerationEvent`), `reject!(reason, admin:)`, `mark_sold!`; invalid transitions raise
+  `Listing::InvalidTransition` with `t("listings.transition.*")` messages.
+- Enums are plain integer columns; `listing.status` returns a String — the state
+  machine compares `from.map(&:to_s).include?(status.to_s)`.
+- `Setting.get/set` caches `settings/<key>` (nil-safe: missing keys fall through
+  to the default), invalidated by `after_commit :clear_cache` plus a synchronous
+  `clear_cache` call inside `Setting.set` (public method; after_commit does not
+  fire inside transactional tests).
+- Counter caches: `listings.favorites_count` (Favorite `counter_cache:`),
+  `stores.listings_count` (Listing belongs_to), `stores.reviews_count/rating_average`
+  via `Store#refresh_rating!` from Review after_create/after_destroy/after_update.
+- API tokens: `ApiToken.issue_for(user, name:, expires_at:)` returns the clear
+  token once, stores `Digest::SHA256.hexdigest` (`token_digest`, unique index);
+  `ApiToken.authenticate(raw)` finds an *active* (unexpired) token, touches
+  `last_used_at`, returns nil otherwise.
+- Category hierarchy via recursive CTEs (`Category#self_and_descendant_ids`
+  public, `#self_and_ancestor_ids` private); `all_spec_attributes` merges own +
+  inherited spec attributes (own joins win). Names are JSONB locale maps
+  (`names: {en:…, es:…}`), `name` falls back to en.
+- Photos: ActiveStorage `has_many_attached :photos` on Listing; count (12),
+  content types (jpeg/png/webp) and size (10 MB) validated in the model because
+  attach persists immediately (custom error keys
+  `activerecord.errors.messages.photo_*`).
+- `SpecAttribute` input_type enum uses `prefix: true` (bare `select`/`number`
+  collide with AR methods).
+
+**Gotchas / follow-ups**
+
+- Fixtures load under PG `disable_referential_integrity` (`DISABLE TRIGGER ALL`),
+  so the tsv trigger never sees fixture rows — `ListingTest#setup` re-runs the
+  reindex UPDATE. Any trigger-dependent fixture data needs the same treatment.
+- Test DB must be prepared with `bin/rails db:test:prepare` **now that structure.sql
+  is the dump format** (pg_dump keeps the trigger). If a worker DB predates the
+  switch, drop the `app_test_three_test_*` databases.
+- Model unit tests run with `I18n.default_locale = :en` (set in
+  `test/test_helper.rb`) so English error-message assertions work; locale-specific
+  tests wrap in `I18n.with_locale(:es)`.
+- Fixtures for JSONB columns must be plain YAML hashes (a JSON *string* fixture
+  value gets double-encoded and the model reads back a String).
+- `Country.seed_defaults!` is idempotent (`find_or_initialize_by` + `update!`);
+  only ES enabled. `Setting.seed_defaults!` uses `set` unless exists.
+- Flipper `disable` on never-seen features logs a harmless warning.
+- No pg_search typo tolerance yet (dmetaphone deferred); Pagy not wired yet;
+  dev DB currently contains smoke-test seed data.
+
 ## 2026-11-16 — Phase 0: foundation (brand PCMarket, gems, auth, i18n, chrome)
 
 **What changed**

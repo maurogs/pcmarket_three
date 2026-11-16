@@ -21,3 +21,7 @@ end
 # key. :en keeps the generated auth tests' English flash assertions working
 # (the app default locale is :es).
 Rails.application.routes.default_url_options[:locale] = :en
+
+# Tests assert English validation/error messages; the app default locale is :es.
+# Tests that need Spanish wrap themselves in I18n.with_locale(:es).
+I18n.default_locale = :en

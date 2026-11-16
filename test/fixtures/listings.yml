@@ -1,0 +1,53 @@
+gigabyte:
+  user: one
+  store: one
+  category: gpus
+  title: Gigabyte RTX 4070 Gaming OC
+  slug: gigabyte-rtx-4070-gaming-oc
+  description: Brand new graphics card, sealed box
+  price_cents: 59999
+  condition: brand_new
+  status: approved
+  specs:
+    vram: 12GB
+    negotiable: false
+
+draft:
+  user: two
+  store: two
+  category: rtx
+  title: Used RTX 3080
+  slug: used-rtx-3080
+  description: Second hand, box included
+  price_cents: 40000
+  condition: used_good
+  status: draft
+  specs:
+    vram: 10GB
+
+pending:
+  user: one
+  store: one
+  category: gpus
+  title: Pending GPU Listing
+  slug: pending-gpu-listing
+  description: Awaiting approval
+  price_cents: 30000
+  condition: used_like_new
+  status: pending_review
+  specs:
+    negotiable: true
+
+rejected:
+  user: two
+  store: two
+  category: gpus
+  title: Rejected GPU Listing
+  slug: rejected-gpu-listing
+  description: Will not pass review
+  price_cents: 10000
+  condition: used_good
+  status: rejected
+  rejection_reason: Photos unreadable
+  specs:
+    negotiable: false

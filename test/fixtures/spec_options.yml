@@ -1,0 +1,9 @@
+vram_8:
+  spec_attribute: vram
+  value: 8GB
+  position: 1
+
+vram_12:
+  spec_attribute: vram
+  value: 12GB
+  position: 2

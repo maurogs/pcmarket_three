@@ -1,0 +1,9 @@
+one:
+  user: one
+  name: One Store
+  slug: one-store
+
+two:
+  user: two
+  name: Two Store
+  slug: two-store
