@@ -61,6 +61,98 @@
     color: var(--color-text);
   }
 
+  /* Form fields (mirrors the inline pattern used in the sell forms). */
+  .input {
+    width: 100%;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    color: var(--color-text);
+  }
+
+  .input::placeholder {
+    color: var(--color-muted);
+  }
+
+  .input:focus {
+    border-color: var(--color-primary);
+    outline: none;
+  }
+
+  .input:disabled {
+    opacity: 0.5;
+  }
+
+  /* Primary action button (matches the header search submit). */
+  .btn-primary {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    border-radius: var(--radius-md);
+    background-color: var(--color-primary);
+    padding: 0 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #fff;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-primary-hover);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.5;
+  }
+
+  /* Tab/pill control (inbox tabs, offer statuses, secondary actions). */
+  .chip {
+    display: inline-flex;
+    min-height: 2rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: 9999px;
+    background-color: var(--color-surface);
+    padding: 0 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .chip:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  .chip-active {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+  }
+
+  .chip-active:hover {
+    color: #fff;
+  }
+
+  /* button_to wraps its button in a form; the wrapper carries the visual
+     style, so strip the UA chrome from the inner button. */
+  .chip > button,
+  .btn-primary > button {
+    background: transparent;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
+
   /* Pagy series navigation (see ListingsHelper#results_pagination). */
   .series-nav {
     display: flex;

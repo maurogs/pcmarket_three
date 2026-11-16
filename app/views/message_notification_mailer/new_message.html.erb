@@ -1,0 +1,12 @@
+<% content_for :title, t(".subject", sender: @message.sender.display_name) %>
+<p><%= t(".greeting", name: @recipient.display_name) %></p>
+<p><%= t(".body", sender: @message.sender.display_name, listing: @conversation.listing&.title) %></p>
+<blockquote style="margin: 1rem 0; padding: 0.5rem 0.75rem; border-left: 3px solid #4f46e5;">
+  <%= @message.body %>
+</blockquote>
+<p>
+  <%= link_to t(".read_reply"),
+        conversation_url(@conversation, locale: @recipient.locale),
+        style: "display:inline-block;background:#4f46e5;color:#fff;padding:0.6rem 1rem;border-radius:6px;" %>
+</p>
+<p><%= t(".safety") %></p>

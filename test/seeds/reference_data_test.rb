@@ -25,7 +25,7 @@ class ReferenceDataSeedTest < ActiveSupport::TestCase
     assert_equal 13, created[:labels]
     assert_equal 21, created[:seller_tags]
     assert_equal 4, created[:countries], "fixtures ship ES + GB, seeds add FR DE IT PT"
-    assert_equal 4, created[:settings]
+    assert_equal 5, created[:settings], "4 core + min_offer_percent (Phase 4a)"
   end
 
   test "every seeded category, spec attribute and spec option carries all six locales" do

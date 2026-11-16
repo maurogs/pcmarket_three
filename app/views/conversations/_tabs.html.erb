@@ -1,0 +1,8 @@
+<div class="mb-4 flex gap-2" role="tablist">
+  <%= link_to t(".chats"), conversations_path(tab: "chats"),
+      class: ("chip" + (params.fetch(:tab, "chats") == "chats" ? " chip-active" : "")) %>
+  <%= link_to t(".offers"), offers_path,
+      class: ("chip" + (request.path == offers_path ? " chip-active" : "")) %>
+  <%= link_to t(".blocked"), blocks_path,
+      class: ("chip" + (request.path == blocks_path ? " chip-active" : "")) %>
+</div>

@@ -1,0 +1,23 @@
+<% blocked = conversation.blocked_by?(current_user) %>
+<div class="border-t border-border p-3">
+  <% if blocked %>
+    <p class="text-sm text-muted"><%= t(".blocked_notice") %></p>
+  <% else %>
+    <%= form_with url: conversation_messages_path(conversation),
+          method: :post, data: { controller: "composer" } do |form| %>
+      <div id="message_form_error" class="mb-2 hidden text-sm text-rose-600" role="alert"></div>
+      <div class="flex items-end gap-2">
+        <%= form.text_area :body, name: "message[body]",
+            class: "input flex-1 resize-none", rows: 2,
+            placeholder: t(".placeholder"),
+            maxlength: Message::MAX_BODY_LENGTH, required: true,
+            data: { composer_target: "input", action: "keydown->composer#keydown input->composer#refresh" } %>
+        <%= form.submit t(".send"), class: "btn-primary shrink-0 cursor-pointer" %>
+      </div>
+      <p class="mt-1 text-xs text-muted">
+        <%= t(".hint") %>
+        <span class="tabular-nums" data-composer-target="counter"><%= Message::MAX_BODY_LENGTH %></span>
+      </p>
+    <% end %>
+  <% end %>
+</div>

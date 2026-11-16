@@ -1,0 +1,83 @@
+<% content_for :title, t(".title", listing: @conversation.listing&.title) %>
+
+<div class="grid gap-4 lg:grid-cols-[16rem_1fr]">
+  <%# Inbox rail: desktop only; mobile navigates with the back link below. %>
+  <aside class="hidden lg:block">
+    <div class="mb-3 flex items-center justify-between">
+      <%= link_to t(".back"), conversations_path, class: "text-sm font-medium text-primary hover:underline" %>
+    </div>
+    <div id="inbox-rail" class="space-y-2">
+      <%= turbo_stream_from current_user, :inbox %>
+      <%= render partial: "conversations/row", collection: @inbox, as: :conversation,
+          locals: { viewer: current_user }, cached: false %>
+    </div>
+  </aside>
+
+  <div class="flex min-h-[70vh] flex-col gap-3">
+    <%# Thread header: other party + listing + actions %>
+    <div class="card flex items-center gap-3 p-3">
+      <%= link_to t(".back"), conversations_path,
+          class: "icon-button lg:hidden", aria: { label: t(".back") } %>
+      <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-sm font-bold text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">
+        <%= user_initials(@conversation.other_party(current_user)) %>
+      </div>
+      <div class="min-w-0 flex-1">
+        <h1 class="truncate font-semibold text-text">
+          <%= @conversation.other_party(current_user).display_name %>
+        </h1>
+        <% if @conversation.listing %>
+          <%= link_to @conversation.listing.title, listing_path(@conversation.listing),
+              class: "block truncate text-sm text-muted hover:underline" %>
+        <% end %>
+      </div>
+      <div class="flex shrink-0 flex-col items-end gap-1">
+        <% if @conversation.listing %>
+          <span class="font-semibold text-text">
+            <%= money(@conversation.listing.price_cents, @conversation.listing.currency) %>
+          </span>
+          <span class="chip"><%= Listing.human_attribute_name("status/#{@conversation.listing.status}") %></span>
+        <% end %>
+      </div>
+      <div class="shrink-0">
+        <% if current_user.blocks_cast.exists?(blocked_id: @conversation.other_party(current_user).id) %>
+          <% block = current_user.blocks_cast.find_by(blocked_id: @conversation.other_party(current_user).id) %>
+          <%= button_to t(".unblock"), block_path(block), method: :delete, class: "chip" %>
+        <% else %>
+          <%= button_to t(".block"), blocks_path,
+              method: :post, params: { blocked_id: @conversation.other_party(current_user).id },
+              class: "chip", form: { data: { turbo_confirm: t(".block_confirm") } } %>
+        <% end %>
+      </div>
+    </div>
+
+    <%# The thread itself %>
+    <div class="card flex flex-1 flex-col overflow-hidden">
+      <%= turbo_stream_from @conversation %>
+      <% if @safety_flagged %>
+        <div class="border-b border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200" role="status">
+          <p class="font-semibold"><%= t(".safety.title") %></p>
+          <p><%= t(".safety.body") %></p>
+        </div>
+      <% end %>
+
+      <div id="messages" class="flex-1 overflow-y-auto p-3"
+           data-controller="thread" data-thread-current-user="<%= current_user.id %>">
+        <% prev_day = nil %>
+        <% @messages.each do |message| %>
+          <% day = message.created_at.to_date %>
+          <% if day != prev_day %>
+            <div class="flex justify-center py-2">
+              <span class="rounded-full bg-surface-muted px-3 py-1 text-xs font-medium text-muted">
+                <%= l day, format: :chat_day %>
+              </span>
+            </div>
+            <% prev_day = day %>
+          <% end %>
+          <%= render "messages/message", message: message %>
+        <% end %>
+      </div>
+
+      <%= render "conversations/composer", conversation: @conversation %>
+    </div>
+  </div>
+</div>

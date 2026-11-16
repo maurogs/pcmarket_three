@@ -33,6 +33,7 @@ pt:
     my_store_listings: Meus anúncios
     my_store_sales: Minhas vendas
     my_store_settings: Configurações da loja
+    messages: Mensagens
   footer:
     newsletter_title: Subscreva a nossa newsletter
     newsletter_placeholder: O seu endereço de e-mail
@@ -260,6 +261,9 @@ pt:
         other: "%{count} avaliações"
       vacation_banner: "%{store} está de férias — novos pedidos estão pausados."
       vacation_cta: Este vendedor está de férias no momento.
+      offers_disabled: Este anúncio não aceita propostas.
+      reserved_banner: 'Reservado até %{until_time}: um comprador está prestes a comprá-lo.'
+      reserved_cta: Este anúncio está reservado neste momento.
   activerecord:
     errors:
       messages:
@@ -628,6 +632,7 @@ pt:
   date:
     formats:
       delivery: "%-d de %B"
+      chat_day: "%d/%m/%Y"
   sell:
     banned_alert: A sua conta está suspensa, não pode gerir os seus anúncios.
     form:
@@ -857,3 +862,122 @@ pt:
           estão pausadas.
       destroy:
         disabled: 'Modo férias desativado: você voltou.'
+  time:
+    formats:
+      chat_day: "%d/%m %H:%M"
+      chat_time: "%H:%M"
+  conversations:
+    composer:
+      blocked_notice: Não pode enviar mensagens nesta conversa.
+      hint: 'Enter para enviar · Shift+Enter nova linha · caracteres restantes:'
+      placeholder: Escreva uma mensagem…
+      send: Enviar
+    create:
+      blocked: Não pode iniciar conversas com este utilizador.
+      self: Não pode escrever a si mesmo no seu próprio anúncio.
+    index:
+      empty:
+        body: Quando falar com compradores ou vendedores, as suas conversas aparecerão
+          aqui.
+        browse: Explorar anúncios
+        title: Ainda não há conversas
+      title: Mensagens
+    show:
+      back: Voltar às mensagens
+      block: Bloquear
+      block_confirm: Bloquear este utilizador? Não poderão escrever-se um ao outro.
+      safety:
+        body: Não partilhe dados bancários nem contacte fora do PCMarket. Use o chat
+          e as propostas para negociar com segurança.
+        title: Conselho de segurança
+      title: 'Conversa: %{listing}'
+      unblock: Desbloquear
+    tabs:
+      blocked: Bloqueados
+      chats: Conversas
+      offers: Propostas
+  messages:
+    create:
+      errors:
+        blocked: Não pode enviar mensagens nesta conversa.
+        blank: A mensagem não pode estar vazia.
+        invalid: A mensagem não pôde ser enviada.
+        not_participant: Não tem acesso a esta conversa.
+        too_long: A mensagem é demasiado longa (máximo 2.000 caracteres).
+    message:
+      read: Lida
+    offer_card:
+      title: Proposta
+      expires: Expira em %{time}
+  offers:
+    chat:
+      offer_sent: 'Proposta enviada: %{amount}'
+    create:
+      created: A sua proposta foi enviada ao vendedor.
+      errors:
+        above_price: A proposta não pode ser igual ou superior ao preço pedido.
+        below_minimum: A proposta mínima para este anúncio é %{min}.
+        invalid: Valor inválido. Introduza um montante em euros.
+        not_allowed: Este anúncio não aceita propostas.
+        self: Não pode fazer uma proposta no seu próprio anúncio.
+        vacation: Este vendedor está de férias e não aceita propostas de momento.
+    decisions:
+      stale: Esta proposta já não está disponível.
+    index:
+      empty:
+        body: Quando receber propostas de compradores ou enviar as suas, aparecerão
+          aqui.
+        browse: Explorar anúncios
+        title: Ainda não há propostas
+      tabs:
+        received: Recebidas (%{count})
+        sent: Enviadas (%{count})
+      title: Propostas
+    new:
+      amount_label: A sua proposta
+      asking_price: 'Preço pedido: %{price}'
+      cancel: Cancelar
+      minimum_hint: A proposta mínima para este anúncio é %{min}.
+      submit: Enviar proposta
+      title: Faça uma proposta
+    row:
+      accept: Aceitar
+      decline: Recusar
+      expires: Expira em %{time}
+      from: De %{buyer}
+      open_chat: Abrir conversa
+      to_seller: Para %{seller}
+      withdraw: Retirar
+    transition:
+      invalid: Esta proposta já está %{status}.
+  acceptances:
+    create:
+      accepted: Proposta aceite. O anúncio fica reservado ao comprador durante 48
+        horas.
+  declines:
+    create:
+      declined: Proposta recusada.
+  withdrawals:
+    create:
+      withdrawn: Retirou a sua proposta.
+  blocks:
+    create:
+      created: Utilizador bloqueado.
+    destroy:
+      destroyed: Utilizador desbloqueado.
+    errors:
+      cannot_block_self: Não pode bloquear a si mesmo.
+      taken: Já tinha bloqueado este utilizador.
+    index:
+      empty: Não tem utilizadores bloqueados.
+      empty_hint: Bloqueie alguém a partir de uma conversa para impedir mensagens
+        em ambos os sentidos.
+      title: Utilizadores bloqueados
+      unblock: Desbloquear
+  message_notification_mailer:
+    new_message:
+      body: "%{sender} escreveu-lhe sobre “%{listing}”."
+      greeting: 'Olá, %{name}:'
+      read_reply: Ler e responder
+      safety: Não pague nem partilhe dados bancários fora do PCMarket.
+      subject: "%{sender} escreveu-lhe no PCMarket"

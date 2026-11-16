@@ -40,5 +40,24 @@ Rails.application.routes.draw do
       resource :vacation, only: %i[create destroy]
       resources :sales, only: %i[index show]
     end
+
+    # Messaging & offers (Phase 4a). Status changes on offers are modelled
+    # as nested singular resources (POST creates the decision), matching the
+    # sell-area convention — no custom member actions.
+    resources :conversations, only: %i[index show create] do
+      resources :messages, only: :create
+      resource :read_receipt, only: :create
+    end
+    resources :blocks, only: %i[index create destroy]
+
+    resources :listings, only: [] do
+      resources :offers, only: %i[new create]
+    end
+    resources :offers, only: :index
+    resources :offers, only: [] do
+      resource :acceptance, only: :create
+      resource :decline, only: :create
+      resource :withdrawal, only: :create
+    end
   end
 end

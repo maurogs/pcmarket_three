@@ -1,0 +1,9 @@
+<%= t(".greeting", name: @recipient.display_name) %>
+
+<%= t(".body", sender: @message.sender.display_name, listing: @conversation.listing&.title) %>
+
+> <%= @message.body %>
+
+<%= t(".read_reply") %>: <%= conversation_url(@conversation, locale: @recipient.locale) %>
+
+<%= t(".safety") %>

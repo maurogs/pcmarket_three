@@ -33,6 +33,7 @@ de:
     my_store_listings: Meine Angebote
     my_store_sales: Meine Verkäufe
     my_store_settings: Shop-Einstellungen
+    messages: Nachrichten
   footer:
     newsletter_title: Newsletter abonnieren
     newsletter_placeholder: Ihre E-Mail-Adresse
@@ -261,6 +262,10 @@ de:
         other: "%{count} Bewertungen"
       vacation_banner: "%{store} macht Urlaub — neue Bestellungen sind pausiert."
       vacation_cta: Dieser Verkäufer ist derzeit im Urlaub.
+      offers_disabled: Dieses Angebot akzeptiert keine Preisvorschläge.
+      reserved_banner: 'Reserviert bis %{until_time}: ein Käufer steht kurz vor dem
+        Kauf.'
+      reserved_cta: Dieses Angebot ist gerade reserviert.
   activerecord:
     errors:
       messages:
@@ -630,6 +635,7 @@ de:
   date:
     formats:
       delivery: "%-d. %B"
+      chat_day: "%d.%m.%Y"
   sell:
     banned_alert: Dein Konto ist gesperrt, daher kannst du keine Inserate verwalten.
     form:
@@ -858,3 +864,124 @@ de:
         enabled: Urlaubsmodus aktiv. Deine Angebote bleiben sichtbar, Käufe sind pausiert.
       destroy:
         disabled: Urlaubsmodus beendet — du bist wieder verfügbar.
+  time:
+    formats:
+      chat_day: "%d.%m. %H:%M"
+      chat_time: "%H:%M"
+  conversations:
+    composer:
+      blocked_notice: Sie können in dieser Unterhaltung keine Nachrichten senden.
+      hint: 'Enter zum Senden · Umschalt+Enter neue Zeile · verbleibende Zeichen:'
+      placeholder: Nachricht schreiben…
+      send: Senden
+    create:
+      blocked: Sie können mit diesem Nutzer keine Unterhaltungen starten.
+      self: Sie können sich nicht selbst auf Ihrem eigenen Angebot schreiben.
+    index:
+      empty:
+        body: Wenn Sie mit Käufern oder Verkäufern schreiben, erscheinen Ihre Unterhaltungen
+          hier.
+        browse: Angebote durchsuchen
+        title: Noch keine Unterhaltungen
+      title: Nachrichten
+    show:
+      back: Zurück zu den Nachrichten
+      block: Blockieren
+      block_confirm: Diesen Nutzer blockieren? Sie können sich gegenseitig keine Nachrichten
+        mehr schreiben.
+      safety:
+        body: Teilen Sie keine Bankdaten und kontaktieren Sie niemanden außerhalb
+          von PCMarket. Verhandeln Sie sicher über Chat und Angebote.
+        title: Sicherheitshinweis
+      title: 'Unterhaltung: %{listing}'
+      unblock: Entsperren
+    tabs:
+      blocked: Blockiert
+      chats: Chats
+      offers: Angebote
+  messages:
+    create:
+      errors:
+        blocked: Sie können in dieser Unterhaltung keine Nachrichten senden.
+        blank: Die Nachricht darf nicht leer sein.
+        invalid: Die Nachricht konnte nicht gesendet werden.
+        not_participant: Sie haben keinen Zugriff auf diese Unterhaltung.
+        too_long: Die Nachricht ist zu lang (maximal 2.000 Zeichen).
+    message:
+      read: Gelesen
+    offer_card:
+      title: Angebot
+      expires: Läuft ab am %{time}
+  offers:
+    chat:
+      offer_sent: 'Angebot gesendet: %{amount}'
+    create:
+      created: Ihr Angebot wurde an den Verkäufer gesendet.
+      errors:
+        above_price: Das Angebot darf nicht dem Verkaufspreis entsprechen oder ihn
+          übersteigen.
+        below_minimum: Das Mindestangebot für dieses Inserat beträgt %{min}.
+        invalid: Ungültiger Betrag. Geben Sie einen Betrag in Euro ein.
+        not_allowed: Dieses Inserat akzeptiert keine Angebote.
+        self: Sie können kein Angebot auf Ihr eigenes Inserat abgeben.
+        vacation: Dieser Verkäufer macht gerade Urlaub und nimmt zurzeit keine Angebote
+          an.
+    decisions:
+      stale: Dieses Angebot ist nicht mehr verfügbar.
+    index:
+      empty:
+        body: Wenn Sie Angebote von Käufern erhalten oder selbst senden, erscheinen
+          sie hier.
+        browse: Angebote durchsuchen
+        title: Noch keine Angebote
+      tabs:
+        received: Erhalten (%{count})
+        sent: Gesendet (%{count})
+      title: Angebote
+    new:
+      amount_label: Ihr Angebot
+      asking_price: 'Verkaufspreis: %{price}'
+      cancel: Abbrechen
+      minimum_hint: Das Mindestangebot für dieses Inserat beträgt %{min}.
+      submit: Angebot senden
+      title: Angebot machen
+    row:
+      accept: Annehmen
+      decline: Ablehnen
+      expires: Läuft ab am %{time}
+      from: Von %{buyer}
+      open_chat: Chat öffnen
+      to_seller: An %{seller}
+      withdraw: Zurückziehen
+    transition:
+      invalid: Dieses Angebot ist bereits %{status}.
+  acceptances:
+    create:
+      accepted: Angebot angenommen. Das Inserat ist 48 Stunden für den Käufer reserviert.
+  declines:
+    create:
+      declined: Angebot abgelehnt.
+  withdrawals:
+    create:
+      withdrawn: Sie haben Ihr Angebot zurückgezogen.
+  blocks:
+    create:
+      created: Nutzer blockiert.
+    destroy:
+      destroyed: Nutzer entsperrt.
+    errors:
+      cannot_block_self: Sie können sich nicht selbst blockieren.
+      taken: Sie haben diesen Nutzer bereits blockiert.
+    index:
+      empty: Sie haben keine blockierten Nutzer.
+      empty_hint: Blockieren Sie jemanden aus einer Unterhaltung, um die Nachrichten
+        in beide Richtungen zu unterbinden.
+      title: Blockierte Nutzer
+      unblock: Entsperren
+  message_notification_mailer:
+    new_message:
+      body: "%{sender} hat Ihnen bezüglich „%{listing}“ geschrieben."
+      greeting: Hallo %{name},
+      read_reply: Lesen und antworten
+      safety: Zahlen Sie nicht und teilen Sie keine Bankdaten außerhalb von PCMarket.
+      subject: "%{sender} hat Ihnen auf PCMarket geschrieben"

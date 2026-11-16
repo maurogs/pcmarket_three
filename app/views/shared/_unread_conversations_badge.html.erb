@@ -1,0 +1,14 @@
+<%# Header inbox link with unread-threads count. The fragment is cached per
+    user and busted by Conversation.clear_unread_cache on message send and on
+    read (see Conversations::Send and the read-receipt path). %>
+<% count = Conversation.unread_badge_count_for(user) %>
+<%= link_to conversations_path, id: "unread-conversations-badge",
+      class: "icon-button relative", title: t("nav.messages"),
+      aria: { label: t("nav.messages") } do %>
+  <%= inline_icon :message, classes: "size-5" %>
+  <% if count > 0 %>
+    <span class="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-white">
+      <%= count %>
+    </span>
+  <% end %>
+<% end %>

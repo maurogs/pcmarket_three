@@ -1,5 +1,130 @@
 # History
 
+## 2026-11-17 — Phase 4a: internal chat & offers (threads, Turbo real-time, blocks, offer decisions, expiry job)
+
+**What changed**
+
+- Routes (all inside the `(:locale)` scope, auth required):
+  `resources :conversations, only: %i[index show create]` with nested
+  `resources :messages, only: :create` + `resource :read_receipt, only: :create`;
+  `resources :blocks, only: %i[index create destroy]`; `listings` nest
+  `resources :offers, only: %i[new create]`; `resources :offers, only: :index`
+  plus singular `resource :acceptance / :decline / :withdrawal` (POST) under
+  `/:locale/offers/:offer_id/...`.
+- Migrations (applied, structure.sql updated): `20261117210001` messages gain
+  `kind` enum (text/offer/system) + `offer_id` FK; `20261117210002` listings
+  gain `reserved_for_id` FK + `reserved_until` (status enum already had
+  `reserved`).
+- Models: `Conversation.for_user` scope (the ONLY lookup path controllers use →
+  outsiders 404), `other_party`, `blocked_by?`, `unread_count_for`,
+  `unread_badge_count_for` (Rails.cache per user), `unread_counts_by_conversation_for`
+  (batched inbox counts), `mark_messages_read_for`. `Message`: `MAX_BODY_LENGTH =
+  2000`, safety-tip regex patterns (`safety_flagged?`, advisory banner only),
+  `after_create :touch_conversation` + `after_create_commit :broadcast_creation`
+  (append bubble to the conversation stream, replace the inbox row on each
+  participant's `[user, :inbox]` stream, clear the unread caches). `Offer`:
+  `OFFER_TTL = 48.hours`, `for_seller` / `sent_by` / `active` / `not_expired`
+  scopes, `accept!`/`decline!`/`withdraw!` (stale-safe), `expire!` for the job.
+  `Listing`: `RESERVATION_TTL = 48.hours`, `reserve_for!`/`release_reservation!`
+  transitions, `reserved` status. `Notification.recent_unread_message_for?`
+  (e-mail throttle probe). `Setting::DEFAULTS` gains `min_offer_percent` (50).
+- Services: `Conversations::Start` (find-or-create per listing+buyer, refuses
+  self + blocked pairs), `Messages::Send` (participant/block/blank/length
+  guards, then Notification + e-mail only if no unread `new_message`
+  Notification for that thread in the last 15 min), `Offers::Create`
+  (approved+offers-allowed+not-on-vacation, amount < price and ≥
+  `ceil(price × min_offer_percent / 100)` via `Offers::Create.minimum_for`,
+  withdraws the buyer's older pending offers, posts an offer card into the
+  thread, `new_offer` Notification), `Offers::{Accept,Decline,Withdraw}`
+  (accept reserves the listing for the buyer + auto-declines every other
+  pending offer + `offer_accepted` Notification; stale decisions return
+  `:stale`). `ExpireOffersJob` expires pending offers and releases lapsed
+  reservations; scheduled in `config/recurring.yml` every 15 minutes.
+- Controllers (skinny; every read scoped through the model APIs):
+  conversations (GET show marks the thread read), messages (create only;
+  `RATE_LIMIT_STORE = ActiveSupport::Cache::MemoryStore.new` constant +
+  `rate_limit to: 30, within: 1.minute, by: Current.user.id` → 429; turbo
+  replies just clear the composer), read_receipts (marks read + re-renders the
+  `shared/_unread_conversations_badge` partial on the user's stream), blocks
+  (create/destroy via `current_user.blocks_cast`; `:cannot_block_self` /
+  uniqueness `:taken` flash), offers (`@received_count`/`@sent_count` tab
+  counts; `find_offerable_listing` 404s for owners and non-approved EXCEPT
+  reserved, which renders the form's 422 `not_allowed` message instead),
+  acceptances/declines/withdrawals (redirect to the thread with
+  notice/`offers.decisions.stale` alert).
+- Views: `conversations/{index,show,_row,_tabs,_composer}` (show = inbox rail +
+  thread; `_row` takes `viewer:` + batched `unread:`, its `id=dom_id` is the
+  broadcast target), `messages/{_message,_offer_card}` (message renders NEUTRAL
+  — alignment is client-side), `offers/{new,index,_row}`, `blocks/index`,
+  `shared/_unread_conversations_badge` (header, after the cart icon).
+  `turbo_stream_from` tags: thread card (`@conversation`) + inbox rail/list
+  (`current_user, :inbox`) — turbo-rails 2.x signs stream names (GID-based).
+- Stimulus: `thread_controller.js` (reads `data-thread-current-user`, toggles
+  `justify-end` on `[data-message]` rows + `bg-primary text-white` on
+  `[data-bubble]`, re-aligns appended bubbles via MutationObserver on
+  `#messages`), `composer_controller.js` (submitting state). `ConversationsHelper#user_initials`.
+- listings/show wiring: "message seller" `button_to conversations_path`
+  (hidden for owner, disabled when sold), real make-offer link when
+  `!on_vacation && offers_allowed? && !owner` else disabled chip with
+  `.offers_disabled`/`.vacation_cta`/`.reserved_cta` title, reserved banner
+  (`listings.show.reserved_banner` with `l(reserved_until, format: :long)`),
+  `:messaging` Flipper gate removed (real feature now); `stripe_checkout` gate kept.
+- `MessageNotificationMailer#new_message` (html+text, renders in the
+  recipient's locale, safety tip in the footer).
+- I18n: new key trees (conversations, offers, blocks, messages.create.errors,
+  acceptances/declines/withdrawals, listings.show.reserved_*,
+  message_notification_mailer.new_message, time/date `chat_day`/`chat_time`)
+  across all 6 locales — `script/lint_locale_keys.rb` green at 759 keys.
+- Design tokens: `.input`, `.btn-primary`, `.chip`, `.chip-active` component
+  classes (+ UA-strip rules because `button_to` puts the class on the FORM
+  wrapper) in `app/assets/tailwind/application.css`; new views use
+  token classes (text-text/text-muted/border-border/bg-surface-muted/
+  bg-primary), amber = advisory, rose = destructive.
+
+**Gotchas recorded**
+
+- `body = body.to_s.strip` inside a no-param method rebinds to an **nil local**
+  instead of calling the attr_reader — every Send call returned `:blank`.
+  Use a distinct local (`text = ...`).
+- User display name is `User#display_name` (store name or username) — `name`
+  does not exist; Store/Category/Label do have `name`.
+- `content_for :title = t(...)` is a syntax error; use `content_for :title, t(...)`.
+- Turbo broadcasts fire even in transactional tests here (Rails 8.1 fixtures),
+  and `capture_turbo_stream_broadcasts` returns **Nokogiri elements** — assert
+  via `el["action"]`/`el["target"]`/`el.to_html`. Model/service tests therefore
+  render `_row`/`_message` partials — they must never need `current_user`.
+- `perform_enqueued_jobs` dequeues → `assert_enqueued_emails` AFTER the block
+  sees 0; assert inside, or don't perform at all.
+- Integration `flash` accessor merges previous request's still-pending flash
+  across POST→POST chains; assert positives (`assert_equal ..., flash[:notice]`).
+- `money` helper lives in `ListingsHelper` (view context only) — controllers
+  format with `Money.new(cents, currency).formatted` (en renders `€300.00`).
+- Seeds test asserts the DEFAULTS count: now **5** settings (`min_offer_percent`).
+- Rate limiting: dedicated `MessagesController::RATE_LIMIT_STORE` so tests can
+  clear it without touching the fragment-cache store.
+
+**Tests** (suite: 274 runs / 0 failures / 0 errors; rubocop clean on 202 files;
+locale lint green; tailwind build clean): new `test/models/{conversation,
+message,offer}_test.rb`, `test/services/conversations/start_test.rb`,
+`test/services/messages/send_test.rb`, `test/services/offers/{create,decisions}
+_test.rb`, `test/jobs/expire_offers_job_test.rb`, `test/mailers/message_notifi
+cation_mailer_test.rb`, `test/integration/{messaging,offers,turbo_broadcasts}
+_test.rb` (messaging: inbox scoping, start/self/block refusals, read receipts,
+30/min 429 loop, blocks CRUD errors; offers: form hints in en money format
+`€300.00`, decision flows, reserved 422 + banner, tab scoping; broadcasts:
+thread append + both inbox-row replaces + `turbo-cable-stream-source` tags).
+
+**Files touched**: config/{routes,recurring}.yml; db/migrate/202611172100{01,02}*.rb;
+db/structure.sql; app/models/{conversation,message,offer,listing,notification,setting,money}.rb;
+app/services/{conversations/start,messages/send,offers/{create,accept,decline,withdraw}}.rb;
+app/jobs/expire_offers_job.rb; app/mailers/message_notification_mailer.rb +
+views/message_notification_mailer/*; app/controllers/{conversations,messages,read_receipts,blocks,offers,acceptances,declines,withdrawals}_controller.rb;
+app/helpers/conversations_helper.rb; app/assets/tailwind/application.css;
+app/javascript/controllers/{thread,composer}_controller.js;
+app/views/{conversations/*,messages/*,offers/*,blocks/index,shared/_unread_conversations_badge};
+app/views/layouts/_header.html.erb; app/views/listings/show.html.erb;
+config/locales/*.yml; the test files listed above.
+
 ## 2026-11-17 — Phase 3b: seller dashboard, store settings, vacation mode (+ photo-purge bugfix)
 
 **What changed**

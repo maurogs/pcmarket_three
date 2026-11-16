@@ -9,6 +9,10 @@ class Listing < ApplicationRecord
   MAX_SELLER_TAGS = 5
   POSTAL_CODE_FORMATS = { "ES" => /\A\d{5}\z/ }.freeze
 
+  # How long an accepted offer locks the listing for its buyer
+  # (ExpireOffersJob releases expired reservations back to approved).
+  RESERVATION_TTL = 48.hours
+
   # Named variants for rendered photos: small WebP for cards/carousels,
   # wide WebP for the show-page gallery.
   PHOTO_VARIANTS = {
@@ -30,6 +34,9 @@ class Listing < ApplicationRecord
   belongs_to :user
   belongs_to :store, optional: true, counter_cache: :listings_count
   belongs_to :category, counter_cache: :listings_count
+  # Set while status is `reserved`: the buyer whose offer was accepted, and
+  # the moment the hold lapses.
+  belongs_to :reserved_for, class_name: "User", optional: true
 
   has_many :favorites, dependent: :destroy
   has_many :favorited_by, through: :favorites, source: :user
@@ -186,6 +193,27 @@ class Listing < ApplicationRecord
   def mark_sold!
     ensure_transition!(from: [ :approved, :reserved ], to: :sold)
     update!(status: :sold, sold_at: Time.current)
+  end
+
+  # Offer accepted: hold the listing for the buyer for RESERVATION_TTL.
+  def reserve_for!(buyer)
+    ensure_transition!(from: [ :approved ], to: :reserved)
+    update!(status: :reserved, reserved_for: buyer,
+            reserved_until: Time.current + RESERVATION_TTL)
+  end
+
+  # Reservation lapsed (or the deal fell through): back to the public pool.
+  def release_reservation!
+    return unless reserved?
+
+    update!(status: :approved, reserved_for: nil, reserved_until: nil)
+  end
+
+  # Tri-state allow_offers column: nil falls back to the store default.
+  def offers_allowed?
+    return allow_offers unless allow_offers.nil?
+
+    store ? store.allow_offers_default : true
   end
 
   def archive!

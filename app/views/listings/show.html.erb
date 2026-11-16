@@ -24,6 +24,11 @@
         <%= inline_icon :clock, classes: "size-5 shrink-0" %>
         <%= t(".vacation_banner", store: listing.store.name) %>
       </p>
+    <% elsif listing.reserved? %>
+      <p class="mb-4 flex items-center gap-2 rounded-md border border-accent/40 bg-accent/10 px-3 py-2.5 text-sm font-medium text-accent">
+        <%= inline_icon :lock, classes: "size-5 shrink-0" %>
+        <%= t(".reserved_banner", until_time: l(listing.reserved_until.to_date, format: :long)) %>
+      </p>
     <% end %>
 
     <%# --- gallery ------------------------------------------------------- %>
@@ -124,29 +129,30 @@
     <div class="mt-5 flex flex-wrap gap-2">
       <% if sold %>
         <p class="rounded-md bg-surface-muted px-4 py-3 text-sm font-medium text-muted"><%= t(".sold_cta") %></p>
-      <% elsif on_vacation %>
-        <%# Vacation mode: the listing stays public but the seller cannot buy. %>
-        <button type="button" disabled title="<%= t(".vacation_cta") %>"
-                class="inline-flex min-h-11 cursor-not-allowed items-center rounded-md bg-primary/40 px-6 text-sm font-semibold text-white">
-          <%= t(".buy_now") %>
-        </button>
-        <button type="button" disabled title="<%= t(".vacation_cta") %>"
-                class="inline-flex min-h-11 cursor-not-allowed items-center rounded-md border border-border px-4 text-sm font-semibold text-muted">
-          <%= t(".make_offer") %>
-        </button>
-      <% elsif Flipper.enabled?(:stripe_checkout) %>
-        <%= link_to t(".buy_now"), "#", class: "inline-flex min-h-11 items-center rounded-md bg-primary px-6 text-sm font-semibold text-white hover:bg-primary-hover" %>
-        <%= link_to t(".make_offer"), "#", class: "inline-flex min-h-11 items-center rounded-md border border-border px-4 text-sm font-semibold hover:border-primary hover:text-primary" %>
+      <% elsif listing.reserved? %>
+        <p class="rounded-md bg-surface-muted px-4 py-3 text-sm font-medium text-muted"><%= t(".reserved_cta") %></p>
       <% else %>
-        <%# Checkout opens with the payments phase; keep the affordance visible. %>
-        <button type="button" disabled title="<%= t(".checkout_soon") %>"
-                class="inline-flex min-h-11 cursor-not-allowed items-center rounded-md bg-primary/40 px-6 text-sm font-semibold text-white">
-          <%= t(".buy_now") %>
-        </button>
-        <button type="button" disabled title="<%= t(".offers_soon") %>"
-                class="inline-flex min-h-11 cursor-not-allowed items-center rounded-md border border-border px-4 text-sm font-semibold text-muted">
-          <%= t(".make_offer") %>
-        </button>
+        <% if Flipper.enabled?(:stripe_checkout) %>
+          <%= link_to t(".buy_now"), "#", class: "inline-flex min-h-11 items-center rounded-md bg-primary px-6 text-sm font-semibold text-white hover:bg-primary-hover" %>
+        <% else %>
+          <%# Checkout opens with the payments phase; keep the affordance visible. %>
+          <button type="button" disabled title="<%= t(".checkout_soon") %>"
+                  class="inline-flex min-h-11 cursor-not-allowed items-center rounded-md bg-primary/40 px-6 text-sm font-semibold text-white">
+            <%= t(".buy_now") %>
+          </button>
+        <% end %>
+
+        <%# Offers are live (Phase 4a): real form unless the seller's store
+            opted out, is on vacation, or this is our own listing. %>
+        <% if !on_vacation && listing.offers_allowed? && listing.user_id != Current.user&.id %>
+          <%= link_to t(".make_offer"), new_listing_offer_path(listing),
+                class: "inline-flex min-h-11 items-center rounded-md border border-border px-4 text-sm font-semibold hover:border-primary hover:text-primary" %>
+        <% else %>
+          <button type="button" disabled title="<%= on_vacation ? t(".vacation_cta") : t(".offers_disabled") %>"
+                  class="inline-flex min-h-11 cursor-not-allowed items-center rounded-md border border-border px-4 text-sm font-semibold text-muted">
+            <%= t(".make_offer") %>
+          </button>
+        <% end %>
       <% end %>
     </div>
 
@@ -209,14 +215,11 @@
           <%= link_to t(".view_store"), store_path(store),
                 class: "inline-flex min-h-11 items-center justify-center rounded-md border border-border text-sm font-semibold hover:border-primary hover:text-primary" %>
         <% end %>
-        <% if Flipper.enabled?(:messaging) %>
-          <%= link_to t(".message_seller"), "#",
-                class: "inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-hover" %>
-        <% else %>
-          <button type="button" disabled title="<%= t(".messaging_soon") %>"
-                  class="inline-flex min-h-11 cursor-not-allowed items-center justify-center rounded-md bg-primary/40 px-4 text-sm font-semibold text-white">
-            <%= t(".message_seller") %>
-          </button>
+        <% if listing.user_id != Current.user&.id %>
+          <%= button_to t(".message_seller"), conversations_path, method: :post,
+                params: { listing_id: listing.to_param },
+                class: "btn-primary w-full cursor-pointer",
+                disabled: listing.sold? %>
         <% end %>
       </div>
     </div>

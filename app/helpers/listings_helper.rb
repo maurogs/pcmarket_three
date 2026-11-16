@@ -1,5 +1,5 @@
 module ListingsHelper
-  CURRENCY_UNITS = { "EUR" => "€", "GBP" => "£", "USD" => "$" }.freeze
+  CURRENCY_UNITS = Money::UNITS
 
   # Options shown before the "Show more" expander in a facet group.
   FACET_PREVIEW = 6

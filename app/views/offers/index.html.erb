@@ -1,0 +1,28 @@
+<% content_for :title, t(".title") %>
+
+<h1 class="text-2xl font-bold text-text"><%= t(".title") %></h1>
+
+<%= render "conversations/tabs" %>
+
+<div class="mb-4 flex gap-2" role="tablist">
+  <%= link_to t(".tabs.received", count: @received_count), offers_path(tab: "received"),
+      class: ("chip" + (@tab == "received" ? " chip-active" : "")) %>
+  <%= link_to t(".tabs.sent", count: @sent_count), offers_path(tab: "sent"),
+      class: ("chip" + (@tab == "sent" ? " chip-active" : "")) %>
+</div>
+
+<% if @offers.any? %>
+  <div class="space-y-2">
+    <%= render partial: "offers/row", collection: @offers, as: :offer %>
+  </div>
+  <div class="mt-6"><%= results_pagination(@pagy) %></div>
+<% else %>
+  <div class="card flex flex-col items-center gap-3 p-10 text-center">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-muted" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 4.5h16.5a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15A2.25 2.25 0 0 0 2.25 6.75v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
+    </svg>
+    <p class="font-semibold text-text"><%= t(".empty.title") %></p>
+    <p class="max-w-sm text-sm text-muted"><%= t(".empty.body") %></p>
+    <%= link_to t(".empty.browse"), listings_path, class: "btn-primary" %>
+  </div>
+<% end %>

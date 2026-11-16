@@ -1,0 +1,19 @@
+<%# Rendered both server-side (thread page) and inside broadcasts, where no
+    current_user exists — alignment/recoloring is done client-side by the
+    thread Stimulus controller via these data attributes. Do not style
+    left/right here. %>
+<div class="flex px-1 py-0.5" data-message data-sender-id="<%= message.sender_id %>">
+  <div class="max-w-[85%] rounded-2xl bg-surface-muted px-3 py-2 text-sm text-text" data-bubble>
+    <% if message.offer_id %>
+      <%= render "messages/offer_card", message: message %>
+    <% else %>
+      <p class="whitespace-pre-line break-words"><%= message.body %></p>
+    <% end %>
+    <p class="mt-1 text-right text-[10px] text-muted">
+      <%= l message.created_at, format: :chat_time %>
+      <% if message.read_at %>
+        <span title="<%= t(".read") %>">&#10003;&#10003;</span>
+      <% end %>
+    </p>
+  </div>
+</div>

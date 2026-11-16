@@ -10,6 +10,13 @@ class ApplicationController < ActionController::Base
   helper_method :current_country_code
 
   private
+    # The rest of the app reads the signed-in user through Current.user;
+    # current_user is the classic name views and controllers prefer.
+    def current_user
+      Current.user
+    end
+    helper_method :current_user
+
     # Locale precedence: URL segment > signed-in user preference > default (:es).
     def switch_locale(&action)
       locale = params[:locale] || Current.user&.locale || I18n.default_locale

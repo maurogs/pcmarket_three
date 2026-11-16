@@ -1,0 +1,39 @@
+<%# Local: offer (from the collection render) %>
+<div class="card flex flex-wrap items-center gap-3 p-3">
+  <div class="min-w-0 flex-1">
+    <div class="flex items-baseline justify-between gap-2">
+      <%= link_to offer.listing.title, listing_path(offer.listing),
+          class: "truncate font-semibold text-text hover:underline" %>
+      <span class="shrink-0 font-bold text-text">
+        <%= money(offer.amount_cents, offer.listing.currency) %>
+      </span>
+    </div>
+    <p class="mt-0.5 text-sm text-muted">
+      <% if @tab == "received" %>
+        <%= t(".from", buyer: offer.buyer.display_name) %>
+      <% else %>
+        <%= t(".to_seller", seller: offer.listing.user.display_name) %>
+      <% end %>
+      <span aria-hidden="true">&middot;</span>
+      <%= l offer.created_at, format: :chat_day %>
+    </p>
+    <p class="mt-1 flex items-center gap-2 text-xs text-muted">
+      <span class="chip"><%= Offer.human_attribute_name("status/#{offer.status}") %></span>
+      <% if offer.actionable? %>
+        <span><%= t(".expires", time: l(offer.expires_at, format: :chat_day)) %></span>
+      <% end %>
+    </p>
+  </div>
+
+  <div class="flex shrink-0 flex-wrap gap-2">
+    <% if @tab == "received" && offer.actionable? %>
+      <%= button_to t(".accept"), offer_acceptance_path(offer), method: :post, class: "btn-primary cursor-pointer" %>
+      <%= button_to t(".decline"), offer_decline_path(offer), method: :post, class: "chip cursor-pointer" %>
+    <% elsif @tab == "sent" && offer.actionable? %>
+      <%= button_to t(".withdraw"), offer_withdrawal_path(offer), method: :post, class: "chip cursor-pointer" %>
+    <% end %>
+    <% if offer.conversation %>
+      <%= link_to t(".open_chat"), conversation_path(offer.conversation), class: "chip" %>
+    <% end %>
+  </div>
+</div>

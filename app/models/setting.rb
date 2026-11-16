@@ -8,6 +8,7 @@ class Setting < ApplicationRecord
     "site_name" => "PCMarket",
     "commission_percent" => 0,
     "featured_price_cents" => 0,
+    "min_offer_percent" => 50,
     "support_email" => "soporte@pcmarket.example"
   }.freeze
 

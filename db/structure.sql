@@ -785,7 +785,9 @@ CREATE TABLE public.listings (
     performance_score integer,
     tsv tsvector,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    reserved_until timestamp(6) without time zone,
+    reserved_for_id bigint
 );
 
 
@@ -819,7 +821,9 @@ CREATE TABLE public.messages (
     body text NOT NULL,
     read_at timestamp(6) without time zone,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    kind integer DEFAULT 0 NOT NULL,
+    offer_id bigint
 );
 
 
@@ -2345,6 +2349,13 @@ CREATE INDEX index_listings_on_price_cents ON public.listings USING btree (price
 
 
 --
+-- Name: index_listings_on_reserved_for_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_listings_on_reserved_for_id ON public.listings USING btree (reserved_for_id);
+
+
+--
 -- Name: index_listings_on_slug; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2405,6 +2416,13 @@ CREATE INDEX index_messages_on_conversation_id ON public.messages USING btree (c
 --
 
 CREATE INDEX index_messages_on_conversation_id_and_created_at ON public.messages USING btree (conversation_id, created_at);
+
+
+--
+-- Name: index_messages_on_offer_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_messages_on_offer_id ON public.messages USING btree (offer_id);
 
 
 --
@@ -2703,6 +2721,14 @@ ALTER TABLE ONLY public.category_spec_attributes
 
 
 --
+-- Name: messages fk_rails_1eec102e10; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.messages
+    ADD CONSTRAINT fk_rails_1eec102e10 FOREIGN KEY (offer_id) REFERENCES public.offers(id);
+
+
+--
 -- Name: order_items fk_rails_2e2a2d0c16; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2780,6 +2806,14 @@ ALTER TABLE ONLY public.saved_searches
 
 ALTER TABLE ONLY public.listing_tags
     ADD CONSTRAINT fk_rails_66e3a27647 FOREIGN KEY (listing_id) REFERENCES public.listings(id);
+
+
+--
+-- Name: listings fk_rails_685414170f; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.listings
+    ADD CONSTRAINT fk_rails_685414170f FOREIGN KEY (reserved_for_id) REFERENCES public.users(id);
 
 
 --
@@ -3013,6 +3047,8 @@ ALTER TABLE ONLY public.moderation_events
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261117210002'),
+('20261117210001'),
 ('20261117200003'),
 ('20261117200002'),
 ('20261117200001'),

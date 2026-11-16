@@ -32,6 +32,7 @@ en:
     my_store_listings: My listings
     my_store_sales: My sales
     my_store_settings: Store settings
+    messages: Messages
   footer:
     newsletter_title: Subscribe to our newsletter
     newsletter_placeholder: Your email address
@@ -256,6 +257,9 @@ en:
         other: "%{count} reviews"
       vacation_banner: "%{store} is on vacation — new orders are paused."
       vacation_cta: This seller is currently on vacation.
+      offers_disabled: This listing does not accept offers.
+      reserved_banner: 'Reserved until %{until_time}: a buyer is about to buy it.'
+      reserved_cta: This listing is currently reserved.
   activerecord:
     errors:
       messages:
@@ -624,6 +628,7 @@ en:
   date:
     formats:
       delivery: "%-d %B"
+      chat_day: "%b %d, %Y"
   sell:
     banned_alert: Your account is suspended, so you cannot manage listings.
     form:
@@ -849,3 +854,120 @@ en:
         enabled: Vacation mode is on. Your listings stay visible, but buying is paused.
       destroy:
         disabled: Vacation mode is off — you are back open.
+  time:
+    formats:
+      chat_day: "%b %d %H:%M"
+      chat_time: "%H:%M"
+  conversations:
+    composer:
+      blocked_notice: You cannot send messages in this conversation.
+      hint: 'Enter to send · Shift+Enter new line · characters left:'
+      placeholder: Write a message…
+      send: Send
+    create:
+      blocked: You cannot start conversations with this user.
+      self: You cannot message yourself on your own listing.
+    index:
+      empty:
+        body: When you chat with buyers or sellers, your conversations will appear
+          here.
+        browse: Browse listings
+        title: No conversations yet
+      title: Messages
+    show:
+      back: Back to messages
+      block: Block
+      block_confirm: Block this user? They won't be able to message you, nor you them.
+      safety:
+        body: Never share bank details or contact people outside PCMarket. Use chat
+          and offers to negotiate safely.
+        title: Safety tip
+      title: 'Conversation: %{listing}'
+      unblock: Unblock
+    tabs:
+      blocked: Blocked
+      chats: Chats
+      offers: Offers
+  messages:
+    create:
+      errors:
+        blocked: You cannot send messages in this conversation.
+        blank: Message cannot be empty.
+        invalid: The message could not be sent.
+        not_participant: You do not have access to this conversation.
+        too_long: The message is too long (maximum 2,000 characters).
+    message:
+      read: Read
+    offer_card:
+      title: Offer
+      expires: Expires %{time}
+  offers:
+    chat:
+      offer_sent: 'Offer sent: %{amount}'
+    create:
+      created: Your offer has been sent to the seller.
+      errors:
+        above_price: The offer cannot be equal to or above the asking price.
+        below_minimum: The minimum offer for this listing is %{min}.
+        invalid: Invalid amount. Enter an amount in euros.
+        not_allowed: This listing does not accept offers.
+        self: You cannot make an offer on your own listing.
+        vacation: This seller is on vacation and is not accepting offers right now.
+    decisions:
+      stale: This offer is no longer available.
+    index:
+      empty:
+        body: When you receive offers from buyers or send your own, they will appear
+          here.
+        browse: Browse listings
+        title: No offers yet
+      tabs:
+        received: Received (%{count})
+        sent: Sent (%{count})
+      title: Offers
+    new:
+      amount_label: Your offer
+      asking_price: 'Asking price: %{price}'
+      cancel: Cancel
+      minimum_hint: The minimum offer for this listing is %{min}.
+      submit: Send offer
+      title: Make an offer
+    row:
+      accept: Accept
+      decline: Decline
+      expires: Expires %{time}
+      from: From %{buyer}
+      open_chat: Open chat
+      to_seller: To %{seller}
+      withdraw: Withdraw
+    transition:
+      invalid: This offer is already %{status}.
+  acceptances:
+    create:
+      accepted: Offer accepted. The listing is reserved for the buyer for 48 hours.
+  declines:
+    create:
+      declined: Offer declined.
+  withdrawals:
+    create:
+      withdrawn: You have withdrawn your offer.
+  blocks:
+    create:
+      created: User blocked.
+    destroy:
+      destroyed: User unblocked.
+    errors:
+      cannot_block_self: You cannot block yourself.
+      taken: You have already blocked this user.
+    index:
+      empty: You have no blocked users.
+      empty_hint: Block someone from a conversation to stop messaging in both directions.
+      title: Blocked users
+      unblock: Unblock
+  message_notification_mailer:
+    new_message:
+      body: '%{sender} wrote to you about "%{listing}".'
+      greeting: Hi %{name},
+      read_reply: Read and reply
+      safety: Do not pay or share bank details outside PCMarket.
+      subject: "%{sender} wrote to you on PCMarket"

@@ -1,0 +1,27 @@
+<%# Locals: conversation, viewer (signed-in side of the row), optional unread count
+    (the inbox pages batch these; broadcasts fall back to the per-row query) %>
+<% other = conversation.other_party(viewer) %>
+<% unread = local_assigns.fetch(:unread) { conversation.unread_count_for(viewer) } %>
+<%= link_to conversation_path(conversation),
+      id: dom_id(conversation),
+      class: "card flex items-center gap-3 p-3 transition-colors hover:bg-surface-muted" do %>
+  <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-sm font-bold text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">
+    <%= user_initials(other) %>
+  </div>
+  <div class="min-w-0 flex-1">
+    <div class="flex items-baseline justify-between gap-2">
+      <p class="truncate font-semibold text-text"><%= other.display_name %></p>
+      <% if unread > 0 %>
+        <span class="inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-semibold text-white">
+          <%= unread %>
+        </span>
+      <% end %>
+    </div>
+    <p class="truncate text-sm text-muted"><%= conversation.listing.title %></p>
+    <% if conversation.last_message_at %>
+      <p class="truncate text-xs text-muted">
+        <%= l conversation.last_message_at, format: :chat_day %>
+      </p>
+    <% end %>
+  </div>
+<% end %>
