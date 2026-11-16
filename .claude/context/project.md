@@ -54,7 +54,17 @@ decision record below. Listings, search, checkout and admin come in later phases
   `schema_format: sql` in `config/database.yml` → `db/structure.sql` (pg_dump);
   never hand-edit it, `db/schema.rb` is gone.
 
+- **Seeds (Phase 2a)**: `db/seeds.rb` `load`s one loader per concern under
+  `db/seeds/` (order: countries_settings, categories, spec_attributes,
+  labels_seller_tags; support module `SeedLoader` is `require`d). Idempotent
+  upserts by slug / key / (attribute, value) / (category, attribute); raw data
+  lives in `db/seeds/data/*.yml` for admins — every name in all 6 locales
+  (proper nouns share one `display` string, translated labels use `names`).
+  Spec attributes attach to categories via `CategorySpecAttribute`
+  (`required` flags: gpu_chipset→gpus, cpu_brand→cpus) and children inherit.
+
 ## Code map
+
 
 | Area | Files |
 | --- | --- |
@@ -72,6 +82,7 @@ decision record below. Listings, search, checkout and admin come in later phases
 | Commerce | `cart.rb`, `cart_item.rb`, `order.rb` (number `PCM-YYYY-NNNNNN` from `order_number_seq`, integer-cent totals + `recalculate_total`, `apply_commission!` gated by Flipper `:commissions` + `Setting commission_percent`), `order_item.rb`, `address.rb`, `offer.rb`, `app/services/commission_calculator.rb` |
 | Messaging | `conversation.rb`, `message.rb`, `block.rb` |
 | Platform | `country.rb` (JSONB-free locale rows via `name_key` i18n keys, `Country.seed_defaults!` ES-only), `setting.rb` (`get/set` + Rails.cache key `settings/<key>`, `seed_defaults!`), `api_token.rb` (`issue_for` → SHA-256 `token_digest`, `authenticate` active-only), `legal_page.rb`, `newsletter_subscription.rb`, `notification.rb`, `saved_search.rb`, `money.rb` (value object: `cents`/`amount`/`to_s`) |
+| Seeds (Phase 2a) | `db/seeds.rb` (loads `db/seeds/support/seed_loader.rb` + one loader per concern, idempotent upserts), raw data `db/seeds/data/{categories,spec_attributes,category_spec_attributes,labels,seller_tags}.yml` — counts: 61 categories, 34 spec attributes, 293 options, 88 category attachments, 13 labels, 21 seller tags, 6 countries, 4 settings |
 | Migrations | Phase 0: `20261116205301…205400`. Phase 1 domain: `db/migrate/20261117090001`–`20261117090033` (countries, settings, stores, categories, spec_*, listings + tsv trigger/GIN, labels/tags/moderation, favorites/follows, saved_searches, conversations/messages/blocks, offers, carts/cart_items, addresses/orders/order_items, reviews, notifications, newsletter, legal_pages, api_tokens, user ban fields, active_storage). Schema dump: `db/structure.sql` (schema_format: sql in `config/database.yml`) |
 | Tests | `test/models/user_test.rb`, `test/models/{listing,category,setting,country,api_token,review,favorite}_test.rb`, `test/services/commission_calculator_test.rb`, `test/controllers/pages_controller_test.rb`, generated `sessions`/`passwords` controller tests, `test/test_helpers/session_test_helper.rb` (`sign_in_as`); fixtures for users/countries/categories/spec_*/stores/listings/orders. `test_helper.rb`: `I18n.default_locale = :en` for error-message assertions; `ListingTest` re-runs the tsv reindex in setup (fixtures load with triggers disabled) |
 
@@ -81,5 +92,7 @@ decision record below. Listings, search, checkout and admin come in later phases
 - Cart/checkout (Stripe, flag `stripe_checkout`), "Sell to us" (flag `sell_to_us`), commissions (flag `commissions`, `CommissionCalculator` + `Order#apply_commission!` ready).
 - Google login (flag `google_login`), email confirmation (`confirmed_at` exists but is unused).
 - `/api/v1` namespace (`ApiToken.authenticate` ready), sitemap_generator config, meta-tags per-page SEO.
-- Seed data: `Country.seed_defaults!` + taxonomy seeds into `db/seeds.rb`; pg_search typo tolerance (dmetaphone) if needed.
+- Seed data: reference data done (Phase 2a: countries, settings, taxonomy,
+  spec filters, labels, seller tags). Demo listings/stores fixtures come with
+  the listings UI phase; pg_search typo tolerance (dmetaphone) if needed.
 - Add `script/lint_locale_keys.rb` to CI.

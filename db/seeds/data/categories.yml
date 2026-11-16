@@ -1,0 +1,595 @@
+# Category tree for PCMarket (slug -> names in all 6 locales, icon, SEO copy).
+# Roots carry an `icon` (icon name used by the nav chrome) and a short
+# `seo_description`. Children inherit nothing; add seo_description only when
+# the admin team writes one. Keep slugs stable: they are public URLs.
+#
+# Load order is the order below; `position` is assigned automatically as
+# 1..n among siblings.
+
+gaming-pcs:
+  icon: gamepad
+  names:
+    es: "PCs gaming"
+    en: "Gaming PCs"
+    fr: "PC gaming"
+    de: "Gaming-PCs"
+    it: "PC da gaming"
+    pt: "PCs gaming"
+  seo_description:
+    es: "PCs gaming nuevos y de segunda mano: montajes económicos, gamings de gama media y equipos profesionales listos para enviar."
+    en: "New and second-hand gaming PCs: budget builds, mid-range rigs and pro-grade machines ready to ship."
+    fr: "PC gaming neufs et d'occasion : configurations économiques, milieu de gamme et machines prêtes à jouer."
+    de: "Neue und gebrauchte Gaming-PCs: Budget-Builds, Mittelklasse-Systeme und Profirechner zum direkten Losspielen."
+    it: "PC da gaming nuovi e usati: configurazioni economiche, fascia media e macchine pronte al gaming."
+    pt: "PCs gaming novos e usados: builds económicos, gama média e máquinas prontas para jogar."
+  children:
+    value-pcs:
+      names:
+        es: "PCs gaming económicos"
+        en: "Value PCs"
+        fr: "PC gaming économiques"
+        de: "Preiswerte Gaming-PCs"
+        it: "PC da gaming economici"
+        pt: "PCs gaming económicos"
+    mid-range-pcs:
+      names:
+        es: "PCs gaming de gama media"
+        en: "Mid-range PCs"
+        fr: "PC gaming milieu de gamme"
+        de: "Mittelklasse-Gaming-PCs"
+        it: "PC da gaming di fascia media"
+        pt: "PCs gaming de gama média"
+    pro-gamer-pcs:
+      names:
+        es: "PCs de gamer profesional"
+        en: "Pro Gamer PCs"
+        fr: "PC de joueur professionnel"
+        de: "Pro-Gamer-PCs"
+        it: "PC da pro gamer"
+        pt: "PCs de gamer profissional"
+    sim-rigs:
+      names:
+        es: "Sim rigs"
+        en: "Sim rigs"
+        fr: "Sim rigs"
+        de: "Sim-Rigs"
+        it: "Sim rig"
+        pt: "Sim rigs"
+
+gpus:
+  icon: gpu
+  names:
+    es: "Tarjetas gráficas"
+    en: "Graphics cards"
+    fr: "Cartes graphiques"
+    de: "Grafikkarten"
+    it: "Schede video"
+    pt: "Placas gráficas"
+  seo_description:
+    es: "Tarjetas gráficas nuevas y de segunda mano: NVIDIA, AMD, Intel y workstation, con especificaciones y fotos reales."
+    en: "New and second-hand graphics cards: NVIDIA, AMD, Intel and workstation GPUs with real specs and photos."
+    fr: "Cartes graphiques neuves et d'occasion : NVIDIA, AMD, Intel et stations de travail, avec specs et photos réelles."
+    de: "Neue und gebrauchte Grafikkarten: NVIDIA, AMD, Intel und Workstations — mit echten Specs und Fotos."
+    it: "Schede video nuove e usate: NVIDIA, AMD, Intel e workstation, con specifiche e foto reali."
+    pt: "Placas gráficas novas e usadas: NVIDIA, AMD, Intel e workstation, com especificações e fotos reais."
+  children:
+    nvidia-gpus:
+      names:
+        es: "Tarjetas gráficas NVIDIA"
+        en: "NVIDIA graphics cards"
+        fr: "Cartes graphiques NVIDIA"
+        de: "NVIDIA-Grafikkarten"
+        it: "Schede video NVIDIA"
+        pt: "Placas gráficas NVIDIA"
+    amd-gpus:
+      names:
+        es: "Tarjetas gráficas AMD"
+        en: "AMD graphics cards"
+        fr: "Cartes graphiques AMD"
+        de: "AMD-Grafikkarten"
+        it: "Schede video AMD"
+        pt: "Placas gráficas AMD"
+    intel-gpus:
+      names:
+        es: "Tarjetas gráficas Intel"
+        en: "Intel graphics cards"
+        fr: "Cartes graphiques Intel"
+        de: "Intel-Grafikkarten"
+        it: "Schede video Intel"
+        pt: "Placas gráficas Intel"
+    workstation-gpus:
+      names:
+        es: "Tarjetas gráficas para workstation"
+        en: "Workstation graphics cards"
+        fr: "Cartes graphiques professionnelles"
+        de: "Workstation-Grafikkarten"
+        it: "Schede video professionali"
+        pt: "Placas gráficas para workstation"
+
+components:
+  icon: cpu
+  names:
+    es: "Componentes"
+    en: "Components"
+    fr: "Composants"
+    de: "Komponenten"
+    it: "Componenti"
+    pt: "Componentes"
+  seo_description:
+    es: "Componentes de PC: procesadores, placas base, memoria, almacenamiento, cajas y fuentes, nuevos y de segunda mano."
+    en: "PC components: CPUs, motherboards, memory, storage, cases and power supplies, new and second-hand."
+    fr: "Composants PC : processeurs, cartes mères, mémoire, stockage, boîtiers et alimentations, neufs et d'occasion."
+    de: "PC-Komponenten: CPUs, Mainboards, Arbeitsspeicher, Laufwerke, Gehäuse und Netzteile, neu und gebraucht."
+    it: "Componenti PC: processori, schede madri, memoria, archiviazione, case e alimentatori, nuovi e usati."
+    pt: "Componentes para PC: processadores, motherboards, memória, armazenamento, caixas e fontes, novos e usados."
+  children:
+    cpus:
+      names:
+        es: "Procesadores"
+        en: "Processors"
+        fr: "Processeurs"
+        de: "Prozessoren"
+        it: "Processori"
+        pt: "Processadores"
+    cpu-coolers:
+      names:
+        es: "Disipadores de CPU"
+        en: "CPU coolers"
+        fr: "Ventirads processeur"
+        de: "CPU-Kühler"
+        it: "Dissipatori CPU"
+        pt: "Coolers de CPU"
+    motherboards:
+      names:
+        es: "Placas base"
+        en: "Motherboards"
+        fr: "Cartes mères"
+        de: "Mainboards"
+        it: "Schede madri"
+        pt: "Motherboards"
+    motherboard-bundles:
+      names:
+        es: "Packs placa base + CPU"
+        en: "Motherboard bundles"
+        fr: "Pack carte mère + CPU"
+        de: "Mainboard-Bundles"
+        it: "Bundle scheda madre"
+        pt: "Kits motherboard + CPU"
+    memory:
+      names:
+        es: "Memoria RAM"
+        en: "Memory (RAM)"
+        fr: "Mémoire (RAM)"
+        de: "Arbeitsspeicher"
+        it: "Memoria (RAM)"
+        pt: "Memória RAM"
+    storage:
+      names:
+        es: "Almacenamiento"
+        en: "Storage"
+        fr: "Stockage"
+        de: "Laufwerke"
+        it: "Archiviazione"
+        pt: "Armazenamento"
+    cases:
+      names:
+        es: "Cajas de PC"
+        en: "PC cases"
+        fr: "Boîtiers PC"
+        de: "PC-Gehäuse"
+        it: "Case PC"
+        pt: "Gabinetes"
+    case-fans:
+      names:
+        es: "Ventiladores de caja"
+        en: "Case fans"
+        fr: "Ventilateurs de boîtier"
+        de: "Gehäuselüfter"
+        it: "Ventole per case"
+        pt: "Ventoinhas de gabinete"
+    power-supplies:
+      names:
+        es: "Fuentes de alimentación"
+        en: "Power supplies"
+        fr: "Alimentations"
+        de: "Netzteile"
+        it: "Alimentatori"
+        pt: "Fontes de alimentação"
+    expansion-cards:
+      names:
+        es: "Tarjetas de expansión"
+        en: "Expansion cards"
+        fr: "Cartes d'extension"
+        de: "Erweiterungskarten"
+        it: "Schede di espansione"
+        pt: "Placas de expansão"
+    network-adapters:
+      names:
+        es: "Adaptadores de red"
+        en: "Network adapters"
+        fr: "Cartes réseau"
+        de: "Netzwerkadapter"
+        it: "Schede di rete"
+        pt: "Adaptadores de rede"
+    other-components:
+      names:
+        es: "Otros componentes"
+        en: "Other components"
+        fr: "Autres composants"
+        de: "Sonstige Komponenten"
+        it: "Altri componenti"
+        pt: "Outros componentes"
+
+peripherals:
+  icon: monitor
+  names:
+    es: "Periféricos"
+    en: "Peripherals"
+    fr: "Périphériques"
+    de: "Peripherie"
+    it: "Periferiche"
+    pt: "Periféricos"
+  seo_description:
+    es: "Periféricos gaming y de oficina: monitores, teclados, ratones, auriculares y mandos, nuevos y de segunda mano."
+    en: "Gaming and office peripherals: monitors, keyboards, mice, headsets and controllers, new and second-hand."
+    fr: "Périphériques gaming et bureau : moniteurs, claviers, souris, casques et manettes, neufs et d'occasion."
+    de: "Gaming- und Büro-Peripherie: Monitore, Tastaturen, Mäuse, Headsets und Controller, neu und gebraucht."
+    it: "Periferiche da gaming e da ufficio: monitor, tastiere, mouse, cuffie e controller, nuovi e usati."
+    pt: "Periféricos para gaming e escritório: monitores, teclados, ratores, auriculares e comandos, novos e usados."
+  children:
+    monitors:
+      names:
+        es: "Monitores"
+        en: "Monitors"
+        fr: "Moniteurs"
+        de: "Monitore"
+        it: "Monitor"
+        pt: "Monitores"
+    headphones:
+      names:
+        es: "Auriculares"
+        en: "Headsets"
+        fr: "Casques audio"
+        de: "Headsets"
+        it: "Cuffie"
+        pt: "Auriculares"
+    keyboards:
+      names:
+        es: "Teclados"
+        en: "Keyboards"
+        fr: "Claviers"
+        de: "Tastaturen"
+        it: "Tastiere"
+        pt: "Teclados"
+    mice:
+      names:
+        es: "Ratones"
+        en: "Mice"
+        fr: "Souris"
+        de: "Mäuse"
+        it: "Mouse"
+        pt: "Ratores"
+    speakers:
+      names:
+        es: "Altavoces"
+        en: "Speakers"
+        fr: "Enceintes"
+        de: "Lautsprecher"
+        it: "Diffusori audio"
+        pt: "Colunas"
+    controllers:
+      names:
+        es: "Mandos"
+        en: "Controllers"
+        fr: "Manettes"
+        de: "Controller"
+        it: "Controller"
+        pt: "Comandos"
+    retro-controllers:
+      names:
+        es: "Mandos retro"
+        en: "Retro controllers"
+        fr: "Manettes rétro"
+        de: "Retro-Controller"
+        it: "Controller retro"
+        pt: "Comandos retro"
+    racing-simulators:
+      names:
+        es: "Volantes de simulación"
+        en: "Racing simulators"
+        fr: "Volants de simulation"
+        de: "Rennsimulatoren"
+        it: "Simulatori di guida"
+        pt: "Simuladores de corrida"
+    webcams:
+      names:
+        es: "Webcams"
+        en: "Webcams"
+        fr: "Webcams"
+        de: "Webcams"
+        it: "Webcam"
+        pt: "Câmaras web"
+    vr:
+      names:
+        es: "Realidad virtual"
+        en: "Virtual reality"
+        fr: "Réalité virtuelle"
+        de: "Virtual Reality"
+        it: "Réalta virtuale"
+        pt: "Realidade virtual"
+    external-storage:
+      names:
+        es: "Almacenamiento externo"
+        en: "External storage"
+        fr: "Stockage externe"
+        de: "Externe Laufwerke"
+        it: "Archiviazione esterna"
+        pt: "Armazenamento externo"
+    other-peripherals:
+      names:
+        es: "Otros periféricos"
+        en: "Other peripherals"
+        fr: "Autres périphériques"
+        de: "Sonstige Peripherie"
+        it: "Altre periferiche"
+        pt: "Outros periféricos"
+
+laptops:
+  icon: laptop
+  names:
+    es: "Portátiles"
+    en: "Laptops"
+    fr: "PC portables"
+    de: "Laptops"
+    it: "Portatili"
+    pt: "Portáteis"
+  seo_description:
+    es: "Portátiles gaming y de trabajo: tamaños de 13, 15 y 17 pulgadas, nuevos y reacondicionados de vendedores verificados."
+    en: "Gaming and work laptops: 13, 15 and 17-inch sizes, new and refurbished from verified sellers."
+    fr: "PC portables gaming et travail : 13, 15 et 17 pouces, neufs et reconditionnés chez des vendeurs vérifiés."
+    de: "Gaming- und Arbeits-Laptops: 13, 15 und 17 Zoll, neu und generalüberholt von verifizierten Verkäufern."
+    it: "Portatili da gaming e da lavoro: da 13, 15 e 17 pollici, nuovi e ricondizionati da venditori verificati."
+    pt: "Portáteis para gaming e trabalho: ecrãs de 13, 15 e 17 polegadas, novos e recondicionados de vendedores verificados."
+  children:
+    laptops-13:
+      names:
+        es: "Portátiles de 13 pulgadas"
+        en: "13-inch laptops"
+        fr: "PC portables 13 pouces"
+        de: "13-Zoll-Laptops"
+        it: "Portatili da 13 pollici"
+        pt: "Portáteis de 13 polegadas"
+    laptops-15:
+      names:
+        es: "Portátiles de 15 pulgadas"
+        en: "15-inch laptops"
+        fr: "PC portables 15 pouces"
+        de: "15-Zoll-Laptops"
+        it: "Portatili da 15 pollici"
+        pt: "Portáteis de 15 polegadas"
+    laptops-17-plus:
+      names:
+        es: "Portátiles de 17 pulgadas o más"
+        en: "17-inch and larger laptops"
+        fr: "PC portables 17 pouces et plus"
+        de: "Laptops ab 17 Zoll"
+        it: "Portatili da 17 pollici e oltre"
+        pt: "Portáteis de 17 polegadas ou mais"
+
+mobile:
+  icon: smartphone
+  names:
+    es: "Móviles y tablets"
+    en: "Phones & tablets"
+    fr: "Téléphones et tablettes"
+    de: "Handys & Tablets"
+    it: "Smartphone e tablet"
+    pt: "Telemóveis e tablets"
+  seo_description:
+    es: "Smartphones y tablets nuevos y de segunda mano: revisados, con garantía del vendedor y envío a toda España."
+    en: "New and second-hand smartphones and tablets: checked, seller-warranted and shipped across Spain."
+    fr: "Smartphones et tablettes neufs et d'occasion : vérifiés, garantis par le vendeur et expédiés partout."
+    de: "Neue und gebrauchte Smartphones und Tablets: geprüft, mit Verkäufergarantie und Versand in ganz Spanien."
+    it: "Smartphone e tablet nuovi e usati: controllati, con garanzia del venditore e spedizione in tutta la Spagna."
+    pt: "Smartphones e tablets novos e usados: verificados, com garantia do vendedor e envio para toda a Espanha."
+  children:
+    phones:
+      names:
+        es: "Smartphones"
+        en: "Smartphones"
+        fr: "Smartphones"
+        de: "Smartphones"
+        it: "Smartphone"
+        pt: "Smartphones"
+    tablets:
+      names:
+        es: "Tablets"
+        en: "Tablets"
+        fr: "Tablettes"
+        de: "Tablets"
+        it: "Tablet"
+        pt: "Tablets"
+
+consoles:
+  icon: gamepad
+  names:
+    es: "Consolas y portátiles"
+    en: "Consoles & handhelds"
+    fr: "Consoles et consoles portables"
+    de: "Konsolen & Handhelds"
+    it: "Console e portatili"
+    pt: "Consolas e portáteis"
+  seo_description:
+    es: "Consolas de sobremesa, portátiles y retro: PS5, Xbox Series, Switch y clásicas, nuevas y de segunda mano."
+    en: "Home, handheld and retro consoles: PS5, Xbox Series, Switch and classics, new and second-hand."
+    fr: "Consoles de salon, portables et rétro : PS5, Xbox Series, Switch et classiques, neuves et d'occasion."
+    de: "Heim-, Handheld- und Retro-Konsolen: PS5, Xbox Series, Switch und Klassiker, neu und gebraucht."
+    it: "Console domestiche, portatili e retro: PS5, Xbox Series, Switch e classiche, nuove e usate."
+    pt: "Consolas de sala, portáteis e retro: PS5, Xbox Series, Switch e clássicas, novas e usadas."
+  children:
+    home-consoles:
+      names:
+        es: "Consolas de sobremesa"
+        en: "Home consoles"
+        fr: "Consoles de salon"
+        de: "Heimkonsolen"
+        it: "Console domestiche"
+        pt: "Consolas de sala"
+    handhelds:
+      names:
+        es: "Consolas portátiles"
+        en: "Handheld consoles"
+        fr: "Consoles portables"
+        de: "Handheld-Konsolen"
+        it: "Console portatili"
+        pt: "Consolas portáteis"
+    retro-consoles:
+      names:
+        es: "Consolas retro"
+        en: "Retro consoles"
+        fr: "Consoles rétro"
+        de: "Retro-Konsolen"
+        it: "Console retro"
+        pt: "Consolas retro"
+    retro-handhelds:
+      names:
+        es: "Consolas portátiles retro"
+        en: "Retro handhelds"
+        fr: "Consoles portables rétro"
+        de: "Retro-Handhelds"
+        it: "Console portatili retro"
+        pt: "Consolas portáteis retro"
+
+workstations:
+  icon: desktop
+  names:
+    es: "Estaciones de trabajo"
+    en: "Workstations"
+    fr: "Stations de travail"
+    de: "Workstations"
+    it: "Workstation"
+    pt: "Workstations"
+  seo_description:
+    es: "Estaciones de trabajo para creadores, streaming e IA local: configuraciones potentes de vendedores especializados."
+    en: "Workstations for creators, streaming and local AI: high-power builds from specialist sellers."
+    fr: "Stations de travail pour créateurs, streaming et IA locale : machines puissantes de vendeurs spécialisés."
+    de: "Workstations für Creator, Streaming und lokale KI: starke Builds von Spezialverkäufern."
+    it: "Workstation per creator, streaming e IA locale: configurazioni potenti da venditori specializzati."
+    pt: "Workstations para criadores, streaming e IA local: builds potentes de vendedores especializados."
+  children:
+    creator-rigs:
+      names:
+        es: "Equipos para creadores"
+        en: "Creator rigs"
+        fr: "Machines pour créateurs"
+        de: "Creator-Rigs"
+        it: "Rig per creator"
+        pt: "Máquinas para criadores"
+    streaming-rigs:
+      names:
+        es: "Equipos de streaming"
+        en: "Streaming rigs"
+        fr: "Machines de streaming"
+        de: "Streaming-Rigs"
+        it: "Rig per lo streaming"
+        pt: "Máquinas de streaming"
+    local-ai-rigs:
+      names:
+        es: "Equipos para IA local"
+        en: "Local AI rigs"
+        fr: "Machines pour IA locale"
+        de: "Local-AI-Rigs"
+        it: "Rig per IA locale"
+        pt: "Máquinas para IA local"
+
+accessories:
+  icon: keyboard
+  names:
+    es: "Accesorios"
+    en: "Accessories"
+    fr: "Accessoires"
+    de: "Zubehör"
+    it: "Accessori"
+    pt: "Acessórios"
+  seo_description:
+    es: "Accesorios para tu setup: decoración, escritorio, coleccionables y ropa gaming de vendedores de toda España."
+    en: "Setup accessories: desk decor, desk gear, collectables and gaming clothing from sellers across Spain."
+    fr: "Accessoires pour votre setup : déco de bureau, rangement, collections et vêtements gaming."
+    de: "Zubehör fürs Setup: Desk-Deko, Schreibtisch-Gear, Sammlerstücke und Gaming-Kleidung."
+    it: "Accessori per la tua postazione: decorazioni da scrivania, accessori, collezionabili e abbigliamento gaming."
+    pt: "Acessórios para o teu setup: decoração de secretária, material de secretária, colecionáveis e roupa gaming."
+  children:
+    art-decor:
+      names:
+        es: "Arte y decoración"
+        en: "Art & decor"
+        fr: "Art et décoration"
+        de: "Kunst & Deko"
+        it: "Arte e decorazioni"
+        pt: "Arte e decoração"
+    desk-accessories:
+      names:
+        es: "Accesorios de escritorio"
+        en: "Desk accessories"
+        fr: "Accessoires de bureau"
+        de: "Schreibtisch-Zubehör"
+        it: "Accessori da scrivania"
+        pt: "Acessórios de secretária"
+    collectibles:
+      names:
+        es: "Coleccionables"
+        en: "Collectables"
+        fr: "Objets de collection"
+        de: "Sammlerstücke"
+        it: "Collezionabili"
+        pt: "Colecionáveis"
+    clothing-gear:
+      names:
+        es: "Ropa y equipación"
+        en: "Clothing & gear"
+        fr: "Vêtements et équipement"
+        de: "Kleidung & Ausrüstung"
+        it: "Abbigliamento e merchandising"
+        pt: "Roupa e equipamento"
+    other-accessories:
+      names:
+        es: "Otros accesorios"
+        en: "Other accessories"
+        fr: "Autres accessoires"
+        de: "Sonstiges Zubehör"
+        it: "Altri accessori"
+        pt: "Outros acessórios"
+
+games-software:
+  icon: disc
+  names:
+    es: "Juegos y software"
+    en: "Games & software"
+    fr: "Jeux et logiciels"
+    de: "Spiele & Software"
+    it: "Giochi e software"
+    pt: "Jogos e software"
+  seo_description:
+    es: "Videojuegos y software para PC y consolas: físicos y digitales, nuevos y de segunda mano."
+    en: "Video games and software for PC and consoles: physical and digital, new and second-hand."
+    fr: "Jeux vidéo et logiciels pour PC et consoles : physiques et dématérialisés, neufs et d'occasion."
+    de: "Videospiele und Software für PC und Konsolen: physisch und digital, neu und gebraucht."
+    it: "Videogiochi e software per PC e console: fisici e digitali, nuovi e usati."
+    pt: "Videogos e software para PC e consolas: físicos e digitais, novos e usados."
+  children:
+    games:
+      names:
+        es: "Videojuegos"
+        en: "Video games"
+        fr: "Jeux vidéo"
+        de: "Videospiele"
+        it: "Videogiochi"
+        pt: "Videogos"
+    software:
+      names:
+        es: "Software"
+        en: "Software"
+        fr: "Logiciels"
+        de: "Software"
+        it: "Software"
+        pt: "Software"

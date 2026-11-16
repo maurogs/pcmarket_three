@@ -1,0 +1,1225 @@
+# Spec attributes and their options (key -> definition), loaded by
+# db/seeds/spec_attributes.rb. Admin-editable reference data:
+#   group       : groups filters together in the UI
+#   input_type  : select | number | text (see the SpecAttribute enum)
+#   unit        : short unit appended to bare values (not translated)
+#   names       : attribute label in all 6 locales
+#   options     : for select attributes, listed in display order.
+#                 `popular: true` renders in the default filter list, the
+#                 rest sit behind a "show more" toggle.
+#                 `display` is the label when it is identical in every
+#                 locale (brands, standards); a full `names` map when it
+#                 must be translated. `value` is the stored slug.
+# Top-level keys starting with "x-" are YAML anchor helpers, skipped by the loader.
+
+x-shared:
+  other: &other
+    es: "Otros"
+    en: "Other"
+    fr: "Autres"
+    de: "Sonstige"
+    it: "Altro"
+    pt: "Outros"
+  none: &none
+    es: "Ninguna"
+    en: "None"
+    fr: "Aucune"
+    de: "Keine"
+    it: "Nessuna"
+    pt: "Nenhuma"
+
+cpu_brand:
+  group: cpu
+  input_type: select
+  names:
+    es: "Marca de CPU"
+    en: "CPU brand"
+    fr: "Marque du processeur"
+    de: "CPU-Marke"
+    it: "Marca CPU"
+    pt: "Marca do CPU"
+  options:
+    - value: intel
+      display: Intel
+      popular: true
+    - value: amd
+      display: AMD
+      popular: true
+    - value: apple
+      display: Apple
+      popular: true
+    - value: other
+      names: *other
+
+cpu_cores:
+  group: cpu
+  input_type: select
+  names:
+    es: "Núcleos del CPU"
+    en: "CPU cores"
+    fr: "Cœurs du processeur"
+    de: "CPU-Kerne"
+    it: "Core della CPU"
+    pt: "Núcleos do CPU"
+  options:
+    - value: "2"
+      names: { es: "2 núcleos", en: "2 cores", fr: "2 cœurs", de: "2 Kerne", it: "2 core", pt: "2 núcleos" }
+    - value: "4"
+      names: { es: "4 núcleos", en: "4 cores", fr: "4 cœurs", de: "4 Kerne", it: "4 core", pt: "4 núcleos" }
+      popular: true
+    - value: "6"
+      names: { es: "6 núcleos", en: "6 cores", fr: "6 cœurs", de: "6 Kerne", it: "6 core", pt: "6 núcleos" }
+      popular: true
+    - value: "8"
+      names: { es: "8 núcleos", en: "8 cores", fr: "8 cœurs", de: "8 Kerne", it: "8 core", pt: "8 núcleos" }
+      popular: true
+    - value: "10"
+      names: { es: "10 núcleos", en: "10 cores", fr: "10 cœurs", de: "10 Kerne", it: "10 core", pt: "10 núcleos" }
+      popular: true
+    - value: "12"
+      names: { es: "12 núcleos", en: "12 cores", fr: "12 cœurs", de: "12 Kerne", it: "12 core", pt: "12 núcleos" }
+      popular: true
+    - value: "14"
+      names: { es: "14 núcleos", en: "14 cores", fr: "14 cœurs", de: "14 Kerne", it: "14 core", pt: "14 núcleos" }
+      popular: true
+    - value: "16"
+      names: { es: "16 núcleos", en: "16 cores", fr: "16 cœurs", de: "16 Kerne", it: "16 core", pt: "16 núcleos" }
+      popular: true
+    - value: "20"
+      names: { es: "20 núcleos", en: "20 cores", fr: "20 cœurs", de: "20 Kerne", it: "20 core", pt: "20 núcleos" }
+      popular: true
+    - value: "24"
+      names: { es: "24 núcleos", en: "24 cores", fr: "24 cœurs", de: "24 Kerne", it: "24 core", pt: "24 núcleos" }
+      popular: true
+    - value: "28"
+      names: { es: "28 núcleos", en: "28 cores", fr: "28 cœurs", de: "28 Kerne", it: "28 core", pt: "28 núcleos" }
+    - value: "32"
+      names: { es: "32 núcleos", en: "32 cores", fr: "32 cœurs", de: "32 Kerne", it: "32 core", pt: "32 núcleos" }
+    - value: "36"
+      names: { es: "36 núcleos", en: "36 cores", fr: "36 cœurs", de: "36 Kerne", it: "36 core", pt: "36 núcleos" }
+    - value: other
+      names: *other
+
+cpu_model:
+  group: cpu
+  input_type: text
+  names:
+    es: "Modelo del CPU"
+    en: "CPU model"
+    fr: "Modèle du processeur"
+    de: "CPU-Modell"
+    it: "Modello CPU"
+    pt: "Modelo do CPU"
+
+cpu_cooler_brand:
+  group: cooling
+  input_type: select
+  names:
+    es: "Marca de disipador"
+    en: "Cooler brand"
+    fr: "Marque du ventirad"
+    de: "Kühler-Marke"
+    it: "Marca del dissipatore"
+    pt: "Marca do cooler"
+  options:
+    - value: antec
+      display: Antec
+      popular: true
+    - value: arctic
+      display: ARCTIC
+      popular: true
+    - value: asus
+      display: Asus
+      popular: true
+    - value: be-quiet
+      display: "be quiet!"
+      popular: true
+    - value: cooler-master
+      display: Cooler Master
+      popular: true
+    - value: corsair
+      display: Corsair
+      popular: true
+    - value: deepcool
+      display: Deepcool
+      popular: true
+    - value: ek
+      display: EK
+      popular: true
+    - value: gamdias
+      display: Gamdias
+      popular: true
+    - value: id-cooling
+      display: ID-COOLING
+      popular: true
+    - value: intel
+      display: Intel
+      popular: true
+    - value: jonsbo
+      display: Jonsbo
+      popular: true
+    - value: lian-li
+      display: Lian Li
+      popular: true
+    - value: msi
+      display: MSI
+      popular: true
+    - value: noctua
+      display: Noctua
+      popular: true
+    - value: nzxt
+      display: NZXT
+      popular: true
+    - value: phanteks
+      display: Phanteks
+      popular: true
+    - value: rosewill
+      display: Rosewill
+      popular: true
+    - value: thermalright
+      display: Thermalright
+      popular: true
+    - value: thermaltake
+      display: Thermaltake
+      popular: true
+    - value: zalman
+      display: Zalman
+      popular: true
+    - value: other
+      names: *other
+      popular: true
+    - value: alphacool
+      display: Alphacool
+    - value: alpenfoehn
+      display: "Alpenföhn"
+    - value: cougar
+      display: Cougar
+    - value: cryorig
+      display: Cryorig
+    - value: endorfy
+      display: Endorfy
+    - value: enermax
+      display: Enermax
+    - value: evga
+      display: EVGA
+    - value: fractal-design
+      display: Fractal Design
+    - value: gelid-solutions
+      display: Gelid Solutions
+    - value: gigabyte
+      display: Gigabyte
+    - value: scythe
+      display: Scythe
+    - value: silverstone
+      display: Silverstone
+    - value: xigmatek
+      display: Xigmatek
+
+cpu_cooler_type:
+  group: cooling
+  input_type: select
+  names:
+    es: "Tipo de disipador"
+    en: "Cooler type"
+    fr: "Type de ventirad"
+    de: "Kühlertyp"
+    it: "Tipo di dissipatore"
+    pt: "Tipo de cooler"
+  options:
+    - value: air
+      names: { es: "Aire", en: "Air", fr: "À air", de: "Luftkühlung", it: "Ad aria", pt: "A ar" }
+      popular: true
+    - value: aio
+      names: { es: "Líquida todo en uno", en: "All-in-one liquid", fr: "Watercooling tout-en-un", de: "All-in-One-Wasserkühlung", it: "A liquido tutto-in-uno", pt: "Líquida all-in-one" }
+      popular: true
+    - value: custom_loop
+      names: { es: "Circuito personalizado", en: "Custom loop", fr: "Boucle personnalisée", de: "Custom-Loop", it: "Ad acqua custom", pt: "Circuito personalizado" }
+    - value: passive
+      names: { es: "Pasivo", en: "Passive", fr: "Passif", de: "Lüfterlos", it: "Passivo", pt: "Passivo" }
+    - value: other
+      names: *other
+
+cpu_socket:
+  group: cpu
+  input_type: select
+  names:
+    es: "Socket del CPU"
+    en: "CPU socket"
+    fr: "Socket processeur"
+    de: "CPU-Sockel"
+    it: "Socket CPU"
+    pt: "Socket do CPU"
+  options:
+    - value: lga1851
+      display: LGA1851
+      popular: true
+    - value: lga1700
+      display: LGA1700
+      popular: true
+    - value: lga1200
+      display: LGA1200
+      popular: true
+    - value: am5
+      display: AM5
+      popular: true
+    - value: am4
+      display: AM4
+      popular: true
+    - value: multiple_intel
+      names: { es: "Varios sockets Intel", en: "Multiple Intel sockets", fr: "Plusieurs sockets Intel", de: "Mehrere Intel-Sockel", it: "Socket Intel multipli", pt: "Vários sockets Intel" }
+    - value: multiple_amd
+      names: { es: "Varios sockets AMD", en: "Multiple AMD sockets", fr: "Plusieurs sockets AMD", de: "Mehrere AMD-Sockel", it: "Socket AMD multipli", pt: "Vários sockets AMD" }
+    - value: multiple_intel_amd
+      names: { es: "Varios sockets Intel y AMD", en: "Multiple Intel & AMD sockets", fr: "Plusieurs sockets Intel et AMD", de: "Mehrere Intel- & AMD-Sockel", it: "Socket Intel e AMD multipli", pt: "Vários sockets Intel e AMD" }
+    - value: other
+      names: *other
+      popular: true
+    - value: lga4189
+      display: LGA4189
+    - value: tr4
+      display: TR4
+    - value: strx4
+      display: sTRX4
+
+gpu_chipset:
+  group: gpu
+  input_type: select
+  names:
+    es: "Chipset gráfico"
+    en: "GPU chipset"
+    fr: "Puce graphique"
+    de: "GPU-Chipsatz"
+    it: "Chip grafico"
+    pt: "Chip gráfico"
+  options:
+    - value: nvidia
+      display: NVIDIA
+      popular: true
+    - value: amd
+      display: AMD
+      popular: true
+    - value: intel
+      display: Intel
+      popular: true
+    - value: apple
+      display: Apple
+      popular: true
+    - value: integrated
+      names: { es: "Integrada", en: "Integrated", fr: "Intégrée", de: "Integriert", it: "Integrata", pt: "Integrada" }
+      popular: true
+    - value: none
+      names: *none
+      popular: true
+
+gpu_model:
+  group: gpu
+  input_type: text
+  names:
+    es: "Modelo de GPU"
+    en: "GPU model"
+    fr: "Modèle de carte graphique"
+    de: "GPU-Modell"
+    it: "Modello GPU"
+    pt: "Modelo de GPU"
+
+gpu_memory:
+  group: gpu
+  input_type: select
+  unit: GB
+  names:
+    es: "Memoria de la GPU"
+    en: "GPU memory"
+    fr: "Mémoire vidéo"
+    de: "Grafikspeicher"
+    it: "Memoria video"
+    pt: "Memória da GPU"
+  options:
+    - value: lt1
+      names: { es: "Menos de 1 GB", en: "Under 1 GB", fr: "Moins de 1 Go", de: "Unter 1 GB", it: "Meno di 1 GB", pt: "Menos de 1 GB" }
+    - value: "1"
+      names: { es: "1 GB", en: "1 GB", fr: "1 Go", de: "1 GB", it: "1 GB", pt: "1 GB" }
+    - value: "2"
+      names: { es: "2 GB", en: "2 GB", fr: "2 Go", de: "2 GB", it: "2 GB", pt: "2 GB" }
+      popular: true
+    - value: "3"
+      names: { es: "3 GB", en: "3 GB", fr: "3 Go", de: "3 GB", it: "3 GB", pt: "3 GB" }
+      popular: true
+    - value: "4"
+      names: { es: "4 GB", en: "4 GB", fr: "4 Go", de: "4 GB", it: "4 GB", pt: "4 GB" }
+      popular: true
+    - value: "6"
+      names: { es: "6 GB", en: "6 GB", fr: "6 Go", de: "6 GB", it: "6 GB", pt: "6 GB" }
+      popular: true
+    - value: "8"
+      names: { es: "8 GB", en: "8 GB", fr: "8 Go", de: "8 GB", it: "8 GB", pt: "8 GB" }
+      popular: true
+    - value: "10"
+      names: { es: "10 GB", en: "10 GB", fr: "10 Go", de: "10 GB", it: "10 GB", pt: "10 GB" }
+      popular: true
+    - value: "11"
+      names: { es: "11 GB", en: "11 GB", fr: "11 Go", de: "11 GB", it: "11 GB", pt: "11 GB" }
+      popular: true
+    - value: "12"
+      names: { es: "12 GB", en: "12 GB", fr: "12 Go", de: "12 GB", it: "12 GB", pt: "12 GB" }
+      popular: true
+    - value: "16"
+      names: { es: "16 GB", en: "16 GB", fr: "16 Go", de: "16 GB", it: "16 GB", pt: "16 GB" }
+      popular: true
+    - value: "20"
+      names: { es: "20 GB", en: "20 GB", fr: "20 Go", de: "20 GB", it: "20 GB", pt: "20 GB" }
+      popular: true
+    - value: "24"
+      names: { es: "24 GB", en: "24 GB", fr: "24 Go", de: "24 GB", it: "24 GB", pt: "24 GB" }
+      popular: true
+    - value: "32"
+      names: { es: "32 GB", en: "32 GB", fr: "32 Go", de: "32 GB", it: "32 GB", pt: "32 GB" }
+      popular: true
+    - value: other
+      names: *other
+      popular: true
+    - value: "48"
+      names: { es: "48 GB", en: "48 GB", fr: "48 Go", de: "48 GB", it: "48 GB", pt: "48 GB" }
+    - value: "64"
+      names: { es: "64 GB", en: "64 GB", fr: "64 Go", de: "64 GB", it: "64 GB", pt: "64 GB" }
+    - value: "96"
+      names: { es: "96 GB", en: "96 GB", fr: "96 Go", de: "96 GB", it: "96 GB", pt: "96 GB" }
+    - value: "128"
+      names: { es: "128 GB", en: "128 GB", fr: "128 Go", de: "128 GB", it: "128 GB", pt: "128 GB" }
+
+memory_capacity:
+  group: memory
+  input_type: select
+  unit: GB
+  names:
+    es: "Capacidad de la memoria"
+    en: "Memory capacity"
+    fr: "Capacité de la mémoire"
+    de: "Speicherkapazität"
+    it: "Capacità della memoria"
+    pt: "Capacidade da memória"
+  options:
+    - value: lt2
+      names: { es: "Menos de 2 GB", en: "Under 2 GB", fr: "Moins de 2 Go", de: "Unter 2 GB", it: "Meno di 2 GB", pt: "Menos de 2 GB" }
+      popular: true
+    - value: "1"
+      names: { es: "1 GB", en: "1 GB", fr: "1 Go", de: "1 GB", it: "1 GB", pt: "1 GB" }
+    - value: "2"
+      names: { es: "2 GB", en: "2 GB", fr: "2 Go", de: "2 GB", it: "2 GB", pt: "2 GB" }
+    - value: "4"
+      names: { es: "4 GB", en: "4 GB", fr: "4 Go", de: "4 GB", it: "4 GB", pt: "4 GB" }
+    - value: "6"
+      names: { es: "6 GB", en: "6 GB", fr: "6 Go", de: "6 GB", it: "6 GB", pt: "6 GB" }
+    - value: "8"
+      names: { es: "8 GB", en: "8 GB", fr: "8 Go", de: "8 GB", it: "8 GB", pt: "8 GB" }
+      popular: true
+    - value: "12"
+      names: { es: "12 GB", en: "12 GB", fr: "12 Go", de: "12 GB", it: "12 GB", pt: "12 GB" }
+      popular: true
+    - value: "16"
+      names: { es: "16 GB", en: "16 GB", fr: "16 Go", de: "16 GB", it: "16 GB", pt: "16 GB" }
+      popular: true
+    - value: "24"
+      names: { es: "24 GB", en: "24 GB", fr: "24 Go", de: "24 GB", it: "24 GB", pt: "24 GB" }
+      popular: true
+    - value: "32"
+      names: { es: "32 GB", en: "32 GB", fr: "32 Go", de: "32 GB", it: "32 GB", pt: "32 GB" }
+      popular: true
+    - value: "48"
+      names: { es: "48 GB", en: "48 GB", fr: "48 Go", de: "48 GB", it: "48 GB", pt: "48 GB" }
+      popular: true
+    - value: "64"
+      names: { es: "64 GB", en: "64 GB", fr: "64 Go", de: "64 GB", it: "64 GB", pt: "64 GB" }
+      popular: true
+    - value: "96"
+      names: { es: "96 GB", en: "96 GB", fr: "96 Go", de: "96 GB", it: "96 GB", pt: "96 GB" }
+    - value: "128"
+      names: { es: "128 GB", en: "128 GB", fr: "128 Go", de: "128 GB", it: "128 GB", pt: "128 GB" }
+      popular: true
+    - value: "192"
+      names: { es: "192 GB", en: "192 GB", fr: "192 Go", de: "192 GB", it: "192 GB", pt: "192 GB" }
+    - value: "256"
+      names: { es: "256 GB", en: "256 GB", fr: "256 Go", de: "256 GB", it: "256 GB", pt: "256 GB" }
+    - value: "512"
+      names: { es: "512 GB", en: "512 GB", fr: "512 Go", de: "512 GB", it: "512 GB", pt: "512 GB" }
+    - value: other
+      names: *other
+
+memory_brand:
+  group: memory
+  input_type: select
+  names:
+    es: "Marca de memoria"
+    en: "Memory brand"
+    fr: "Marque de mémoire"
+    de: "Speicher-Marke"
+    it: "Marca della memoria"
+    pt: "Marca da memória"
+  options:
+    - value: adata
+      display: ADATA
+      popular: true
+    - value: corsair
+      display: Corsair
+      popular: true
+    - value: crucial
+      display: Crucial
+      popular: true
+    - value: g-skill
+      display: G.Skill
+      popular: true
+    - value: kingston
+      display: Kingston
+      popular: true
+    - value: patriot
+      display: Patriot
+      popular: true
+    - value: samsung
+      display: Samsung
+      popular: true
+    - value: teamgroup
+      display: Teamgroup
+      popular: true
+    - value: lexar
+      display: Lexar
+      popular: true
+    - value: other
+      names: *other
+      popular: true
+    - value: goodram
+      display: GoodRAM
+    - value: mushkin
+      display: Mushkin
+    - value: transcend
+      display: Transcend
+    - value: sk-hynix
+      display: SK hynix
+    - value: micron
+      display: Micron
+
+memory_type:
+  group: memory
+  input_type: select
+  names:
+    es: "Tipo de memoria"
+    en: "Memory type"
+    fr: "Type de mémoire"
+    de: "Speichertyp"
+    it: "Tipo di memoria"
+    pt: "Tipo de memória"
+  options:
+    - value: ddr3
+      display: DDR3
+      popular: true
+    - value: ddr4
+      display: DDR4
+      popular: true
+    - value: ddr5
+      display: DDR5
+      popular: true
+    - value: other
+      names: *other
+
+memory_modules:
+  group: memory
+  input_type: select
+  names:
+    es: "Número de módulos"
+    en: "Number of modules"
+    fr: "Nombre de barrettes"
+    de: "Anzahl der Module"
+    it: "Numero di moduli"
+    pt: "Número de módulos"
+  options:
+    - value: "1"
+      names: { es: "1 módulo", en: "1 module", fr: "1 barrette", de: "1 Modul", it: "1 modulo", pt: "1 módulo" }
+      popular: true
+    - value: "2"
+      names: { es: "2 módulos", en: "2 modules", fr: "2 barrettes", de: "2 Module", it: "2 moduli", pt: "2 módulos" }
+      popular: true
+    - value: "3"
+      names: { es: "3 módulos", en: "3 modules", fr: "3 barrettes", de: "3 Module", it: "3 moduli", pt: "3 módulos" }
+    - value: "4"
+      names: { es: "4 módulos", en: "4 modules", fr: "4 barrettes", de: "4 Module", it: "4 moduli", pt: "4 módulos" }
+      popular: true
+    - value: "8"
+      names: { es: "8 módulos", en: "8 modules", fr: "8 barrettes", de: "8 Module", it: "8 moduli", pt: "8 módulos" }
+    - value: other
+      names: *other
+
+memory_form_factor:
+  group: memory
+  input_type: select
+  names:
+    es: "Formato de la memoria"
+    en: "Memory form factor"
+    fr: "Format de mémoire"
+    de: "Speicher-Formfaktor"
+    it: "Formato della memoria"
+    pt: "Formato da memória"
+  options:
+    - value: dimm
+      display: DIMM
+      popular: true
+    - value: so_dimm
+      display: SO-DIMM
+      popular: true
+    - value: other
+      names: *other
+
+storage_capacity:
+  group: storage
+  input_type: select
+  names:
+    es: "Capacidad del almacenamiento"
+    en: "Storage capacity"
+    fr: "Capacité de stockage"
+    de: "Speicherkapazität"
+    it: "Capacità di archiviazione"
+    pt: "Capacidade de armazenamento"
+  options:
+    - value: lt256
+      names: { es: "Menos de 256 GB", en: "Under 256 GB", fr: "Moins de 256 Go", de: "Unter 256 GB", it: "Meno di 256 GB", pt: "Menos de 256 GB" }
+      popular: true
+    - value: 128gb
+      names: { es: "128 GB", en: "128 GB", fr: "128 Go", de: "128 GB", it: "128 GB", pt: "128 GB" }
+      popular: true
+    - value: 256gb
+      names: { es: "256 GB", en: "256 GB", fr: "256 Go", de: "256 GB", it: "256 GB", pt: "256 GB" }
+      popular: true
+    - value: 480gb
+      names: { es: "480 GB", en: "480 GB", fr: "480 Go", de: "480 GB", it: "480 GB", pt: "480 GB" }
+      popular: true
+    - value: 500gb
+      names: { es: "500 GB", en: "500 GB", fr: "500 Go", de: "500 GB", it: "500 GB", pt: "500 GB" }
+      popular: true
+    - value: 512gb
+      names: { es: "512 GB", en: "512 GB", fr: "512 Go", de: "512 GB", it: "512 GB", pt: "512 GB" }
+      popular: true
+    - value: 1tb
+      names: { es: "1 TB", en: "1 TB", fr: "1 To", de: "1 TB", it: "1 TB", pt: "1 TB" }
+      popular: true
+    - value: 2tb
+      names: { es: "2 TB", en: "2 TB", fr: "2 To", de: "2 TB", it: "2 TB", pt: "2 TB" }
+      popular: true
+    - value: 4tb
+      names: { es: "4 TB", en: "4 TB", fr: "4 To", de: "4 TB", it: "4 TB", pt: "4 TB" }
+      popular: true
+    - value: other
+      names: *other
+      popular: true
+    - value: 8tb
+      names: { es: "8 TB", en: "8 TB", fr: "8 To", de: "8 TB", it: "8 TB", pt: "8 TB" }
+    - value: 12tb
+      names: { es: "12 TB", en: "12 TB", fr: "12 To", de: "12 TB", it: "12 TB", pt: "12 TB" }
+    - value: 16tb
+      names: { es: "16 TB", en: "16 TB", fr: "16 To", de: "16 TB", it: "16 TB", pt: "16 TB" }
+    - value: gt16tb
+      names: { es: "Más de 16 TB", en: "Over 16 TB", fr: "Plus de 16 To", de: "Über 16 TB", it: "Oltre 16 TB", pt: "Mais de 16 TB" }
+
+storage_interface:
+  group: storage
+  input_type: select
+  names:
+    es: "Interfaz del almacenamiento"
+    en: "Storage interface"
+    fr: "Interface de stockage"
+    de: "Schnittstelle"
+    it: "Interfaccia di archiviazione"
+    pt: "Interface de armazenamento"
+  options:
+    - value: sata_hdd
+      display: SATA HDD
+      popular: true
+    - value: sata_ssd
+      display: SATA SSD
+      popular: true
+    - value: nvme_ssd
+      display: NVMe SSD
+      popular: true
+    - value: pcie_ssd
+      display: PCIe SSD
+      popular: true
+    - value: other
+      names: *other
+
+storage_form_factor:
+  group: storage
+  input_type: select
+  names:
+    es: "Formato del almacenamiento"
+    en: "Storage form factor"
+    fr: "Format de stockage"
+    de: "Bauform"
+    it: "Formato di archiviazione"
+    pt: "Formato de armazenamento"
+  options:
+    - value: m2
+      display: "M.2"
+      popular: true
+    - value: 2_5
+      display: '2.5"'
+      popular: true
+    - value: 3_5
+      display: '3.5"'
+      popular: true
+    - value: msata
+      display: mSATA
+    - value: other
+      names: *other
+
+storage_brand:
+  group: storage
+  input_type: select
+  names:
+    es: "Marca de almacenamiento"
+    en: "Storage brand"
+    fr: "Marque de stockage"
+    de: "Laufwerk-Marke"
+    it: "Marca di archiviazione"
+    pt: "Marca de armazenamento"
+  options:
+    - value: crucial
+      display: Crucial
+      popular: true
+    - value: kingston
+      display: Kingston
+      popular: true
+    - value: samsung
+      display: Samsung
+      popular: true
+    - value: seagate
+      display: Seagate
+      popular: true
+    - value: western-digital
+      display: Western Digital
+      popular: true
+    - value: wd
+      display: WD
+      popular: true
+    - value: sandisk
+      display: SanDisk
+      popular: true
+    - value: lexar
+      display: Lexar
+      popular: true
+    - value: corsair
+      display: Corsair
+      popular: true
+    - value: other
+      names: *other
+
+motherboard_brand:
+  group: motherboard
+  input_type: select
+  names:
+    es: "Marca de la placa base"
+    en: "Motherboard brand"
+    fr: "Marque de la carte mère"
+    de: "Mainboard-Marke"
+    it: "Marca della scheda madre"
+    pt: "Marca da motherboard"
+  options:
+    - value: asrock
+      display: ASRock
+      popular: true
+    - value: asus
+      display: Asus
+      popular: true
+    - value: biostar
+      display: Biostar
+    - value: gigabyte
+      display: Gigabyte
+      popular: true
+    - value: msi
+      display: MSI
+      popular: true
+    - value: nzxt
+      display: NZXT
+    - value: other
+      names: *other
+
+motherboard_form_factor:
+  group: motherboard
+  input_type: select
+  names:
+    es: "Formato de la placa base"
+    en: "Motherboard form factor"
+    fr: "Format de la carte mère"
+    de: "Mainboard-Formfaktor"
+    it: "Formato della scheda madre"
+    pt: "Formato da motherboard"
+  options:
+    - value: atx
+      display: ATX
+      popular: true
+    - value: micro_atx
+      display: Micro-ATX
+      popular: true
+    - value: mini_itx
+      display: Mini-ITX
+      popular: true
+    - value: e_atx
+      display: E-ATX
+    - value: other
+      names: *other
+
+motherboard_networking:
+  group: motherboard
+  input_type: select
+  names:
+    es: "Conectividad de la placa base"
+    en: "Motherboard networking"
+    fr: "Connectivité de la carte mère"
+    de: "Netzwerk (Mainboard)"
+    it: "Connettività della scheda madre"
+    pt: "Rede da motherboard"
+  options:
+    - value: ethernet_wifi
+      names: { es: "Ethernet + Wi-Fi", en: "Ethernet + Wi-Fi", fr: "Ethernet + Wi-Fi", de: "Ethernet + WLAN", it: "Ethernet + Wi-Fi", pt: "Ethernet + Wi-Fi" }
+      popular: true
+    - value: ethernet_only
+      names: { es: "Solo Ethernet", en: "Ethernet only", fr: "Ethernet uniquement", de: "Nur Ethernet", it: "Solo Ethernet", pt: "Apenas Ethernet" }
+      popular: true
+    - value: wifi_only
+      names: { es: "Solo Wi-Fi", en: "Wi-Fi only", fr: "Wi-Fi uniquement", de: "Nur WLAN", it: "Solo Wi-Fi", pt: "Apenas Wi-Fi" }
+    - value: none
+      names: *none
+      popular: true
+
+case_brand:
+  group: case
+  input_type: select
+  names:
+    es: "Marca de la caja"
+    en: "Case brand"
+    fr: "Marque du boîtier"
+    de: "Gehäuse-Marke"
+    it: "Marca del case"
+    pt: "Marca do gabinete"
+  options:
+    - value: antec
+      display: Antec
+      popular: true
+    - value: be-quiet
+      display: "be quiet!"
+      popular: true
+    - value: cooler-master
+      display: Cooler Master
+      popular: true
+    - value: corsair
+      display: Corsair
+      popular: true
+    - value: fractal-design
+      display: Fractal Design
+      popular: true
+    - value: hyte
+      display: Hyte
+      popular: true
+    - value: lian-li
+      display: Lian Li
+      popular: true
+    - value: montech
+      display: Montech
+      popular: true
+    - value: nzxt
+      display: NZXT
+      popular: true
+    - value: phanteks
+      display: Phanteks
+      popular: true
+    - value: thermaltake
+      display: Thermaltake
+      popular: true
+    - value: mars-gaming
+      display: Mars Gaming
+      popular: true
+    - value: nox
+      display: Nox
+      popular: true
+    - value: sharkoon
+      display: Sharkoon
+    - value: other
+      names: *other
+
+case_form_factor:
+  group: case
+  input_type: select
+  names:
+    es: "Formato de la caja"
+    en: "Case form factor"
+    fr: "Format du boîtier"
+    de: "Gehäuse-Formfaktor"
+    it: "Formato del case"
+    pt: "Formato do gabinete"
+  options:
+    - value: mid_tower
+      names: { es: "Torre media", en: "Mid tower", fr: "Tour moyenne", de: "Mid-Tower", it: "Mid tower", pt: "Torre média" }
+      popular: true
+    - value: mini_tower
+      names: { es: "Torre pequeña", en: "Mini tower", fr: "Mini tour", de: "Mini-Tower", it: "Mini tower", pt: "Mini torre" }
+      popular: true
+    - value: full_tower
+      names: { es: "Torre completa", en: "Full tower", fr: "Tour haute", de: "Full-Tower", it: "Full tower", pt: "Torre completa" }
+      popular: true
+    - value: sff
+      names: { es: "Formato compacto (SFF)", en: "Small form factor (SFF)", fr: "Format compacte (SFF)", de: "Small Form Factor (SFF)", it: "Formato compatto (SFF)", pt: "Formato compacto (SFF)" }
+      popular: true
+    - value: open_frame
+      names: { es: "Chasis abierto", en: "Open frame", fr: "Châssis ouvert", de: "Offenes Gehäuse", it: "Case aperto", pt: "Gabinete aberto" }
+    - value: htpc
+      names: { es: "HTPC", en: "HTPC", fr: "HTPC", de: "HTPC", it: "HTPC", pt: "HTPC" }
+    - value: other
+      names: *other
+
+case_color:
+  group: case
+  input_type: select
+  names:
+    es: "Color de la caja"
+    en: "Case colour"
+    fr: "Couleur du boîtier"
+    de: "Gehäusefarbe"
+    it: "Colore del case"
+    pt: "Cor do gabinete"
+  options:
+    - value: black
+      names: { es: "Negro", en: "Black", fr: "Noir", de: "Schwarz", it: "Nero", pt: "Preto" }
+      popular: true
+    - value: white
+      names: { es: "Blanco", en: "White", fr: "Blanc", de: "Weiß", it: "Bianco", pt: "Branco" }
+      popular: true
+    - value: silver
+      names: { es: "Plateado", en: "Silver", fr: "Argenté", de: "Silber", it: "Argento", pt: "Prateado" }
+      popular: true
+    - value: gray
+      names: { es: "Gris", en: "Grey", fr: "Gris", de: "Grau", it: "Grigio", pt: "Cinzento" }
+      popular: true
+    - value: red
+      names: { es: "Rojo", en: "Red", fr: "Rouge", de: "Rot", it: "Rosso", pt: "Vermelho" }
+    - value: blue
+      names: { es: "Azul", en: "Blue", fr: "Bleu", de: "Blau", it: "Blu", pt: "Azul" }
+    - value: pink
+      names: { es: "Rosa", en: "Pink", fr: "Rose", de: "Rosa", it: "Rosa", pt: "Rosa" }
+    - value: green
+      names: { es: "Verde", en: "Green", fr: "Vert", de: "Grün", it: "Verde", pt: "Verde" }
+    - value: multicolor
+      names: { es: "Multicolor", en: "Multicolour", fr: "Multicolore", de: "Mehrfarbig", it: "Multicolore", pt: "Multicolor" }
+    - value: black_white
+      names: { es: "Blanco y negro", en: "Black & white", fr: "Noir et blanc", de: "Schwarz-Weiß", it: "Bianco e nero", pt: "Preto e branco" }
+    - value: other
+      names: *other
+
+psu_brand:
+  group: power
+  input_type: select
+  names:
+    es: "Marca de la fuente"
+    en: "Power supply brand"
+    fr: "Marque de l'alimentation"
+    de: "Netzteil-Marke"
+    it: "Marca dell'alimentatore"
+    pt: "Marca da fonte"
+  options:
+    - value: be-quiet
+      display: "be quiet!"
+      popular: true
+    - value: corsair
+      display: Corsair
+      popular: true
+    - value: cooler-master
+      display: Cooler Master
+      popular: true
+    - value: evga
+      display: EVGA
+      popular: true
+    - value: msi
+      display: MSI
+      popular: true
+    - value: nzxt
+      display: NZXT
+      popular: true
+    - value: seasonic
+      display: Seasonic
+      popular: true
+    - value: super-flower
+      display: Super Flower
+      popular: true
+    - value: thermaltake
+      display: Thermaltake
+      popular: true
+    - value: other
+      names: *other
+
+psu_wattage:
+  group: power
+  input_type: select
+  unit: W
+  names:
+    es: "Potencia de la fuente"
+    en: "Power supply wattage"
+    fr: "Puissance de l'alimentation"
+    de: "Netzteil-Leistung"
+    it: "Potenza dell'alimentatore"
+    pt: "Potência da fonte"
+  options:
+    - value: lt400
+      names: { es: "Menos de 400 W", en: "Under 400 W", fr: "Moins de 400 W", de: "Unter 400 W", it: "Meno di 400 W", pt: "Menos de 400 W" }
+    - value: "400"
+      display: "400 W"
+      popular: true
+    - value: "450"
+      display: "450 W"
+      popular: true
+    - value: "500"
+      display: "500 W"
+      popular: true
+    - value: "550"
+      display: "550 W"
+      popular: true
+    - value: "600"
+      display: "600 W"
+      popular: true
+    - value: "650"
+      display: "650 W"
+      popular: true
+    - value: "700"
+      display: "700 W"
+      popular: true
+    - value: "750"
+      display: "750 W"
+      popular: true
+    - value: "800"
+      display: "800 W"
+      popular: true
+    - value: "850"
+      display: "850 W"
+      popular: true
+    - value: "1000"
+      display: "1000 W"
+      popular: true
+    - value: "1200"
+      display: "1200 W"
+      popular: true
+    - value: "1600"
+      display: "1600 W"
+    - value: other
+      names: *other
+
+psu_form_factor:
+  group: power
+  input_type: select
+  names:
+    es: "Formato de la fuente"
+    en: "Power supply form factor"
+    fr: "Format de l'alimentation"
+    de: "Netzteil-Formfaktor"
+    it: "Formato dell'alimentatore"
+    pt: "Formato da fonte"
+  options:
+    - value: atx
+      display: ATX
+      popular: true
+    - value: sfx
+      display: SFX
+      popular: true
+    - value: sfx_l
+      display: SFX-L
+    - value: tfx
+      display: TFX
+    - value: other
+      names: *other
+
+rgb_lighting:
+  group: extras
+  input_type: select
+  names:
+    es: "Iluminación RGB"
+    en: "RGB lighting"
+    fr: "Éclairage RGB"
+    de: "RGB-Beleuchtung"
+    it: "Illuminazione RGB"
+    pt: "Iluminação RGB"
+  options:
+    - value: addressable
+      names: { es: "RGB direccionable", en: "Addressable RGB", fr: "RVB adressable", de: "Adressierbares RGB", it: "RGB indirizzabile", pt: "RGB endereçável" }
+      popular: true
+    - value: static
+      names: { es: "RGB fijo", en: "Static RGB", fr: "RVB fixe", de: "Festes RGB", it: "RGB fisso", pt: "RGB fixo" }
+      popular: true
+    - value: none
+      names: *none
+      popular: true
+
+screen_size:
+  group: display
+  input_type: number
+  unit: '"'
+  names:
+    es: "Tamaño de pantalla"
+    en: "Screen size"
+    fr: "Taille d'écran"
+    de: "Bildschirmgröße"
+    it: "Dimensione dello schermo"
+    pt: "Tamanho do ecrã"
+
+refresh_rate:
+  group: display
+  input_type: select
+  unit: Hz
+  names:
+    es: "Frecuencia de refresco"
+    en: "Refresh rate"
+    fr: "Taux de rafraîchissement"
+    de: "Bildwiederholrate"
+    it: "Frequenza di aggiornamento"
+    pt: "Taxa de atualização"
+  options:
+    - value: "60"
+      display: "60 Hz"
+      popular: true
+    - value: "75"
+      display: "75 Hz"
+    - value: "144"
+      display: "144 Hz"
+      popular: true
+    - value: "165"
+      display: "165 Hz"
+      popular: true
+    - value: "240"
+      display: "240 Hz"
+      popular: true
+    - value: "360"
+      display: "360 Hz"
+      popular: true
+
+resolution:
+  group: display
+  input_type: select
+  names:
+    es: "Resolución"
+    en: "Resolution"
+    fr: "Résolution"
+    de: "Auflösung"
+    it: "Risoluzione"
+    pt: "Resolução"
+  options:
+    - value: 1080p
+      display: "1080p Full HD"
+      popular: true
+    - value: 1440p
+      display: "1440p QHD"
+      popular: true
+    - value: 2160p
+      display: "2160p 4K"
+      popular: true
+    - value: ultrawide
+      names: { es: "Ultra panorámica", en: "Ultrawide", fr: "Ultralarge", de: "Ultrawide", it: "Ultra larga", pt: "Ultralarga" }
+      popular: true
+
+storage_gb_mobile:
+  group: mobile
+  input_type: select
+  unit: GB
+  names:
+    es: "Almacenamiento"
+    en: "Internal storage"
+    fr: "Stockage interne"
+    de: "Interner Speicher"
+    it: "Archiviazione interna"
+    pt: "Armazenamento interno"
+  options:
+    - value: "64"
+      names: { es: "64 GB", en: "64 GB", fr: "64 Go", de: "64 GB", it: "64 GB", pt: "64 GB" }
+      popular: true
+    - value: "128"
+      names: { es: "128 GB", en: "128 GB", fr: "128 Go", de: "128 GB", it: "128 GB", pt: "128 GB" }
+      popular: true
+    - value: "256"
+      names: { es: "256 GB", en: "256 GB", fr: "256 Go", de: "256 GB", it: "256 GB", pt: "256 GB" }
+      popular: true
+    - value: "512"
+      names: { es: "512 GB", en: "512 GB", fr: "512 Go", de: "512 GB", it: "512 GB", pt: "512 GB" }
+      popular: true
+    - value: "1024"
+      names: { es: "1024 GB", en: "1024 GB", fr: "1024 Go", de: "1024 GB", it: "1024 GB", pt: "1024 GB" }
+
+device_brand:
+  group: devices
+  input_type: select
+  names:
+    es: "Marca del dispositivo"
+    en: "Device brand"
+    fr: "Marque de l'appareil"
+    de: "Geräte-Marke"
+    it: "Marca del dispositivo"
+    pt: "Marca do dispositivo"
+  options:
+    - value: apple
+      display: Apple
+      popular: true
+    - value: samsung
+      display: Samsung
+      popular: true
+    - value: google
+      display: Google
+      popular: true
+    - value: xiaomi
+      display: Xiaomi
+      popular: true
+    - value: oneplus
+      display: OnePlus
+      popular: true
+    - value: sony
+      display: Sony
+      popular: true
+    - value: nintendo
+      display: Nintendo
+      popular: true
+    - value: microsoft
+      display: Microsoft
+    - value: valve
+      display: Valve
+    - value: asus
+      display: Asus
+    - value: lenovo
+      display: Lenovo
+    - value: other
+      names: *other
+
+platform:
+  group: devices
+  input_type: select
+  names:
+    es: "Plataforma"
+    en: "Platform"
+    fr: "Plateforme"
+    de: "Plattform"
+    it: "Piattaforma"
+    pt: "Plataforma"
+  options:
+    - value: ps5
+      display: "PlayStation 5"
+      popular: true
+    - value: ps4
+      display: "PlayStation 4"
+      popular: true
+    - value: xbox_series
+      display: "Xbox Series X|S"
+      popular: true
+    - value: switch
+      display: "Nintendo Switch"
+      popular: true
+    - value: switch2
+      display: "Nintendo Switch 2"
+      popular: true
+    - value: steam_deck
+      display: "Steam Deck"
+      popular: true
+    - value: pc
+      display: PC
+      popular: true
+    - value: retro
+      names: { es: "Retro", en: "Retro", fr: "Rétro", de: "Retro", it: "Retro", pt: "Retrô" }
+      popular: true
+    - value: other
+      names: *other

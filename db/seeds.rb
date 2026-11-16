@@ -1,9 +1,17 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
+# Reference-data seeds (Phase 2a: taxonomy, filters, labels, tags; later
+# phases add more loaders under db/seeds/). Every loader upserts by stable
+# slug/key, so `bin/rails db:seed` is idempotent and safe at any time in
+# every environment. Raw data lives in db/seeds/data/*.yml for the admin
+# team; loaders run in the order below.
+seed_dir = Rails.root.join("db", "seeds")
+
+# support file is a plain module definition, so `require` (loaded once);
+# the loaders below are re-`load`ed on every run.
+require seed_dir.join("support/seed_loader.rb").to_s
+
+%w[
+  countries_settings
+  categories
+  spec_attributes
+  labels_seller_tags
+].each { |name| load seed_dir.join("#{name}.rb") }

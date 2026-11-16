@@ -1,0 +1,172 @@
+# Seller tags (style tags sellers pick for their listings).
+# `slug` is stable; names in 6 locales — brand-like words (noctua, sakura,
+# lo-fi, rgb, steampunk, anime) stay identical, the rest are translated.
+
+anime:
+  names:
+    es: "Anime"
+    en: "Anime"
+    fr: "Anime"
+    de: "Anime"
+    it: "Anime"
+    pt: "Anime"
+basic:
+  names:
+    es: "Básico"
+    en: "Basic"
+    fr: "Basique"
+    de: "Basis"
+    it: "Basico"
+    pt: "Básico"
+blackout:
+  names:
+    es: "Negro total"
+    en: "Blackout"
+    fr: "Noir total"
+    de: "Blackout"
+    it: "Total black"
+    pt: "Preto total"
+compact:
+  names:
+    es: "Compacto"
+    en: "Compact"
+    fr: "Compact"
+    de: "Kompakt"
+    it: "Compatto"
+    pt: "Compacto"
+cozy:
+  names:
+    es: "Acogedor"
+    en: "Cozy"
+    fr: "Cosy"
+    de: "Gemütlich"
+    it: "Accogliente"
+    pt: "Acolhedor"
+glass:
+  names:
+    es: "Cristal"
+    en: "Glass"
+    fr: "Verre"
+    de: "Glas"
+    it: "Vetro"
+    pt: "Vidro"
+lo-fi:
+  names:
+    es: "Lo-fi"
+    en: "Lo-fi"
+    fr: "Lo-fi"
+    de: "Lo-fi"
+    it: "Lo-fi"
+    pt: "Lo-fi"
+luxe:
+  names:
+    es: "Lujo"
+    en: "Luxe"
+    fr: "Luxe"
+    de: "Luxus"
+    it: "Lusso"
+    pt: "Luxo"
+max-performance:
+  names:
+    es: "Rendimiento máximo"
+    en: "Max performance"
+    fr: "Performance maximale"
+    de: "Höchstleistung"
+    it: "Prestazioni massime"
+    pt: "Desempenho máximo"
+minimalist:
+  names:
+    es: "Minimalista"
+    en: "Minimalist"
+    fr: "Minimaliste"
+    de: "Minimalistisch"
+    it: "Minimalista"
+    pt: "Minimalista"
+noctua:
+  names:
+    es: "Noctua"
+    en: "Noctua"
+    fr: "Noctua"
+    de: "Noctua"
+    it: "Noctua"
+    pt: "Noctua"
+rainbow:
+  names:
+    es: "Arcoíris"
+    en: "Rainbow"
+    fr: "Arc-en-ciel"
+    de: "Regenbogen"
+    it: "Arcobaleno"
+    pt: "Arco-íris"
+retro:
+  names:
+    es: "Retro"
+    en: "Retro"
+    fr: "Rétro"
+    de: "Retro"
+    it: "Retro"
+    pt: "Retrô"
+rgb:
+  names:
+    es: "RGB"
+    en: "RGB"
+    fr: "RGB"
+    de: "RGB"
+    it: "RGB"
+    pt: "RGB"
+sakura:
+  names:
+    es: "Sakura"
+    en: "Sakura"
+    fr: "Sakura"
+    de: "Sakura"
+    it: "Sakura"
+    pt: "Sakura"
+sci-fi:
+  names:
+    es: "Ciencia ficción"
+    en: "Sci-fi"
+    fr: "Science-fiction"
+    de: "Sci-Fi"
+    it: "Fantascienza"
+    pt: "Ficção científica"
+space:
+  names:
+    es: "Espacial"
+    en: "Space"
+    fr: "Espace"
+    de: "Weltraum"
+    it: "Spazio"
+    pt: "Espaço"
+steampunk:
+  names:
+    es: "Steampunk"
+    en: "Steampunk"
+    fr: "Steampunk"
+    de: "Steampunk"
+    it: "Steampunk"
+    pt: "Steampunk"
+superhero:
+  names:
+    es: "Superhéroe"
+    en: "Superhero"
+    fr: "Super-héros"
+    de: "Superheld"
+    it: "Supereroe"
+    pt: "Super-herói"
+whiteout:
+  names:
+    es: "Blanco total"
+    en: "Whiteout"
+    fr: "Blanc total"
+    de: "Whiteout"
+    it: "Total white"
+    pt: "Branco total"
+wood:
+  names:
+    es: "Madera"
+    en: "Wood"
+    fr: "Bois"
+    de: "Holz"
+    it: "Legno"
+    pt: "Madeira"

@@ -1,0 +1,140 @@
+# Which spec attributes are attached to which category
+# (db/seeds/spec_attributes.rb creates the CategorySpecAttribute rows).
+# Attaching to a root category (e.g. gaming-pcs, gpus, workstations) makes
+# the filters inherit down to every child; attaching to a child (e.g. cpus,
+# monitors) scopes it to that branch. `required:` lists attributes the
+# listing form must ask for. Attributes keep their SpecAttribute position.
+
+gaming-pcs:
+  keys:
+    - cpu_brand
+    - cpu_cores
+    - cpu_model
+    - cpu_cooler_brand
+    - cpu_cooler_type
+    - cpu_socket
+    - gpu_chipset
+    - gpu_model
+    - gpu_memory
+    - memory_capacity
+    - memory_type
+    - storage_capacity
+    - storage_interface
+    - motherboard_brand
+    - motherboard_form_factor
+    - motherboard_networking
+    - case_brand
+    - case_form_factor
+    - case_color
+    - psu_wattage
+    - rgb_lighting
+
+workstations:
+  keys:
+    - cpu_brand
+    - cpu_cores
+    - cpu_model
+    - cpu_cooler_brand
+    - cpu_cooler_type
+    - cpu_socket
+    - gpu_chipset
+    - gpu_model
+    - gpu_memory
+    - memory_capacity
+    - memory_type
+    - storage_capacity
+    - storage_interface
+    - motherboard_brand
+    - motherboard_form_factor
+    - motherboard_networking
+    - case_brand
+    - case_form_factor
+    - case_color
+    - psu_wattage
+    - rgb_lighting
+
+gpus:
+  keys:
+    - gpu_chipset
+    - gpu_model
+    - gpu_memory
+    - rgb_lighting
+  required:
+    - gpu_chipset
+
+cpus:
+  keys:
+    - cpu_brand
+    - cpu_cores
+    - cpu_socket
+    - cpu_model
+  required:
+    - cpu_brand
+
+cpu-coolers:
+  keys:
+    - cpu_cooler_brand
+    - cpu_cooler_type
+
+memory:
+  keys:
+    - memory_brand
+    - memory_capacity
+    - memory_form_factor
+    - memory_modules
+    - memory_type
+
+storage:
+  keys:
+    - storage_brand
+    - storage_capacity
+    - storage_form_factor
+    - storage_interface
+
+motherboards:
+  keys:
+    - motherboard_brand
+    - motherboard_form_factor
+    - motherboard_networking
+    - cpu_socket
+    - memory_type
+
+cases:
+  keys:
+    - case_brand
+    - case_color
+    - case_form_factor
+
+power-supplies:
+  keys:
+    - psu_brand
+    - psu_form_factor
+    - psu_wattage
+
+monitors:
+  keys:
+    - screen_size
+    - refresh_rate
+    - resolution
+
+laptops:
+  keys:
+    - cpu_brand
+    - cpu_model
+    - gpu_chipset
+    - gpu_model
+    - memory_capacity
+    - storage_capacity
+    - screen_size
+
+mobile:
+  keys:
+    - device_brand
+    - storage_gb_mobile
+    - screen_size
+
+consoles:
+  keys:
+    - platform
+    - device_brand
+    - storage_gb_mobile

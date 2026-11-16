@@ -1,0 +1,132 @@
+# Listing labels (badge shown on cards and detail pages).
+# `slug` is stable, `color` is the badge hex colour, names in 6 locales.
+
+value-pcs:
+  color: "#16a34a"
+  names:
+    es: "Buen precio"
+    en: "Great value"
+    fr: "Bon rapport qualité-prix"
+    de: "Preis-Leistung"
+    it: "Ottimo prezzo"
+    pt: "Bom preço"
+
+mid-range-pcs:
+  color: "#2563eb"
+  names:
+    es: "Gama media"
+    en: "Mid-range"
+    fr: "Milieu de gamme"
+    de: "Mittelklasse"
+    it: "Fascia media"
+    pt: "Gama média"
+
+pro-gamer-pcs:
+  color: "#7c3aed"
+  names:
+    es: "Gama alta gaming"
+    en: "Pro gamer"
+    fr: "Haut de gamme gaming"
+    de: "Pro-Gamer-Klasse"
+    it: "Fascia alta gaming"
+    pt: "Gama alta gaming"
+
+featured:
+  color: "#f97316"
+  names:
+    es: "Destacado"
+    en: "Featured"
+    fr: "À la une"
+    de: "Hervorgehoben"
+    it: "In evidenza"
+    pt: "Destaque"
+
+rare:
+  color: "#e11d48"
+  names:
+    es: "Raro"
+    en: "Rare"
+    fr: "Rare"
+    de: "Selten"
+    it: "Raro"
+    pt: "Raro"
+
+value-gpus:
+  color: "#16a34a"
+  names:
+    es: "GPU con buen precio"
+    en: "Great value GPU"
+    fr: "GPU bon rapport qualité-prix"
+    de: "Preiswerte GPU"
+    it: "GPU ottimo prezzo"
+    pt: "GPU com bom preço"
+
+mid-range-gpus:
+  color: "#2563eb"
+  names:
+    es: "GPU de gama media"
+    en: "Mid-range GPU"
+    fr: "GPU milieu de gamme"
+    de: "Mittelklasse-GPU"
+    it: "GPU di fascia media"
+    pt: "GPU de gama média"
+
+pro-gamer-gpus:
+  color: "#7c3aed"
+  names:
+    es: "GPU de gama alta"
+    en: "Pro gamer GPU"
+    fr: "GPU haut de gamme"
+    de: "Pro-Gamer-GPU"
+    it: "GPU di fascia alta"
+    pt: "GPU de gama alta"
+
+value-cpus:
+  color: "#16a34a"
+  names:
+    es: "CPU con buen precio"
+    en: "Great value CPU"
+    fr: "CPU bon rapport qualité-prix"
+    de: "Preiswerte CPU"
+    it: "CPU ottimo prezzo"
+    pt: "CPU com bom preço"
+
+mid-range-cpus:
+  color: "#2563eb"
+  names:
+    es: "CPU de gama media"
+    en: "Mid-range CPU"
+    fr: "CPU milieu de gamme"
+    de: "Mittelklasse-CPU"
+    it: "CPU di fascia media"
+    pt: "CPU de gama média"
+
+pro-gamer-cpus:
+  color: "#7c3aed"
+  names:
+    es: "CPU de gama alta"
+    en: "Pro gamer CPU"
+    fr: "CPU haut de gamme"
+    de: "Pro-Gamer-CPU"
+    it: "CPU di fascia alta"
+    pt: "CPU de gama alta"
+
+free-shipping:
+  color: "#0d9488"
+  names:
+    es: "Envío gratis"
+    en: "Free shipping"
+    fr: "Livraison gratuite"
+    de: "Versandkostenfrei"
+    it: "Spedizione gratuita"
+    pt: "Envio grátis"
+
+staff-pick:
+  color: "#f59e0b"
+  names:
+    es: "Selección del equipo"
+    en: "Staff pick"
+    fr: "Choix de l'équipe"
+    de: "Team-Tipp"
+    it: "Scelta dello staff"
+    pt: "Escolha da equipa"

@@ -1,5 +1,49 @@
 # History
 
+## 2026-11-17 — Phase 2a: reference-data seeds (taxonomy, spec filters, labels, seller tags)
+
+**What was built**
+
+- Idempotent seed loaders: `db/seeds.rb` loads `db/seeds/support/seed_loader.rb`
+  (module `SeedLoader`: YAML reader with `aliases: true`, 6-locale map validator,
+  `display`-fallback for non-translatable labels) then, in order,
+  `countries_settings.rb` (delegates to `Country.seed_defaults!` /
+  `Setting.seed_defaults!`), `categories.rb`, `spec_attributes.rb` (attributes +
+  options + `CategorySpecAttribute` attachments incl. `required` flags),
+  `labels_seller_tags.rb`. Every loader upserts by slug/key/value
+  (`find_or_initialize_by` + `update!`); loaders are `load`ed (not required)
+  so repeated `db:seed` runs re-execute — verified idempotent (two dev runs,
+  counts unchanged).
+- Raw admin-readable data in `db/seeds/data/`: `categories.yml` (10 roots with
+  icon + 6-locale seo_description, 51 children = 61 categories),
+  `spec_attributes.yml` (34 attributes, 293 options, `x-shared` YAML anchors
+  for the recurring "Other"/"None" maps; `popular` per spec; brand/standard
+  labels use one `display` string across locales — proper nouns — capacity
+  names are real translations incl. FR "Go/To"), `category_spec_attributes.yml`
+  (88 attachments; gpu_chipset required for gpus, cpu_brand for cpus; roots
+  like gaming-pcs/workstations inherit down), `labels.yml` (13 labels + hex
+  colours), `seller_tags.yml` (21 tags). All names carry es/en/fr/de/it/pt.
+- Test `test/seeds/reference_data_test.rb`: runs `db/seeds.rb` twice inside the
+  test transaction, asserts identical counts + exact per-table created counts
+  (61/34/293/88/13/21/countries+4/settings+4), 6-locale coverage for every
+  seeded Category/SpecAttribute/SpecOption/Label/SellerTag, root icons +
+  seo_descriptions, `gpus.all_spec_attributes` includes gpu_chipset (+ child
+  inheritance, required flags, popular-option sets).
+
+**Why**
+
+Phase 2a per the roadmap: reference data must be admin-editable (YAML, one
+file per concern), re-seedable without duplicates, and complete in all six
+locales. Gotchas recorded: `YAML.load_file` needs `aliases: true`; re-`load`ing
+a file that defines constants emits "already initialized" warnings, so the
+constant-holding helper is `require`d while data loaders are `load`ed. Dev DB
+contains two pre-seed smoke rows (`categories/rtx`, `gpu_memory:12gb` option)
+left over from earlier manual testing — harmless, not duplicated by seeds.
+
+**Files touched**: db/seeds.rb; db/seeds/{support/seed_loader,countries_settings,categories,spec_attributes,labels_seller_tags}.rb;
+db/seeds/data/{categories,spec_attributes,category_spec_attributes,labels,seller_tags}.yml;
+test/seeds/reference_data_test.rb.
+
 ## 2026-11-17 — Phase 1: domain layer (full model layer, associations, I18n)
 
 **What was built**
