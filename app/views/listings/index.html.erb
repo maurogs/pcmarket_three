@@ -1,0 +1,70 @@
+<%# Shared browse/search results page (also rendered by CategoriesController). %>
+<% category = @result.filters[:category] %>
+<% set_meta_tags(title: category ? category.name : (@result.filters[:q].presence || t(".title_all")),
+                 description: category ? category.seo_description : t(".meta_description")) %>
+
+<% if category %>
+  <nav aria-label="<%= t(".breadcrumb") %>" class="mb-3 flex flex-wrap items-center gap-1 text-xs text-muted">
+    <%= link_to t(".breadcrumb_home"), root_path, class: "hover:text-primary" %>
+    <% breadcrumb_categories(category).each do |crumb| %>
+      <%= inline_icon :chevron_right, classes: "size-3.5 shrink-0" %>
+      <% if crumb == category %>
+        <span class="font-medium text-text" aria-current="page"><%= crumb.name %></span>
+      <% else %>
+        <%= link_to crumb.name, category_path(crumb), class: "hover:text-primary" %>
+      <% end %>
+    <% end %>
+  </nav>
+<% end %>
+
+<header class="mb-4">
+  <h1 class="text-xl font-bold tracking-tight sm:text-2xl">
+    <% if category %>
+      <%= category.name %>
+    <% elsif @result.filters[:q].present? %>
+      <%= t(".title_query", query: @result.filters[:q]) %>
+    <% else %>
+      <%= t(".title_all") %>
+    <% end %>
+  </h1>
+
+  <% if category && category.seo_description.present? %>
+    <p class="mt-1.5 max-w-2xl text-sm leading-6 text-muted"><%= category.seo_description %></p>
+  <% end %>
+
+  <%# Sub-category pills stay outside the results frame: they are navigation, not filtering. %>
+  <% if category && category.children.any? %>
+    <nav aria-label="<%= t(".subcategories") %>" class="mt-3 flex flex-wrap gap-2">
+      <% category.children.first(12).each do |child| %>
+        <%= link_to child.name, listings_path(request.query_parameters.merge(category: child.slug)),
+              class: "rounded-full border border-border bg-surface-muted px-3 py-1.5 text-xs font-medium text-text transition hover:border-primary hover:text-primary min-h-9 inline-flex items-center" %>
+      <% end %>
+    </nav>
+  <% end %>
+</header>
+
+<%# One GET form drives both the sidebar and the results frame: every change
+    is a frame-only Turbo visit, so the shell, header and sidebar stay put. %>
+<%= render "listings/browse", result: @result %>
+
+<%# Bottom SEO block: indexable text plus internal links, category pages only. %>
+<% if category && @result.total_count.positive? %>
+  <section class="mt-10 border-t border-border pt-6 text-sm leading-6 text-muted">
+    <h2 class="mb-2 text-base font-semibold text-text">
+      <%= t(".seo_heading", category: category.name) %>
+    </h2>
+    <p class="max-w-3xl">
+      <%= t(".seo_text",
+            category: category.name,
+            count: @result.total_count,
+            country: t("countries.#{current_country_code.downcase}")) %>
+    </p>
+    <% if category.children.any? %>
+      <ul class="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+        <% category.children.each do |child| %>
+          <li><%= link_to child.name, category_path(child), class: "text-primary hover:underline" %></li>
+        <% end %>
+      </ul>
+    <% end %>
+  </section>
+<% end %>

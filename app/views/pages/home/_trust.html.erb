@@ -1,0 +1,18 @@
+<%# Trust strip: the four reasons to buy here. %>
+<section class="mt-10 rounded-lg border border-border bg-surface-muted p-5">
+  <h2 class="sr-only"><%= t(".title") %></h2>
+  <ul class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+    <% [ [ :shield, t(".buyer.title"), t(".buyer.text") ],
+         [ :lock, t(".payments.title"), t(".payments.text") ],
+         [ :truck, t(".delivery.title"), t(".delivery.text") ],
+         [ :message, t(".support.title"), t(".support.text") ] ].each do |icon, title, text| %>
+      <li class="flex gap-3">
+        <span class="text-primary"><%= inline_icon icon, classes: "size-6" %></span>
+        <div>
+          <h3 class="text-sm font-semibold"><%= title %></h3>
+          <p class="mt-0.5 text-xs leading-5 text-muted"><%= text %></p>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+</section>

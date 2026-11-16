@@ -13,3 +13,11 @@ negotiable:
     es: Negociable
   input_type: boolean
   position: 2
+
+ports:
+  key: ports
+  names:
+    en: Ports
+    es: Puertos
+  input_type: multi_select
+  position: 3

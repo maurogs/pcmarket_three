@@ -7,3 +7,19 @@ vram_12:
   spec_attribute: vram
   value: 12GB
   position: 2
+
+hdmi:
+  spec_attribute: ports
+  value: hdmi
+  names:
+    en: HDMI
+    es: HDMI
+  position: 1
+
+displayport:
+  spec_attribute: ports
+  value: displayport
+  names:
+    en: DisplayPort
+    es: DisplayPort
+  position: 2

@@ -1,0 +1,23 @@
+<%# Scroll-snap carousel of graphics cards: the category with the most traffic. %>
+<% cache [ I18n.locale, "home/gpus", Listing.maximum(:updated_at) ], expires_in: 15.minutes do %>
+  <% category = Category.active.find_by(slug: "gpus") %>
+  <% listings = Listing.published.with_card_data.where(category_id: category.self_and_descendant_ids).recent.limit(12).to_a if category %>
+  <% if category && listings.present? %>
+    <section class="mt-10">
+      <header class="mb-3 flex items-baseline justify-between gap-3">
+        <h2 class="text-lg font-bold tracking-tight"><%= t(".title") %></h2>
+        <%= link_to t(".view_all"), category_path(category),
+              class: "shrink-0 text-sm font-semibold text-primary hover:underline" %>
+      </header>
+
+      <ul class="scroll-snap-row -mx-4 flex gap-3 overflow-x-auto px-4 pb-3 sm:mx-0 sm:px-0"
+          role="list" aria-label="<%= category.name %>">
+        <% listings.each do |listing| %>
+          <li class="w-44 shrink-0 snap-start sm:w-52">
+            <%= render "shared/listing_card", listing: listing, compact: true %>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
+<% end %>

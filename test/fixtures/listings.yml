@@ -8,6 +8,61 @@ gigabyte:
   price_cents: 59999
   condition: brand_new
   status: approved
+  published_at: 2026-09-15 10:00:00
+  specs:
+    vram: 12GB
+    negotiable: false
+
+sold:
+  user: one
+  store: one
+  category: gpus
+  title: Sold ASUS ROG Strix RTX 3070
+  slug: sold-asus-rog-strix-rtx-3070
+  description: Already sold, kept for history
+  price_cents: 35000
+  condition: used_good
+  status: sold
+  city: Madrid
+  published_at: 2026-08-01 09:00:00
+  sold_at: 2026-10-05 12:00:00
+  specs:
+    vram: 8GB
+    ports:
+      - hdmi
+      - displayport
+
+as_new:
+  user: two
+  store: two
+  category: rtx
+  title: Barely used RTX 4060
+  slug: barely-used-rtx-4060
+  description: Only used for a week, mint condition
+  price_cents: 33000
+  condition: used_like_new
+  status: approved
+  favorites_count: 12
+  published_at: 2026-09-20 08:00:00
+  specs:
+    vram: 8GB
+    negotiable: true
+    ports:
+      - hdmi
+      - displayport
+
+featured:
+  user: one
+  store: one
+  category: rtx
+  title: Featured Zotac RTX 4070 Super
+  slug: featured-zotac-rtx-4070-super
+  description: Hand-picked by our moderation team
+  price_cents: 65000
+  condition: used_like_new
+  status: approved
+  featured_until: 2099-01-01 00:00:00
+  published_at: 2026-08-10 08:00:00
   specs:
     vram: 12GB
     negotiable: false

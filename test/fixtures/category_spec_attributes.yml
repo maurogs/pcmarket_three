@@ -7,3 +7,8 @@ negotiable_gpus:
   category: gpus
   spec_attribute: negotiable
   required: true
+
+ports_gpus:
+  category: gpus
+  spec_attribute: ports
+  position: 2

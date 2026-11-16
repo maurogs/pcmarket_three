@@ -1,398 +1,597 @@
+---
 de:
   site:
     name: PCMarket
   layouts:
-    announcement: "Neu: PCMarket ist jetzt in Spanien verfügbar. Kaufen und verkaufen Sie neue und gebrauchte PC-Hardware."
+    announcement: 'Neu: PCMarket ist jetzt in Spanien verfügbar. Kaufen und verkaufen
+      Sie neue und gebrauchte PC-Hardware.'
   nav:
-    search_placeholder: "Grafikkarten, Prozessoren, Laptops suchen…"
-    search_submit: "Suchen"
-    list_item: "Angebot einstellen"
-    sell_to_us: "An uns verkaufen"
-    wishlist: "Merkzettel"
-    notifications: "Benachrichtigungen"
-    cart: "Warenkorb"
-    account: "Konto"
-    log_in: "Anmelden"
-    log_out: "Abmelden"
-    sign_up: "Registrieren"
-    menu: "Menü"
-    close_menu: "Menü schließen"
-    toggle_theme: "Zwischen hellem und dunklem Modus wechseln"
+    search_placeholder: Grafikkarten, Prozessoren, Laptops suchen…
+    search_submit: Suchen
+    list_item: Angebot einstellen
+    sell_to_us: An uns verkaufen
+    wishlist: Merkzettel
+    notifications: Benachrichtigungen
+    cart: Warenkorb
+    account: Konto
+    log_in: Anmelden
+    log_out: Abmelden
+    sign_up: Registrieren
+    menu: Menü
+    close_menu: Menü schließen
+    toggle_theme: Zwischen hellem und dunklem Modus wechseln
+    categories: Kategorien
+    new: Neuheiten
+    more: Mehr
+    all_categories: Alle %{name} ansehen
+    promo_finder_title: Finden Sie Ihr Ersatzteil
+    promo_finder_text: Tausende Angebote von Verkäufern im ganzen Land.
+    promo_sell_title: Verkaufen Sie Ihre Hardware
+    promo_sell_text: Gebrauchte Komponenten in zwei Minuten inserieren.
   footer:
-    newsletter_title: "Newsletter abonnieren"
-    newsletter_placeholder: "Ihre E-Mail-Adresse"
-    newsletter_submit: "Abonnieren"
-    about: "Über uns"
-    help: "Hilfe"
-    buying_selling: "Kaufen und verkaufen"
-    about_us: "Unternehmen"
-    careers: "Karriere"
-    press: "Presse"
-    contact: "Kontakt"
-    faq: "Hilfecenter"
-    shipping: "Versand und Rückgabe"
-    how_to_sell: "Verkaufen"
-    how_to_buy: "Kaufen"
-    selling_requirements: "Voraussetzungen für Verkäufer"
-    language: "Sprache"
+    newsletter_title: Newsletter abonnieren
+    newsletter_placeholder: Ihre E-Mail-Adresse
+    newsletter_submit: Abonnieren
+    about: Über uns
+    help: Hilfe
+    buying_selling: Kaufen und verkaufen
+    about_us: Unternehmen
+    careers: Karriere
+    press: Presse
+    contact: Kontakt
+    faq: Hilfecenter
+    shipping: Versand und Rückgabe
+    how_to_sell: Verkaufen
+    how_to_buy: Kaufen
+    selling_requirements: Voraussetzungen für Verkäufer
+    language: Sprache
     copyright: "© %{year} %{brand}. Alle Rechte vorbehalten."
   locales:
-    es: "Español"
-    en: "English"
-    fr: "Français"
-    de: "Deutsch"
-    it: "Italiano"
-    pt: "Português"
+    es: Español
+    en: English
+    fr: Français
+    de: Deutsch
+    it: Italiano
+    pt: Português
   pages:
     home:
       hero:
-        title: "PC-Hardware sicher kaufen und verkaufen"
-        subtitle: "Der spanische Marktplatz für neue und gebrauchte PC-Komponenten – von Enthusiasten für Enthusiasten."
-        cta_primary: "Angebot einstellen"
-        cta_secondary: "Kategorien ansehen"
+        title: PC-Hardware sicher kaufen und verkaufen
+        subtitle: Der spanische Marktplatz für neue und gebrauchte PC-Komponenten
+          – von Enthusiasten für Enthusiasten.
+        cta_primary: Angebot einstellen
+        cta_secondary: Kategorien ansehen
+        search_label: PCMarket durchsuchen
+        cta_soon: Verkauf startet bald
+        trust_buyer: Käuferschutz
+        trust_shipping: Sendungsverfolgung
+        trust_returns: Einfache Rückgabe
+      newest:
+        title: Neueste Anzeigen
+        view_all: Alle ansehen
+      gpus:
+        title: Grafikkarten
+        view_all: Grafikkarten ansehen
+      deals:
+        title: Top-Angebote dieser Woche
+      saved:
+        title: Meistgemerkt diese Woche
+      sold:
+        title: Kürzlich verkauft
+      categories:
+        title: Beliebte Kategorien
+      newsletter:
+        title: Bleiben Sie informiert
+        text: Neue Anzeigen und Top-Angebote direkt in Ihr Postfach.
+      trust:
+        title: Warum auf PCMarket kaufen
+        buyer:
+          title: Käuferschutz
+          text: Sie erhalten Ihr Geld zurück, wenn der Artikel nicht ankommt oder
+            nicht der Beschreibung entspricht.
+        payments:
+          title: Sichere Zahlungen
+          text: Zahlungen werden sicher aufbewahrt, bis Sie die Lieferung bestätigen.
+        delivery:
+          title: Sendungsverfolgung
+          text: Jeder Versand ist versichert und von Tür zu Tür nachverfolgbar.
+        support:
+          title: Freundlicher Support
+          text: Ein Team aus PC-Enthusiasten antwortet innerhalb von 24 Stunden.
   sessions:
     new:
-      title: "Anmelden"
-      submit: "Anmelden"
-      forgot_password: "Passwort vergessen?"
-      no_account: "Noch kein Konto?"
+      title: Anmelden
+      submit: Anmelden
+      forgot_password: Passwort vergessen?
+      no_account: Noch kein Konto?
     create:
-      invalid_credentials: "Versuchen Sie eine andere E-Mail-Adresse oder ein anderes Passwort."
-      rate_limited: "Versuchen Sie es später erneut."
+      invalid_credentials: Versuchen Sie eine andere E-Mail-Adresse oder ein anderes
+        Passwort.
+      rate_limited: Versuchen Sie es später erneut.
   passwords:
     new:
-      title: "Passwort vergessen?"
-      submit: "Anweisungen zum Zurücksetzen senden"
+      title: Passwort vergessen?
+      submit: Anweisungen zum Zurücksetzen senden
     create:
-      mailed: "Anweisungen zum Zurücksetzen gesendet (falls ein Konto mit dieser E-Mail-Adresse existiert)."
-      rate_limited: "Versuchen Sie es später erneut."
+      mailed: Anweisungen zum Zurücksetzen gesendet (falls ein Konto mit dieser E-Mail-Adresse
+        existiert).
+      rate_limited: Versuchen Sie es später erneut.
     edit:
-      title: "Passwort aktualisieren"
-      submit: "Speichern"
-      password_placeholder: "Neues Passwort eingeben"
-      password_confirmation_placeholder: "Neues Passwort wiederholen"
-      invalid_token: "Der Link zum Zurücksetzen ist ungültig oder abgelaufen."
+      title: Passwort aktualisieren
+      submit: Speichern
+      password_placeholder: Neues Passwort eingeben
+      password_confirmation_placeholder: Neues Passwort wiederholen
+      invalid_token: Der Link zum Zurücksetzen ist ungültig oder abgelaufen.
     update:
-      success: "Das Passwort wurde zurückgesetzt."
-      mismatch: "Die Passwörter stimmen nicht überein."
+      success: Das Passwort wurde zurückgesetzt.
+      mismatch: Die Passwörter stimmen nicht überein.
   registrations:
     new:
-      title: "Konto erstellen"
-      submit: "Konto erstellen"
-      already_have_account: "Sie haben bereits ein Konto?"
-      phone_hint: "Optional"
-      username_hint: "3–30 Zeichen: Buchstaben, Zahlen, Unterstriche und Bindestriche."
+      title: Konto erstellen
+      submit: Konto erstellen
+      already_have_account: Sie haben bereits ein Konto?
+      phone_hint: Optional
+      username_hint: '3–30 Zeichen: Buchstaben, Zahlen, Unterstriche und Bindestriche.'
     create:
-      success: "Willkommen! Ihr Konto wurde erstellt."
-      rate_limited: "Versuchen Sie es später erneut."
+      success: Willkommen! Ihr Konto wurde erstellt.
+      rate_limited: Versuchen Sie es später erneut.
   passwords_mailer:
     reset:
-      subject: "Passwort zurücksetzen"
-      intro: "Verwenden Sie den folgenden Link, um Ihr Passwort zurückzusetzen."
-      link_text: "Passwort zurücksetzen"
-      expires_in: "Dieser Link läuft in %{duration} ab."
+      subject: Passwort zurücksetzen
+      intro: Verwenden Sie den folgenden Link, um Ihr Passwort zurückzusetzen.
+      link_text: Passwort zurücksetzen
+      expires_in: Dieser Link läuft in %{duration} ab.
   countries:
-    es: "Spanien"
-    fr: "Frankreich"
-    gb: "Vereinigtes Königreich"
-    de: "Deutschland"
-    it: "Italien"
-    pt: "Portugal"
+    es: Spanien
+    fr: Frankreich
+    gb: Vereinigtes Königreich
+    de: Deutschland
+    it: Italien
+    pt: Portugal
   listings:
     transition:
-      invalid: "Der Status kann nicht von %{from} auf %{to} geändert werden."
-      reject_reason_required: "Ein Ablehnungsgrund ist erforderlich."
+      invalid: Der Status kann nicht von %{from} auf %{to} geändert werden.
+      reject_reason_required: Ein Ablehnungsgrund ist erforderlich.
+    index:
+      title_all: Alle Anzeigen
+      title_query: Ergebnisse für „%{query}“
+      meta_description: 'Neue und gebrauchte PC-Hardware auf PCMarket kaufen und verkaufen:
+        Grafikkarten, Prozessoren, Speicher und mehr.'
+      breadcrumb: Brotkrumen-Navigation
+      breadcrumb_home: Startseite
+      subcategories: Unterkategorien
+      seo_heading: Neue und gebrauchte %{category} auf PCMarket
+      seo_text:
+        one: Aktuell gibt es %{count} Anzeige für %{category} in %{country}.
+        other: Aktuell gibt es %{count} Anzeigen für %{category} in %{country}.
+    filters:
+      title: Filter
+      close: Filter schließen
+      price: Preis (€)
+      min_placeholder: Min
+      max_placeholder: Max
+      min_aria: Mindestpreis
+      max_aria: Höchstpreis
+      condition: Zustand
+      labels: Kennzeichnungen
+      tags: Händler-Schlagwörter
+      show_more: "+%{count} weitere"
+      clear_all: Alle löschen
+      show_results:
+        one: "%{count} Ergebnis anzeigen"
+        other: "%{count} Ergebnisse anzeigen"
+    results:
+      filters_button: Filter
+      sort: Sortieren nach
+      sort_options:
+        best_match: Beste Treffer
+        newest: Neueste
+        price_asc: 'Preis: aufsteigend'
+        price_desc: 'Preis: absteigend'
+        most_favorited: Am häufigsten gemerkt
+      applied_filters: Aktive Filter
+      remove_filter: Filter entfernen
+      clear_all: Alle Filter löschen
+      chip_query: 'Suche: %{query}'
+      chip_min: Ab %{price}
+      chip_max: Bis %{price}
+      empty_title: Keine Anzeigen entsprechen Ihren Filtern
+      empty_text: Entfernen Sie einen Filter, erweitern Sie die Preisspanne oder prüfen
+        Sie die Schreibweise.
+      empty_categories: Beliebte Kategorien
+      count:
+        one: "%{count} Ergebnis"
+        other: "%{count} Ergebnisse"
+    show:
+      breadcrumb: Brotkrumen-Navigation
+      breadcrumb_home: Startseite
+      sold_banner: Verkauft
+      gallery: Fotogalerie
+      previous_photo: Vorheriges Foto
+      next_photo: Nächstes Foto
+      photo_thumbnail: Foto %{number}
+      published_on: Einstellt am %{date}
+      labels: Kennzeichnungen
+      sold_cta: Dieser Artikel ist bereits verkauft
+      buy_now: Jetzt kaufen
+      make_offer: Angebot machen
+      checkout_soon: Die Kasse ist noch nicht verfügbar
+      offers_soon: Angebote sind noch nicht verfügbar
+      protection_title: Käuferschutz
+      protection_text: Zahlen Sie über PCMarket und erhalten Sie Ihr Geld zurück,
+        wenn Ihre Bestellung nicht ankommt oder nicht der Beschreibung entspricht.
+      description_title: Beschreibung
+      report: Diese Anzeige melden
+      view_store: Shop ansehen
+      message_seller: Verkäufer anschreiben
+      messaging_soon: Die Nachrichten sind noch nicht verfügbar
+      safety_title: Sicher einkaufen
+      safety_1: Kommunikation und Zahlungen immer über PCMarket abwickeln.
+      safety_2: Bewertungen des Verkäufers vor dem Kauf ansehen.
+      safety_3: Paket bei Erhalt fotografieren, falls es beschädigt ist.
+      similar_title: Ähnliche Anzeigen
+      from_seller_title: Mehr von diesem Verkäufer
+      delivery_between: zwischen dem %{from} und dem %{to}
+      specs:
+        title: Technische Daten
+      shipping:
+        title: Versand
+        not_available: Nur Abholung
+        free: Kostenloser Versand
+        cost: "+%{price} Versandkosten"
+        estimate: 'Geschätzte Lieferung: %{window}'
+        pickup: Abholung möglich
+        pickup_city: Abholung in %{city}
+        returns_title: Rücknahmen möglich
+        returns_text: Die meisten Artikel können Sie innerhalb von 14 Tagen nach Lieferung
+          zurückgeben.
+      views:
+        one: "%{count} Aufruf"
+        other: "%{count} Aufrufe"
+      quantity:
+        one: "%{count} verfügbar"
+        other: "%{count} verfügbar"
+      reviews_count:
+        one: "%{count} Bewertung"
+        other: "%{count} Bewertungen"
   activerecord:
     errors:
       messages:
-        photo_limit_exceeded: "darf nicht mehr als %{count} Fotos haben"
-        photo_content_type_invalid: "muss ein JPEG-, PNG- oder WebP-Bild sein"
-        photo_too_large: "darf höchstens %{max} MB wiegen"
-        cannot_block_self: "darf nicht Sie selbst sein"
-        not_purchasable: "ist nicht kaufbar"
+        photo_limit_exceeded: darf nicht mehr als %{count} Fotos haben
+        photo_content_type_invalid: muss ein JPEG-, PNG- oder WebP-Bild sein
+        photo_too_large: darf höchstens %{max} MB wiegen
+        cannot_block_self: darf nicht Sie selbst sein
+        not_purchasable: ist nicht kaufbar
     models:
-      address: "Adresse"
-      api_token: "API-Token"
-      block: "Blockierung"
-      cart: "Warenkorb"
-      cart_item: "Warenkorbartikel"
-      category: "Kategorie"
-      conversation: "Unterhaltung"
-      country: "Land"
-      favorite: "Merklisteneintrag"
-      follow: "Folge"
-      label: "Label"
-      legal_page: "Rechtliche Seite"
-      listing: "Anzeige"
-      listing_label: "Anzeigen-Label"
-      listing_tag: "Anzeigen-Tag"
-      message: "Nachricht"
-      moderation_event: "Moderationsereignis"
-      newsletter_subscription: "Newsletter-Abo"
-      notification: "Benachrichtigung"
-      offer: "Angebot"
-      order: "Bestellung"
-      order_item: "Bestellposition"
-      review: "Bewertung"
-      saved_search: "Gespeicherte Suche"
-      seller_tag: "Verkäufer-Tag"
-      setting: "Einstellung"
-      spec_attribute: "Technisches Merkmal"
-      spec_option: "Merkmalsoption"
-      store: "Shop"
-      user: "Benutzer"
+      address: Adresse
+      api_token: API-Token
+      block: Blockierung
+      cart: Warenkorb
+      cart_item: Warenkorbartikel
+      category: Kategorie
+      conversation: Unterhaltung
+      country: Land
+      favorite: Merklisteneintrag
+      follow: Folge
+      label: Label
+      legal_page: Rechtliche Seite
+      listing: Anzeige
+      listing_label: Anzeigen-Label
+      listing_tag: Anzeigen-Tag
+      message: Nachricht
+      moderation_event: Moderationsereignis
+      newsletter_subscription: Newsletter-Abo
+      notification: Benachrichtigung
+      offer: Angebot
+      order: Bestellung
+      order_item: Bestellposition
+      review: Bewertung
+      saved_search: Gespeicherte Suche
+      seller_tag: Verkäufer-Tag
+      setting: Einstellung
+      spec_attribute: Technisches Merkmal
+      spec_option: Merkmalsoption
+      store: Shop
+      user: Benutzer
     attributes:
       address:
-        full_name: "Vollständiger Name"
-        line1: "Adresse (Zeile 1)"
-        line2: "Adresse (Zeile 2)"
-        city: "Stadt"
-        region: "Bundesland / Region"
-        postal_code: "Postleitzahl"
-        country_code: "Land"
-        phone: "Telefonnummer"
-        default: "Standardadresse"
+        full_name: Vollständiger Name
+        line1: Adresse (Zeile 1)
+        line2: Adresse (Zeile 2)
+        city: Stadt
+        region: Bundesland / Region
+        postal_code: Postleitzahl
+        country_code: Land
+        phone: Telefonnummer
+        default: Standardadresse
       api_token:
-        user: "Benutzer"
-        token_digest: "Token-Hash"
-        name: "Name"
-        last_used_at: "Zuletzt verwendet"
-        expires_at: "Läuft ab am"
+        user: Benutzer
+        token_digest: Token-Hash
+        name: Name
+        last_used_at: Zuletzt verwendet
+        expires_at: Läuft ab am
       block:
-        blocker: "Blockierender Benutzer"
-        blocked: "Blockierter Benutzer"
+        blocker: Blockierender Benutzer
+        blocked: Blockierter Benutzer
       cart:
-        user: "Benutzer"
-        token: "Warenkorb-Token"
+        user: Benutzer
+        token: Warenkorb-Token
       cart_item:
-        cart: "Warenkorb"
-        listing: "Anzeige"
-        quantity: "Menge"
+        cart: Warenkorb
+        listing: Anzeige
+        quantity: Menge
       category:
-        parent: "Elternkategorie"
-        slug: "Slug"
-        names: "Namen"
-        seo_descriptions: "SEO-Beschreibungen"
-        position: "Position"
-        active: "Aktiv"
-        listings_count: "Anzahl der Anzeigen"
-        icon: "Symbol"
+        parent: Elternkategorie
+        slug: Slug
+        names: Namen
+        seo_descriptions: SEO-Beschreibungen
+        position: Position
+        active: Aktiv
+        listings_count: Anzahl der Anzeigen
+        icon: Symbol
       conversation:
-        listing: "Anzeige"
-        buyer: "Käufer"
-        seller: "Verkäufer"
-        last_message_at: "Letzte Nachricht"
+        listing: Anzeige
+        buyer: Käufer
+        seller: Verkäufer
+        last_message_at: Letzte Nachricht
       country:
-        code: "Code"
-        name_key: "Name"
-        currency: "Währung"
-        default_locale: "Standardsprache"
-        enabled: "Aktiviert"
-        vat_rate: "MwSt.-Satz"
+        code: Code
+        name_key: Name
+        currency: Währung
+        default_locale: Standardsprache
+        enabled: Aktiviert
+        vat_rate: MwSt.-Satz
       favorite:
-        user: "Benutzer"
-        listing: "Anzeige"
+        user: Benutzer
+        listing: Anzeige
       follow:
-        follower: "Follower"
-        store: "Shop"
+        follower: Follower
+        store: Shop
       label:
-        slug: "Slug"
-        names: "Namen"
-        color: "Farbe"
+        slug: Slug
+        names: Namen
+        color: Farbe
       legal_page:
-        country_code: "Land"
-        locale: "Sprache"
-        slug: "Slug"
-        title: "Titel"
-        body: "Inhalt"
-        published: "Veröffentlicht"
+        country_code: Land
+        locale: Sprache
+        slug: Slug
+        title: Titel
+        body: Inhalt
+        published: Veröffentlicht
       listing:
-        user: "Verkäufer"
-        store: "Shop"
-        category: "Kategorie"
-        country_code: "Land"
-        title: "Titel"
-        slug: "Slug"
-        description: "Beschreibung"
-        price_cents: "Preis"
-        original_price_cents: "Ursprünglicher Preis"
+        user: Verkäufer
+        store: Shop
+        category: Kategorie
+        country_code: Land
+        title: Titel
+        slug: Slug
+        description: Beschreibung
+        price_cents: Preis
+        original_price_cents: Ursprünglicher Preis
         condition:
-          brand_new: "Neu"
-          open_box: "Open Box"
-          used_like_new: "Gebraucht – wie neu"
-          used_good: "Gebraucht – guter Zustand"
-          for_parts: "Für Ersatzteile"
+          brand_new: Neu
+          open_box: Open Box
+          used_like_new: Gebraucht – wie neu
+          used_good: Gebraucht – guter Zustand
+          for_parts: Für Ersatzteile
         status:
-          draft: "Entwurf"
-          pending_review: "Wartet auf Prüfung"
-          approved: "Genehmigt"
-          rejected: "Abgelehnt"
-          sold: "Verkauft"
-          archived: "Archiviert"
-          reserved: "Reserviert"
-        currency: "Währung"
-        rejection_reason: "Ablehnungsgrund"
-        quantity: "Menge"
-        specs: "Technische Merkmale"
-        shipping_available: "Versand verfügbar"
-        local_pickup: "Abholung vor Ort"
-        city: "Stadt"
-        region: "Bundesland / Region"
-        postal_code: "Postleitzahl"
-        shipping_price_cents: "Versandkosten"
-        free_shipping: "Kostenloser Versand"
-        allow_offers: "Angebote zulassen"
-        featured_until: "Hervorgehoben bis"
-        published_at: "Veröffentlicht am"
-        sold_at: "Verkauft am"
-        views_count: "Aufrufe"
-        favorites_count: "Anzahl Favoriten"
-        performance_score: "Leistungsindex"
-        photos: "Fotos"
+          draft: Entwurf
+          pending_review: Wartet auf Prüfung
+          approved: Genehmigt
+          rejected: Abgelehnt
+          sold: Verkauft
+          archived: Archiviert
+          reserved: Reserviert
+        currency: Währung
+        rejection_reason: Ablehnungsgrund
+        quantity: Menge
+        specs: Technische Merkmale
+        shipping_available: Versand verfügbar
+        local_pickup: Abholung vor Ort
+        city: Stadt
+        region: Bundesland / Region
+        postal_code: Postleitzahl
+        shipping_price_cents: Versandkosten
+        free_shipping: Kostenloser Versand
+        allow_offers: Angebote zulassen
+        featured_until: Hervorgehoben bis
+        published_at: Veröffentlicht am
+        sold_at: Verkauft am
+        views_count: Aufrufe
+        favorites_count: Anzahl Favoriten
+        performance_score: Leistungsindex
+        photos: Fotos
       listing_label:
-        listing: "Anzeige"
-        label: "Label"
+        listing: Anzeige
+        label: Label
       listing_tag:
-        listing: "Anzeige"
-        seller_tag: "Tag"
+        listing: Anzeige
+        seller_tag: Tag
       message:
-        conversation: "Unterhaltung"
-        sender: "Absender"
-        body: "Nachricht"
-        read_at: "Gelesen am"
+        conversation: Unterhaltung
+        sender: Absender
+        body: Nachricht
+        read_at: Gelesen am
       moderation_event:
-        listing: "Anzeige"
-        admin: "Moderator"
+        listing: Anzeige
+        admin: Moderator
         action:
-          approved: "Genehmigt"
-          rejected: "Abgelehnt"
-          edited: "Bearbeitet"
-          unpublished: "Nicht veröffentlicht"
-        note: "Notiz"
+          approved: Genehmigt
+          rejected: Abgelehnt
+          edited: Bearbeitet
+          unpublished: Nicht veröffentlicht
+        note: Notiz
       newsletter_subscription:
-        email: "E-Mail-Adresse"
-        locale: "Sprache"
-        confirmed_at: "Bestätigt am"
+        email: E-Mail-Adresse
+        locale: Sprache
+        confirmed_at: Bestätigt am
       notification:
-        user: "Benutzer"
-        kind: "Typ"
-        payload: "Details"
-        read_at: "Gelesen am"
+        user: Benutzer
+        kind: Typ
+        payload: Details
+        read_at: Gelesen am
       offer:
-        listing: "Anzeige"
-        buyer: "Käufer"
-        amount_cents: "Betrag"
+        listing: Anzeige
+        buyer: Käufer
+        amount_cents: Betrag
         status:
-          pending: "Ausstehend"
-          accepted: "Angenommen"
-          declined: "Abgelehnt"
-          withdrawn: "Zurückgezogen"
-          expired: "Abgelaufen"
-        expires_at: "Läuft ab am"
+          pending: Ausstehend
+          accepted: Angenommen
+          declined: Abgelehnt
+          withdrawn: Zurückgezogen
+          expired: Abgelaufen
+        expires_at: Läuft ab am
       order:
-        buyer: "Käufer"
-        seller: "Verkäufer"
-        number: "Bestellnummer"
+        buyer: Käufer
+        seller: Verkäufer
+        number: Bestellnummer
         status:
-          pending_payment: "Zahlung ausstehend"
-          paid: "Bezahlt"
-          shipped: "Versandt"
-          delivered: "Zugestellt"
-          completed: "Abgeschlossen"
-          cancelled: "Storniert"
-          refunded: "Erstattet"
-          disputed: "Fallend"
-        subtotal_cents: "Zwischensumme"
-        shipping_cents: "Versand"
-        commission_cents: "Provision"
-        total_cents: "Gesamt"
-        currency: "Währung"
-        shipping_address: "Lieferadresse"
-        payment_provider: "Zahlungsdienstleister"
-        payment_reference: "Zahlungsreferenz"
-        tracking_number: "Sendungsnummer"
-        carrier: "Spedition"
-        shipped_at: "Versandt am"
-        delivered_at: "Zugestellt am"
-        buyer_protection_until: "Käuferschutz bis"
+          pending_payment: Zahlung ausstehend
+          paid: Bezahlt
+          shipped: Versandt
+          delivered: Zugestellt
+          completed: Abgeschlossen
+          cancelled: Storniert
+          refunded: Erstattet
+          disputed: Fallend
+        subtotal_cents: Zwischensumme
+        shipping_cents: Versand
+        commission_cents: Provision
+        total_cents: Gesamt
+        currency: Währung
+        shipping_address: Lieferadresse
+        payment_provider: Zahlungsdienstleister
+        payment_reference: Zahlungsreferenz
+        tracking_number: Sendungsnummer
+        carrier: Spedition
+        shipped_at: Versandt am
+        delivered_at: Zugestellt am
+        buyer_protection_until: Käuferschutz bis
       order_item:
-        order: "Bestellung"
-        listing: "Anzeige"
-        title: "Titel"
-        price_cents: "Preis"
-        quantity: "Menge"
+        order: Bestellung
+        listing: Anzeige
+        title: Titel
+        price_cents: Preis
+        quantity: Menge
       review:
-        order: "Bestellung"
-        reviewer: "Bewertender"
-        store: "Shop"
-        seller: "Verkäufer"
-        rating: "Bewertung"
-        body: "Bewertung"
+        order: Bestellung
+        reviewer: Bewertender
+        store: Shop
+        seller: Verkäufer
+        rating: Bewertung
+        body: Bewertung
       saved_search:
-        user: "Benutzer"
-        name: "Name"
-        query: "Suchbegriff"
-        category: "Kategorie"
-        filters: "Filter"
-        email_alerts: "E-Mail-Benachrichtigungen"
-        last_notified_at: "Letzte Benachrichtigung"
+        user: Benutzer
+        name: Name
+        query: Suchbegriff
+        category: Kategorie
+        filters: Filter
+        email_alerts: E-Mail-Benachrichtigungen
+        last_notified_at: Letzte Benachrichtigung
       seller_tag:
-        slug: "Slug"
-        names: "Namen"
+        slug: Slug
+        names: Namen
       setting:
-        key: "Schlüssel"
-        value: "Wert"
+        key: Schlüssel
+        value: Wert
       spec_attribute:
-        key: "Schlüssel"
-        names: "Namen"
+        key: Schlüssel
+        names: Namen
         input_type:
-          select: "Einfachauswahl"
-          multi_select: "Mehrfachauswahl"
-          number: "Zahl"
-          text: "Text"
-          boolean: "Ja/Nein"
-        unit: "Einheit"
-        filterable: "Filterbar"
-        position: "Position"
-        group: "Gruppe"
+          select: Einfachauswahl
+          multi_select: Mehrfachauswahl
+          number: Zahl
+          text: Text
+          boolean: Ja/Nein
+        unit: Einheit
+        filterable: Filterbar
+        position: Position
+        group: Gruppe
       spec_option:
-        spec_attribute: "Technisches Merkmal"
-        value: "Wert"
-        names: "Namen"
-        position: "Position"
-        popular: "Beliebt"
+        spec_attribute: Technisches Merkmal
+        value: Wert
+        names: Namen
+        position: Position
+        popular: Beliebt
       store:
-        user: "Inhaber"
-        name: "Shop-Name"
-        slug: "Slug"
-        description: "Beschreibung"
+        user: Inhaber
+        name: Shop-Name
+        slug: Slug
+        description: Beschreibung
         store_type:
-          individual: "Privatperson"
-          business: "Unternehmen"
-        verified: "Verifiziert"
-        vat_number: "USt-IdNr."
-        vacation_mode: "Urlaubsmodus"
-        allow_offers_default: "Angebote standardmäßig zulassen"
-        listings_count: "Anzahl der Anzeigen"
-        sales_count: "Anzahl der Verkäufe"
-        rating_average: "Durchschnittliche Bewertung"
-        reviews_count: "Anzahl der Bewertungen"
-        followers_count: "Follower"
-        logo: "Logo"
-        banner: "Banner"
+          individual: Privatperson
+          business: Unternehmen
+        verified: Verifiziert
+        vat_number: USt-IdNr.
+        vacation_mode: Urlaubsmodus
+        allow_offers_default: Angebote standardmäßig zulassen
+        listings_count: Anzahl der Anzeigen
+        sales_count: Anzahl der Verkäufe
+        rating_average: Durchschnittliche Bewertung
+        reviews_count: Anzahl der Bewertungen
+        followers_count: Follower
+        logo: Logo
+        banner: Banner
       user:
-        username: "Benutzername"
-        email_address: "E-Mail-Adresse"
-        password: "Passwort"
-        password_confirmation: "Passwortbestätigung"
-        first_name: "Vorname"
-        last_name: "Nachname"
-        phone: "Telefonnummer"
+        username: Benutzername
+        email_address: E-Mail-Adresse
+        password: Passwort
+        password_confirmation: Passwortbestätigung
+        first_name: Vorname
+        last_name: Nachname
+        phone: Telefonnummer
         role:
-          user: "Benutzer"
-          admin: "Administrator"
-        locale: "Sprache"
-        country_code: "Land"
-        confirmed_at: "Bestätigt am"
-        banned_at: "Gesperrt am"
-        ban_reason: "Grund der Sperre"
+          user: Benutzer
+          admin: Administrator
+        locale: Sprache
+        country_code: Land
+        confirmed_at: Bestätigt am
+        banned_at: Gesperrt am
+        ban_reason: Grund der Sperre
+  shared:
+    listing_card:
+      labels: Kennzeichnungen
+      sold_out: Verkauft
+      save_soon: Merken ist bald verfügbar
+      save_login: Anmelden, um diese Anzeige zu merken
+    card_rail:
+      view_all: Alle ansehen
+  stores:
+    verified: Verifizierter Verkäufer
+    types:
+      individual: Privatverkäufer
+      business: Unternehmen
+    show:
+      no_reviews: Noch keine Bewertungen
+      follow: Folgen
+      follow_soon: Folgen ist noch nicht verfügbar
+      message: Nachricht
+      message_soon: Die Nachrichten sind noch nicht verfügbar
+      stats_followers: Follower
+      stats_for_sale: Im Angebot
+      stats_sold: Verkauft
+      tabs_label: Shop-Bereiche
+      tabs:
+        listings: Anzeigen
+        about: Über
+        reviews: Bewertungen
+      about_title: Über diesen Shop
+      about_empty: Dieser Verkäufer hat noch keine Beschreibung verfasst.
+      about_type: Verkäufertyp
+      about_member_since: Mitglied seit
+      about_verified: Verifiziert
+      about_vat: USt-IdNr.
+      reviews_title: Bewertungen
+      reviews_empty: Noch keine Bewertungen. Seien Sie der Erste.
+      reviews_count:
+        one: "%{count} Bewertung"
+        other: "%{count} Bewertungen"
+  helpers:
+    boolean:
+      'yes': Ja
+      'no': Nein
+    stars:
+      label: 'Bewertung: %{value} von 5'
+  date:
+    formats:
+      delivery: "%-d. %B"

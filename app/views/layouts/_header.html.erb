@@ -1,3 +1,6 @@
+<%# Top navigation chrome. The mega menu fragment is cached per locale for
+    one hour and busted whenever any category changes. %>
+<% nav_categories = Category.roots.active.ordered.includes(:children).index_by(&:slug) %>
 <div class="border-b border-border bg-surface" data-controller="menu theme">
   <div class="bg-accent px-4 py-1.5 text-center text-sm font-medium text-white">
     <%= t("layouts.announcement") %>
@@ -9,17 +12,14 @@
       <span><%= t("site.name") %></span>
     <% end %>
 
-    <%= form_with url: root_path, method: :get, class: "hidden md:flex min-w-0 flex-1 items-center gap-2" do |form| %>
+    <%= form_with url: listings_path, method: :get, class: "hidden md:flex min-w-0 flex-1 items-center gap-2" do |form| %>
       <%= form.search_field :q, placeholder: t("nav.search_placeholder"), class: "w-full max-w-xl rounded-md border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-muted focus:border-primary focus:outline-none", aria: { label: t("nav.search_submit") } %>
-      <%= form.submit t("nav.search_submit"), class: "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90 cursor-pointer" %>
+      <%= form.submit t("nav.search_submit"), class: "min-h-11 cursor-pointer rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90" %>
     <% end %>
 
     <div class="ml-auto flex items-center gap-2">
-      <%= link_to "#", class: "hidden md:inline-block rounded-md bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent/90" do %>
+      <%= link_to "#", class: "hidden md:inline-block min-h-11 rounded-md bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent/90" do %>
         <%= t("nav.list_item") %>
-      <% end %>
-      <%= link_to "#", class: "hidden md:inline-block rounded-md border border-border px-3 py-2 text-sm font-medium text-text hover:bg-surface-muted" do %>
-        <%= t("nav.sell_to_us") %>
       <% end %>
 
       <%= link_to "#", class: "icon-button", aria: { label: t("nav.wishlist") } do %>
@@ -48,43 +48,146 @@
         <%= link_to t("nav.log_in"), new_session_path, class: "icon-button", aria: { label: t("nav.log_in") } %>
       <% end %>
 
-      <button type="button" data-action="theme#toggle" class="icon-button" aria: { label: t("nav.toggle_theme") }>
+      <%= link_to "#", class: "icon-button md:hidden", aria: { label: t("nav.search_placeholder") }, "data-action": "menu#open" do %>
+        <%= inline_icon :tag, classes: "size-5" %>
+      <% end %>
+
+      <button type="button" data-action="theme#toggle" class="icon-button" aria-label="<%= t("nav.toggle_theme") %>">
         <svg class="hidden size-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v2m0 14v2M5.6 5.6l1.4 1.4m9.9 9.9 1.4 1.4M3 12h2m14 0h2M5.6 18.4l1.4-1.4m9.9-9.9 1.4-1.4"/><circle cx="12" cy="12" r="4"/></svg>
         <svg class="block size-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
       </button>
 
-      <button type="button" data-action="menu#toggle" data-menu-target="button" class="icon-button md:hidden" aria: { label: t("nav.menu"), expanded: "false" }>
+      <button type="button" data-action="menu#toggle" data-menu-target="button" class="icon-button md:hidden" aria-label="<%= t("nav.menu") %>" aria-expanded="false">
         <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
     </div>
   </div>
 
+  <% menu_bust = Category.maximum(:updated_at) %>
+
+  <%# Desktop mega menu bar %>
+  <div class="hidden border-t border-border md:block">
+    <%= cache ["mega_menu", I18n.locale, menu_bust], expires_in: 1.hour do %>
+      <nav class="relative mx-auto max-w-6xl px-4" data-controller="mega-menu"
+           data-action="mouseleave->mega-menu#closeAll focusout->mega-menu#focusout keydown.esc->mega-menu#keydown"
+           aria-label="<%= t("nav.categories") %>">
+        <ul class="flex items-stretch gap-1 text-sm font-medium">
+          <li>
+            <%= link_to t("nav.new"), listings_path(sort: "newest"),
+                  class: "inline-flex min-h-11 items-center gap-1 rounded-md px-3 hover:bg-surface-muted hover:text-primary" %>
+          </li>
+          <%# Prefer the curated grouping from the seeded taxonomy; fall back to
+              every root category so the menu is never empty. %>
+          <% mega_items = [ %w[gaming-pcs gpus components peripherals laptops mobile consoles workstations], %w[accessories games-software] ].filter_map { |group| group.select { |slug| nav_categories.key?(slug) }.presence } %>
+          <% mega_items = nav_categories.keys.each_slice(4).to_a if mega_items.empty? %>
+          <% mega_items.each_with_index do |slugs, index| %>
+            <li>
+              <button type="button" data-mega-index="<%= index %>" data-mega-menu-target="button"
+                      data-action="mouseenter->mega-menu#open focus->mega-menu#open click->mega-menu#toggle"
+                      aria-expanded="false" aria-haspopup="true"
+                      class="inline-flex min-h-11 cursor-pointer items-center gap-1 rounded-md px-3 hover:bg-surface-muted hover:text-primary">
+                <% if slugs.size == 1 %>
+                  <%= nav_categories[slugs.first]&.name || slugs.first.humanize %>
+                <% else %>
+                  <%= t("nav.more") %>
+                <% end %>
+                <%= inline_icon :chevron_down, classes: "size-3.5" %>
+              </button>
+            </li>
+          <% end %>
+        </ul>
+
+        <% mega_items.each_with_index do |slugs, index| %>
+          <div data-mega-menu-target="panel"
+               class="absolute inset-x-0 top-full z-30 hidden border-t border-border bg-surface shadow-lg">
+            <div class="mx-auto grid max-w-6xl gap-6 p-4 md:grid-cols-[1fr_minmax(0,260px)]">
+              <div class="grid gap-x-6 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
+                <% slugs.each do |slug| %>
+                  <% root = nav_categories[slug] %>
+                  <% next if root.nil? %>
+                  <div>
+                    <%= link_to root.name, category_path(root), class: "block min-h-11 rounded-md px-2 py-2.5 text-sm font-semibold text-text hover:bg-surface-muted hover:text-primary" %>
+                    <ul class="mt-1 space-y-0.5">
+                      <% root.children.each do |child| %>
+                        <li>
+                          <%= link_to child.name, category_path(child), class: "block min-h-11 rounded-md px-2 py-2.5 text-sm text-muted hover:bg-surface-muted hover:text-text" %>
+                        </li>
+                      <% end %>
+                    </ul>
+                  </div>
+                <% end %>
+              </div>
+              <div class="flex flex-col gap-3 border-t border-border pt-4 md:border-l md:border-t-0 md:pl-4 md:pt-0">
+                <%= link_to "#", class: "flex-1 rounded-lg bg-primary/5 p-4 ring-1 ring-primary/20 hover:ring-primary/40 dark:bg-primary/10" do %>
+                  <span class="flex items-center gap-2 text-sm font-semibold text-primary">
+                    <%= inline_icon :filter, classes: "size-4" %>
+                    <%= t("nav.promo_finder_title") %>
+                  </span>
+                  <span class="mt-1 block text-xs text-muted"><%= t("nav.promo_finder_text") %></span>
+                <% end %>
+                <%= link_to "#", class: "flex-1 rounded-lg bg-accent/10 p-4 ring-1 ring-accent/30 hover:ring-accent/60" do %>
+                  <span class="flex items-center gap-2 text-sm font-semibold text-accent">
+                    <%= inline_icon :tag, classes: "size-4" %>
+                    <%= t("nav.promo_sell_title") %>
+                  </span>
+                  <span class="mt-1 block text-xs text-muted"><%= t("nav.promo_sell_text") %></span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </nav>
+    <% end %>
+  </div>
+
   <div data-menu-target="backdrop" class="fixed inset-0 z-40 hidden bg-black/50 md:hidden" data-action="menu#close"></div>
 
-  <div data-menu-target="panel" class="fixed inset-y-0 left-0 z-50 w-72 -translate-x-full transform bg-surface p-4 transition-transform md:hidden" role="dialog" aria-modal="true" aria: { label: t("nav.menu") }>
+  <%# Mobile slide-in menu: categories become native <details> accordions. %>
+  <div data-menu-target="panel" class="fixed inset-y-0 left-0 z-50 w-80 max-w-[85vw] -translate-x-full transform overflow-y-auto bg-surface p-4 transition-transform md:hidden" role="dialog" aria-modal="true" aria-label="<%= t("nav.menu") %>">
     <div class="flex items-center justify-between">
       <span class="text-lg font-bold text-primary"><%= t("site.name") %></span>
-      <button type="button" data-action="menu#close" class="icon-button" aria: { label: t("nav.close_menu") }>&times;</button>
+      <button type="button" data-action="menu#close" class="icon-button" aria-label="<%= t("nav.close_menu") %>">&times;</button>
     </div>
 
-    <%= form_with url: root_path, method: :get, class: "mt-4 flex items-center gap-2" do |form| %>
-      <%= form.search_field :q, placeholder: t("nav.search_placeholder"), class: "w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-muted focus:border-primary focus:outline-none", aria: { label: t("nav.search_submit") } %>
-      <%= form.submit t("nav.search_submit"), class: "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90 cursor-pointer" %>
+    <%= form_with url: listings_path, method: :get, class: "mt-4 flex items-center gap-2" do |form| %>
+      <%= form.search_field :q, placeholder: t("nav.search_placeholder"), class: "min-w-0 flex-1 rounded-md border border-border bg-surface px-3 py-2.5 text-sm text-text placeholder:text-muted focus:border-primary focus:outline-none", aria: { label: t("nav.search_submit") } %>
+      <%= form.submit t("nav.search_submit"), class: "min-h-11 cursor-pointer rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90" %>
     <% end %>
 
-    <nav class="mt-4 flex flex-col gap-1 text-sm">
-      <%= link_to t("nav.list_item"), "#", class: "rounded-md bg-accent px-3 py-2 text-center font-medium text-white hover:bg-accent/90" %>
-      <%= link_to t("nav.sell_to_us"), "#", class: "rounded-md border border-border px-3 py-2 text-center font-medium text-text hover:bg-surface-muted" %>
+    <nav class="mt-4 flex flex-col gap-1 text-sm" aria-label="<%= t("nav.categories") %>">
+      <%= link_to t("nav.new"), listings_path(sort: "newest"), class: "flex min-h-11 items-center rounded-md px-3 py-2.5 font-medium hover:bg-surface-muted" %>
       <hr class="my-2 border-border">
-      <%= link_to t("nav.wishlist"), "#", class: "rounded-md px-3 py-2 hover:bg-surface-muted" %>
-      <%= link_to t("nav.notifications"), "#", class: "rounded-md px-3 py-2 hover:bg-surface-muted" %>
-      <%= link_to t("nav.cart"), "#", class: "rounded-md px-3 py-2 hover:bg-surface-muted" %>
+      <%= cache ["mobile_menu", I18n.locale, menu_bust], expires_in: 1.hour do %>
+        <% nav_categories.values.each do |root| %>
+          <% if root.children.any? %>
+            <details>
+              <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between rounded-md px-3 py-2.5 font-medium hover:bg-surface-muted">
+                <%= root.name %>
+                <%= inline_icon :chevron_down, classes: "size-4 text-muted" %>
+              </summary>
+              <ul class="ml-3 border-l border-border pl-2">
+                <li><%= link_to t("nav.all_categories", name: root.name), category_path(root), class: "flex min-h-11 items-center rounded-md px-3 py-2.5 text-muted hover:bg-surface-muted" %></li>
+                <% root.children.each do |child| %>
+                  <li><%= link_to child.name, category_path(child), class: "flex min-h-11 items-center rounded-md px-3 py-2.5 hover:bg-surface-muted" %></li>
+                <% end %>
+              </ul>
+            </details>
+          <% else %>
+            <%= link_to root.name, category_path(root), class: "flex min-h-11 items-center rounded-md px-3 py-2.5 font-medium hover:bg-surface-muted" %>
+          <% end %>
+        <% end %>
+      <% end %>
+      <hr class="my-2 border-border">
+      <%= link_to t("nav.list_item"), "#", class: "flex min-h-11 items-center rounded-md bg-accent px-3 py-2.5 text-center font-medium text-white hover:bg-accent/90" %>
+      <%= link_to t("nav.wishlist"), "#", class: "rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
+      <%= link_to t("nav.notifications"), "#", class: "rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
+      <%= link_to t("nav.cart"), "#", class: "rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
       <hr class="my-2 border-border">
       <% if authenticated? %>
-        <%= button_to t("nav.log_out"), session_path, method: :delete, class: "w-full rounded-md px-3 py-2 text-left text-sm text-text hover:bg-surface-muted" %>
+        <%= button_to t("nav.log_out"), session_path, method: :delete, class: "w-full min-h-11 rounded-md px-3 py-2.5 text-left text-sm text-text hover:bg-surface-muted" %>
       <% else %>
-        <%= link_to t("nav.log_in"), new_session_path, class: "rounded-md px-3 py-2 hover:bg-surface-muted" %>
-        <%= link_to t("nav.sign_up"), new_registration_path, class: "rounded-md px-3 py-2 hover:bg-surface-muted" %>
+        <%= link_to t("nav.log_in"), new_session_path, class: "rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
+        <%= link_to t("nav.sign_up"), new_registration_path, class: "rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
       <% end %>
     </nav>
   </div>

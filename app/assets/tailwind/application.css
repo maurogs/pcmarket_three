@@ -53,4 +53,79 @@
     background-color: var(--color-surface-muted);
     color: var(--color-text);
   }
+
+  /* Pagy series navigation (see ListingsHelper#results_pagination). */
+  .series-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .series-nav a {
+    display: inline-flex;
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 0 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .series-nav a:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  .series-nav a[aria-current="page"] {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+  }
+
+  .series-nav a[aria-disabled="true"] {
+    border-color: transparent;
+    color: var(--color-muted);
+  }
+
+  /* Browse filters: static column from lg up, full-height bottom sheet below. */
+  .filters-sheet {
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .filters-sheet {
+      display: block;
+      width: 16rem;
+      flex-shrink: 0;
+    }
+  }
+
+  .filters-sheet.is-open {
+    display: block;
+    position: fixed;
+    top: 3.5rem;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 50;
+    width: auto;
+    overflow-y: auto;
+    border-top: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+    padding: 1rem;
+  }
+
+  /* Horizontal card carousels. */
+  .scroll-snap-row {
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
 }

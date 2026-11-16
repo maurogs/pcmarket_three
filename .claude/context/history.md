@@ -1,5 +1,150 @@
 # History
 
+## 2026-11-16 — Fix: shared-cache leak on listing and store pages
+
+**What changed**
+
+- `ListingsController#show`: `fresh_when(..., public: true)` is now
+  `public: Current.user.nil? && (@listing.approved? || @listing.sold?)`, plus
+  `cache_control: { max_age: 0, must_revalidate: true, private: !shared_cacheable }` so
+  the private side is stated explicitly instead of relying on the framework default.
+  Same treatment in `StoresController#show`, where the visibility half of the rule is
+  simply `Current.user.nil?` (a storefront only ever lists approved listings, but the
+  layout header is personalised).
+- Audited the rest: `CategoriesController#show` and `PagesController#home` never call
+  `fresh_when`/`expires_in`, so they already emit `max-age=0, private, must-revalidate`
+  — nothing to change there (verified by a temporary header probe).
+- Tests (`test/controllers/listings_controller_test.rb`,
+  `test/controllers/stores_controller_test.rb`): anonymous GET of an approved listing /
+  store → `Cache-Control` matches `/\bpublic\b/` and not `private`; signed-in owner GET
+  of a draft listing, admin GET of a pending one, signed-in GET of a sold listing and
+  signed-in store GET → match `/\bprivate\b/` and not `public`.
+
+**Why**
+
+`public: true` told CDNs and proxy caches they may store the response, but two slices of
+it are not shared-safe: signed-in visitors get a personalised header
+(`layouts/_header.html.erb` uses `authenticated?`), and owners/admins can open
+draft/pending_review/rejected listings. A shared cache could therefore hand one visitor's
+page to another. The ETag already varies with `Current.user.present?`, so the fix costs
+nothing for anonymous traffic. Note reserved listings now fall on the private side
+(`set_listing` shows them publicly, the cache rule does not publish them) — deliberate,
+they still revalidate via ETag/`Last-Modified`.
+
+**Files touched**
+
+- `app/controllers/listings_controller.rb`, `app/controllers/stores_controller.rb`
+- `test/controllers/listings_controller_test.rb`, `test/controllers/stores_controller_test.rb`
+- `.claude/context/{history,project}.md`
+
+**Verification** `bin/rails test` → 138 runs / 879 assertions / 0 failures / 0 errors;
+`bin/rubocop` → 138 files, 0 offences. Probed headers: anonymous listing/store
+`max-age=0, public, must-revalidate`; owner draft and signed-in store
+`max-age=0, private, must-revalidate`; category and home pages
+`max-age=0, private, must-revalidate` (unchanged).
+
+## 2026-11-16 — Phase 2b: public browsing (search, categories, listing and store pages)
+
+**What was built**
+
+- `ListingSearch` service (`app/services/listing_search.rb`) — the only place public
+  queries are built. Params: `q`, `category` (self + descendants; unknown slug → `none`),
+  `min_eur`/`max_eur` (→ integer cents), `condition[]`, `f[attr][]` (OR within an
+  attribute via jsonb containment / `jsonb_array_elements_text`, AND across attributes),
+  `labels[]`, `tags[]`, `seller` (store slug), `sort`
+  (`best_match|newest|price_asc|price_desc|most_favorited`), `page`. Returns a `Result`
+  struct (`records, pagy, total_count, facets, facet_attributes, filters`) plus
+  `#facet_count`, `#spec_facets`, `#applied_filters?`, `#empty?`. Facet counts are
+  **one** query (`WITH scoped AS (…) UNION ALL` over condition::text, label/tag joins on
+  slug and jsonb spec expansion), computed before pagination. Featured-first ordering
+  only when `Flipper.enabled?(:featured_listings)`. `with_card_includes` eager loads
+  store/photos/labels/tags.
+- Routes: `resources :listings, only: %i[index show]`, `resources :categories, only: :show,
+  path: "c"`, `resources :stores, only: :show`, `get "search" → listings#index`
+  (renders, never redirects — asserted by a test).
+- Controllers stay skinny: `ListingsController#index` builds `@result` (also used by
+  `CategoriesController#show`, which merges the category slug into the params, and by
+  `StoresController#show`, which merges `seller:`); `#show` uses `fresh_when(etag:,
+  last_modified:, public: true)` and queues `ListingViewJob` for non-owner, non-bot hits.
+  Visibility: approved/sold/reserved public; draft/pending_review/rejected/archived only
+  for owner or admin (404 otherwise). Sold listings render a sold banner and no buy CTAs.
+- Browse UI: `listings/_browse` wraps one `<form method="get" data-turbo-frame="results">`
+  around `_filters` (sidebar + mobile `<dialog>` sheet) and `<turbo-frame id="results"
+  data-turbo-action="advance">`, so filtering swaps only the results. `shared/_listing_card`
+  is a locale-keyed cached fragment; `shared/_card_rail` powers the home rails and the
+  "similar listings" block. Listing show: gallery carousel, specs table, shipping/estimate,
+  store card, breadcrumb. Store page: `?tab=listings|about|reviews`.
+- Header mega menu (desktop hover/focus panels + mobile `<details>` accordions), cached
+  per locale and busted by `Category.maximum(:updated_at)`; tap targets are `min-h-11`
+  (44px) across header, filters and sort controls, and the browse grid stacks to one
+  column on small screens. New Stimulus controllers: `mega_menu`, `filters`, `gallery`
+  (plus the existing `menu`, `theme`).
+- Home sections (`pages/home/*`): hero, category tiles, deals, newest, GPU rail, saved/
+  popular, recently sold, trust, newsletter.
+- Helpers (`ListingsHelper`): `money` (locale-formatted, always shows cents except for
+  round EUR where the currency style allows), `spec_value_label`, `stars` (clamped SVG
+  rating), facet option builders with counts, applied-filter chips, breadcrumbs,
+  `photo_variant_tag`/`listing_photo_tag` (webp `card` 400 / `gallery` 1200, always
+  `loading="lazy" decoding="async"` + width/height, SVG placeholder otherwise).
+- i18n: 481 identical keys in all six locales, `script/lint_locale_keys.rb` green, British
+  English in `en`. Plurals are nested maps (`count: { one:, other: }`).
+- Dev sample catalogue: `db/seeds/sample_listings.rb` (dev-only, idempotent) — 5 sellers,
+  41 listings, 13 reviews, 80 generated placeholder photos.
+
+**Why**
+
+Public browsing is the whole SEO/traffic surface, so the phase is organised around the
+query layer (one service, one facet query, eager loading, fragment caching, conditional
+GETs) with deliberately thin controllers, and every interactive control is a plain GET
+form that degrades without JS (Turbo Frame is progressive enhancement).
+
+**Gotchas recorded**
+
+- pagy 43.8 ships no railtie: `include Pagy::Method` in `ApplicationController`,
+  `Pagy::Offset.new(...)` inside the service, `Pagy::I18n.locale = I18n.locale.to_s` in
+  `switch_locale`, nav via `raw(pagy.series_nav)`; do **not** add `pagy.*` keys to the app
+  locale files.
+- `trg_listings_tsv` only fires on `UPDATE OF title, description`, so fixture INSERTs
+  leave `tsv` null → global `setup { Listing.reindex_search_vectors! }` in
+  `test/test_helper.rb`.
+- `Authentication` must run `resume_session` **before** the auth filters, otherwise
+  public controllers (`allow_unauthenticated_access`) never set `Current.user` and
+  per-user fragments/CTAs render as logged-out for signed-in users.
+- `Store.friendly.find` (not `find!`) — FriendlyId scoped by `slug`.
+- Raw Ruby such as `aria: { label: … }` must not be written inside literal HTML tags in
+  ERB; use `aria-label="<%= … %>"` there and keep the hash form for tag helpers.
+- Fixture slugs must not collide with dev seed slugs
+  (`ReferenceDataSeedTest` asserts exact reference counts: 61 categories, 34 spec
+  attributes, 293 options, 88 attachments, 13 labels, 21 seller tags).
+- Dev uses `:memory_store`, so cached fragments (mega menu, cards, rails) survive template
+  and locale edits while the server runs. Restart the server or `Rails.cache.clear` before
+  judging a smoke test.
+
+**Files touched** (all uncommitted, on top of `e145877`)
+
+- New: `app/controllers/{listings,categories,stores}_controller.rb`,
+  `app/services/listing_search.rb`, `app/jobs/listing_view_job.rb`,
+  `app/helpers/listings_helper.rb`, `app/javascript/controllers/{mega_menu,filters,gallery}_controller.js`,
+  `app/views/listings/*`, `app/views/shared/{_listing_card,_card_rail}.html.erb`,
+  `app/views/stores/show.html.erb`, `app/views/pages/home/*`, `db/seeds/sample_listings.rb`,
+  `test/services/listing_search_test.rb`, `test/controllers/{listings,categories,stores}_controller_test.rb`,
+  `test/helpers/listings_helper_test.rb`, `test/fixtures/{labels,listing_labels,seller_tags,listing_tags}.yml`.
+- Modified: `config/routes.rb`, `config/locales/{es,en,fr,de,it,pt}.yml`,
+  `app/controllers/{application,concerns/authentication}.rb`,
+  `app/models/{listing,category,spec_attribute,review}.rb`, `app/helpers/application_helper.rb`,
+  `app/views/layouts/_header.html.erb`, `app/views/pages/home.html.erb`,
+  `app/assets/tailwind/application.css`, `db/seeds.rb`, `test/test_helper.rb`,
+  `test/models/listing_test.rb`, `test/fixtures/{listings,categories,category_spec_attributes,spec_attributes,spec_options}.yml`,
+  `.claude/context/*`.
+
+**Verification** `bin/rails test` → 133 runs / 851 assertions / 0 failures / 0 errors;
+`bin/rubocop` → 138 files, 0 offences; `ruby script/lint_locale_keys.rb` → "All 6 locale
+files share the same 481 keys"; `bin/rails db:seed` twice → 0 new records;
+`bin/rails tailwindcss:build` OK; smoke curl on `/es`, `/es/c/gpus`, `/en/listings?q=rtx`,
+`/en/search?q=rtx` (200, not a redirect), a listing show (200 + 304 on `If-None-Match`),
+a filtered category page and `/es/stores/<slug>?tab=reviews` — all 200, zero
+"translation missing", 0 errors in `log/development.log`.
+
 ## 2026-11-17 — Phase 2a: reference-data seeds (taxonomy, spec filters, labels, seller tags)
 
 **What was built**

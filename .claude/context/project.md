@@ -3,8 +3,10 @@
 ## Purpose
 
 Marketplace for new and second-hand PC hardware (GPUs, CPUs, laptops, components).
-Phase 0 built the foundation: auth, i18n, Tailwind chrome (header/footer), and the
-decision record below. Listings, search, checkout and admin come in later phases.
+Phase 0 built the foundation (auth, i18n, Tailwind chrome), Phase 1 the domain layer,
+Phase 2a the reference-data seeds and Phase 2b **public browsing** — search results,
+category pages, listing pages and seller storefronts, all read-only. Listing create/edit
+(publish flow), cart/checkout and the admin/moderation UI come in later phases.
 
 ## Stack
 
@@ -63,19 +65,83 @@ decision record below. Listings, search, checkout and admin come in later phases
   Spec attributes attach to categories via `CategorySpecAttribute`
   (`required` flags: gpu_chipset→gpus, cpu_brand→cpus) and children inherit.
 
+- **Public browsing (Phase 2b)** — read-only, no auth required:
+  - Routes: `resources :listings, only: %i[index show]`, `resources :categories, only: :show,
+    path: "c"`, `resources :stores, only: :show`, plus `get "search" → listings#index`
+    (a canonical results page, **never** a redirect). All inside `scope "(:locale)"`.
+  - **All querying lives in `ListingSearch`** (`app/services/listing_search.rb`): skinny
+    controllers just build params and call it. Returns a `Result` struct
+    (`records, pagy, total_count, facets, facet_attributes, filters`) with `#empty?`,
+    `#facet_count`, `#spec_facets`, `#applied_filters?`. Facet counts come from **one**
+    SQL query (`WITH scoped AS (…) UNION ALL` over condition::text, label/tag joins by
+    slug and `jsonb_each`/`jsonb_array_elements_text` for specs) computed **before**
+    pagination, so counts never track the current page. `category` = self + descendants
+    (unknown slug → `none`), `min_eur`/`max_eur` → cents, `condition[]`, `f[attr][]`
+    (OR within an attribute, AND across attributes, arrays matched element-wise),
+    `labels[]`, `tags[]`, `seller` (store slug), `sort` in
+    `best_match|newest|price_asc|price_desc|most_favorited`, `page`.
+    Featured-first ordering only when `Flipper.enabled?(:featured_listings)`.
+  - **Eager loading / N+1**: cards render through `Listing#with_card_data` (store, photos,
+    labels, tags); controller tests assert the `sql.active_record` notification count
+    stays flat when the result set grows.
+  - **Pagination**: pagy 43 has **no railtie** in this app, so `include Pagy::Method` in
+    `ApplicationController` and `ListingSearch` builds `Pagy::Offset.new` explicitly
+    (nav via `results_pagination` helper → `raw(pagy.series_nav)`); `Pagy::I18n.locale`
+    is set in `switch_locale`. No `pagy.*` keys in the app locale files. 24 per page.
+  - **Filtering is a Turbo Frame**: one `<form method="get" data-turbo-frame="results"
+    data-controller="filters">` wraps the sidebar and `<turbo-frame id="results"
+    data-turbo-action="advance">`, so applying a filter re-renders only `#results`
+    (`listings/_browse`, `_filters`, `_results` are shared by index / category / store
+    pages). The mobile filter sheet is a `<dialog>` (`.filters-sheet` in the Tailwind CSS).
+  - **Caching**: fragment caching on (`:memory_store` in dev, `:solid_cache_store` in
+    prod, `:null_store` in test) with Russian-doll cards —
+    `cache [I18n.locale, "listing_card", …, listing]` in `shared/_listing_card`; the
+    header mega menu + mobile menu fragments are cached per locale and busted by
+    `Category.maximum(:updated_at)`; show/store pages use `fresh_when(etag:, last_modified:,
+    public: <anonymous AND publicly visible>, private: otherwise)` — only anonymous hits on
+    publicly visible records may enter a shared cache, because the header is personalised
+    and owners/admins see unpublished listings (verified 304 on `If-None-Match`).
+  - **Images**: `Listing::PHOTO_VARIANTS` = `card` (webp 400×400) and `gallery`
+    (webp 1200×1200); helpers always emit `loading="lazy" decoding="async"` plus explicit
+    `width`/`height` (CLS-free), with an SVG placeholder when a listing has no photos.
+  - **Visibility**: `Listing.published == where(status: :approved)`; show allows
+    `approved`/`sold`/`reserved` to everyone and everything else to owner/admin only.
+    Sold listings stay public with a sold banner and **no** buy/offer/contact CTAs.
+  - **Store page** tabs are `?tab=listings|about|reviews` (`StoresController::TABS`),
+    reviews paginated at 10 with `pagy(...)`.
+  - **Sample data is dev-only**: `db/seeds/sample_*.rb` early-return unless
+    `Rails.env.development?` (4 sample stores, 41 listings, 80 generated photos, 13
+    reviews). Tests use fixtures only — fixture slugs deliberately avoid seed slugs.
+  - **Gotcha — search vectors and fixtures**: `trg_listings_tsv` only fires on
+    `UPDATE OF title, description`, so bulk fixture INSERTs leave `tsv` null. The global
+    `setup` in `test/test_helper.rb` calls `Listing.reindex_search_vectors!`; keep it
+    there rather than per test file.
+  - **Gotcha — public pages and sessions**: `Authentication` now always runs
+    `before_action :resume_session` and only then `require_authentication`; without that,
+    public controllers (`allow_unauthenticated_access`) left `Current.user` nil, which
+    broke cached-per-user fragments.
+- **i18n**: the 6 locale files currently share an identical tree of **481 keys**. Plurals
+  must be nested (`count: { one:, other: }`) — i18n 1.15.2 does not resolve flat
+  `*_one`/`*_other` keys. Locale files are machine-merged (`YAML.dump` → alphabetical
+  keys); regenerate rather than hand-splicing.
+
+
+
 ## Code map
 
 
 | Area | Files |
 | --- | --- |
-| Routes (locale-scoped) | `config/routes.rb` — root `pages#home`, `resource :session`, `resources :passwords`, `resource :registration` |
+| Routes (locale-scoped) | `config/routes.rb` — root `pages#home`, `resources :listings, only: %i[index show]`, `resources :categories, only: :show, path: "c"`, `resources :stores, only: :show`, `get "search" → listings#index`, `resource :session`, `resources :passwords`, `resource :registration` |
 | Auth | `app/controllers/concerns/authentication.rb` (cookie resume, `Current.session`), `sessions_controller.rb`, `passwords_controller.rb`, `passwords_mailer.rb` |
 | Sign-up | `registrations_controller.rb` + `views/registrations/new` |
 | User model | `app/models/user.rb` — `email_address` (normalized downcase, uniq index), `username` (uniq index, `/\A[a-zA-Z0-9_\-]{3,30}\z/`), `first_name`, `last_name`, `phone`, `role` enum (user:0 admin:1), `locale` (default "es"), `country_code` (default "ES"), `confirmed_at`, `banned_at` (`banned?/ban!/unban!`), `display_name`; has_many: store, listings, sales/orders, favorites, follows, seller_follows, saved_searches, conversations, offers, carts, reviews, sent_messages, api_tokens |
 | Locale switching | `application_controller.rb`, `config/application.rb`, `config/locales/*.yml`, `script/lint_locale_keys.rb` |
-| Layout & chrome | `app/views/layouts/application.html.erb`, `_header.html.erb` (announcement, logo, search `GET /:locale?q=`, placeholders, icons, account dropdown, hamburger menu), `_footer.html.erb` (newsletter, link columns, language switcher, copyright), `_flashes.html.erb` |
-| Design tokens | `app/assets/tailwind/application.css` (`--color-primary` #4f46e5, `--color-accent` #f97316, surface/surface-muted/text/muted/border; `.dark` overrides) |
-| Stimulus | `app/javascript/controllers/theme_controller.js`, `menu_controller.js` |
+| Layout & chrome | `app/views/layouts/application.html.erb`, `_header.html.erb` (announcement, logo, search `GET /:locale?q=`, wishlist/notifications/cart icons, account dropdown, desktop mega menu + mobile slide-in menu, both cached per locale and busted by `Category.maximum(:updated_at)`), `_footer.html.erb` (newsletter, link columns, language switcher, copyright), `_flashes.html.erb` |
+| Design tokens | `app/assets/tailwind/application.css` (`--color-primary` #4f46e5, `--color-accent` #f97316, surface/surface-muted/text/muted/border; `.dark` overrides; component classes `btn-primary/secondary/ghost`, `card`, `chip`, `chip-choice`, `input`, `select`, `nav-link`, `icon-button`, `series-nav`, `filters-sheet`, `scroll-snap-row`) |
+| Stimulus | `app/javascript/controllers/{theme,menu,mega_menu,filters,gallery}_controller.js` — `mega-menu` hover/focus panels (Esc + focusout close), `filters` mobile `<dialog>` sheet + auto-submit, `gallery` swipe/keyboard carousel |
+| Browse & search (2b) | `app/services/listing_search.rb` (`Result` struct, one facet-count query, `with_card_includes`), `app/controllers/{listings,categories,stores}_controller.rb` (skinny; `search_params` + `current_country_code` in `ApplicationController`), `app/helpers/listings_helper.rb` (`money`, `spec_value_label`, `stars`, `applied_filter_chips`, `facet_options*`, `listing_photo_tag`, `photo_variant_tag`, breadcrumbs, `url_without_filter`), `app/jobs/listing_view_job.rb` (view counter) |
+| Browse UI (2b) | `app/views/listings/{index,_browse,_filters,_results,show,_show_specs,_show_shipping}.html.erb` (also rendered by `CategoriesController#show` — no separate category template — and by `StoresController#show`), `app/views/shared/{_listing_card,_card_rail}.html.erb`, `app/views/stores/show.html.erb` (tabs `?tab=listings|about|reviews`), `app/views/pages/home.html.erb` + `app/views/pages/home/{hero,categories,deals,newest,gpus,saved,sold,trust,newsletter}.html.erb` |
 | Taxonomy | `category.rb` (self-referential `parent_id`, JSONB `names` locale maps, recursive CTEs `self_and_descendant_ids`/`self_and_ancestor_ids`, FriendlyId; NOTE `categories.listings_count` is a plain counter_cache of ALL listings including drafts/rejected — public per-category counts must query `Listing.published`/`visible`), `spec_attribute.rb` (`key`, JSONB names, `input_type` enum with `prefix: true`) + `spec_option.rb` + join `category_spec_attribute.rb` — spec attributes attach to any category and are inherited down the tree (`Category#all_spec_attributes`) |
 | Listings | `listing.rb` — FriendlyId `:slugged, :sequentially_slugged` (`slug_candidates`), pg_search `search_text` (tsvector column `tsv` + trigger + GIN in migrations 090008/090009), enums `condition` (brand_new/open_box/used_like_new/used_good/for_parts) and `status` (draft/pending_review/approved/rejected/sold/archived/reserved) with transitions `submit_for_review!`/`approve!(admin)`/`reject!(reason, admin:)`/`mark_sold!` raising `Listing::InvalidTransition`; integer-cent columns (`price_cents` etc.) + `Money` value object (`Listing#price`, `discount_percent`); JSONB `specs` (may be empty — accessories/games have none — but must be a Hash); photos via ActiveStorage (`has_many_attached`, 12/10 MB/jpeg-png-webp model validations); scopes: `published/visible/featured/in_country/recent`; labels/tags: `label.rb`, `listing_label.rb`, `seller_tag.rb`, `listing_tag.rb`, moderation: `moderation_event.rb` |
 | Stores & reputation | `store.rb` (FriendlyId, counters `listings_count/reviews_count/rating_average`, `refresh_rating!`), `review.rb` (uniq `order_id`, reviewer/store/seller), `favorite.rb` (counter cache on `favorites_count`), `follow.rb` |
@@ -83,16 +149,21 @@ decision record below. Listings, search, checkout and admin come in later phases
 | Messaging | `conversation.rb`, `message.rb`, `block.rb` |
 | Platform | `country.rb` (JSONB-free locale rows via `name_key` i18n keys, `Country.seed_defaults!` ES-only), `setting.rb` (`get/set` + Rails.cache key `settings/<key>`, `seed_defaults!`), `api_token.rb` (`issue_for` → SHA-256 `token_digest`, `authenticate` active-only), `legal_page.rb`, `newsletter_subscription.rb`, `notification.rb`, `saved_search.rb`, `money.rb` (value object: `cents`/`amount`/`to_s`) |
 | Seeds (Phase 2a) | `db/seeds.rb` (loads `db/seeds/support/seed_loader.rb` + one loader per concern, idempotent upserts), raw data `db/seeds/data/{categories,spec_attributes,category_spec_attributes,labels,seller_tags}.yml` — counts: 61 categories, 34 spec attributes, 293 options, 88 category attachments, 13 labels, 21 seller tags, 6 countries, 4 settings |
+| Seeds (Phase 2b, dev-only) | `db/seeds/sample_listings.rb` early-returns unless `Rails.env.development?`; seeds 5 sample sellers (store + user each), 41 listings across the taxonomy (labels, seller tags, JSONB specs, favorites/views counters, `status: sold` on a few indexes, `featured_until = 7.days.from_now` on the featured ones), 13 reviews through delivered orders, then attaches 80 generated 1200×900 placeholder photos (ImageMagick gradients cached in `tmp/sample_photos/` — no fonts on this box, so no text overlay). Idempotent: re-running creates 0 records. Dev DB after seeding: 42 listings (39 approved, 3 sold), 80 attachments, 13 reviews, 5 sample stores |
 | Migrations | Phase 0: `20261116205301…205400`. Phase 1 domain: `db/migrate/20261117090001`–`20261117090033` (countries, settings, stores, categories, spec_*, listings + tsv trigger/GIN, labels/tags/moderation, favorites/follows, saved_searches, conversations/messages/blocks, offers, carts/cart_items, addresses/orders/order_items, reviews, notifications, newsletter, legal_pages, api_tokens, user ban fields, active_storage). Schema dump: `db/structure.sql` (schema_format: sql in `config/database.yml`) |
-| Tests | `test/models/user_test.rb`, `test/models/{listing,category,setting,country,api_token,review,favorite}_test.rb`, `test/services/commission_calculator_test.rb`, `test/controllers/pages_controller_test.rb`, generated `sessions`/`passwords` controller tests, `test/test_helpers/session_test_helper.rb` (`sign_in_as`); fixtures for users/countries/categories/spec_*/stores/listings/orders. `test_helper.rb`: `I18n.default_locale = :en` for error-message assertions; `ListingTest` re-runs the tsv reindex in setup (fixtures load with triggers disabled) |
+| Tests | `test/models/user_test.rb`, `test/models/{listing,category,setting,country,api_token,review,favorite}_test.rb`, `test/services/{commission_calculator,listing_search}_test.rb`, `test/controllers/{pages,listings,categories,stores,sessions,passwords}_controller_test.rb`, `test/helpers/listings_helper_test.rb`, `test/test_helpers/session_test_helper.rb` (`sign_in_as`); fixtures for users/countries/categories/spec_*/labels/seller_tags/stores/listings/orders/files. `test_helper.rb`: `I18n.default_locale = :en`, `routes.default_url_options[:locale] = :en`, and a **global** `setup { Listing.reindex_search_vectors! }` (fixture INSERTs do not fire `trg_listings_tsv`, which only fires on UPDATE of title/description). `listings_controller_test.rb` also guards against N+1 by counting `sql.active_record` notifications |
 
 ## Open items (next phases)
 
-- Listings UI phase: CRUD + publish flow (admin approval per `Listing` state machine), search page wired to `Listing.search_text` + Pagy, photo upload form (validations live in the model).
+- Seller dashboard phase: create/edit listing + publish flow (`submit_for_review!` →
+  admin approval), photo upload form, mark-sold, favourites/wishlist persistence.
+  Phase 2b left the buy/favourite/sell CTAs as `#` links or disabled buttons on purpose.
 - Cart/checkout (Stripe, flag `stripe_checkout`), "Sell to us" (flag `sell_to_us`), commissions (flag `commissions`, `CommissionCalculator` + `Order#apply_commission!` ready).
 - Google login (flag `google_login`), email confirmation (`confirmed_at` exists but is unused).
 - `/api/v1` namespace (`ApiToken.authenticate` ready), sitemap_generator config, meta-tags per-page SEO.
-- Seed data: reference data done (Phase 2a: countries, settings, taxonomy,
-  spec filters, labels, seller tags). Demo listings/stores fixtures come with
-  the listings UI phase; pg_search typo tolerance (dmetaphone) if needed.
+- Seed data: reference data done (Phase 2a) and dev demo catalogue done (Phase 2b,
+  dev-only). Photo placeholders are generated gradients — replace with real assets if
+  screenshots/design reviews matter. pg_search typo tolerance (dmetaphone) if needed.
+- Saved searches, offers, messaging and reviews UI (models exist; Phase 2b shows
+  read-only reviews on the store page).
 - Add `script/lint_locale_keys.rb` to CI.

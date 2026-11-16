@@ -4,12 +4,6 @@ class ListingTest < ActiveSupport::TestCase
   # Fixtures load under PostgreSQL's disable_referential_integrity, which runs
   # ALTER TABLE ... DISABLE TRIGGER ALL — so the tsv trigger never sees the
   # fixture rows. Re-run the same reindex the trigger/migration use.
-  setup do
-    Listing.connection.execute(<<~SQL)
-      UPDATE listings SET tsv = setweight(to_tsvector('simple', coalesce(title, '')), 'A') ||
-                           setweight(to_tsvector('simple', coalesce(description, '')), 'B')
-    SQL
-  end
 
   def listing
     @listing ||= listings(:gigabyte)

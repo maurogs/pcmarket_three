@@ -7,6 +7,13 @@ class Listing < ApplicationRecord
   MAX_PHOTO_BYTES = 10.megabytes
   PHOTO_CONTENT_TYPES = %w[image/jpeg image/png image/webp].freeze
 
+  # Named variants for rendered photos: small WebP for cards/carousels,
+  # wide WebP for the show-page gallery.
+  PHOTO_VARIANTS = {
+    card: { format: :webp, resize_to_limit: [ 400, 400 ] }.freeze,
+    gallery: { format: :webp, resize_to_limit: [ 1200, 1200 ] }.freeze
+  }.freeze
+
   extend FriendlyId
 
   friendly_id :slug_candidates, use: [ :slugged, :sequentially_slugged ]
@@ -64,10 +71,57 @@ class Listing < ApplicationRecord
   scope :featured, -> { where("featured_until > ?", Time.current) }
   scope :in_country, ->(code) { where(country_code: code) }
   scope :recent, -> { order(published_at: :desc, id: :desc) }
+  scope :discounted, -> { where("original_price_cents IS NOT NULL AND original_price_cents > price_cents") }
+  scope :in_category_slug, ->(slug) { where(category: Category.where(slug: slug)) }
+  scope :recently_sold, -> { where(status: :sold).order(sold_at: :desc, id: :desc) }
+
+  # Everything a card needs in one round trip: photo attachments plus the
+  # store/user/labels/category rendered on the card. Use on every relation that
+  # renders cards.
+  scope :with_card_data, -> {
+    with_attached_photos.includes(:store, :user, :labels, :category, photos_attachments: :blob)
+  }
+
+  # Listings favorited within the window, most saved first.
+  scope :most_saved_since, ->(since) {
+    published
+      .where(id: Favorite.where(created_at: since..).select(:listing_id))
+      .order(favorites_count: :desc, published_at: :desc, id: :desc)
+  }
 
   # Money-like decimal value built from the integer cents column.
   def price
     Money.new(price_cents, currency)
+  end
+
+  # Published listings in the same category whose price sits closest to this
+  # one; used for the "Similar listings" rail on the show page.
+  def self.similar_to(listing, limit: 8)
+    published
+      .where(category_id: listing.category_id)
+      .where.not(id: listing.id)
+      .order(Arel.sql(sanitize_sql_array([ "ABS(price_cents - ?) ASC", listing.price_cents ])))
+      .order(published_at: :desc, id: :desc)
+      .limit(limit)
+  end
+
+  # The seller's other published listings, newest first: "More from this seller".
+  def self.from_seller_of(listing, limit: 8)
+    published
+      .where(user_id: listing.user_id)
+      .where.not(id: listing.id)
+      .order(published_at: :desc, id: :desc)
+      .limit(limit)
+  end
+
+  # Recompute every listing's search vector. Rails' fixture inserts go through
+  # bulk INSERTs that trg_listings_tsv does not fire for, so the test suite
+  # calls this once fixtures are loaded.
+  def self.reindex_search_vectors!
+    connection.execute(<<~SQL)
+      UPDATE listings SET tsv = setweight(to_tsvector('simple', coalesce(title, '')), 'A') ||
+                           setweight(to_tsvector('simple', coalesce(description, '')), 'B')
+    SQL
   end
 
   def discount_percent

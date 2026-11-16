@@ -1,0 +1,141 @@
+<%# Sidebar filters. Static column on desktop, full-height bottom sheet on
+    mobile (toggled by the "Filters" button in the results toolbar). %>
+<aside class="filters-sheet" data-filters-target="sheet" aria-label="<%= t(".title") %>">
+  <div class="mb-3 flex items-center justify-between gap-2 lg:hidden">
+    <h2 class="text-base font-bold"><%= t(".title") %></h2>
+    <button type="button" data-action="filters#close"
+            class="icon-button size-11 hover:bg-surface-muted"
+            aria-label="<%= t(".close") %>">
+      <%= inline_icon :close, classes: "size-5" %>
+    </button>
+  </div>
+
+  <%# --- price ----------------------------------------------------------- %>
+  <details open class="border-t border-border py-3">
+    <summary class="flex min-h-8 cursor-pointer items-center justify-between text-sm font-semibold">
+      <%= t(".price") %>
+      <%= inline_icon :chevron_down, classes: "size-4 text-muted" %>
+    </summary>
+    <div class="mt-2 flex items-center gap-2">
+      <input type="number" name="min_price" value="<%= params[:min_price] %>"
+             min="0" step="1" inputmode="numeric" placeholder="<%= t(".min_placeholder") %>"
+             aria-label="<%= t(".min_aria") %>"
+             data-action="filters#submit"
+             class="h-11 w-24 rounded-md border border-border bg-surface px-2 text-sm text-text placeholder:text-muted focus:border-primary focus:outline-none">
+      <span class="text-muted" aria-hidden="true">–</span>
+      <input type="number" name="max_price" value="<%= params[:max_price] %>"
+             min="0" step="1" inputmode="numeric" placeholder="<%= t(".max_placeholder") %>"
+             aria-label="<%= t(".max_aria") %>"
+             data-action="filters#submit"
+             class="h-11 w-24 rounded-md border border-border bg-surface px-2 text-sm text-text placeholder:text-muted focus:border-primary focus:outline-none">
+      <span class="text-sm text-muted">€</span>
+    </div>
+  </details>
+
+  <%# --- condition ------------------------------------------------------- %>
+  <% condition_rows = Listing.conditions.keys.filter_map do |value|
+       count = @result.facet_count("condition", value)
+       [ value, count ] if count.positive? || @result.filters[:conditions].include?(value)
+     end %>
+  <% if condition_rows.any? %>
+    <details open class="border-t border-border py-3">
+      <summary class="flex min-h-8 cursor-pointer items-center justify-between text-sm font-semibold">
+        <%= t(".condition") %>
+        <%= inline_icon :chevron_down, classes: "size-4 text-muted" %>
+      </summary>
+      <div class="mt-1 space-y-0.5">
+        <% condition_rows.each do |value, count| %>
+          <label class="flex min-h-11 cursor-pointer items-center gap-2.5 text-sm">
+            <input type="checkbox" name="condition[]" value="<%= value %>"
+                   <%= "checked" if @result.filters[:conditions].include?(value) %>
+                   data-action="filters#submit"
+                   class="size-4 shrink-0 rounded border-border accent-primary">
+            <span class="flex-1 truncate"><%= Listing.human_attribute_name("condition.#{value}") %></span>
+            <span class="text-xs text-muted tabular-nums"><%= count %></span>
+          </label>
+        <% end %>
+      </div>
+    </details>
+  <% end %>
+
+  <%# --- spec facets ------------------------------------------------------- %>
+  <% @result.facet_attributes.each do |attribute| %>
+    <% rows = facet_options(attribute, @result) %>
+    <% next if rows.empty? %>
+    <% selected = Array(@result.filters[:specs][attribute.key]) %>
+    <details open class="border-t border-border py-3">
+      <summary class="flex min-h-8 cursor-pointer items-center justify-between text-sm font-semibold">
+        <%= spec_attribute_label(attribute) %>
+        <%= inline_icon :chevron_down, classes: "size-4 text-muted" %>
+      </summary>
+      <div class="mt-1 space-y-0.5">
+        <% rows.first(ListingsHelper::FACET_PREVIEW).each do |value, label, count| %>
+          <label class="flex min-h-11 cursor-pointer items-center gap-2.5 text-sm">
+            <input type="checkbox" name="f[<%= attribute.key %>][]" value="<%= value %>"
+                   <%= "checked" if selected.include?(value) %>
+                   data-action="filters#submit"
+                   class="size-4 shrink-0 rounded border-border accent-primary">
+            <span class="flex-1 truncate"><%= label %></span>
+            <span class="text-xs text-muted tabular-nums"><%= count %></span>
+          </label>
+        <% end %>
+        <% if rows.size > ListingsHelper::FACET_PREVIEW %>
+          <%# JS-free expansion of the long tail of options. %>
+          <details class="mt-1">
+            <summary class="min-h-11 cursor-pointer text-xs font-semibold text-primary">
+              <%= t(".show_more", count: rows.size - ListingsHelper::FACET_PREVIEW) %>
+            </summary>
+            <div class="space-y-0.5">
+              <% rows.drop(ListingsHelper::FACET_PREVIEW).each do |value, label, count| %>
+                <label class="flex min-h-11 cursor-pointer items-center gap-2.5 text-sm">
+                  <input type="checkbox" name="f[<%= attribute.key %>][]" value="<%= value %>"
+                         <%= "checked" if selected.include?(value) %>
+                         data-action="filters#submit"
+                         class="size-4 shrink-0 rounded border-border accent-primary">
+                  <span class="flex-1 truncate"><%= label %></span>
+                  <span class="text-xs text-muted tabular-nums"><%= count %></span>
+                </label>
+              <% end %>
+            </div>
+          </details>
+        <% end %>
+      </div>
+    </details>
+  <% end %>
+
+  <%# --- labels + seller tags -------------------------------------------- %>
+  <% [ [ "label", :labels, t(".labels") ], [ "seller_tag", :tags, t(".tags") ] ].each do |facet_key, param, heading| %>
+    <% rows = facet_options_for_column(facet_key, param, @result) %>
+    <% next if rows.empty? %>
+    <% selected = Array(@result.filters[param]) %>
+    <details open class="border-t border-border py-3">
+      <summary class="flex min-h-8 cursor-pointer items-center justify-between text-sm font-semibold">
+        <%= heading %>
+        <%= inline_icon :chevron_down, classes: "size-4 text-muted" %>
+      </summary>
+      <div class="mt-1 space-y-0.5">
+        <% rows.first(ListingsHelper::FACET_PREVIEW).each do |value, label, count| %>
+          <label class="flex min-h-11 cursor-pointer items-center gap-2.5 text-sm">
+            <input type="checkbox" name="<%= param %>[]" value="<%= value %>"
+                   <%= "checked" if selected.include?(value) %>
+                   data-action="filters#submit"
+                   class="size-4 shrink-0 rounded border-border accent-primary">
+            <span class="flex-1 truncate"><%= label %></span>
+            <span class="text-xs text-muted tabular-nums"><%= count %></span>
+          </label>
+        <% end %>
+      </div>
+    </details>
+  <% end %>
+
+  <div class="sticky bottom-0 -mx-4 mt-4 flex items-center gap-2 border-t border-border bg-surface px-4 py-3 lg:static lg:mx-0 lg:border-0 lg:p-0">
+    <button type="button" data-action="filters#close"
+            class="inline-flex min-h-11 flex-1 items-center justify-center rounded-md bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-hover lg:hidden">
+      <%= t(".show_results", count: @result.total_count) %>
+    </button>
+    <% if @result.applied_filters? %>
+      <%= link_to t(".clear_all"), request.path,
+            class: "inline-flex min-h-11 items-center rounded-md border border-border px-3 text-sm font-medium hover:border-primary hover:text-primary" %>
+    <% end %>
+  </div>
+</aside>

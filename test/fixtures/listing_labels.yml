@@ -1,0 +1,11 @@
+gigabyte_open_box:
+  listing: gigabyte
+  label: open_box
+
+gigabyte_local_pickup:
+  listing: gigabyte
+  label: local_pickup_only
+
+featured_open_box:
+  listing: featured
+  label: open_box

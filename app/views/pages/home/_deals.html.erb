@@ -1,0 +1,10 @@
+<%# Featured deals: listings with an original price above the current one. %>
+<% cache [ I18n.locale, "home/deals", Listing.maximum(:updated_at) ], expires_in: 20.minutes do %>
+  <% listings = Listing.published.with_card_data.discounted.recent.limit(12).to_a %>
+  <% if listings.any? %>
+    <%= render "shared/card_rail",
+          title: t(".title"),
+          listings: listings,
+          href: listings_path(sort: "price_asc") %>
+  <% end %>
+<% end %>

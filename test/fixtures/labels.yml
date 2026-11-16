@@ -1,0 +1,13 @@
+open_box:
+  slug: open-box
+  names:
+    en: Open box
+    es: Caja abierta
+  color: "#6d28d9"
+
+local_pickup_only:
+  slug: local-pickup-only
+  names:
+    en: Local pickup only
+    es: Solo recogida local
+  color: "#16a34a"

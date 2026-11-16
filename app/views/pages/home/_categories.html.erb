@@ -1,0 +1,23 @@
+<%# Category tiles: the enabled root categories, cached until the taxonomy moves. %>
+<% cache [ I18n.locale, "home/categories", Category.maximum(:updated_at) ], expires_in: 6.hours do %>
+  <% roots = Category.roots.active.ordered.to_a %>
+  <% if roots.any? %>
+    <section class="mt-10">
+      <h2 class="mb-3 text-lg font-bold tracking-tight"><%= t(".title") %></h2>
+
+      <ul class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        <% roots.each do |root| %>
+          <li>
+            <%= link_to category_path(root),
+                  class: "group flex h-full min-h-24 flex-col items-center justify-center gap-2 rounded-lg border border-border bg-surface p-4 text-center transition hover:border-primary hover:shadow-md" do %>
+              <span class="text-muted transition group-hover:text-primary">
+                <%= category_icon(root) || inline_icon(:chip, classes: "size-7") %>
+              </span>
+              <span class="text-sm font-medium leading-5"><%= root.name %></span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
+<% end %>

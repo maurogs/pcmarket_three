@@ -7,6 +7,13 @@ Rails.application.routes.draw do
   scope "(:locale)", locale: /es|en|fr|de|it|pt/ do
     root "pages#home"
 
+    # Public browsing (Phase 2b). `search` renders the same results page as
+    # the listings index — it is a canonical SEO entry, not a redirect.
+    resources :listings, only: %i[index show], path: "listings"
+    resources :categories, only: :show, path: "c"
+    resources :stores, only: :show, path: "stores"
+    get "search", to: "listings#index", as: :search
+
     resource :session
     resources :passwords, param: :token
     resource :registration, only: %i[new create]

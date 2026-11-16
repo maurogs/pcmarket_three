@@ -2,6 +2,10 @@ module Authentication
   extend ActiveSupport::Concern
 
   included do
+    # Resume the session on every controller — public pages still want to know
+    # who the visitor is (etags, moderation affordances). Only the enforcement
+    # callback is skipped by allow_unauthenticated_access.
+    before_action :resume_session
     before_action :require_authentication
     helper_method :authenticated?
   end

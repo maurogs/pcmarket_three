@@ -9,6 +9,8 @@ class Review < ApplicationRecord
   validates :order_id, uniqueness: true
   validates :body, length: { maximum: 4000 }, allow_nil: true
 
+  scope :recent_first, -> { order(created_at: :desc, id: :desc) }
+
   after_create :refresh_store_rating
   after_destroy :refresh_store_rating
   after_update :refresh_store_rating, if: :saved_change_to_rating?

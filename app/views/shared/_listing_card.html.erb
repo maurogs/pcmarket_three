@@ -1,0 +1,79 @@
+<%# ListingCard: photo, label chips, discount badge, price (EUR per locale),
+    title (2-line clamp), store + verified badge, condition, favourite heart.
+    locals: listing, compact (carousel variant) %>
+<% compact = local_assigns.fetch(:compact, false) %>
+<% sold = listing.sold? %>
+<%= cache [ I18n.locale, "listing_card", compact, authenticated?, listing ] do %>
+  <article class="relative flex flex-col overflow-hidden rounded-lg border border-border bg-surface transition hover:border-primary/50 hover:shadow-md">
+    <div class="relative aspect-square overflow-hidden bg-surface-muted">
+      <%= listing_photo_tag(listing, alt: listing.title) %>
+
+      <% labels = listing.labels.to_a %>
+      <% if labels.any? %>
+        <ul class="absolute left-1.5 top-1.5 z-10 flex max-w-[80%] flex-wrap gap-1" aria-label="<%= t(".labels") %>">
+          <% labels.first(2).each do |label| %>
+            <li class="rounded px-1.5 py-0.5 text-[11px] font-semibold leading-4 text-white"
+                style="background-color: <%= label.color.presence || "#4f46e5" %>"><%= label.name %></li>
+          <% end %>
+        </ul>
+      <% end %>
+
+      <% if listing.discount_percent > 0 %>
+        <span class="absolute right-1.5 top-1.5 z-10 rounded bg-accent px-1.5 py-0.5 text-[11px] font-bold text-white">
+          -<%= listing.discount_percent %>%
+        </span>
+      <% end %>
+
+      <% if sold %>
+        <div class="absolute inset-0 z-[5] flex items-center justify-center bg-black/45">
+          <span class="rounded bg-white px-2 py-1 text-xs font-bold uppercase tracking-wider text-slate-900 dark:bg-slate-100">
+            <%= t(".sold_out") %>
+          </span>
+        </div>
+      <% end %>
+
+      <%# Placeholder favourite control (forms arrive with the favourites phase). %>
+      <div class="absolute bottom-1.5 right-1.5 z-10">
+        <% if authenticated? %>
+          <button type="button" disabled class="flex size-9 cursor-default items-center justify-center rounded-full bg-surface/90 text-muted hover:text-accent dark:bg-slate-900/90" title="<%= t(".save_soon") %>">
+            <%= inline_icon :heart, classes: "size-5" %>
+          </button>
+        <% else %>
+          <%= link_to new_session_path, class: "flex size-9 items-center justify-center rounded-full bg-surface/90 text-muted hover:text-accent dark:bg-slate-900/90", title: t(".save_login"), aria: { label: t(".save_login") } do %>
+            <%= inline_icon :heart, classes: "size-5" %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="flex flex-1 flex-col gap-1 p-2.5">
+      <div class="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+        <span class="text-sm font-bold text-text"><%= money(listing.price_cents, listing.currency) %></span>
+        <% if listing.original_price_cents.present? && listing.original_price_cents > listing.price_cents %>
+          <del class="text-xs text-muted"><%= money(listing.original_price_cents, listing.currency) %></del>
+        <% end %>
+      </div>
+
+      <h3 class="text-sm leading-5">
+        <%# Stretched link makes the whole card clickable while the heart stays on top. %>
+        <%= link_to listing.title, listing_path(listing),
+              class: "line-clamp-2 font-medium text-text hover:text-primary after:absolute after:inset-0 after:content-['']",
+              title: listing.title %>
+      </h3>
+
+      <% unless compact %>
+        <div class="mt-auto space-y-0.5 pt-1 text-xs text-muted">
+          <div class="flex items-center gap-1">
+            <% if listing.store %>
+              <span class="truncate"><%= listing.store.name %></span>
+              <%= verified_badge(listing.store, classes: "size-3.5") %>
+            <% else %>
+              <span class="truncate"><%= listing.user.display_name %></span>
+            <% end %>
+          </div>
+          <div><%= condition_label(listing) %></div>
+        </div>
+      <% end %>
+    </div>
+  </article>
+<% end %>

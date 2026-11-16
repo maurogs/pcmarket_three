@@ -1,0 +1,10 @@
+<%# Social proof: the listings saved the most during the last seven days. %>
+<% cache [ I18n.locale, "home/saved", Listing.maximum(:updated_at) ], expires_in: 15.minutes do %>
+  <% listings = Listing.with_card_data.most_saved_since(1.week.ago).limit(12).to_a %>
+  <% if listings.any? %>
+    <%= render "shared/card_rail",
+          title: t(".title"),
+          listings: listings,
+          href: listings_path(sort: "most_favorited") %>
+  <% end %>
+<% end %>

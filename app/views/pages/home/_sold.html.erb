@@ -1,0 +1,7 @@
+<%# Recently sold: proof that the marketplace actually moves stock. %>
+<% cache [ I18n.locale, "home/sold", Listing.maximum(:sold_at) ], expires_in: 30.minutes do %>
+  <% listings = Listing.with_card_data.recently_sold.limit(12).to_a %>
+  <% if listings.any? %>
+    <%= render "shared/card_rail", title: t(".title"), listings: listings %>
+  <% end %>
+<% end %>

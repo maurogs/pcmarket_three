@@ -1,0 +1,237 @@
+<% listing = @listing %>
+<% sold = listing.sold? %>
+<% category = listing.category %>
+<% set_meta_tags(title: listing.title, description: listing.description.to_s.truncate(160)) %>
+
+<nav aria-label="<%= t(".breadcrumb") %>" class="mb-3 flex flex-wrap items-center gap-1 text-xs text-muted">
+  <%= link_to t(".breadcrumb_home"), root_path, class: "hover:text-primary" %>
+  <% breadcrumb_categories(category).each do |crumb| %>
+    <%= inline_icon :chevron_right, classes: "size-3.5 shrink-0" %>
+    <%= link_to crumb.name, category_path(crumb), class: "hover:text-primary" %>
+  <% end %>
+</nav>
+
+<div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
+  <div class="min-w-0">
+    <% if sold %>
+      <p class="mb-4 flex items-center gap-2 rounded-md border border-accent/40 bg-accent/10 px-3 py-2.5 text-sm font-semibold text-accent">
+        <%= inline_icon :check, classes: "size-5" %>
+        <%= t(".sold_banner") %>
+      </p>
+    <% end %>
+
+    <%# --- gallery ------------------------------------------------------- %>
+    <% photos = listing.photos.to_a %>
+    <div data-controller="gallery"
+         class="select-none" data-gallery-index-value="0">
+      <div class="relative overflow-hidden rounded-lg border border-border bg-surface-muted"
+           tabindex="0" data-action="keydown->gallery#keydown pointerdown->gallery#pointerdown pointerup->gallery#pointerup"
+           aria-label="<%= t(".gallery") %>">
+        <% if photos.any? %>
+          <% photos.each_with_index do |photo, index| %>
+            <div class="<%= "hidden" unless index.zero? %> absolute inset-0" data-gallery-target="slide">
+              <%= photo_variant_tag(photo, variant: :gallery, alt: listing.title) %>
+            </div>
+          <% end %>
+
+          <% if photos.size > 1 %>
+            <button type="button" data-action="gallery#previous"
+                    class="absolute left-2 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-surface/85 text-text hover:bg-surface"
+                    aria-label="<%= t(".previous_photo") %>">
+              <%= inline_icon :chevron_left, classes: "size-5" %>
+            </button>
+            <button type="button" data-action="gallery#next"
+                    class="absolute right-2 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-surface/85 text-text hover:bg-surface"
+                    aria-label="<%= t(".next_photo") %>">
+              <%= inline_icon :chevron_right, classes: "size-5" %>
+            </button>
+            <span class="absolute bottom-2 right-2 rounded bg-slate-900/70 px-2 py-1 text-xs font-medium text-white"
+                  data-gallery-target="counter">1 / <%= photos.size %></span>
+          <% end %>
+        <% else %>
+          <div class="aspect-[4/3] w-full"><%= photo_placeholder_tag(listing.title) %></div>
+        <% end %>
+      </div>
+
+      <% if photos.size > 1 %>
+        <ul class="mt-2 flex gap-2 overflow-x-auto pb-1">
+          <% photos.each_with_index do |photo, index| %>
+            <li>
+              <button type="button" data-action="gallery#select" data-gallery-index-param="<%= index %>"
+                      class="<%= index.zero? ? "ring-2 ring-primary" : "" %> block size-16 overflow-hidden rounded border border-border bg-surface-muted">
+                <%= photo_variant_tag(photo, variant: :card, alt: t(".photo_thumbnail", number: index + 1)) %>
+              </button>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+    </div>
+
+    <%# --- title + price ------------------------------------------------- %>
+    <div class="mt-5">
+      <h1 class="text-xl font-bold leading-7 sm:text-2xl"><%= listing.title %></h1>
+
+      <div class="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+        <span class="text-2xl font-bold"><%= money(listing.price_cents, listing.currency) %></span>
+        <% if listing.original_price_cents.present? && listing.original_price_cents > listing.price_cents %>
+          <del class="text-base text-muted"><%= money(listing.original_price_cents, listing.currency) %></del>
+          <span class="rounded bg-accent px-1.5 py-0.5 text-xs font-bold text-white">
+            -<%= listing.discount_percent %>%
+          </span>
+        <% end %>
+      </div>
+
+      <ul class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted">
+        <li class="inline-flex items-center gap-1.5">
+          <%= inline_icon :tag, classes: "size-4" %>
+          <%= condition_label(listing) %>
+        </li>
+        <li class="inline-flex items-center gap-1.5">
+          <%= inline_icon :map_pin, classes: "size-4" %>
+          <%= [ listing.city, listing.region ].compact_blank.join(", ").presence || t("countries.#{listing.country_code.downcase}") %>
+        </li>
+        <% if listing.published_at %>
+          <li class="inline-flex items-center gap-1.5">
+            <%= inline_icon :clock, classes: "size-4" %>
+            <%= t(".published_on", date: l(listing.published_at.to_date, format: :long)) %>
+          </li>
+        <% end %>
+        <% if listing.views_count.positive? %>
+          <li class="inline-flex items-center gap-1.5">
+            <%= inline_icon :eye, classes: "size-4" %>
+            <%= t(".views", count: listing.views_count) %>
+          </li>
+        <% end %>
+      </ul>
+
+      <% if listing.labels.any? %>
+        <ul class="mt-3 flex flex-wrap gap-1.5" aria-label="<%= t(".labels") %>">
+          <% listing.labels.each do |label| %>
+            <li class="rounded px-2 py-1 text-xs font-semibold text-white"
+                style="background-color: <%= label.color.presence || "#4f46e5" %>"><%= label.name %></li>
+          <% end %>
+        </ul>
+      <% end %>
+    </div>
+
+    <%# --- call to action ------------------------------------------------ %>
+    <div class="mt-5 flex flex-wrap gap-2">
+      <% if sold %>
+        <p class="rounded-md bg-surface-muted px-4 py-3 text-sm font-medium text-muted"><%= t(".sold_cta") %></p>
+      <% elsif Flipper.enabled?(:stripe_checkout) %>
+        <%= link_to t(".buy_now"), "#", class: "inline-flex min-h-11 items-center rounded-md bg-primary px-6 text-sm font-semibold text-white hover:bg-primary-hover" %>
+        <%= link_to t(".make_offer"), "#", class: "inline-flex min-h-11 items-center rounded-md border border-border px-4 text-sm font-semibold hover:border-primary hover:text-primary" %>
+      <% else %>
+        <%# Checkout opens with the payments phase; keep the affordance visible. %>
+        <button type="button" disabled title="<%= t(".checkout_soon") %>"
+                class="inline-flex min-h-11 cursor-not-allowed items-center rounded-md bg-primary/40 px-6 text-sm font-semibold text-white">
+          <%= t(".buy_now") %>
+        </button>
+        <button type="button" disabled title="<%= t(".offers_soon") %>"
+                class="inline-flex min-h-11 cursor-not-allowed items-center rounded-md border border-border px-4 text-sm font-semibold text-muted">
+          <%= t(".make_offer") %>
+        </button>
+      <% end %>
+    </div>
+
+    <% if !sold && listing.quantity > 1 %>
+      <p class="mt-2 text-xs text-muted"><%= t(".quantity", count: listing.quantity) %></p>
+    <% end %>
+
+    <%# --- buyer protection --------------------------------------------- %>
+    <div class="mt-4 flex gap-3 rounded-md border border-border bg-surface-muted p-3.5">
+      <span class="text-primary"><%= inline_icon :shield, classes: "size-6" %></span>
+      <div>
+        <h2 class="text-sm font-semibold"><%= t(".protection_title") %></h2>
+        <p class="mt-0.5 text-xs leading-5 text-muted"><%= t(".protection_text") %></p>
+      </div>
+    </div>
+
+    <%# --- description --------------------------------------------------- %>
+    <% if listing.description.present? %>
+      <section class="mt-6">
+        <h2 class="text-base font-semibold"><%= t(".description_title") %></h2>
+        <p class="mt-2 whitespace-pre-line text-sm leading-6 text-text"><%= listing.description %></p>
+      </section>
+    <% end %>
+
+    <%= render "listings/show_specs", listing: listing %>
+    <%= render "listings/show_shipping", listing: listing %>
+
+    <p class="mt-6 text-xs text-muted">
+      <%= link_to t(".report"), "#", class: "hover:text-primary hover:underline" %>
+    </p>
+  </div>
+
+  <%# --- seller card ---------------------------------------------------- %>
+  <aside class="order-first space-y-4 lg:order-none lg:sticky lg:top-20">
+    <div class="rounded-lg border border-border bg-surface p-4">
+      <% store = listing.store %>
+      <div class="flex items-start gap-3">
+        <% if store %>
+          <%= link_to store_path(store), class: "min-w-0 flex-1" do %>
+            <p class="flex items-center gap-1.5 truncate text-sm font-semibold hover:text-primary">
+              <span class="truncate"><%= store.name %></span>
+              <%= verified_badge(store, classes: "size-4") %>
+            </p>
+          <% end %>
+        <% else %>
+          <p class="min-w-0 flex-1 truncate text-sm font-semibold"><%= listing.user.display_name %></p>
+        <% end %>
+      </div>
+
+      <% if store && store.reviews_count.positive? %>
+        <p class="mt-2 flex items-center gap-1.5 text-xs text-muted">
+          <%= stars(store.rating_average) %>
+          <span class="tabular-nums"><%= number_with_precision(store.rating_average, precision: 1) %></span>
+          <span>· <%= t(".reviews_count", count: store.reviews_count) %></span>
+        </p>
+      <% end %>
+
+      <div class="mt-3 grid gap-2">
+        <% if store %>
+          <%= link_to t(".view_store"), store_path(store),
+                class: "inline-flex min-h-11 items-center justify-center rounded-md border border-border text-sm font-semibold hover:border-primary hover:text-primary" %>
+        <% end %>
+        <% if Flipper.enabled?(:messaging) %>
+          <%= link_to t(".message_seller"), "#",
+                class: "inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-hover" %>
+        <% else %>
+          <button type="button" disabled title="<%= t(".messaging_soon") %>"
+                  class="inline-flex min-h-11 cursor-not-allowed items-center justify-center rounded-md bg-primary/40 px-4 text-sm font-semibold text-white">
+            <%= t(".message_seller") %>
+          </button>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="rounded-lg border border-border p-4 text-xs leading-5 text-muted">
+      <h2 class="text-sm font-semibold text-text"><%= t(".safety_title") %></h2>
+      <ul class="mt-2 space-y-1.5">
+        <li><%= t(".safety_1") %></li>
+        <li><%= t(".safety_2") %></li>
+        <li><%= t(".safety_3") %></li>
+      </ul>
+    </div>
+  </aside>
+</div>
+
+<%# --- rails: similar + more from the same seller (cached 10 minutes) ------ %>
+<%= cache [ I18n.locale, "listing_rails", listing.category_id, listing.user_id, listing.price_cents, listing.id ],
+          expires_in: 10.minutes do %>
+  <% similar = Listing.with_card_data.similar_to(listing, limit: 8) %>
+  <% if similar.any? %>
+    <%= render "shared/card_rail",
+          title: t(".similar_title"),
+          listings: similar,
+          href: category_path(category) %>
+  <% end %>
+
+  <% from_seller = Listing.with_card_data.from_seller_of(listing, limit: 8) %>
+  <% if from_seller.any? %>
+    <%= render "shared/card_rail",
+          title: t(".from_seller_title"),
+          listings: from_seller,
+          href: (listing.store ? store_path(listing.store, tab: "listings") : nil) %>
+  <% end %>
+<% end %>

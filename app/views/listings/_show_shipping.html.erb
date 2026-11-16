@@ -1,0 +1,44 @@
+<%# Shipping, collection and returns. Estimated delivery = 2-5 business days. %>
+<section class="mt-6 border-t border-border pt-4">
+  <h2 class="text-base font-semibold"><%= t("listings.show.shipping.title") %></h2>
+
+  <ul class="mt-2 space-y-2.5 text-sm leading-6">
+    <li class="flex gap-2.5">
+      <span class="mt-0.5 text-muted"><%= inline_icon :truck, classes: "size-5" %></span>
+      <div>
+        <% if !listing.shipping_available %>
+          <p class="font-medium"><%= t("listings.show.shipping.not_available") %></p>
+        <% elsif listing.free_shipping %>
+          <p class="font-medium"><%= t("listings.show.shipping.free") %></p>
+        <% else %>
+          <p class="font-medium">
+            <%= t("listings.show.shipping.cost", price: money(listing.shipping_price_cents, listing.currency)) %>
+          </p>
+        <% end %>
+        <% if listing.shipping_available %>
+          <p class="text-xs text-muted"><%= t("listings.show.shipping.estimate", window: estimated_delivery_label) %></p>
+        <% end %>
+      </div>
+    </li>
+
+    <% if listing.local_pickup %>
+      <li class="flex gap-2.5">
+        <span class="mt-0.5 text-muted"><%= inline_icon :box, classes: "size-5" %></span>
+        <div>
+          <p class="font-medium"><%= t("listings.show.shipping.pickup") %></p>
+          <% if listing.city.present? %>
+            <p class="text-xs text-muted"><%= t("listings.show.shipping.pickup_city", city: listing.city) %></p>
+          <% end %>
+        </div>
+      </li>
+    <% end %>
+
+    <li class="flex gap-2.5">
+      <span class="mt-0.5 text-muted"><%= inline_icon :returns, classes: "size-5" %></span>
+      <div>
+        <p class="font-medium"><%= t("listings.show.shipping.returns_title") %></p>
+        <p class="text-xs text-muted"><%= t("listings.show.shipping.returns_text") %></p>
+      </div>
+    </li>
+  </ul>
+</section>

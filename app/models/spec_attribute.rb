@@ -21,4 +21,16 @@ class SpecAttribute < ApplicationRecord
   def name
     names[I18n.locale.to_s].presence || names["en"].presence
   end
+
+  # Usable as a checkbox-list filter (options or true/false; free text and
+  # plain numbers are excluded).
+  def facet?
+    filterable? && (input_type_select? || input_type_multi_select? || input_type_boolean?)
+  end
+
+  # Cast a submitted filter value to the type stored in the listing `specs`
+  # jsonb so containment comparisons match (booleans are stored as JSON true/false).
+  def spec_json_scalar(value)
+    input_type_boolean? ? ActiveRecord::Type::Boolean.new.cast(value) : value.to_s
+  end
 end

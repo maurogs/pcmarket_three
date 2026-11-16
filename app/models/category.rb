@@ -30,17 +30,19 @@ class Category < ApplicationRecord
   end
 
   # Ids of this category plus all categories below it, in one recursive CTE.
+  # Memoised: the browse page asks for it several times (scope, facets, SEO copy).
   def self_and_descendant_ids
-    self.class.connection.select_values(
-      self.class.sanitize_sql_array([ <<~SQL, id ])
-        WITH RECURSIVE tree AS (
-          SELECT id FROM categories WHERE id = ?
-          UNION ALL
-          SELECT c.id FROM categories c JOIN tree t ON c.parent_id = t.id
-        )
-        SELECT id FROM tree
-      SQL
-    ).map(&:to_i)
+    @self_and_descendant_ids ||=
+      self.class.connection.select_values(
+        self.class.sanitize_sql_array([ <<~SQL, id ])
+          WITH RECURSIVE tree AS (
+            SELECT id FROM categories WHERE id = ?
+            UNION ALL
+            SELECT c.id FROM categories c JOIN tree t ON c.parent_id = t.id
+          )
+          SELECT id FROM tree
+        SQL
+      ).map(&:to_i)
   end
 
   # Own spec attributes plus those inherited from every ancestor category
@@ -55,28 +57,29 @@ class Category < ApplicationRecord
       existing = unique_by_spec[row.spec_attribute_id]
       unique_by_spec[row.spec_attribute_id] = row if existing.nil? || row.category_id == id
     end
-    SpecAttribute.where(id: unique_by_spec.keys).order(position: :asc, id: :asc).to_a
+    SpecAttribute.where(id: unique_by_spec.keys).includes(:spec_options).order(position: :asc, id: :asc).to_a
   end
 
   def leaf?
     children.empty?
   end
 
-  private
-
   # Ids of this category plus every ancestor, in one recursive CTE.
   def self_and_ancestor_ids
-    self.class.connection.select_values(
-      self.class.sanitize_sql_array([ <<~SQL, id ])
-        WITH RECURSIVE chain AS (
-          SELECT id, parent_id FROM categories WHERE id = ?
-          UNION ALL
-          SELECT c.id, c.parent_id FROM categories c JOIN chain ch ON c.id = ch.parent_id
-        )
-        SELECT id FROM chain
-      SQL
-    ).map(&:to_i)
+    @self_and_ancestor_ids ||=
+      self.class.connection.select_values(
+        self.class.sanitize_sql_array([ <<~SQL, id ])
+          WITH RECURSIVE chain AS (
+            SELECT id, parent_id FROM categories WHERE id = ?
+            UNION ALL
+            SELECT c.id, c.parent_id FROM categories c JOIN chain ch ON c.id = ch.parent_id
+          )
+          SELECT id FROM chain
+        SQL
+      ).map(&:to_i)
   end
+
+  private
 
   def translated(hash)
     locale = I18n.locale.to_s

@@ -11,7 +11,9 @@ module ActiveSupport
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
 
-    # Add more helper methods to be used all tests here...
+    # Fixture inserts bypass the listings_tsv trigger, so keyword search would
+    # see empty vectors without this.
+    setup { Listing.reindex_search_vectors! }
   end
 end
 

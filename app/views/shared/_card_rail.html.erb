@@ -1,0 +1,19 @@
+<%# Horizontal card carousel used by the home page and listing show page.
+    locals: title, listings, href (optional "view all" link) %>
+<% return if listings.empty? %>
+<section class="mt-10">
+  <header class="mb-3 flex items-baseline justify-between gap-3">
+    <h2 class="text-lg font-bold tracking-tight"><%= title %></h2>
+    <% if local_assigns[:href] %>
+      <%= link_to t(".view_all"), href, class: "shrink-0 text-sm font-semibold text-primary hover:underline" %>
+    <% end %>
+  </header>
+
+  <ul class="scroll-snap-row -mx-4 flex gap-3 overflow-x-auto px-4 pb-3 sm:mx-0 sm:px-0">
+    <% listings.each do |listing| %>
+      <li class="w-40 shrink-0 snap-start sm:w-48">
+        <%= render "shared/listing_card", listing: listing, compact: true %>
+      </li>
+    <% end %>
+  </ul>
+</section>

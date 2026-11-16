@@ -15,3 +15,7 @@ require seed_dir.join("support/seed_loader.rb").to_s
   spec_attributes
   labels_seller_tags
 ].each { |name| load seed_dir.join("#{name}.rb") }
+
+# Development-only catalogue so the browse pages have something to show.
+# The loader itself is a no-op outside development and test.
+load seed_dir.join("sample_listings.rb")

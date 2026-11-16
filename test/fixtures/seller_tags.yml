@@ -1,0 +1,11 @@
+watercooled:
+  slug: watercooled
+  names:
+    en: Watercooled
+    es: Refrigeración líquida
+
+silent_build:
+  slug: silent-build
+  names:
+    en: Silent build
+    es: Montaje silencioso

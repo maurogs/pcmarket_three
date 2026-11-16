@@ -1,0 +1,37 @@
+<%# Hero: headline, big search, primary CTAs and the trust chips. %>
+<section class="rounded-xl border border-border bg-surface-muted px-5 py-12 text-center sm:px-8 sm:py-16">
+  <h1 class="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-text sm:text-4xl lg:text-5xl">
+    <%= t(".title") %>
+  </h1>
+  <p class="mx-auto mt-4 max-w-xl text-base text-muted">
+    <%= t(".subtitle") %>
+  </p>
+
+  <%= form_with url: listings_path, method: :get, class: "mx-auto mt-7 flex max-w-xl gap-2" do %>
+    <label class="sr-only" for="hero_q"><%= t(".search_label") %></label>
+    <input type="search" id="hero_q" name="q" autocomplete="off"
+           placeholder="<%= t("nav.search_placeholder") %>"
+           class="h-12 min-w-0 flex-1 rounded-md border border-border bg-surface px-3.5 text-sm text-text placeholder:text-muted focus:border-primary focus:outline-none">
+    <button type="submit"
+            class="inline-flex h-12 min-w-28 items-center justify-center rounded-md bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-hover">
+      <%= t("nav.search_submit") %>
+    </button>
+  <% end %>
+
+  <div class="mt-5 flex flex-wrap items-center justify-center gap-3">
+    <%# Listing forms arrive in Phase 3; keep the sell path visible. %>
+    <%= link_to t(".cta_primary"), "#", title: t(".cta_soon"),
+          class: "inline-flex min-h-11 items-center rounded-md bg-accent px-5 text-sm font-semibold text-white hover:bg-accent-hover" %>
+    <%= link_to t(".cta_secondary"), listings_path,
+          class: "inline-flex min-h-11 items-center rounded-md border border-border bg-surface px-5 text-sm font-semibold hover:border-primary hover:text-primary" %>
+  </div>
+
+  <ul class="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-muted">
+    <% [ [ :shield, t(".trust_buyer") ], [ :truck, t(".trust_shipping") ], [ :returns, t(".trust_returns") ] ].each do |icon, label| %>
+      <li class="inline-flex items-center gap-1.5">
+        <%= inline_icon icon, classes: "size-4 text-primary" %>
+        <%= label %>
+      </li>
+    <% end %>
+  </ul>
+</section>

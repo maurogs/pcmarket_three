@@ -1,0 +1,20 @@
+<%# Overview & specifications: translated attribute names, values rendered with
+    their translated option labels. Collapsed on mobile, open from sm up. %>
+<% pairs = sorted_spec_pairs(listing) %>
+<% if pairs.any? %>
+  <details class="mt-6 border-t border-border pt-4" <%= "open" unless listing.description.present? %>>
+    <summary class="group flex min-h-11 cursor-pointer items-center justify-between gap-3 text-base font-semibold">
+      <h2><%= t("listings.show.specs.title") %></h2>
+      <%= inline_icon :chevron_down, classes: "size-5 text-muted transition group-open:rotate-180" %>
+    </summary>
+
+    <dl class="mt-2 grid gap-x-8 sm:grid-cols-2">
+      <% pairs.each do |key, value| %>
+        <div class="flex items-baseline justify-between gap-4 border-b border-border py-2 text-sm">
+          <dt class="text-muted"><%= spec_attribute_label(key) %></dt>
+          <dd class="text-right font-medium"><%= spec_value_text(key, value) %></dd>
+        </div>
+      <% end %>
+    </dl>
+  </details>
+<% end %>

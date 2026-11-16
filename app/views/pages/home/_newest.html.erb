@@ -1,0 +1,19 @@
+<%# Newest listings as a proper grid (the section with the most items). %>
+<% cache [ I18n.locale, "home/newest", Listing.maximum(:updated_at) ], expires_in: 10.minutes do %>
+  <% listings = Listing.published.with_card_data.recent.limit(12).to_a %>
+  <% if listings.any? %>
+    <section class="mt-10">
+      <header class="mb-3 flex items-baseline justify-between gap-3">
+        <h2 class="text-lg font-bold tracking-tight"><%= t(".title") %></h2>
+        <%= link_to t(".view_all"), listings_path(sort: "newest"),
+              class: "shrink-0 text-sm font-semibold text-primary hover:underline" %>
+      </header>
+
+      <ul class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 md:gap-4">
+        <% listings.each do |listing| %>
+          <li><%= render "shared/listing_card", listing: listing %></li>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
+<% end %>
