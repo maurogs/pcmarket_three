@@ -139,7 +139,7 @@ class Listing < ApplicationRecord
   # store/user/labels/category rendered on the card. Use on every relation that
   # renders cards.
   scope :with_card_data, -> {
-    with_attached_photos.includes(:store, :user, :labels, :category, photos_attachments: :blob)
+    with_attached_photos.includes(:store, :user, :labels, :category, :seller_tags, photos_attachments: :blob)
   }
 
   # Listings favorited within the window, most saved first.

@@ -43,7 +43,8 @@ module Admin
     end
 
     def self.latest_signups(limit: 8)
-      User.order(created_at: :desc, id: :desc).limit(limit)
+      # display_name on each row reads the store — preload it.
+      User.order(created_at: :desc, id: :desc).includes(:store).limit(limit)
     end
 
     def initialize(days:)

@@ -24,7 +24,7 @@
           <tr>
             <td class="font-medium"><%= seller_tag.name %></td>
             <td class="font-mono text-xs"><%= seller_tag.slug %></td>
-            <td class="text-muted"><%= seller_tag.listings.size %></td>
+            <td class="text-muted"><%= seller_tag.listings_count %></td>
             <td class="whitespace-nowrap text-right">
               <%= link_to t(".actions.edit"), edit_admin_seller_tag_path(seller_tag), class: "btn-secondary" %>
               <%= button_to t(".actions.destroy"), admin_seller_tag_path(seller_tag), method: :delete,

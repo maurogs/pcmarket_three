@@ -74,9 +74,49 @@ class Category < ApplicationRecord
 
   # Own spec attributes plus those inherited from every ancestor category
   # (one recursive CTE walking up the parent chain).
+  # Memoised: validate_specs and the spec pickers call it repeatedly per instance.
   def all_spec_attributes
-    spec_attribute_rows
-      .then { |rows| SpecAttribute.where(id: rows.keys).includes(:spec_options).order(position: :asc, id: :asc).to_a }
+    @all_spec_attributes ||=
+      spec_attribute_rows
+        .then { |rows| SpecAttribute.where(id: rows.keys).includes(:spec_options).order(position: :asc, id: :asc).to_a }
+  end
+
+  # Batched #all_spec_attributes for an already-loaded set of categories:
+  # chains, join rows and attributes each resolve in ONE query for the whole
+  # set and the result is memoised per instance (the preload shares one
+  # Category instance per id, so listing collections repeat instances).
+  # Used by the sell API index, which serialises every listing's category.
+  def self.warm_spec_attributes!(categories)
+    pending = categories.reject { |category| category.instance_variable_defined?(:@all_spec_attributes) }
+    return if pending.empty?
+
+    chains = connection.select_all(
+      sanitize_sql_array([ <<~SQL, pending.map(&:id) ])
+        WITH RECURSIVE chain AS (
+          SELECT id AS root_id, id, parent_id FROM categories WHERE id IN (?)
+          UNION ALL
+          SELECT ch.root_id, c.id, c.parent_id FROM categories c JOIN chain ch ON c.id = ch.parent_id
+        )
+        SELECT root_id, id FROM chain
+      SQL
+    )
+    ancestor_ids_by_root =
+      chains.each_with_object(Hash.new { |hash, key| hash[key] = [] }) { |row, map| map[row["root_id"]] << row["id"] }
+
+    rows = CategorySpecAttribute.where(category_id: ancestor_ids_by_root.values.flatten.uniq)
+                                .left_joins(:spec_attribute).preload(:spec_attribute)
+    attribute_ids_by_root = ancestor_ids_by_root.transform_values do |ancestor_ids|
+      ancestor_set = Set.new(ancestor_ids)
+      rows.filter { |row| ancestor_set.include?(row.category_id) }.map(&:spec_attribute_id).uniq
+    end
+
+    needed = attribute_ids_by_root.values.flatten.uniq
+    attributes = SpecAttribute.where(id: needed).includes(:spec_options).order(position: :asc, id: :asc).to_a
+    pending.each do |category|
+      ids = attribute_ids_by_root[category.id]
+      category.instance_variable_set(:@all_spec_attributes, attributes.select { |attribute| ids.include?(attribute.id) })
+      category.instance_variable_set(:@self_and_ancestor_ids, ancestor_ids_by_root[category.id])
+    end
   end
 
   # spec_attribute_id => required flag for every attribute usable in this
@@ -120,7 +160,8 @@ class Category < ApplicationRecord
     @spec_attribute_rows ||= begin
       rows = CategorySpecAttribute
         .where(category_id: self_and_ancestor_ids)
-        .joins(:spec_attribute)
+        .left_joins(:spec_attribute)
+        .preload(:spec_attribute)
         .order("spec_attributes.position ASC, category_spec_attributes.category_id ASC")
       unique_by_spec = {}
       rows.each do |row|

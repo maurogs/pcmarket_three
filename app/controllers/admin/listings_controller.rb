@@ -16,7 +16,12 @@ module Admin
       @scope = Admin::ListingFilter.call(params)
 
       respond_to do |format|
-        format.html { @pagy, @listings = pagy(@scope, limit: PER_PAGE) }
+        # Photo thumbs, seller display and category names on every row of the
+        # 50-row table: preload them all (user: :store feeds display_name).
+        format.html do
+          scope = @scope.includes(user: :store, store: [], category: [], photos_attachments: :blob)
+          @pagy, @listings = pagy(scope, limit: PER_PAGE)
+        end
         format.csv do
           send_data Listings::CsvExport.build(@scope),
                     filename: "pcmarket-listings-#{Date.current}.csv",

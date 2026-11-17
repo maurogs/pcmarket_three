@@ -30,10 +30,15 @@ module Users
     # Only publicly visible listings need pulling down; archive! raises
     # InvalidTransition elsewhere, so the relation picks the safe sources.
     def archive_listings
-      user.listings.where(status: [ :approved ]).find_each do |listing|
-        listing.archive!
-      rescue Listing::InvalidTransition
-        nil
+      # Pause the N+1 scan: the state machine must run per listing (callbacks
+      # and validations each record goes through), which is intentional for a
+      # rare admin action — batching the archive itself would skip them.
+      NPlusOnePause.call do
+        user.listings.where(status: [ :approved ]).find_each do |listing|
+          listing.archive!
+        rescue Listing::InvalidTransition
+          nil
+        end
       end
     end
   end

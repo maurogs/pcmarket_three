@@ -71,7 +71,11 @@ class Notification < ApplicationRecord
   # Real-time badge: replace the header bell fragment on the user's personal
   # [user, :notifications] stream (subscribed in the layout header).
   def bust_unread_cache_and_broadcast
-    Notification.clear_unread_cache(user)
+    # Bump a warm counter instead of deleting it: a transition creates one
+    # notification per party per request, and each create's broadcast render
+    # below re-reads the badge — deleting the key would re-COUNT per create
+    # (N+1). With a cold cache the badge fetch counts exactly once.
+    Rails.cache.increment("users/#{user.id}/unread_notifications", 1, initial: nil)
     Turbo::StreamsChannel.broadcast_replace_to(
       [ user, :notifications ], target: "notifications-badge",
       partial: "shared/notifications_badge", locals: { user: user }

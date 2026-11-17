@@ -57,4 +57,8 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
+
+  # Phase 8c: every N+1 query detected in a test fails it (each test opens its
+  # own Prosopite scan in test/test_helper.rb).
+  config.after_initialize { Prosopite.raise = true }
 end

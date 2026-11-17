@@ -16,6 +16,7 @@ module Sell
 
     def new
       @listing = current_user.listings.new(quantity: 1, shipping_available: true, condition: "used_good")
+      preload_seller_tags(@listing)
       assign_category_state
     end
 
@@ -27,6 +28,7 @@ module Sell
         notice = result.submitted? ? t(".submitted") : t(".draft_saved")
         redirect_to edit_sell_listing_path(@listing), notice: notice
       else
+        preload_seller_tags(@listing)
         assign_category_state(form_params)
         render :new, status: :unprocessable_entity
       end
@@ -50,6 +52,7 @@ module Sell
         end
         redirect_to edit_sell_listing_path(@listing), notice: notice
       else
+        preload_seller_tags(@listing)
         assign_category_state(form_params)
         render :edit, status: :unprocessable_entity
       end
@@ -72,6 +75,15 @@ module Sell
 
     def set_listing
       @listing = current_user.listings.friendly.find(params[:id])
+      preload_seller_tags(@listing)
+    end
+
+    # _form.html.erb checks @listing.seller_tags.include?(tag) once per tag:
+    # seed the association from a single SellerTag query so the checkbox loop
+    # never fires one EXISTS per tag.
+    def preload_seller_tags(listing)
+      selected = listing.seller_tag_ids
+      listing.association(:seller_tags).target = SellerTag.all.select { |tag| selected.include?(tag.id) }
     end
 
     # Status changes are driven by the dedicated POST resources

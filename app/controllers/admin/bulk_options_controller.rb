@@ -10,13 +10,15 @@ module Admin
     def create
       lines = params.dig(:bulk_option, :values).to_s.split(/[\r\n]+/).map(&:strip).reject(&:empty?)
       position = (@spec_attribute.spec_options.maximum(:position) || 0) + 1
+      # One query for the current option values instead of an EXISTS per line.
+      taken = @spec_attribute.spec_options.pluck(:value).to_set
 
       created = []
       skipped = []
       ActiveRecord::Base.transaction do
         lines.uniq.each do |line|
           value = line.parameterize
-          if value.blank? || @spec_attribute.spec_options.exists?(value: value)
+          if value.blank? || taken.include?(value)
             skipped << line
             next
           end
@@ -24,6 +26,7 @@ module Admin
           option = @spec_attribute.spec_options.new(value: value, position: position)
           option.assign_translations(:names, { I18n.default_locale.to_s => line })
           if option.save
+            taken << value
             created << option
             position += 1
           else

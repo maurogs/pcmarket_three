@@ -43,7 +43,7 @@ module Admin
         meta_description_fields(errors, values)
 
         if errors.empty?
-          values.each { |key, value| Setting.set(key, value) }
+          Setting.set_many(values)
           Result.new(errors: {})
         else
           Result.new(errors: errors)

@@ -29,6 +29,33 @@ module ActiveSupport
   end
 end
 
+# Prosopite N+1 scan (Prosopite.raise = true in the test env, see
+# config/environments/test.rb). Only integration/controller tests scan, and
+# only around the HTTP request itself, so fixture and setup queries are never
+# scanned. In Rails 8.1 get/post/patch/delete delegate to the integration
+# session, and the method behind them is ActionDispatch::Integration::Session
+# #process, so the scan wraps that (prepend: Session defines process directly,
+# a class-reopen + super would recurse).
+module ProsopiteIntegrationScan
+  def process(...)
+    Prosopite.scan(prosopite_scan_context) { super }
+  end
+end
+
+class ActionDispatch::Integration::Session
+  prepend ProsopiteIntegrationScan
+  attr_accessor :prosopite_scan_context
+end
+
+class ActionDispatch::IntegrationTest
+  setup { integration_session.prosopite_scan_context = "#{self.class}##{name}" }
+
+  # reset! (testing multiple sessions) replaces the session; carry the label over.
+  def create_session(app)
+    super.tap { |session| session.prosopite_scan_context = "#{self.class}##{name}" }
+  end
+end
+
 # All routes live under an optional /(:locale) segment. Integration test URL
 # helpers merge this into url_options, so every helper-built path is /en/...
 # and positional segment args (e.g. password_path(token)) bind to the right

@@ -11,7 +11,8 @@ module Admin
 
     def index
       @scope = Admin::UserFilter.call(params)
-      @pagy, @users = pagy(@scope, limit: PER_PAGE)
+      # display_name reads the store for every row of the table.
+      @pagy, @users = pagy(@scope.includes(:store), limit: PER_PAGE)
     end
 
     def show

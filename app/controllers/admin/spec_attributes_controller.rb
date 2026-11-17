@@ -9,7 +9,8 @@ module Admin
     before_action :set_spec_attribute, only: %i[edit update destroy]
 
     def index
-      @spec_attributes = SpecAttribute.ordered.includes(:spec_options)
+      # The table prints the option count and the attached categories per row.
+      @spec_attributes = SpecAttribute.ordered.includes(:spec_options, :categories)
     end
 
     def new

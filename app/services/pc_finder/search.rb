@@ -172,7 +172,9 @@ class PcFinder::Search
     end
 
     def with_card_includes(scope)
+      # Exactly the card payload ListingSearch uses (browse/search results
+      # render the same partials; seller_tags is only needed by the API).
       scope.with_attached_photos
-           .includes(:store, :user, :category, :labels, :seller_tags, photos_attachments: :blob)
+           .includes(:store, :user, :category, :labels, photos_attachments: :blob)
     end
 end

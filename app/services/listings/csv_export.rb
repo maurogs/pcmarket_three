@@ -27,7 +27,9 @@ module Listings
     end
 
     def to_csv
-      relation = scope.select(PHOTOS_COUNT_SQL)
+      # find_each batches the rows, but row() reads user/store/category per
+      # listing: preload them so every batch loads each association once.
+      relation = scope.select(PHOTOS_COUNT_SQL).includes(:user, :store, :category)
       out = +""
       out << csv_line(HEADERS)
       relation.find_each(batch_size: 100) do |listing|

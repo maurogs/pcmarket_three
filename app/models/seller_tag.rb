@@ -8,6 +8,11 @@ class SellerTag < ApplicationRecord
   validates :slug, presence: true, uniqueness: true
   validates :names, presence: true
 
+  # Listing counts per tag in one GROUP BY (the admin index table).
+  scope :with_listing_counts, -> {
+    left_joins(:listing_tags).group(:id).select("seller_tags.*, COUNT(listing_tags.id) AS listings_count")
+  }
+
   def name
     names[I18n.locale.to_s].presence || names["en"].presence
   end

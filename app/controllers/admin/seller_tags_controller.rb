@@ -6,7 +6,7 @@ module Admin
     before_action :set_seller_tag, only: %i[edit update destroy]
 
     def index
-      @seller_tags = SellerTag.order(:slug)
+      @seller_tags = SellerTag.with_listing_counts.order(:slug)
     end
 
     def new

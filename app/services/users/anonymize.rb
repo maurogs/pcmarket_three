@@ -75,11 +75,15 @@ module Users
     # Listings leave the catalogue (drafts included); sold ones keep their
     # order history link.
     def archive_listings
-      user.listings.where.not(status: %w[archived sold]).find_each do |listing|
-        begin
-          listing.archive!
-        rescue Listing::InvalidTransition
-          nil
+      # Pause the N+1 scan: per-listing archive! (callbacks + validations) is
+      # intentional for a rare GDPR erasure; the transitions cannot batch.
+      NPlusOnePause.call do
+        user.listings.where.not(status: %w[archived sold]).find_each do |listing|
+          begin
+            listing.archive!
+          rescue Listing::InvalidTransition
+            nil
+          end
         end
       end
     end

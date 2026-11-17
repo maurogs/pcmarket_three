@@ -1771,3 +1771,44 @@ app/helpers/application_helper.rb; app/assets/tailwind/application.css;
 app/javascript/controllers/{theme,menu}_controller.js;
 test/{test_helper.rb,fixtures/users.yml,models/user_test.rb,controllers/pages_controller_test.rb};
 script/lint_locale_keys.rb.
+
+## 2026-11-17 — Phase 8c step B: N+1 fixes (Prosopite scans HTTP requests in integration tests)
+
+**What changed**
+
+- New `NPlusOnePause` concern helper (app/models/concerns/n_plus_one_pause.rb):
+  `Prosopite.pause { }` guarded by `defined?(Prosopite)`.
+- Pauses (justified per-record work, not view N+1s): `Users::Ban#archive_listings`
+  and `Users::Anonymize#archive_listings` (state-machine transitions per listing are
+  intentional for rare admin/GDPR actions); `PcFindersController#load_game_picks`
+  cache-miss block (bounded cold rebuild, one Search per game, ≤ once per 10 min/country).
+- Preloading instead of pausing everywhere else: admin users index + dashboard
+  latest_signups `includes(:store)` (User#display_name); admin listings index
+  `includes(user: :store, store: [], category: [], photos_attachments: :blob)`;
+  `Listings::CsvExport` `includes(:user, :store, :category)` with find_each;
+  admin spec_attributes index `includes(:spec_options, :categories)`;
+  `SellerTag.with_listing_counts` (GROUP BY) for the admin tags index;
+  `Sell::ListingsController#preload_seller_tags` (form checkbox loop);
+  `Listing.with_card_data` gained `:seller_tags` (API `_listing_full` partial);
+  `Admin::BulkOptionsController` one `pluck(:value)` set instead of EXISTS per line.
+- `Category#all_spec_attributes` memoised per instance; `spec_attribute_rows`
+  `left_joins + preload(:spec_attribute)`; new `Category.warm_spec_attributes!`
+  batches chains/rows/attributes in one query each for loaded sets (sell API index
+  jbuilder) — memoisation holds because belongs_to preload shares instances.
+- `PcFindersController#show`: pick ids cached in `Rails.cache` keyed by
+  [country, Listing.maximum(:updated_at)], listings loaded once with `with_card_data`;
+  `PcFinder::Search#with_card_includes` aligned with ListingSearch's card includes.
+- `Setting.set_many` (one SELECT for the form's keys) used by `Admin::Settings::Update`.
+- `Notification#bust_unread_cache_and_broadcast`: increments the warm badge counter
+  (`Rails.cache.increment ..., initial: nil`) instead of deleting it — deleting made
+  every multi-recipient transition re-COUNT inside each broadcast's badge render.
+
+**Why**: Prosopite (dev + test, `Prosopite.raise = true`) flagged 36 N+1 sites; the
+goal of step B is 0 errors with the scanner raising.
+
+**Files touched**: app/models/{category,listing,notification,seller_tag,setting}.rb;
+app/models/concerns/n_plus_one_pause.rb; app/services/users/{ban,anonymize}.rb;
+app/services/admin/{dashboard_stats,settings}.rb; app/services/listings/csv_export.rb;
+app/services/pc_finder/search.rb; app/controllers/{pc_finders,sell/listings}_controller.rb;
+app/controllers/admin/{users,listings,seller_tags,spec_attributes,bulk_options}_controller.rb;
+app/views/{admin/seller_tags/index.html.erb,api/v1/sell/listings/index.json.jbuilder}.

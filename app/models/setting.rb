@@ -70,6 +70,19 @@ class Setting < ApplicationRecord
     setting
   end
 
+  # Bulk write for the settings form: one SELECT for every key up front,
+  # then the same per-key save/cache semantics as .set.
+  def self.set_many(values)
+    rows = where(key: values.keys).index_by(&:key)
+    values.map do |key, value|
+      setting = rows[key.to_s] || new(key: key.to_s)
+      setting.value = value
+      setting.save!
+      setting.clear_cache
+      setting
+    end
+  end
+
   # Nil defaults mean "unset until an admin provides a value" (settings.value
   # is NOT NULL), so they are documented in DEFAULTS but never written.
   def self.seed_defaults!
