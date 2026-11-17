@@ -140,6 +140,7 @@ class Admin::SettingsControllerTest < ActionDispatch::IntegrationTest
         announcement_enabled: "0",
         announcement_text: {},
         maintenance_mode: "0",
+        search_engine_indexing: "1",
         social_links: {},
         default_meta_description: {}
       }

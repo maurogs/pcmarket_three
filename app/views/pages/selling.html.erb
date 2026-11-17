@@ -1,4 +1,4 @@
-<% content_for :title, t(".title") %>
+<% set_meta(title: t(".title"), description: t(".lede")) %>
 <% commissions_on = Flipper.enabled?(:commissions) %>
 <% commission_percent = Setting.get("commission_percent").to_s %>
 

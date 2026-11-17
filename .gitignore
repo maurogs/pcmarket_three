@@ -30,6 +30,9 @@
 
 /public/assets
 
+# Generated sitemaps (bin/rails sitemap:refresh / SitemapRefreshJob).
+/public/sitemaps
+
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 

@@ -1537,7 +1537,48 @@ pt:
   disputes:
     create:
       opened: Disputa aberta. A nossa equipa contactá-lo-á.
+  seo:
+    default_description: 'PCMarket — mercado de hardware de PC novo e usado:
+      placas de vídeo, processadores, portáteis e muito mais.'
+    home:
+      title: Mercado de componentes de PC
+      description: 'Compre e venda hardware de PC novo e usado no PCMarket:
+        placas de vídeo, processadores, placas-mãe, portáteis e periféricos de
+        vendedores verificados em toda a Espanha.'
+    search:
+      query_description: 'Resultados de pesquisa por "%{query}" no PCMarket:
+        componentes de PC correspondentes à venda.'
+    trust:
+      description: 'Como o PCMarket protege compradores e vendedores: pagamento
+        em custódia, moderação de anúncios, lojas verificadas e garantias de
+        compra.'
+    pc_finder:
+      results_description: 'PCs gaming escolhidos pelo quiz PC Finder do
+        PCMarket: filtre por jogos, resolução, FPS e orçamento.'
+    store:
+      description: '%{store} no PCMarket: veja os componentes da loja,
+        consulte a avaliação e contacte o vendedor.'
+    legal:
+      description: 'Informação legal do PCMarket para utilizadores: condições,
+        privacidade e política de cookies para compradores e vendedores.'
   errors:
+    search_label: Pesquisar no PCMarket
+    search_placeholder: Pesquisar placas de vídeo, CPUs…
+    search:
+      home: Voltar ao início
+      browse: Ver todos os anúncios
+    not_found:
+      title: Página não encontrada
+      lede: A página que procura não existe, foi renomeada ou está disponível
+        noutro endereço.
+    unprocessable:
+      title: O pedido não pôde ser processado
+      lede: Algo no formulário ou na ligação seguida é inválido. Comece de novo
+        a partir de uma página nova.
+    internal_server_error:
+      title: Ocorreu um erro
+      lede: Encontrámos um erro inesperado ao carregar esta página. Tente de
+        novo daqui a pouco.
     messages:
       invalid_postal_code: não é um código postal válido (5 dígitos)
       province_unknown: não é uma província reconhecida
@@ -2786,6 +2827,11 @@ pt:
         maintenance_mode: Modo de manutenção
         maintenance_hint: Quando ativo, o site público mostra um aviso 503; os administradores
           continuam a navegar
+        group_seo: Motores de busca
+        search_engine_indexing: Permitir que os motores de busca indexem este site
+        search_engine_indexing_hint: Quando desligado, o robots.txt bloqueia o
+          site inteiro e cada página pública é servida com noindex — usar em
+          pré-produção
         commission_hint: Percentagem cobrada a cada vendedor (0-20)
         min_offer_hint: Percentagem mínima do preço para aceitar uma oferta
         announcement_enabled: Mostrar o anúncio

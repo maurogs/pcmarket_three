@@ -22,4 +22,7 @@ production:
   saved_search_digest:
     class: SavedSearchDigestJob
     schedule: hourly
+  refresh_sitemap:
+    class: SitemapRefreshJob
+    schedule: at 3am every day
 

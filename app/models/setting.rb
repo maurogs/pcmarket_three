@@ -10,7 +10,10 @@ class Setting < ApplicationRecord
     "featured_price_cents" => 0,
     "min_offer_percent" => 50,
     "support_email" => "soporte@pcmarket.example",
-    "min_public_stat" => 50
+    "min_public_stat" => 50,
+    # Phase 8a: robots.txt / indexing switch. Only production indexes by
+    # default; staging copies stay out of search engines.
+    "search_engine_indexing" => Rails.env.production?
   }.freeze
 
   # Phase 7b: the company identity shown on legal pages, the footer and the
@@ -70,6 +73,12 @@ class Setting < ApplicationRecord
   # trade_name defaults to site_name when the admin left it blank.
   def self.trade_name
     get("trade_name").to_s.presence || get("site_name", "").to_s
+  end
+
+  # Indexing switch (Phase 8a): robots.txt and the Seo concern consult this.
+  # Unset means "yes in production, no everywhere else".
+  def self.search_engine_indexing?
+    get("search_engine_indexing", Rails.env.production?) == true
   end
 
   # Values for the legal-page placeholders ({{legal_name}}, {{tax_id}}, …)

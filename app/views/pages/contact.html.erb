@@ -1,4 +1,4 @@
-<% content_for :title, t(".title") %>
+<% set_meta(title: t(".title"), description: t(".lede")) %>
 <% support_email = Setting.get("support_email").to_s %>
 <% support_phone = Setting.get("support_phone").to_s %>
 <% prefill_name = authenticated? ? [current_user.first_name, current_user.last_name].compact.join(" ") : "" %>

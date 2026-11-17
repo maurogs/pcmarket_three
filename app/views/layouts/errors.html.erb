@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="<%= locale %>">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="robots" content="noindex, follow">
+    <%= display_meta_tags site: site_name, reverse: true, separator: " | " %>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="min-h-screen bg-surface text-text antialiased">
+    <%= render "layouts/header" %>
+
+    <main class="mx-auto w-full max-w-6xl px-4 py-6">
+      <%= yield %>
+    </main>
+
+    <%= render "layouts/footer" %>
+  </body>
+</html>

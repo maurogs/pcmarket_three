@@ -1,4 +1,4 @@
-<% content_for :title, t("legal_pages.slugs.#{@page.slug}") %>
+<% set_meta(title: t("legal_pages.slugs.#{@page.slug}"), description: t("seo.legal.description")) %>
 
 <div class="mx-auto max-w-5xl">
   <header>

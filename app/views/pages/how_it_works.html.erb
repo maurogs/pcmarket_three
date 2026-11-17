@@ -1,4 +1,4 @@
-<% content_for :title, t(".title") %>
+<% set_meta(title: t(".title"), description: t(".lede")) %>
 <% escrow = Flipper.enabled?(:stripe_checkout) %>
 
 <div class="mx-auto max-w-3xl">

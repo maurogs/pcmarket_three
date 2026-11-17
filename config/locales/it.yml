@@ -1538,7 +1538,48 @@ it:
   disputes:
     create:
       opened: Controversia aperta. Il nostro team ti contatterà.
+  seo:
+    default_description: 'PCMarket — marketplace di hardware PC nuovo e usato:
+      schede video, processori, portatili e altro.'
+    home:
+      title: Marketplace di componenti PC
+      description: 'Compra e vendi hardware PC nuovo e usato su PCMarket: schede
+        video, processori, schede madri, portatili e periferiche da venditori
+        verificati in tutta la Spagna.'
+    search:
+      query_description: 'Risultati della ricerca per «%{query}» su PCMarket:
+        componenti PC corrispondenti in vendita.'
+    trust:
+      description: 'Come PCMarket protegge acquirenti e venditori: pagamento in
+        escrow, moderazione degli annunci, negozi verificati e garanzie per
+        l''acquirente.'
+    pc_finder:
+      results_description: 'PC gaming selezionati dal quiz PC Finder di PCMarket:
+        filtra per giochi, risoluzione, FPS e budget.'
+    store:
+      description: '%{store} su PCMarket: sfoglia i componenti del negozio,
+        controlla la valutazione e contatta il venditore.'
+    legal:
+      description: 'Informazioni legali PCMarket per gli utenti: condizioni,
+        privacy e cookie policy per acquirenti e venditori.'
   errors:
+    search_label: Cerca su PCMarket
+    search_placeholder: Cerca schede video, CPU…
+    search:
+      home: Torna alla home
+      browse: Sfoglia tutti gli annunci
+    not_found:
+      title: Pagina non trovata
+      lede: La pagina che cerchi non esiste, è stata rinominata o è disponibile
+        a un altro indirizzo.
+    unprocessable:
+      title: La richiesta non può essere elaborata
+      lede: Qualcosa nel modulo o nel link seguito non è valido. Riparti da una
+        pagina nuova.
+    internal_server_error:
+      title: Qualcosa è andato storto
+      lede: Si è verificato un errore inatteso durante il caricamento della
+        pagina. Riprova tra qualche momento.
     messages:
       invalid_postal_code: non è un CAP valido (5 cifre)
       province_unknown: non è una provincia riconosciuta
@@ -2791,6 +2832,11 @@ it:
         maintenance_mode: Modalità manutenzione
         maintenance_hint: Se attivo, il sito pubblico mostra un avviso 503; gli amministratori
           possono navigare
+        group_seo: Motori di ricerca
+        search_engine_indexing: Consenti l'indicizzazione del sito da parte dei motori
+        search_engine_indexing_hint: Se disattivato, robots.txt blocca l'intero
+          sito e ogni pagina pubblica viene servita con noindex — usato in
+          preproduzione
         commission_hint: Percentuale applicata a ogni venditore (0-20)
         min_offer_hint: Percentuale minima del prezzo per accettare un'offerta
         announcement_enabled: Mostra annuncio

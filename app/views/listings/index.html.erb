@@ -1,7 +1,10 @@
 <%# Shared browse/search results page (also rendered by CategoriesController). %>
 <% category = @result.filters[:category] %>
-<% set_meta_tags(title: category ? category.name : (@result.filters[:q].presence || t(".title_all")),
-                 description: category ? category.seo_description : t(".meta_description")) %>
+<% browse_noindex = @result.filters[:q].present? || seo_filtered_browse_count(@result, category_from_path: controller.controller_name == "categories") > 2 || @result.total_count.zero? %>
+<% set_meta(title: category ? category.name : (@result.filters[:q].presence || t(".title_all")),
+            description: (category ? category.seo_description : nil) ||
+                         (@result.filters[:q].present? ? t("seo.search.query_description", query: @result.filters[:q]) : t(".meta_description")),
+            noindex: browse_noindex) %>
 
 <% if category %>
   <nav aria-label="<%= t(".breadcrumb") %>" class="mb-3 flex flex-wrap items-center gap-1 text-xs text-muted">
@@ -67,4 +70,13 @@
       </ul>
     <% end %>
   </section>
+<% end %>
+
+<%# Structured data for category pages: breadcrumb + the first 24 results. %>
+<% if category && @result.pagy.page == 1 %>
+  <%= json_ld_tag(
+        breadcrumb_json_ld([[t(".breadcrumb_home"), root_url]] +
+                           breadcrumb_categories(category).map { |crumb| [crumb.name, category_url(crumb)] }),
+        item_list_json_ld(@result.records)
+      ) %>
 <% end %>

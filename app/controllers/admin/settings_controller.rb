@@ -33,7 +33,7 @@ module Admin
         :min_public_stat, :blog_url,
         :legal_name, :trade_name, :tax_id, :registered_address,
         :mercantile_registry_data, :contact_email, :dpo_email, :phone,
-        :announcement_enabled, :maintenance_mode,
+        :announcement_enabled, :maintenance_mode, :search_engine_indexing,
         announcement_text: I18n.available_locales.map(&:to_s),
         social_links: Admin::Settings::SOCIAL_SITES,
         default_meta_description: I18n.available_locales.map(&:to_s)
@@ -63,6 +63,7 @@ module Admin
         "announcement_enabled" => announcement["enabled"] == true,
         "announcement_text" => announcement["text"] || {},
         "maintenance_mode" => Setting.get("maintenance_mode", false) == true,
+        "search_engine_indexing" => Setting.search_engine_indexing?,
         "social_links" => Setting.get("social_links", {}) || {},
         "default_meta_description" => Setting.get("default_meta_description", {}) || {}
       }
@@ -72,7 +73,7 @@ module Admin
       %w[site_name support_email support_phone commission_percent featured_price_cents
          featured_days min_offer_percent min_public_stat blog_url legal_name trade_name
          tax_id registered_address mercantile_registry_data contact_email dpo_email phone
-         announcement maintenance_mode social_links default_meta_description]
+         announcement maintenance_mode search_engine_indexing social_links default_meta_description]
     end
   end
 end

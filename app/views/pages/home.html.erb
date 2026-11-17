@@ -1,4 +1,6 @@
 <%# Home page: cached sections, each hidden when it has no content. %>
+<% set_meta(title: t("seo.home.title"), description: t("seo.home.description")) %>
+<%= json_ld_tag(organization_json_ld, web_site_json_ld) %>
 <%= render "pages/home/hero" %>
 <%= render "pages/home/categories" %>
 <%= render "pages/home/deals" %>

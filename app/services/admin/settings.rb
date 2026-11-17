@@ -38,6 +38,7 @@ module Admin
         legal_identity_fields(errors, values)
         announcement_fields(errors, values)
         boolean_field(errors, values, "maintenance_mode")
+        boolean_field(errors, values, "search_engine_indexing")
         social_fields(errors, values)
         meta_description_fields(errors, values)
 
@@ -139,7 +140,9 @@ module Admin
       end
 
       def boolean_field(errors, values, key)
-        values[key] = ActiveModel::Type::Boolean.new.cast(raw(key))
+        # A missing checkbox param means "off": an unchecked Rails checkbox
+        # posts "0", and a key absent from the form posts nothing at all.
+        values[key] = ActiveModel::Type::Boolean.new.cast(raw(key)) == true
       end
 
       def translated_text_field(errors, values, key, max:)

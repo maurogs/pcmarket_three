@@ -2,6 +2,9 @@
     "Load more" chains nested Turbo frames (one per page) so later pages
     append instead of replacing. %>
 <% filters = @results.filters %>
+<% finder_filters = [filters[:games].any?, filters[:resolution].present?, filters[:fps].present?, filters[:budget].present?, filters[:tags].any?] %>
+<% set_meta(title: t(".title"), description: t("seo.pc_finder.results_description"),
+            noindex: finder_filters.count(true) > 2 || @results.total_count.zero?) %>
 <% next_page = @results.pagy.page < @results.pagy.pages ? @results.pagy.page + 1 : nil %>
 <% page = @results.pagy.page %>
 

@@ -52,8 +52,10 @@ class ListingsControllerTest < ActionDispatch::IntegrationTest
       assert_response :success
     end
     # Overhead is fixed (count + one facet query + eager loads): three cards
-    # must not cost meaningfully more queries than one.
-    assert_operator three, :<=, 24, "expected bounded queries, got #{three}"
+    # must not cost meaningfully more queries than one. The budget carries
+    # one extra read since Phase 8a: the layout's site_name Setting for the
+    # meta tags (a cache miss on a cold Rails.cache).
+    assert_operator three, :<=, 25, "expected bounded queries, got #{three}"
     assert_operator three - one, :<=, 4, "query count scales with cards (3 cards=#{three}, 1 card=#{one})"
   end
 

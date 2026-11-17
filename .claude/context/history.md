@@ -1,5 +1,107 @@
 # History
 
+## 2026-11-17 — Phase 8a: SEO (meta tags + JSON-LD, robots.txt, sitemap, localized error pages, brand assets)
+
+**What changed**
+
+- **Meta pipeline (meta-tags gem)**: `SeoHelper#set_meta` (single entry
+  point called from every public view) renders title, description,
+  canonical, Open Graph (incl. `product:price` extensions + og:locale +
+  `locale:alternate`), Twitter summary_large_image and hreflang. Canonical
+  strips `TRACKING_PARAMS` always; filterable pages (listings index,
+  categories, pc-finder results, stores) keep their filter/facet params
+  via `seo_kept_params` (`sort` and `page=1` dropped). `es` is the
+  unprefixed form, so each page has ONE canonical; hreflang alternates
+  (6 locales + `x-default`) render only on indexable pages. Application
+  layout: `display_meta_tags site: site_name, reverse: true, separator:
+  " | "` + theme-color meta + favicon set + `site.webmanifest` link.
+- **Robots directives**: `Seo` concern (all controllers): `NOINDEX_AREAS`
+  (admin/sell/account/carts/checkouts/auth/messaging/offers/orders/…) →
+  `robots: noindex,follow` meta in a before_action + `X-Robots-Tag:
+  noindex, follow` header in an after_action. Dynamic rules evaluated in
+  views: free-text `q` search, **>2 facet groups**
+  (`ListingsHelper#seo_filtered_browse_count`; price band counts once,
+  path category doesn't count) and zero-result pages are noindexed. The
+  pre-8a hardcoded `<meta name="robots" content="noindex">` + manual
+  `<title>` in the admin layout were replaced by `display_meta_tags
+  site: false, title: content_for fallback` so the concern is the single
+  robots source everywhere.
+- **JSON-LD**: `JsonLdHelper` builders — Organization (+sameAs from
+  `social_links`) + WebSite (+SearchAction) on home, BreadcrumbList on
+  listing/category/store pages, Product+Offer (availability `SoldOut` for
+  sold listings, `itemCondition` mapped from the condition enum, Brand
+  from brand-ish specs, seller Organization/Person), store Organization
+  with AggregateRating ONLY when `reviews_count > 0`, ItemList (first 24,
+  page 1 only) on categories, FAQPage on `/pages/help`. `json_ld_tag`
+  renders `tag.script(payload.to_json.html_safe, type:
+  "application/ld+json")` — ActiveSupport's `to_json` escapes `<`/`>`/`&`
+  as `\u003c`…, which already prevents `</script>` breakout; a follow-up
+  `json_escape`/`gsub`/ERB pass would corrupt the JSON and must NOT be
+  added. Regression test: listing titled `…</script><script>alert(1)
+  </script>…` → the ld+json block parses with `JSON.parse`, round-trips
+  the title, and contains no literal `</script>`.
+- **robots.txt**: static `public/robots.txt` deleted; route `get
+  "robots.txt" => "robots#show"` (outside the locale scope — must be at
+  the domain root). `RobotsController` renders disallow-all UNLESS
+  `Rails.env.production? && Setting.search_engine_indexing?`; then
+  `Disallow: /*/<area>` + `/<area>` pairs for every private area + the
+  `Sitemap:` line. New Setting `search_engine_indexing` (DEFAULTS: true
+  only in production) — seeded settings are now **7**.
+- **Sitemap**: `config/sitemap.rb` (sitemap_generator): every URL added
+  in all six locale variants, each carrying `xhtml:link` hreflang
+  alternates back-linked across locales; home/trust/pc-finder/content
+  pages/active categories/published listings/stores with
+  listings/legal slugs. Output to `public/sitemaps/` (gitignored; dev
+  run: 769 URLs). `SitemapRefreshJob` + daily 3am recurring entry. Tests
+  run the Interpreter against a temp dir via `SITEMAP_PUBLIC_PATH` +
+  `APP_URL` and assert published-listing URLs (draft/pending/sold
+  absent) and alternates. GOTCHA: sitemap_generator renders xhtml:link
+  attributes in fixed `rel`/`href`/`hreflang` order — assert in that
+  order.
+- **Localized error pages**: static `public/404|422|500.html` deleted;
+  `config.exceptions_app = self.routes` in test + production; routes
+  `/404`, `/422`, `/500` → `ErrorsController` (recovers the locale from
+  `action_dispatch.original_path`, `layout "errors"`, noindex). GOTCHA:
+  in the test env DebugExceptions still wins for UNROUTED urls — assert
+  localized content through `/404` with an explicit
+  `env: { "action_dispatch.original_path" => "/fr/…" }`.
+- **Listing slug history**: FriendlyId `:history` on Listing +
+  `ListingsController#show` 301 when `listing.slug != params[:id]`
+  (same pattern as stores).
+- **Brand assets**: `public/favicon.ico`, `icon-32/192/512.png`,
+  `apple-touch-icon.png`, `og-default.png` (default `og:image` via
+  `SeoHelper::DEFAULT_OG_IMAGE`), `site.webmanifest`; application,
+  account, sell, admin and errors layouts link the set.
+
+**Tests added**
+
+`test/integration/seo_test.rb` (meta title/description/canonical per page
+type, hreflang=7 incl. x-default, noindex rules incl. >2 filters,
+cart/checkout/account/sell/admin/auth meta + X-Robots-Tag, JSON-LD
+@types per page incl. SoldOut + FAQPage, hostile-title JSON-LD safety);
+`test/integration/robots_txt_test.rb` (both setting states);
+`test/integration/sitemap_test.rb`; `test/integration/error_pages_test.rb`
+(404/422/500 statuses + localized 404); `test/integration/listing_slug_
+history_test.rb`. Fixed from the first pass: sitemap alternate assertions
+now expect the gem's attribute order; seeds test expects 7 settings.
+
+**Files touched**
+
+`app/controllers/concerns/seo.rb` (new), `app/helpers/seo_helper.rb`
+(new), `app/helpers/json_ld_helper.rb` (new), `app/controllers/robots_
+controller.rb` + `app/controllers/errors_controller.rb` (new),
+`app/views/errors/*` + `app/views/layouts/errors.html.erb` (new),
+`app/jobs/sitemap_refresh_job.rb` (new), `config/sitemap.rb` (new),
+`app/views/layouts/{application,admin,account,sell}.html.erb`,
+`app/views/pages/*`, `app/views/listings/{index,show}.html.erb` and the
+other public views (`set_meta` + JSON-LD), `app/controllers/
+{listings,application}_controller.rb`, `app/helpers/listings_helper.rb`,
+`app/models/{listing,setting}.rb`, `app/services/admin/settings.rb` +
+`app/views/admin/settings/edit.html.erb` (indexing toggle),
+`config/{routes,recurring}.yml`, `config/environments/{test,production}.rb`,
+`.gitignore`, `config/locales/*.yml`, the five new/updated test files
+above.
+
 ## 2026-11-17 — Phase 7f: legal corpus for Italy (IT/it) and Portugal (PT/pt) + FR returns presumption fix
 
 **What changed**

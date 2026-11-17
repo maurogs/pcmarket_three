@@ -1,5 +1,9 @@
 <% store = @store %>
-<% set_meta_tags(title: store.name, description: store.description.to_s.truncate(160)) %>
+<% set_meta(title: store.name, description: store.description.to_s.presence || t("seo.store.description", store: store.name)) %>
+<%= json_ld_tag(
+      breadcrumb_json_ld([[t("listings.index.breadcrumb_home"), root_url], [store.name, nil]]),
+      store_json_ld(store)
+    ) %>
 
 <header class="overflow-hidden rounded-lg border border-border bg-surface">
   <div class="h-28 bg-gradient-to-r from-primary/80 via-primary to-accent sm:h-36">

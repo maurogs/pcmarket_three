@@ -1536,7 +1536,48 @@ es:
   disputes:
     create:
       opened: Controversia abierta. Nuestro equipo te contactará.
+  seo:
+    default_description: 'PCMarket — mercado de componentes de PC nuevos y de
+      segunda mano: tarjetas gráficas, procesadores, portátiles y más.'
+    home:
+      title: Mercado de componentes de PC
+      description: 'Compra y vende componentes de PC nuevos y de segunda mano en
+        PCMarket: tarjetas gráficas, procesadores, placas base, portátiles y
+        periféricos de vendedores verificados en toda España.'
+    search:
+      query_description: 'Resultados de búsqueda de «%{query}» en PCMarket:
+        componentes de PC compatibles a la venta.'
+    trust:
+      description: 'Cómo protege PCMarket a compradores y vendedores: pago
+        retenido, moderación de anuncios, tiendas verificadas y garantías para
+        el comprador.'
+    pc_finder:
+      results_description: 'Ordenadores gaming seleccionados por el test de
+        PC Finder de PCMarket: filtra por juegos, resolución, FPS y presupuesto.'
+    store:
+      description: '%{store} en PCMarket: consulta los componentes de PC de la
+        tienda, su valoración y contacta con el vendedor.'
+    legal:
+      description: 'Información legal de PCMarket para usuarios: condiciones,
+        privacidad y política de cookies para compradores y vendedores.'
   errors:
+    search_label: Buscar en PCMarket
+    search_placeholder: Busca tarjetas gráficas, procesadores…
+    search:
+      home: Volver al inicio
+      browse: Ver todos los anuncios
+    not_found:
+      title: Página no encontrada
+      lede: La página que buscas no existe, se ha renombrado o está disponible
+        en otra dirección.
+    unprocessable:
+      title: No se ha podido procesar la petición
+      lede: Algo del formulario o del enlace que has seguido no es válido.
+        Vuelve a intentarlo desde una página nueva.
+    internal_server_error:
+      title: Ha ocurrido un error
+      lede: Hemos encontrado un error inesperado al cargar esta página.
+        Vuévelo a intentar en un momento.
     messages:
       invalid_postal_code: no es un código postal válido (5 dígitos)
       province_unknown: no es una provincia reconocida
@@ -2784,6 +2825,11 @@ es:
         maintenance_mode: Modo mantenimiento
         maintenance_hint: Mientras esté activo, la web pública muestra un aviso 503;
           los administradores siguen pudiendo navegar
+        group_seo: Buscadores
+        search_engine_indexing: Permitir indexar esta web en los buscadores
+        search_engine_indexing_hint: Si está desactivado, robots.txt bloquea toda
+          la web y cada página pública se sirve con noindex — úsalo en
+          preproducción
         commission_hint: Porcentaje cobrado a cada vendedor (0-20)
         min_offer_hint: Porcentaje mínimo sobre el precio para aceptar una oferta
         announcement_enabled: Mostrar el anuncio

@@ -2,7 +2,26 @@
 <% sold = listing.sold? %>
 <% on_vacation = !sold && listing.store&.vacation_mode? %>
 <% category = listing.category %>
-<% set_meta_tags(title: listing.title, description: listing.description.to_s.truncate(160)) %>
+<% first_photo = listing.photos.first %>
+<% set_meta(title: listing.title,
+            description: "#{listing.title} — #{money(listing.price_cents, listing.currency)}, " \
+                         "#{Listing.human_attribute_name("condition/#{listing.condition}")}. #{listing.description}"
+                           .truncate(155),
+            og_type: "product",
+            og_image: (variant_url(first_photo, :gallery) if first_photo),
+            product: listing) %>
+<% if first_photo %>
+  <% content_for :head do %>
+    <%# LCP: the first gallery image is the biggest element on the page. %>
+    <link rel="preload" as="image" href="<%= variant_url(first_photo, :gallery) %>" fetchpriority="high">
+  <% end %>
+<% end %>
+<%= json_ld_tag(
+      breadcrumb_json_ld([[t(".breadcrumb_home"), root_url]] +
+                         breadcrumb_categories(category).map { |crumb| [crumb.name, category_url(crumb)] } +
+                         [[listing.title, nil]]),
+      product_json_ld(listing)
+    ) %>
 
 <nav aria-label="<%= t(".breadcrumb") %>" class="mb-3 flex flex-wrap items-center gap-1 text-xs text-muted">
   <%= link_to t(".breadcrumb_home"), root_path, class: "hover:text-primary" %>
@@ -41,7 +60,12 @@
         <% if photos.any? %>
           <% photos.each_with_index do |photo, index| %>
             <div class="<%= "hidden" unless index.zero? %> absolute inset-0" data-gallery-target="slide">
-              <%= photo_variant_tag(photo, variant: :gallery, alt: listing.title) %>
+              <% if index.zero? %>
+                <%= photo_variant_tag(photo, variant: :gallery, alt: listing.title,
+                                      loading: "eager", fetchpriority: "high") %>
+              <% else %>
+                <%= photo_variant_tag(photo, variant: :gallery, alt: listing.title) %>
+              <% end %>
             </div>
           <% end %>
 

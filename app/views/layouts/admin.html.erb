@@ -3,14 +3,20 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title><%= content_for?(:title) ? yield(:title) : t(".title") %></title>
-    <meta name="robots" content="noindex">
+    <%# Title + robots go through the meta-tags pipeline: the Seo concern
+        has already set "noindex,follow" for the admin area (and the
+        matching X-Robots-Tag header), and admin views keep supplying
+        their page title via content_for(:title). %>
+    <%= display_meta_tags site: false,
+                          title: (content_for?(:title) ? yield(:title) : t(".title")) %>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+    <link rel="icon" href="/icon-32.png" type="image/png" sizes="32x32">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
 
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>

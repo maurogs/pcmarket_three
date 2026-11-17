@@ -22,7 +22,10 @@ class Listing < ApplicationRecord
 
   extend FriendlyId
 
-  friendly_id :slug_candidates, use: [ :slugged, :sequentially_slugged ]
+  # :history (Phase 8a): when a seller retitles a listing the old slug keeps
+  # resolving and ListingsController#show 301s to the new one — the same
+  # pattern Store uses after a rename.
+  friendly_id :slug_candidates, use: [ :slugged, :sequentially_slugged, :history ]
 
   enum :condition, {
     brand_new: 0, open_box: 1, used_like_new: 2, used_good: 3, for_parts: 4
@@ -361,6 +364,12 @@ class Listing < ApplicationRecord
 
   def slug_candidates
     [ :title, [ :title, :id ] ]
+  end
+
+  # Retitles mint a fresh slug; the previous one is kept in friendly_id_slugs
+  # so old links resolve (see the :history note above).
+  def should_generate_new_friendly_id?
+    title_changed? || super
   end
 
   # An empty {} is fine (accessories and games have no specs); only reject

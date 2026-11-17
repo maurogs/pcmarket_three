@@ -29,6 +29,9 @@ Rails.application.configure do
   # Render exception templates for rescuable exceptions and raise for other exceptions.
   config.action_dispatch.show_exceptions = :rescuable
 
+  # Same localized 404/422/500 pages as production (see config/routes.rb).
+  config.exceptions_app = self.routes
+
   # Disable request forgery protection in test environment.
   config.action_controller.allow_forgery_protection = false
 

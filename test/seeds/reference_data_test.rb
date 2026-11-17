@@ -31,7 +31,8 @@ class ReferenceDataSeedTest < ActiveSupport::TestCase
     # air-cooling, aio-cooling) already exist in the fixtures.
     assert_equal 21, created[:seller_tags]
     assert_equal 4, created[:countries], "fixtures ship ES + GB, seeds add FR DE IT PT"
-    assert_equal 6, created[:settings], "4 core + min_offer_percent (Phase 4a) + min_public_stat (Phase 7b)"
+    assert_equal 7, created[:settings],
+                 "4 core + min_offer_percent (Phase 4a) + min_public_stat (Phase 7b) + search_engine_indexing (Phase 8a)"
   end
 
   test "every seeded category, spec attribute and spec option carries all six locales" do

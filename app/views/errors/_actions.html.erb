@@ -1,0 +1,14 @@
+<div class="mt-8 flex flex-wrap gap-3">
+  <%= form_with url: listings_path, method: :get, role: "search", class: "flex w-full items-center gap-2 sm:w-auto sm:flex-1" do |form| %>
+    <%= form.label :q, t("errors.search_label"), class: "sr-only" %>
+    <%= form.search_field :q, required: true, placeholder: t("errors.search_placeholder"), class: "input" %>
+    <%= form.submit t("search.submit"), class: "btn-primary" %>
+  <% end %>
+</div>
+
+<div class="mt-4 flex flex-wrap gap-4 text-sm">
+  <%= link_to t("errors.search.home"), root_path, class: "font-medium text-primary hover:underline" %>
+  <%= link_to t("errors.search.browse"), listings_path, class: "font-medium text-primary hover:underline" %>
+  <%= link_to t("nav.trust"), trust_path, class: "font-medium text-primary hover:underline" %>
+  <%= link_to t("nav.help"), page_path(slug: "help"), class: "font-medium text-primary hover:underline" %>
+</div>

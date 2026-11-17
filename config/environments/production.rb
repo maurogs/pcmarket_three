@@ -12,6 +12,10 @@ Rails.application.configure do
   # Full error reports are disabled.
   config.consider_all_requests_local = false
 
+  # Localized error pages (Phase 8a): 404/422/500 are dispatched to
+  # ErrorsController through the routes instead of static public/*.html files.
+  config.exceptions_app = self.routes
+
   # Turn on fragment caching in view templates.
   config.action_controller.perform_caching = true
 

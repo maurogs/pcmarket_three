@@ -32,6 +32,12 @@ class ListingsController < ApplicationController
     raise ActiveRecord::RecordNotFound unless listing.approved? || listing.sold? ||
                                              listing.reserved? || owner_or_admin?(listing)
 
+    # Retitled listings: FriendlyId :history resolves the old slug, then we
+    # 301 to the canonical URL (same pattern as renamed stores).
+    if listing.slug != params[:id]
+      redirect_to listing_path(listing), status: :moved_permanently and return
+    end
+
     @listing = listing
   end
 

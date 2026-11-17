@@ -236,4 +236,21 @@ Rails.application.routes.draw do
   # Stripe webhook endpoint: no locale segment, no session, CSRF-skipped
   # (Stripe authenticates via the signed payload — see the controller).
   resources :stripe_webhooks, only: :create
+
+  # Non-resource exceptions to the locale scoping (legitimate: fixed,
+  # machine-readable paths that must live at the domain root):
+  #
+  # * robots.txt is served dynamically (see RobotsController) so the
+  #   rules follow the search_engine_indexing setting and the
+  #   environment; a static public/robots.txt would shadow the route,
+  #   which is why it was deleted.
+  get "robots.txt" => "robots#show"
+
+  # Localized error pages: config.exceptions_app = routes re-dispatches
+  # 404/422/500 to these paths (ShowExceptions rewrites PATH_INFO to the
+  # status code), and ErrorsController recovers the locale from the
+  # original request path.
+  get "/404" => "errors#not_found"
+  get "/422" => "errors#unprocessable"
+  get "/500" => "errors#internal_server_error"
 end

@@ -1,4 +1,5 @@
-<% content_for :title, t(".title") %>
+<% set_meta(title: t(".title"), description: t("seo.trust.description")) %>
+<%= json_ld_tag(faq_json_ld((1..6).map { |n| [t(".faq.q#{n}"), t(".faq.a#{n}")] })) %>
 <% escrow = Flipper.enabled?(:stripe_checkout) %>
 <% legal = LegalPage.deliverable_slugs(country_code: current_country_code, locale: I18n.locale.to_s) %>
 

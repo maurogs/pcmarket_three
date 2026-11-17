@@ -42,6 +42,22 @@ module ListingsHelper
     raw(pagy.series_nav)
   end
 
+  # Number of active facet "groups" on a browse/search result page (price
+  # band counts once; each facet type counts once). The page's own
+  # category context is not a filter when it comes from the URL path.
+  # Used by the SEO noindex rule: >2 filters = long-tail noise.
+  def seo_filtered_browse_count(result, category_from_path:)
+    filters = result.filters
+    count = 0
+    count += 1 if filters[:min_cents] || filters[:max_cents]
+    count += 1 if filters[:conditions].any?
+    count += 1 if filters[:specs].any?
+    count += 1 if filters[:labels].any?
+    count += 1 if filters[:tags].any?
+    count += 1 if !category_from_path && filters[:category]
+    count
+  end
+
   # Removable chips for every filter in play: [label, url-without-that-filter].
   def applied_filter_chips(result)
     filters = result.filters

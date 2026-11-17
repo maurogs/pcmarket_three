@@ -1,3 +1,9 @@
-<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="256" cy="256" r="256" fill="red"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="104" fill="#4f46e5"/>
+  <g fill="none" stroke="#ffffff" stroke-width="26" stroke-linejoin="round" stroke-linecap="round">
+    <rect x="112" y="112" width="288" height="208" rx="24"/>
+    <path d="M256 320v56"/>
+    <path d="M192 400h128"/>
+  </g>
+  <text x="256" y="246" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="116" font-weight="700" fill="#ffffff">$</text>
 </svg>

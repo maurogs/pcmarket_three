@@ -1542,7 +1542,47 @@ de:
   disputes:
     create:
       opened: Streitfall eröffnet. Unser Team kontaktiert dich.
+  seo:
+    default_description: 'PCMarket — Marktplatz für neue und gebrauchte
+      PC-Hardware: Grafikkarten, Prozessoren, Laptops und mehr.'
+    home:
+      title: PC-Komponenten-Marktplatz
+      description: 'Neue und gebrauchte PC-Hardware auf PCMarket kaufen und
+        verkaufen: Grafikkarten, Prozessoren, Mainboards, Laptops und Peripherie
+        von verifizierten Verkäufern in ganz Spanien.'
+    search:
+      query_description: 'Suchergebnisse für „%{query}“ auf PCMarket: passende
+        PC-Komponenten im Angebot.'
+    trust:
+      description: 'Wie PCMarket Käufer und Verkäufer schützt: treuhänderische
+        Zahlung, Angebots-Moderation, verifizierte Shops und Käuferschutz.'
+    pc_finder:
+      results_description: 'Gaming-PCs aus dem PC-Finder-Quiz von PCMarket:
+        filtern nach Spielen, Auflösung, FPS und Budget.'
+    store:
+      description: '%{store} auf PCMarket: die PC-Komponenten des Shops
+        durchsuchen, Bewertung ansehen und den Verkäufer kontaktieren.'
+    legal:
+      description: 'Rechtliche Informationen für PCMarket-Nutzer: Bedingungen,
+        Datenschutz und Cookie-Richtlinie für Käufer und Verkäufer.'
   errors:
+    search_label: PCMarket durchsuchen
+    search_placeholder: Grafikkarten, CPUs suchen…
+    search:
+      home: Zurück zur Startseite
+      browse: Alle Angebote durchsuchen
+    not_found:
+      title: Seite nicht gefunden
+      lede: Die gesuchte Seite existiert nicht, wurde umbenannt oder ist unter
+        einer anderen Adresse erreichbar.
+    unprocessable:
+      title: Die Anfrage konnte nicht verarbeitet werden
+      lede: Etwas am Formular oder am gefolgten Link ist ungültig. Beginnen Sie
+        neu auf einer frischen Seite.
+    internal_server_error:
+      title: Etwas ist schiefgelaufen
+      lede: Beim Laden dieser Seite ist ein unerwarteter Fehler aufgetreten.
+        Bitte versuchen Sie es in einem Moment erneut.
     messages:
       invalid_postal_code: ist keine gültige Postleitzahl (5 Ziffern)
       province_unknown: ist keine anerkannte Provinz
@@ -2801,6 +2841,11 @@ de:
         maintenance_mode: Wartungsmodus
         maintenance_hint: Ist er aktiv, zeigt die öffentliche Seite einen 503-Hinweis;
           Admins können weiter stöbern
+        group_seo: Suchmaschinen
+        search_engine_indexing: Suchmaschinen dürfen diese Seite indexieren
+        search_engine_indexing_hint: Ist die Option aus, sperrt robots.txt die
+          ganze Seite und jede öffentliche Seite liefert noindex — für Staging
+          nutzen
         commission_hint: Prozentsatz pro Verkäufer (0-20)
         min_offer_hint: Mindestprozentsatz des Preises für Angebotsannahme
         announcement_enabled: Banner anzeigen
