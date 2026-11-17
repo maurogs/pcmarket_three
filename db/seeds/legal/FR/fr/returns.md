@@ -34,7 +34,7 @@ Tout produit vendu par un professionnel bénéficie de la garantie légale de co
 - **Produits neufs :** la garantie dure **2 ans** à compter de la livraison.
 - **Produits d'occasion :** les parties peuvent la ramener à **12 mois** au moins.
 
-Les défauts de conformité apparaissant dans les **12 mois** suivant la livraison (biens neufs ou d'occasion) sont présumés exister au moment de celle-ci. Si le produit n'est pas conforme (inapte à l'usage attendu, absent des caractéristiques annoncées, etc.), vous pouvez exiger sa réparation ou son remplacement ; à défaut, une réduction du prix ou la résolution de la vente (retour et remboursement). Un particulier vendeur ne doit pas cette garantie légale : à son égard s'appliquent la protection de l'acheteur et les règles du Code civil ci-dessous.
+Conformément à l'article L. 217-7 du code de la consommation, les défauts de conformité apparaissant dans les **24 mois** suivant la livraison des biens neufs (**12 mois** pour les biens d'occasion) sont présumés exister au moment de celle-ci. Si le produit n'est pas conforme (inapte à l'usage attendu, absent des caractéristiques annoncées, etc.), vous pouvez exiger sa réparation ou son remplacement ; à défaut, une réduction du prix ou la résolution de la vente (retour et remboursement). Un particulier vendeur ne doit pas cette garantie légale : à son égard s'appliquent la protection de l'acheteur et les règles du Code civil ci-dessous.
 
 ## Garantie des vices cachés (articles 1641 et suivants du code civil)
 

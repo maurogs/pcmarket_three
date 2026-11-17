@@ -1,5 +1,79 @@
 # History
 
+## 2026-11-17 — Phase 7f: legal corpus for Italy (IT/it) and Portugal (PT/pt) + FR returns presumption fix
+
+**What changed**
+
+- `db/seeds/legal/FR/fr/returns.md` — corrected the presumption of
+  non-conformity sentence: 24 months for new goods and 12 months for
+  second-hand goods (C. conso art. L217-7), replacing the previous
+  blanket "12 months for all goods".
+- `db/seeds/legal/IT/it/` — eight Italian templates adapted to Italian +
+  EU law: legal_notice cites D.Lgs. 70/2003 art. 7 identification
+  ({{legal_name}}, {{registered_address}}, {{tax_id}}, Registro
+  Imprese/REA {{registry}}) with bracketed TODO markers for capitale
+  sociale and PEC; terms cover the intermediary role (artt. 16-17
+  D.Lgs. 70/2003 + DSA), 18+, ranking transparency via Reg. 2019/1150 +
+  DSA art. 27 + Codice del consumo art. 22 c. 4-bis, DSA arts. 16-17,
+  20-21, 23 duties, 0 % fees with 15-day notice, Italian law with the
+  foro del consumatore (art. 66-bis Codice del consumo); privacy cites
+  GDPR + D.Lgs. 196/2003 as amended by D.Lgs. 101/2018, DAC7 via
+  D.Lgs. 32/2023 reporting to the Agenzia delle Entrate, Garante
+  complaint (garanteprivacy.it); cookies cites art. 122 Codice privacy +
+  Garante guidelines of 10 June 2021 (no cookie wall, scroll is not
+  consent, consent re-ask no sooner than 6 months) with the shared
+  strictly-necessary cookie table; returns covers C2C (no recesso, arts.
+  1490 ff. c.c. hidden-defect route) vs B2C (14-day diritto di recesso,
+  artt. 52 ss. with modulo tipo; garanzia legale di conformità 2 anni,
+  artt. 128 ss. as amended by D.Lgs. 170/2021, reducible to min. 1 year
+  for used goods, 12-month presumption); buyer_protection, seller_terms
+  (traders: DSA art. 30, Codice del consumo arts. 46-49/52-59/128-130,
+  DAC7) and prohibited_items add Italian specifics (art. 474 c.p.
+  contraffazione, art. 648 c.p. ricettazione, legge 633/1941 artt.
+  171-bis ss., D.Lgs. 30/2005).
+- `db/seeds/legal/PT/pt/` — eight European-Portuguese templates:
+  legal_notice cites DL 7/2004 art. 10 ({{legal_name}}, {{tax_id}} as
+  NIPC, Conservatória do Registo Comercial {{registry}}) with a bracketed
+  TODO for capital social; terms cover intermediary (DL 7/2004 arts.
+  11-13 + DSA), ranking transparency, 18+, DSA complaints plus the
+  Lei 144/2015 RAL route with an `[entidade RAL a indicar — TODO]`
+  marker, the mandatory Livro de Reclamações Eletrónico
+  (livroreclamacoes.pt, DL 74/2017), 0 % fees with 15-day notice,
+  Portuguese law with the consumer's forum (art. 95.º-A CPC); privacy
+  cites RGPD + Lei 58/2019, DAC7 via DL 41/2023 reporting to the AT,
+  CNPD complaint (cnpd.pt); cookies cites Lei 41/2004 art. 5 (as
+  amended by Lei 46/2012) + CNPD guidance (no cookie wall) with the
+  shared cookie table; returns covers C2C (arts. 913 ss. CC route) vs
+  B2C (14-day livre resolução, DL 24/2014 art. 10 with the annex-I
+  formulário; garantia de conformidade 3 anos under DL 84/2021, used
+  goods reducible by agreement to min. 18 months, presumption kept
+  general "nos termos do DL 84/2021"); buyer_protection, seller_terms
+  (traders: DSA art. 30, DL 24/2014 duties, Livro de Reclamações,
+  DAC7) and prohibited_items (arts. 231-232 CP receptação/branqueamento,
+  art. 296 CP contra a propriedade industrial). No EU ODR platform is
+  mentioned in any text.
+- Structural contract held for both sets: `# Title` first line, italic
+  template note as first body line, 4+ `##` headings, only renderer-
+  resolvable {{placeholders}}; bracketed TODO markers for the
+  business-decision gaps (capitale sociale, PEC, entidade RAL, capital
+  social).
+
+**Why**
+
+Completes the launch legal corpus for the IT and PT countries (launch
+gate `Country#missing_legal_slugs` now empty for all six) and corrects a
+wrong French conformity-presumption period.
+
+**Files touched**: db/seeds/legal/FR/fr/returns.md;
+db/seeds/legal/IT/it/*.md (8); db/seeds/legal/PT/pt/*.md (8);
+.claude/context/history.md.
+
+**Verification**: `bin/rails db:seed` ×2 (idempotent); runner check —
+`missing_legal_slugs` empty for all 6 countries, LegalPage total 56
+(IT 8, PT 8); `bin/rails test test/seeds/legal_pages_seeds_test.rb` 8
+runs / 673 assertions / 0 failures; full `bin/rails test` 789 runs /
+12479 assertions / 0 failures; `bin/rubocop` 427 files, no offenses.
+
 ## 2026-11-18 — Phase 7e: legal corpus for France (FR/fr) and Germany (DE/de)
 
 **What changed**
