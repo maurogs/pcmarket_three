@@ -15,9 +15,10 @@
 #   SEED_RESET=1 bin/rails db:seed       # wipe demo records first
 #
 # Every demo user owns a fixed `*@demo.pcmarket.test` e-mail — the
-# idempotency marker: a second run only tops up listings to the target and
-# skips the social graph when demo favourites already exist. Refuses to run
-# in production unless ALLOW_DEMO_SEED=1.
+# idempotency marker: a second run tops listings up to the target and
+# re-runs every social-graph step, which each only create the rows still
+# missing to reach the GRAPH targets — so an interrupted run can simply be
+# run again. Refuses to run in production unless ALLOW_DEMO_SEED=1.
 #
 # This file defines DemoSeed without executing it; db/seeds.rb loads it and
 # calls DemoSeed.run! under the environment gate. Tests require it directly.
@@ -27,6 +28,26 @@ module DemoSeed
   LEGACY_DOMAIN = "pcmarket.test"
   PASSWORD = "DemoPassw0rd!"
   DEFAULT_COUNT = 300
+
+  # Top-up targets for the social/commerce graph: every step counts what the
+  # demo users already have and only creates the missing rows to reach these,
+  # so each step is independent and the whole graph section can be re-run
+  # after an interruption.
+  GRAPH = {
+    favorites_per_buyer: 6,
+    follows_total: 80,
+    follows_per_buyer: 2,
+    saved_searches: 15,
+    conversations: 25,
+    offers_per_state: 4,
+    cancelled_orders: 2,
+    message_notifications: 10,
+    open_reports: 3
+  }.freeze
+
+  # Lifecycle slots for the sold-listing orders (the old `i % 7` cycle written
+  # out): two orders parked per state, two walking all the way to completed.
+  ORDER_PLAN = [ :paid, :shipped, :delivered, :completed, :completed, :disputed, :refunded ] * 2
 
   PROVINCES = YAML.load_file(Rails.root.join("config/data/es_provinces.yml")).freeze
 
@@ -345,6 +366,7 @@ module DemoSeed
         finalize_listing(listing, attrs, admin)
         created += 1
         @counts["listings:#{attrs[:status]}"] += 1
+        puts format("  listings: %d/%d created", created, need) if (created % 25).zero?
       end
       unless skipped.empty?
         puts "Validation errors per category (fix the catalog, these listings were skipped):"
@@ -553,12 +575,17 @@ module DemoSeed
       nil
     end
     # --- social / commerce graph -------------------------------------------------
+    # Each step below is an independent top-up (see GRAPH): it counts what
+    # demo users already have, creates only the missing rows, and prints its
+    # progress — so a re-run after an interruption finishes the graph instead
+    # of skipping it (old behaviour) or duplicating it.
     def seed_social_graph(admin, buyers, sellers, stores, listings)
-      return puts("Social graph already present (demo favourites exist) — leaving it alone.") if Favorite.where(user: demo_users).exists?
-
       demo_listings = listings.to_a
       approved = demo_listings.select(&:approved?)
-      return if approved.empty?
+      if approved.empty?
+        puts "No approved demo listings — social graph skipped."
+        return
+      end
 
       seed_favorites(buyers, demo_listings)
       seed_follows(buyers, stores)
@@ -576,51 +603,88 @@ module DemoSeed
     end
 
     def seed_favorites(buyers, demo_listings)
+      added = 0
       buyers.each do |buyer|
-        pool = demo_listings.reject { |l| l.user_id == buyer.id }
-        pool.sample(rand(2..10), random: @rng).each do |listing|
+        owned = Favorite.where(user: buyer).pluck(:listing_id)
+        need = GRAPH[:favorites_per_buyer] - owned.size
+        next if need <= 0
+
+        pool = demo_listings.reject { |l| l.user_id == buyer.id || owned.include?(l.id) }
+        pool.sample(need, random: @rng).each do |listing|
           Favorite.create!(user: buyer, listing: listing, price_cents_at_save: listing.price_cents)
-          @counts["favorites"] += 1
+          added += 1
         end
       end
+      puts format("Favorites: %d added, %d total", added, Favorite.where(user: demo_users).count)
     end
 
     def seed_follows(buyers, stores)
-      return if stores.empty?
+      return puts("Follows: no demo stores — skipped.") if stores.empty?
 
-      buyers.sample(40, random: @rng).each do |buyer|
-        stores.sample(rand(1..3), random: @rng).each do |store|
-          next if store.user_id == buyer.id
+      per_buyer = Follow.where(follower: demo_users).group(:follower_id).count
+      need = GRAPH[:follows_total] - per_buyer.values.sum
+      buyers.shuffle(random: @rng).each do |buyer|
+        break if need <= 0
+
+        stores.shuffle(random: @rng).each do |store|
+          break if need <= 0 || per_buyer.fetch(buyer.id, 0) >= GRAPH[:follows_per_buyer]
+          next if store.user_id == buyer.id || Follow.exists?(follower: buyer, store: store)
 
           Follow.create!(follower: buyer, store: store)
+          per_buyer[buyer.id] = per_buyer.fetch(buyer.id, 0) + 1
+          need -= 1
           @counts["follows"] += 1
         end
       end
+      puts format("Follows: %d added, %d total", @counts["follows"], Follow.where(follower: demo_users).count)
     end
 
     def seed_saved_searches(buyers)
       names = [ "Gráficas RTX baratas", "PC gaming completo", "Portátil para estudiar", "Mandos retro", "Consola PS5", "Componentes para subir el PC" ]
-      buyers.sample(15, random: @rng).each_with_index do |buyer, i|
-        SavedSearch.create!(
-          user: buyer,
-          name: names[i % names.size],
-          query: [ "rtx", "gaming", "portatil", "retro", "ps5", "ryzen" ].sample(random: @rng),
-          filters: { "min_price" => [ 100, 200, 300 ].sample(random: @rng),
-                     "max_price" => [ 400, 800, 1500 ].sample(random: @rng),
-                     "condition" => %w[used_like_new used_good brand_new].sample(random: @rng) },
-          email_alerts: @rng.rand < 0.5
-        )
-        @counts["saved_searches"] += 1
+      added = 0
+      need = GRAPH[:saved_searches] - SavedSearch.where(user: demo_users).count
+      round = 0
+      while need > 0 && round < 3
+        before = need
+        buyers.shuffle(random: @rng).each do |buyer|
+          break if need <= 0
+          next if SavedSearch.where(user: buyer).count > round
+
+          index = SavedSearch.where(user: demo_users).count
+          SavedSearch.create!(
+            user: buyer,
+            name: names[index % names.size],
+            query: [ "rtx", "gaming", "portatil", "retro", "ps5", "ryzen" ].sample(random: @rng),
+            filters: { "min_price" => [ 100, 200, 300 ].sample(random: @rng),
+                       "max_price" => [ 400, 800, 1500 ].sample(random: @rng),
+                       "condition" => %w[used_like_new used_good brand_new].sample(random: @rng) },
+            email_alerts: @rng.rand < 0.5
+          )
+          need -= 1
+          added += 1
+          @counts["saved_searches"] += 1
+        end
+        break if need == before
+
+        round += 1
       end
+      puts format("Saved searches: %d added, %d total", added, SavedSearch.where(user: demo_users).count)
     end
 
     def seed_conversations(buyers, demo_listings)
-      conversations = []
-      demo_listings.select(&:approved?).sample(25, random: @rng).each do |listing|
+      conversations = Conversation.where(buyer: demo_users).order(:id).to_a
+      paired = conversations.map { |c| [ c.listing_id, c.buyer_id ] }
+      approved = demo_listings.select(&:approved?)
+      need = GRAPH[:conversations] - conversations.size
+      attempts = 0
+      while need > 0 && attempts < GRAPH[:conversations] * 4
+        attempts += 1
+        listing = approved.sample(random: @rng)
         buyer = buyers.reject { |b| b.id == listing.user_id }.sample(random: @rng)
-        next if buyer.nil? || Conversation.exists?(listing: listing, buyer: buyer)
+        next if buyer.nil? || paired.include?([ listing.id, buyer.id ])
 
         conversation = Conversation.create!(listing: listing, buyer: buyer, seller: listing.user)
+        paired << [ listing.id, buyer.id ]
         script = CONVERSATION_SCRIPTS[rand(CONVERSATION_SCRIPTS.size)]
         opened = rand(1..30).days.ago
         script.first(rand(2..script.size)).each_with_index do |line, i|
@@ -629,62 +693,85 @@ module DemoSeed
                           created_at: opened + (i * rand(10..300)).minutes)
         end
         conversations << conversation
+        need -= 1
         @counts["conversations"] += 1
+        puts format("  conversation %d/%d: %s", conversations.size, GRAPH[:conversations], listing.title.truncate(40))
       end
+      puts format("Conversations: %d added, %d total", @counts["conversations"], conversations.size)
       conversations
     end
 
     def seed_offers(buyers, demo_listings)
-      states = %w[pending accepted declined withdrawn expired]
-      demo_listings.select { |l| l.approved? && l.allow_offers? }.sample(20, random: @rng).each_with_index do |listing, i|
-        buyer = buyers.reject { |b| b.id == listing.user_id }.sample(random: @rng)
-        next if buyer.nil? || Offer.exists?(listing: listing, buyer: buyer)
+      pool = demo_listings.select { |l| l.approved? && l.allow_offers? }
+      blocked = Offer.where(buyer: demo_users).pluck(:listing_id).uniq
+      Offer.statuses.keys.each do |state|
+        need = GRAPH[:offers_per_state] - Offer.where(buyer: demo_users, status: state).count
+        added = 0
+        pool.shuffle(random: @rng).each do |listing|
+          break if need <= 0
+          next if blocked.include?(listing.id)
 
-        amount = (listing.price_cents * (0.7 + @rng.rand * 0.25)).round
-        offer = Offer.create!(listing: listing, buyer: buyer, amount_cents: amount,
-                              expires_at: rand(1..5).days.from_now,
-                              created_at: rand(2..20).days.ago)
-        case states[i % states.size]
-        when "accepted" then offer.accept!
-        when "declined" then offer.decline!
-        when "withdrawn" then offer.withdraw!
-        when "expired" then offer.expire!
+          buyer = buyers.reject { |b| b.id == listing.user_id }.sample(random: @rng)
+          next if buyer.nil?
+
+          amount = (listing.price_cents * (0.7 + @rng.rand * 0.25)).round
+          offer = Offer.create!(listing: listing, buyer: buyer, amount_cents: amount,
+                                expires_at: rand(1..5).days.from_now,
+                                created_at: rand(2..20).days.ago)
+          case state
+          when "accepted" then offer.accept!
+          when "declined" then offer.decline!
+          when "withdrawn" then offer.withdraw!
+          when "expired" then offer.expire!
+          end
+          blocked << listing.id
+          need -= 1
+          added += 1
+          @counts["offers:#{state}"] += 1
         end
-        @counts["offers:#{states[i % states.size]}"] += 1
+        puts format("Offers (%s): %d added, %d total", state, added,
+                    Offer.where(buyer: demo_users).where(status: state).count)
       end
     end
 
     # Orders walk the real state machine (pay!/ship!/...) and the timestamps
     # are backdated afterwards so conversations and dashboards look lived-in.
+    # Top-up: the ORDER_PLAN distribution is diffed against the demo orders
+    # already in the DB and sold listings that already have an order are left
+    # alone, so re-running only creates the missing lifecycle slots.
     def seed_orders(buyers, demo_listings)
-      orders = []
       sold = demo_listings.select(&:sold?)
-      approved_for_cancel = demo_listings.select { |l| l.approved? }
+      taken = OrderItem.where(listing_id: sold.map(&:id)).distinct.pluck(:listing_id)
+      pool = sold.reject { |l| taken.include?(l.id) }
 
-      sold.first(14).each_with_index do |listing, i|
+      existing = Order.where(buyer: demo_users).group(:status).count
+      plan = ORDER_PLAN.tally.flat_map do |state, target|
+        Array.new([ target - existing.fetch(state.to_s, 0), 0 ].max, state)
+      end
+      puts format("Orders: %d existing (%s), %d to create", existing.values.sum, existing.inspect, plan.size)
+      plan.each do |state|
+        listing = pool.shift
+        if listing.nil?
+          puts "  no sold listing left for the #{state} slot — skipping the rest"
+          break
+        end
+
         buyer = buyers.reject { |b| b.id == listing.user_id }.sample(random: @rng)
         next if buyer.nil?
 
         order = build_order(buyer, listing)
         next if order.nil?
 
-        placed = rand(10..80).days.ago
-        case i % 7
-        when 0 then order.pay!
-        when 1 then order.pay! && order.ship!(carrier: carrier, tracking_number: tracking)
-        when 2 then walk_to(order, :delivered)
-        when 3 then walk_to(order, :completed)
-        when 4 then walk_to(order, :completed)
-        when 5 then walk_to(order, :disputed)
-        when 6 then walk_to(order, :disputed) && order.refund!
-        end
-        backdate_order(order, placed)
-        orders << order
+        walk_order(order, state)
+        backdate_order(order, rand(10..80).days.ago)
         @counts["orders:#{order.status}"] += 1
+        puts format("  order %s: %s", order.status, listing.title.truncate(40))
       end
 
-      # A couple of abandoned checkouts: pending_payment, cancelled.
-      2.times do
+      # Abandoned checkouts: cancelled top-up (pending_payment -> pay! -> cancel!).
+      approved_for_cancel = demo_listings.select { |l| l.approved? && !taken.include?(l.id) }
+      need_cancel = [ GRAPH[:cancelled_orders] - existing.fetch("cancelled", 0), 0 ].max
+      need_cancel.times do
         listing = approved_for_cancel[rand(approved_for_cancel.size)]
         buyer = buyers.reject { |b| b.id == listing.user_id }.sample(random: @rng)
         next if buyer.nil?
@@ -695,10 +782,13 @@ module DemoSeed
         order.pay!
         order.cancel!
         backdate_order(order, rand(4..15).days.ago)
-        orders << order
+        taken << listing.id
         @counts["orders:cancelled"] += 1
+        puts format("  order cancelled: %s", listing.title.truncate(40))
       end
-      orders
+      puts format("Orders total: %d (%s)", Order.where(buyer: demo_users).count,
+                  Order.where(buyer: demo_users).group(:status).count.inspect)
+      Order.where(buyer: demo_users).includes(seller: :store).to_a
     end
 
     def build_order(buyer, listing)
@@ -716,12 +806,21 @@ module DemoSeed
       nil
     end
 
-    def walk_to(order, target)
+    # park the order in `state` (:paid, :shipped, :delivered, :completed,
+    # :disputed, :refunded) using only the real transitions.
+    def walk_order(order, state)
       order.pay!
+      return order if state == :paid
+
       order.ship!(carrier: carrier, tracking_number: tracking)
+      return order if state == :shipped
+
       order.mark_delivered!
-      order.complete! if target == :completed
-      order.open_dispute! if target == :disputed
+      case state
+      when :completed then order.complete!
+      when :disputed then order.open_dispute!
+      when :refunded then order.open_dispute! && order.refund!
+      end
       order
     end
 
@@ -752,8 +851,11 @@ module DemoSeed
       }
     end
 
+    # `orders` is the full demo order set (seed_orders returns what already
+    # existed too), so completed orders from a previous interrupted run get
+    # their reviews on the next pass; the exists? guard keeps re-runs clean.
     def seed_reviews(orders)
-      completed = orders.select(&:completed?).select { |o| o.seller.store.present? }
+      completed = orders.select { |o| o.completed? && o.seller.store.present? }
       completed.each do |order|
         next if @rng.rand < 0.4
         next if Review.exists?(order_id: order.id)
@@ -763,49 +865,85 @@ module DemoSeed
                        body: REVIEW_BLURBS[rand(REVIEW_BLURBS.size)])
         @counts["reviews"] += 1
       end
+      puts format("Reviews: %d added, %d total", @counts["reviews"], Review.where(reviewer: demo_users).count)
     end
 
     # The transition! methods do not fan out notifications (that happens in
     # the checkout/pay controllers), so mirror what a buyer would see.
+    # Idempotent: one notification per (user, kind, order) — the payload
+    # equality check doubles as the "already created" marker.
     def seed_order_notifications(orders)
       kind_by_status = {
         "paid" => "order_paid", "shipped" => "order_shipped", "delivered" => "order_delivered",
         "completed" => "order_completed", "cancelled" => "order_cancelled",
         "disputed" => "order_disputed", "refunded" => "order_refunded"
       }
+      added = 0
       orders.each do |order|
         kind = kind_by_status[order.status]
         next if kind.nil? || kind == "order_paid"
 
-        Notification.create!(user: order.buyer, kind: kind, payload: { "order_id" => order.id })
+        payload = { "order_id" => order.id }
+        next if Notification.exists?(user: order.buyer, kind: kind, payload: payload)
+
+        Notification.create!(user: order.buyer, kind: kind, payload: payload)
+        added += 1
         @counts["notifications"] += 1
       end
+      puts format("Order notifications: %d added", added)
     end
 
     def seed_message_notifications(conversations)
-      conversations.first(10).each do |conversation|
+      added = 0
+      conversations.sort_by(&:id).first(GRAPH[:message_notifications]).each do |conversation|
         last = conversation.messages.order(created_at: :desc).first
         next if last.nil?
 
         receiver = conversation.other_party(last.sender)
-        Notification.create!(user: receiver, kind: "new_message",
-                             payload: { "conversation_id" => conversation.id })
+        payload = { "conversation_id" => conversation.id }
+        next if Notification.exists?(user: receiver, kind: "new_message", payload: payload)
+
+        Notification.create!(user: receiver, kind: "new_message", payload: payload)
+        added += 1
         @counts["notifications"] += 1
       end
+      puts format("Message notifications: %d added", added)
     end
 
+    # Top-up: keep GRAPH[:open_reports] open demo reports; a report counts
+    # towards the target only while unresolved.
     def seed_reports(buyers, approved)
-      pool = approved.reject { |l| buyers.map(&:id).include?(l.user_id) }.uniq(&:id).sample(3, random: @rng)
+      open_count = Report.where(user: demo_users).open.count
+      need = GRAPH[:open_reports] - open_count
+      if need <= 0
+        puts "Reports: #{open_count} open — nothing to add"
+        return
+      end
+
+      pool = approved.reject { |l| buyers.map(&:id).include?(l.user_id) }.uniq(&:id).shuffle(random: @rng)
       reasons = Report.reasons.keys
-      pool.each_with_index do |listing, i|
-        Report.create!(listing: listing, user: buyers[i], reason: reasons[i % reasons.size],
-                       details: REPORT_DETAILS[i % REPORT_DETAILS.size],
+      added = 0
+      pool.each do |listing|
+        break if added >= need
+
+        index = open_count + added
+        buyer = buyers[index % buyers.size]
+        next if listing.user_id == buyer.id || Report.open.exists?(user: buyer, listing: listing)
+
+        Report.create!(listing: listing, user: buyer, reason: reasons[index % reasons.size],
+                       details: REPORT_DETAILS[index % REPORT_DETAILS.size],
                        created_at: rand(2..20).days.ago)
+        added += 1
         @counts["reports"] += 1
       end
+      puts format("Reports: %d added, %d open", added, Report.where(user: demo_users).open.count)
     end
 
+    # Keep exactly one closed report as the admin example — re-runs must not
+    # keep closing the remaining open ones away.
     def close_one_report(admin, approved)
+      return 0 if Report.where(resolved_by: admin).exists?
+
       report = Report.open.joins(:listing).merge(Listing.where(user: demo_users)).first
       return 0 if report.nil?
 
@@ -815,7 +953,10 @@ module DemoSeed
     end
 
     def seed_contact_messages
+      added = 0
       CONTACT_SUBJECTS.each do |subject|
+        next if ContactMessage.exists?(subject: subject) # subjects are fixed => this is the idempotency marker
+
         ContactMessage.create!(
           name: "#{Faker::Name.first_name} #{Faker::Name.last_name}",
           email: Faker::Internet.email(domain: DEMO_DOMAIN),
@@ -824,23 +965,47 @@ module DemoSeed
           locale: "es",
           created_at: rand(1..45).days.ago
         )
+        added += 1
         @counts["contact_messages"] += 1
       end
+      puts format("Contact messages: %d added, %d total", added, ContactMessage.where("email LIKE ?", "%@#{DEMO_DOMAIN}").count)
     end
 
     def seed_newsletter_preferences(users)
+      changed = 0
       users.each do |user|
         prefs = user.notification_preferences.presence || User::DEFAULT_EMAIL_PREFERENCES
         next if prefs["email_newsletter"] == (@rng.rand < 0.6)
 
         user.update!(notification_preferences: prefs.merge("email_newsletter" => @rng.rand < 0.6))
+        changed += 1
       end
+      puts "Newsletter preferences: #{changed} users updated (#{users.size} considered)"
     end
 
     def report
-      puts "\n=== Demo seed summary ==="
+      puts "\n=== Demo seed summary (this run) ==="
       @counts.sort.each { |key, value| puts format("  %-26s %d", key, value) }
       puts format("  %-26s %s", "photo sources", @fetcher.source_counts.inspect)
+      puts "\n=== Demo totals in the database ==="
+      demo = demo_users
+      totals = {
+        "users" => demo.count,
+        "listings" => Listing.where(user: demo).count,
+        "listings with photos" => Listing.where(user: demo).joins(:photos_attachments).distinct.count,
+        "stores" => Store.where(user: demo).count,
+        "favorites" => Favorite.where(user: demo).count,
+        "follows" => Follow.where(follower: demo).count,
+        "saved searches" => SavedSearch.where(user: demo).count,
+        "conversations" => Conversation.where(buyer: demo).count,
+        "messages" => Message.where(conversation: Conversation.where(buyer: demo)).count,
+        "offers" => Offer.where(buyer: demo).count,
+        "orders" => Order.where(buyer: demo).count,
+        "reviews" => Review.where(reviewer: demo).count,
+        "notifications" => Notification.where(user: demo).count,
+        "reports" => Report.where(user: demo).count
+      }
+      totals.sort.each { |label, value| puts format("  %-26s %d", label, value) }
       puts "  login: admin@#{DEMO_DOMAIN} (password #{PASSWORD}); also seller1..40@, business1..8@, buyer1..60@#{DEMO_DOMAIN}"
     end
   end

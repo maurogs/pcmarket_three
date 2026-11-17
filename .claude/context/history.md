@@ -87,6 +87,15 @@
 - Seed wall time is dominated by cold pool fetches (~52 unique category
   queries × 3 s throttle); re-runs with a warm `tmp/demo_images` are
   fast. Placeholder fallback works fully offline.
+- **Graph section made per-step idempotent (top-up)**: removed the
+  "favourites exist → skip graph" guard; every step now counts what demo
+  users already have and only creates the missing rows to reach the new
+  `GRAPH` targets + `ORDER_PLAN` state distribution (orders diff against
+  existing demo orders and skip sold listings that already have one;
+  notifications/contact messages/close-one-report have their own
+  exists?-style markers), with progress output per step — an interrupted
+  seed re-run now completes the graph (verified on dev: 59-listing
+  top-up + full graph in one pass, second pass a no-op).
 
 ## 2026-11-17 — Phase 8b: JSON API v1 (bearer auth, full REST surface, OpenAPI docs, devices)
 
