@@ -1,5 +1,65 @@
 # History
 
+## 2026-11-18 — Phase 7c: Spanish legal templates (seeded), needs_legal_review flag, admin review workflow
+
+**What changed**
+
+- Migration `20261118030003` adds
+  `legal_pages.needs_legal_review` (boolean, NOT NULL, default true) — every
+  seeded legal text is a TEMPLATE until legal counsel signs it off.
+- `LegalPage`: `pending_legal_review` scope (published AND needs_legal_review)
+  + virtual `legal_reviewed` (inverse of needs_legal_review) for the admin
+  checkbox.
+- Admin legal pages: index rows and edit header show an amber
+  "Template — pending legal review" chip while true; the form gained a
+  "Reviewed by legal counsel" checkbox (`legal_page[legal_reviewed]`,
+  permitted; ticking it sets needs_legal_review=false) and the update audit
+  row now records `needs_legal_review`. Dashboard: `DashboardStats` gained
+  `legal_pages_pending_review` (published pages still pending) shown as a
+  footnote on the admin dashboard.
+- Seed loader `db/seeds/legal_pages.rb` (loaded from `db/seeds.rb` after
+  labels_seller_tags): upserts `db/seeds/legal/<COUNTRY>/<locale>/<slug>.md`
+  by (country_code, locale, slug) — first line `# Title` → title, rest →
+  body, published: true, needs_legal_review: true. **NEVER overwrites a page
+  whose needs_legal_review is false** (admin-approved text wins; logs a
+  skip). Idempotent; malformed paths are warned and skipped.
+- 8 Spanish templates in `db/seeds/legal/ES/es/`: terms, privacy, cookies,
+  legal_notice, returns, buyer_protection, seller_terms, prohibited_items.
+  Accurate for Spain/EU (LSSI-CE arts. 10/16/22.2, RGPD+LOPDGDD, DSA arts.
+  11–12/16/17/20/21/23/27/30, Reg. 2019/1150 ranking transparency, TRLGDCU
+  arts. 102–108 withdrawal + art. 120 guarantee 3y/≥1y used per RDL 7/2021,
+  DAC7 Directive 2021/514 transposed by Ley 13/2023 → AEAT reporting when
+  payments run through the platform, AEPD complaint right). NO EU ODR
+  mention (discontinued 2025). Each doc starts with an italic
+  "pending legal review" note, uses only the identity placeholders
+  ({{site_name}} {{legal_name}} {{tax_id}} {{registered_address}}
+  {{registry}} {{contact_email}} {{dpo_email}}) and has ≥4 `##` headings
+  (TOC). Company data never invented.
+- Locale keys ×6: `admin.legal_pages.{index,edit}.pending_review_chip`,
+  `admin.legal_pages.form.{reviewed,reviewed_hint}`,
+  `admin.dashboards.show.footnote.legal_pending_review` (one/other).
+
+**Tests**: new `test/seeds/legal_pages_seeds_test.rb` (all 8 ES/es seeded
+pending review, title/body split, idempotent re-run, reviewed pages never
+overwritten, ≥4 headings + TOC, no unresolved `{{…}}` after render with
+identity Settings). `Admin::LegalPagesControllerTest`: chip shows/hides,
+"Reviewed by legal counsel" PATCH clears needs_legal_review + audited
+(details include it), checkbox rendered. `Admin::DashboardStatsTest`:
+pending-review count. `CountryTest`: enabling checks the country DEFAULT
+locale (English-only pages don't satisfy GB). Full suite 787 runs / 11905
+assertions green; rubocop clean; locale lint 2570 keys ×6; zeitwerk +
+eager_load OK; dev curl: all 8 `/es/legal/<slug>` → 200, 0 unresolved
+placeholders.
+
+**Files touched**: db/migrate/20261118030003*.rb; app/models/legal_page.rb;
+app/controllers/admin/legal_pages_controller.rb;
+app/views/admin/legal_pages/{index,edit,_form}.html.erb;
+app/services/admin/dashboard_stats.rb; app/views/admin/dashboards/show.html.erb;
+db/seeds.rb + db/seeds/legal_pages.rb; db/seeds/legal/ES/es/*.md (8);
+config/locales/{es,en,fr,de,it,pt}.yml;
+test/seeds/legal_pages_seeds_test.rb, test/controllers/admin/legal_pages_controller_test.rb,
+test/services/admin/dashboard_stats_test.rb, test/models/country_test.rb.
+
 ## 2026-11-18 — Phase 7b: trust & safety page, content pages, contact inbox, listing reports, public legal delivery, cookie consent, footer rebuild
 
 **What changed**

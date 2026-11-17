@@ -746,7 +746,8 @@ CREATE TABLE public.legal_pages (
     body text,
     published boolean DEFAULT false NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    needs_legal_review boolean DEFAULT true NOT NULL
 );
 
 
@@ -3512,6 +3513,7 @@ ALTER TABLE ONLY public.moderation_events
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261118030003'),
 ('20261118030002'),
 ('20261118030001'),
 ('20261118020002'),

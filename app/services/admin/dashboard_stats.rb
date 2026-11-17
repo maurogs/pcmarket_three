@@ -13,6 +13,7 @@ module Admin
     Result = Struct.new(:new_users, :new_listings, :pending_count, :oldest_pending_at,
                         :approved_count, :rejected_count, :orders_count, :gmv_cents,
                         :commission_cents, :open_disputes, :active_sellers, :daily,
+                        :legal_pages_pending_review,
                         keyword_init: true) do
       def daily_max
         daily.map { |day| [ day[:listings], day[:users] ].max }.max || 0
@@ -64,7 +65,8 @@ module Admin
         commission_cents: paid_orders(since).sum(:commission_cents).to_i,
         open_disputes: Order.disputed.count,
         active_sellers: Listing.where(created_at: since..).distinct.count(:user_id),
-        daily: daily_series(since)
+        daily: daily_series(since),
+        legal_pages_pending_review: LegalPage.pending_legal_review.count
       )
     end
 

@@ -14,6 +14,7 @@ require seed_dir.join("support/seed_loader.rb").to_s
   categories
   spec_attributes
   labels_seller_tags
+  legal_pages
 ].each { |name| load seed_dir.join("#{name}.rb") }
 
 # Development-only catalogue so the browse pages have something to show.

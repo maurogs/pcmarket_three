@@ -1934,6 +1934,9 @@ de:
           open_disputes: "%{count} offene Streitfälle"
           oldest_pending: 'Ältester Fall: %{time}'
           queue_empty: Warteschlange leer
+          legal_pending_review:
+            one: "%{count} veröffentlichte Seite wartet auf Rechtsprüfung"
+            other: "%{count} veröffentlichte Seiten warten auf Rechtsprüfung"
         chart:
           listings_title: Neue Anzeigen pro Tag
           users_title: Neuanmeldungen pro Tag
@@ -2837,6 +2840,7 @@ de:
         new: Neuer Rechtstext
         published_chip: Veröffentlicht
         draft_chip: Entwurf
+        pending_review_chip: Vorlage — rechtliche Prüfung ausstehend
         filters:
           country: Land
           all_countries: Alle
@@ -2864,9 +2868,13 @@ de:
       edit:
         title: "„%{title}“ bearbeiten"
         copy_note: Kopie von „%{language}“ erstellt
+        pending_review_chip: Vorlage — rechtliche Prüfung ausstehend
       form:
         slug_pick: Textart
         published: Veröffentlicht
+        reviewed: Von Rechtsberatung geprüft
+        reviewed_hint: Ungeprüfte Seiten sind generierte Vorlagen; erst ankreuzen,
+          nachdem die Texte juristisch freigegeben wurden.
         body_hint: Markdown; HTML wird beim Rendern bereinigt
         submit: Speichern
         cancel: Abbrechen

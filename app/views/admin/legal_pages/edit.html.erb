@@ -2,6 +2,9 @@
 
 <div class="mb-4">
   <h1 class="mb-1 text-xl font-bold"><%= t(".title", title: @legal_page.title) %></h1>
+  <% if @legal_page.needs_legal_review? %>
+    <span class="mb-1 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800"><%= t(".pending_review_chip") %></span>
+  <% end %>
   <% if @copy_source %>
     <p class="text-sm text-muted"><%= t(".copy_note", language: t("locales.#{@copy_source.locale}")) %></p>
   <% end %>

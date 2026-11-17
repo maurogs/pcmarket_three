@@ -1918,6 +1918,9 @@ es:
           open_disputes: "%{count} disputas abiertas"
           oldest_pending: 'Más antiguo: %{time}'
           queue_empty: Cola vacía
+          legal_pending_review:
+            one: "%{count} página publicada pendiente de revisión legal"
+            other: "%{count} páginas publicadas pendientes de revisión legal"
         chart:
           listings_title: Anuncios nuevos por día
           users_title: Altas nuevas por día
@@ -2821,6 +2824,7 @@ es:
         new: Nueva página legal
         published_chip: Publicada
         draft_chip: Borrador
+        pending_review_chip: Plantilla — pendiente de revisión legal
         filters:
           country: País
           all_countries: Todos
@@ -2848,9 +2852,13 @@ es:
       edit:
         title: Editar «%{title}»
         copy_note: Copia creada desde «%{language}»
+        pending_review_chip: Plantilla — pendiente de revisión legal
       form:
         slug_pick: Tipo de página
         published: Publicada
+        reviewed: Revisado por asesoría legal
+        reviewed_hint: Las páginas sin revisar son plantillas generadas; marca esta
+          casilla solo cuando un abogado haya aprobado el texto.
         body_hint: Markdown; el HTML se desinfecta al renderizar
         submit: Guardar
         cancel: Cancelar

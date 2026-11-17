@@ -44,6 +44,14 @@
     <%= t(".published") %>
   </label>
 
+  <div>
+    <label class="flex items-center gap-2 text-sm">
+      <%= form.check_box :legal_reviewed, class: "size-4 accent-indigo-600" %>
+      <%= t(".reviewed") %>
+    </label>
+    <p class="mt-1 text-xs text-muted"><%= t(".reviewed_hint") %></p>
+  </div>
+
   <div class="flex gap-2">
     <%= form.submit t(".submit"), class: "btn-primary" %>
     <%= link_to t(".cancel"), admin_legal_pages_path, class: "btn-secondary" %>

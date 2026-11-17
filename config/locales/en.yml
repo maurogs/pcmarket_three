@@ -1903,6 +1903,9 @@ en:
           open_disputes: "%{count} open disputes"
           oldest_pending: 'Oldest pending: %{time}'
           queue_empty: Queue empty
+          legal_pending_review:
+            one: "%{count} published page pending legal review"
+            other: "%{count} published pages pending legal review"
         chart:
           listings_title: New listings per day
           users_title: New signups per day
@@ -2805,6 +2808,7 @@ en:
         new: New legal page
         published_chip: Published
         draft_chip: Draft
+        pending_review_chip: Template — pending legal review
         filters:
           country: Country
           all_countries: All
@@ -2831,9 +2835,13 @@ en:
       edit:
         title: Edit “%{title}”
         copy_note: Copy created from “%{language}”
+        pending_review_chip: Template — pending legal review
       form:
         slug_pick: Page type
         published: Published
+        reviewed: Reviewed by legal counsel
+        reviewed_hint: Unreviewed pages are seeded templates; tick this once a lawyer
+          has approved the text.
         body_hint: Markdown; HTML is sanitized when rendering
         submit: Save
         cancel: Cancel

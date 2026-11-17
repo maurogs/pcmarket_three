@@ -10,6 +10,20 @@ class LegalPage < ApplicationRecord
 
   scope :published, -> { where(published: true) }
   scope :for_country, ->(code) { where(country_code: code) }
+  # Phase 7c: published texts still seeded from the template files (nobody
+  # has ticked "Reviewed by legal counsel" yet) — the admin dashboard counts
+  # these.
+  scope :pending_legal_review, -> { published.where(needs_legal_review: true) }
+
+  # Inverse of needs_legal_review for the admin checkbox: ticked once legal
+  # counsel has approved the text. Writing it back flips needs_legal_review.
+  def legal_reviewed
+    !needs_legal_review?
+  end
+
+  def legal_reviewed=(value)
+    self.needs_legal_review = !ActiveModel::Type::Boolean.new.cast(value)
+  end
 
   def self.find_published(country_code:, locale:, slug:)
     published.find_by(country_code: country_code, locale: locale, slug: slug)

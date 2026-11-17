@@ -1936,6 +1936,9 @@ fr:
           open_disputes: "%{count} litiges ouverts"
           oldest_pending: 'Plus ancien : %{time}'
           queue_empty: File vide
+          legal_pending_review:
+            one: "%{count} page publiée en attente de revue juridique"
+            other: "%{count} pages publiées en attente de revue juridique"
         chart:
           listings_title: Nouvelles annonces par jour
           users_title: Nouveaux inscrits par jour
@@ -2843,6 +2846,7 @@ fr:
         new: Nouvelle page légale
         published_chip: Publiée
         draft_chip: Brouillon
+        pending_review_chip: Modèle — en attente de revue juridique
         filters:
           country: Pays
           all_countries: Tous
@@ -2870,9 +2874,13 @@ fr:
       edit:
         title: Modifier « %{title} »
         copy_note: Copie créée depuis « %{language} »
+        pending_review_chip: Modèle — en attente de revue juridique
       form:
         slug_pick: Type de page
         published: Publiée
+        reviewed: Revu par un conseiller juridique
+        reviewed_hint: 'Les pages non relues sont des modèles générés : cochez cette
+          case une fois le texte approuvé par un juriste.'
         body_hint: Markdown ; le HTML est assaini à l'affichage
         submit: Enregistrer
         cancel: Annuler

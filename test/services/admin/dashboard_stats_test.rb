@@ -41,6 +41,18 @@ class Admin::DashboardStatsTest < ActiveSupport::TestCase
     assert_operator stats.daily_max, :>=, 0
   end
 
+  test "pending legal review counts published pages only" do
+    LegalPage.create!(country_code: "ES", locale: "es", slug: "terms",
+                      title: "T", body: "b", published: true) # needs_legal_review defaults true
+    LegalPage.create!(country_code: "ES", locale: "es", slug: "privacy",
+                      title: "P", body: "b", published: true, needs_legal_review: false)
+    LegalPage.create!(country_code: "ES", locale: "es", slug: "cookies",
+                      title: "C", body: "b", published: false)
+
+    stats = Admin::DashboardStats.call(days: 7)
+    assert_equal 1, stats.legal_pages_pending_review
+  end
+
   test "results are cached per period" do
     first = Admin::DashboardStats.call(days: 30)
     User.create!(email_address: "fresh-#{SecureRandom.hex(4)}@example.com",

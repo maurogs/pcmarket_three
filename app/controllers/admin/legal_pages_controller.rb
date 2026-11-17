@@ -49,7 +49,8 @@ module Admin
 
       if @legal_page.save
         audit!("legal_page_update", @legal_page,
-               slug: @legal_page.slug, locale: @legal_page.locale, published: @legal_page.published)
+               slug: @legal_page.slug, locale: @legal_page.locale, published: @legal_page.published,
+               needs_legal_review: @legal_page.needs_legal_review)
         redirect_to admin_legal_pages_path, notice: t(".updated", slug: @legal_page.slug)
       else
         render :edit, status: :unprocessable_entity
@@ -70,7 +71,8 @@ module Admin
     end
 
     def legal_page_params
-      params.require(:legal_page).permit(:country_code, :locale, :slug, :title, :body, :published)
+      params.require(:legal_page).permit(:country_code, :locale, :slug, :title, :body, :published,
+                                         :legal_reviewed)
     end
 
     def copy_source(country_code, locale, slug)

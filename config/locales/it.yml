@@ -1921,6 +1921,9 @@ it:
           open_disputes: "%{count} dispute aperte"
           oldest_pending: 'Il più vecchio: %{time}'
           queue_empty: Coda vuota
+          legal_pending_review:
+            one: "%{count} pagina pubblicata in attesa di revisione legale"
+            other: "%{count} pagine pubblicate in attesa di revisione legale"
         chart:
           listings_title: Nuovi annunci al giorno
           users_title: Nuove iscrizioni al giorno
@@ -2827,6 +2830,7 @@ it:
         new: Nuova pagina legale
         published_chip: Pubblicata
         draft_chip: Bozza
+        pending_review_chip: Modello — in attesa di revisione legale
         filters:
           country: Paese
           all_countries: Tutti
@@ -2854,9 +2858,13 @@ it:
       edit:
         title: Modifica “%{title}”
         copy_note: Copia creata da “%{language}”
+        pending_review_chip: Modello — in attesa di revisione legale
       form:
         slug_pick: Tipo di pagina
         published: Pubblicata
+        reviewed: Revisionato dal consulente legale
+        reviewed_hint: Le pagine non revisionate sono modelli generati; seleziona la
+          casella solo dopo l'approvazione di un avvocato.
         body_hint: Markdown; l'HTML viene ripulito al rendering
         submit: Salva
         cancel: Annulla

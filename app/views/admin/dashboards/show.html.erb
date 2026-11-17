@@ -46,10 +46,11 @@
   <% end %>
 </div>
 
-<div class="mb-6 grid grid-cols-2 gap-3 text-xs text-muted sm:grid-cols-4">
+<div class="mb-6 grid grid-cols-2 gap-3 text-xs text-muted sm:grid-cols-5">
   <p><%= t(".footnote.commission", amount: money(@stats.commission_cents)) %></p>
   <p><%= t(".footnote.active_sellers", count: @stats.active_sellers) %></p>
   <p><%= t(".footnote.open_disputes", count: @stats.open_disputes) %></p>
+  <p><%= t(".footnote.legal_pending_review", count: @stats.legal_pages_pending_review) %></p>
   <p>
     <% if @stats.oldest_pending_at %>
       <%= t(".footnote.oldest_pending", time: time_ago_in_words(@stats.oldest_pending_at)) %>

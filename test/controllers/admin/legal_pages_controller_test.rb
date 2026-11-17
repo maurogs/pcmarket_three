@@ -102,6 +102,58 @@ class Admin::LegalPagesControllerTest < ActionDispatch::IntegrationTest
     assert source.reload.persisted? # prefill must not touch the source row
   end
 
+  test "index and edit flag an unreviewed page; the flag disappears once reviewed" do
+    page = legal_page # needs_legal_review defaults to true
+
+    get admin_legal_pages_path
+    assert_response :success
+    assert_includes response.body, I18n.t("admin.legal_pages.index.pending_review_chip")
+
+    get edit_admin_legal_page_path(page)
+    assert_response :success
+    assert_includes response.body, I18n.t("admin.legal_pages.edit.pending_review_chip")
+
+    page.update!(needs_legal_review: false)
+
+    get admin_legal_pages_path
+    assert_not_includes response.body, I18n.t("admin.legal_pages.index.pending_review_chip")
+  end
+
+  test "ticking 'Reviewed by legal counsel' clears needs_legal_review, audited" do
+    page = legal_page(published: true)
+    assert page.needs_legal_review?
+
+    assert_difference -> { AdminAuditLog.count } do
+      patch admin_legal_page_path(page), params: {
+        legal_page: { country_code: page.country_code, locale: page.locale, slug: page.slug,
+                      title: page.title, body: page.body, published: "1", legal_reviewed: "1" }
+      }
+    end
+    assert_redirected_to admin_legal_pages_path
+    assert_not page.reload.needs_legal_review
+
+    audit = AdminAuditLog.last
+    assert_equal "legal_page_update", audit.action
+    assert_equal false, audit.details["needs_legal_review"]
+
+    # Unticking re-opens the review (checkbox unchecked posts "0").
+    patch admin_legal_page_path(page), params: {
+      legal_page: { country_code: page.country_code, locale: page.locale, slug: page.slug,
+                    title: page.title, body: page.body, published: "1", legal_reviewed: "0" }
+    }
+    assert page.reload.needs_legal_review
+  end
+
+  test "the edit form shows the reviewed checkbox ticked for reviewed pages" do
+    page = legal_page
+    page.update!(needs_legal_review: false)
+
+    get edit_admin_legal_page_path(page)
+    assert_response :success
+    assert_select "input[type=checkbox][name='legal_page[legal_reviewed]'][value='1']"
+    assert_select "input[type=hidden][name='legal_page[legal_reviewed]'][value='0']"
+  end
+
   test "creating from a copy source persists a new page for the target locale with the copied body, audited" do
     source = legal_page(country_code: "ES", locale: "en", slug: "terms",
                         title: "Source Terms Title", body: "Copied legal body")
