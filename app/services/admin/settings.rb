@@ -33,6 +33,9 @@ module Admin
         cents_field(errors, values, "featured_price_cents")
         integer_field(errors, values, "featured_days", range: FEATURED_DAYS_RANGE)
         integer_field(errors, values, "min_offer_percent", range: MIN_OFFER_RANGE)
+        integer_field(errors, values, "min_public_stat", range: 0..1_000_000)
+        url_field(errors, values, "blog_url")
+        legal_identity_fields(errors, values)
         announcement_fields(errors, values)
         boolean_field(errors, values, "maintenance_mode")
         social_fields(errors, values)
@@ -71,6 +74,36 @@ module Admin
           values[key] = value
         else
           errors[key] = "invalid_email"
+        end
+      end
+
+      # Company identity entries (Phase 7b) may be blank — the dashboard
+      # shows a "Legal identity incomplete" warning instead of blocking.
+      def legal_identity_fields(errors, values)
+        string_field(errors, values, "legal_name", max: 150, allow_blank: true)
+        string_field(errors, values, "trade_name", max: 100, allow_blank: true)
+        string_field(errors, values, "tax_id", max: 30, allow_blank: true)
+        string_field(errors, values, "registered_address", max: 300, allow_blank: true)
+        string_field(errors, values, "mercantile_registry_data", max: 300, allow_blank: true)
+        optional_email_field(errors, values, "contact_email")
+        optional_email_field(errors, values, "dpo_email")
+        string_field(errors, values, "phone", max: 30, allow_blank: true)
+      end
+
+      def optional_email_field(errors, values, key)
+        return if raw(key).to_s.strip.empty?
+
+        email_field(errors, values, key)
+      end
+
+      def url_field(errors, values, key)
+        value = raw(key).to_s.strip
+        if value.empty?
+          values[key] = ""
+        elsif valid_url?(value)
+          values[key] = value
+        else
+          errors[key] = "invalid_url"
         end
       end
 

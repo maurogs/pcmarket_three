@@ -40,6 +40,8 @@ de:
         newsletter: Newsletter
         audit_logs: Audit-Protokoll
         trade_ins: Trade-ins
+        reports: Meldungen
+        contact_messages: Support-Nachrichten
   nav:
     search_placeholder: Grafikkarten, Prozessoren, Laptops suchen…
     search_submit: Suchen
@@ -95,6 +97,25 @@ de:
     selling_requirements: Voraussetzungen für Verkäufer
     language: Sprache
     copyright: "© %{year} %{brand}. Alle Rechte vorbehalten."
+    trust_safety: Trust & Safety
+    blog: Blog
+    help_centre: Hilfe-Center
+    how_it_works: So funktioniert's
+    sell_on: Verkaufen auf PCMarket
+    seller_guides: Verkäuferhandbuch
+    pc_finder: PC-Finder
+    sell_to_us: An uns verkaufen
+    legal: Rechtliches
+    cookie_preferences: Cookie-Einstellungen
+    follow_us: Folgen
+    no_social: Unsere Profile in sozialen Netzwerken folgen bald.
+    country_indicator: Ergebnisse für %{country}
+    social:
+      instagram: Instagram
+      tiktok: TikTok
+      youtube: YouTube
+      x: X
+      discord: Discord
   locales:
     es: Español
     en: English
@@ -154,6 +175,250 @@ de:
         under_budget_title: Gaming-PCs unter 1.000 €
         under_budget_more: Alle Gaming-PCs unter 1.000 € ansehen
         best_for_title: Die besten PCs für beliebte Spiele
+    about:
+      title: Über PCMarket
+      lede: PCMarket ist der Marktplatz für PC-Hardware in unserem Markt — neu und gebraucht, gebaut von Menschen, die PCs bauen.
+      cards:
+        mission:
+          title: Eine Kategorie, richtig gemacht
+          text: Allgemeine Marktplätze begraben PC-Teile im Rauschen. Wir gehen stattdessen in die Tiefe bei Spezifikationen, Sockeln und Kompatibilität.
+        wide:
+          title: Neu und gebraucht nebeneinander
+          text: Upgrader, Werkstatt und Hobbyisten teilen denselben Katalog — jede Anzeigenart ist willkommen, solange sie ehrlich ist.
+        fair:
+          title: Fair für beide Seiten
+          text: Klarer Schutz für Käufer, klare Regeln und schnelle Auszahlungen für Verkäufer.
+      story:
+        title: Warum wir angefangen haben
+        p1: 'Wer schon einmal eine kompatible Grafikkarte, einen CPU-Sockel oder ein Laptop-Display gesucht hat, kennt den Schmerz: Die Hälfte der Anzeigen lässt genau die eine Spezifikation weg, die über Kompatibilität entscheidet — und niemand schützt die Transaktion.'
+        p2: PCMarket löst beide Probleme. Strukturierte Spezifikationen in jeder Anzeige, menschliche Moderation vor der Veröffentlichung und Käuferschutz bei jeder Bestellung.
+      values:
+        title: Wofür wir einstehen
+        items:
+          a: Ehrliche Anzeigen — durch echte Moderatoren durchgesetzt, nicht nur durch Bots.
+          b: Schnelle, menschliche Hilfe.
+          c: 'Transparente Regeln: Lies sie, sie sind kurz.'
+          d: Datenschutz by default — nur die Daten, die ein Verkauf wirklich braucht.
+      promise:
+        title: Unser Versprechen
+        text: Jede Bestellung auf PCMarket ist geschützt. Wenn etwas schiefgeht, lösen wir es.
+        trust_cta: So schützen wir dich
+        contact_cta: Sprich mit uns
+    how_it_works:
+      title: So funktioniert's
+      lede: Von der Suche bis zur Haustür in wenigen kleinen Schritten.
+      search:
+        title: Finde das Teil
+        filter:
+          title: Filter, die Spezifikationen respektieren
+          text: Filtere nach Sockel, Chipsatz, Kapazität, Zustand und mehr. Spezifikationen sind in jeder Anzeige strukturiert — deshalb funktionieren die Filter wirklich.
+        series:
+          title: Kuratierte Serien
+          text: Stöbere in kuratierten Übersichten der besten Komponenten nach Bereich.
+        pc_finder:
+          title: PC-Finder-Quiz
+          text: Weißt du nicht, was du brauchst? Beantworte ein paar Fragen und wir schlagen kaufbereite Gaming-PCs vor.
+      buy:
+        title: Sicher kaufen
+        reserve:
+          title: Den Artikel reservieren
+          text: Bestellen sichert den Bestand — die Anzeige ist in dem Moment reserviert, in dem du bestellst.
+        pay:
+          title: An der Kasse zahlen
+          text: Eine Kasse, ein klarer Gesamtbetrag. Kartendaten werden von unserem Zahlungsanbieter verarbeitet und von uns nie gespeichert.
+        receive:
+          title: Erhalten und bestätigen
+          text: Verfolge die Bestellung, bestätige die Lieferung, hinterlasse eine Bewertung. Wenn etwas nicht stimmt, eröffne vor der Bestätigung eine Streitigkeit.
+        escrow_note: Kartenzahlungen werden von unserem Zahlungsanbieter erfasst und an den Verkäufer ausgezahlt, sobald du die Lieferung bestätigst.
+        direct_note: Nach der Bestellung werden Zahlung und Lieferung auf der Bestellseite vereinbart. Wickle immer über PCMarket ab und halte die Unterhaltung im Chat.
+        trust_link: Der vollständige Käuferschutz-Guide.
+      pay:
+        title: Ein klarer Gesamtbetrag
+        items:
+          methods: Zahle per Karte, oder wickle direkt ab, wo dieser Modus aktiv ist.
+          hold: Die Anzeige wird in dem Moment für dich gehalten, in dem du bestellst.
+          receipt: Jede Bestellung hat ein aufgeschlüsseltes Protokoll, das du jederzeit ansehen kannst.
+      more:
+        title: Gut zu wissen
+        tracking:
+          title: Bestellungen verfolgen
+          text: Bestellungen haben eine Statusseite in deinem Konto mit jedem protokollierten Schritt.
+        trust:
+          title: Käuferschutz
+          text: Was abgedeckt ist, was nicht, und wie Streitigkeiten funktionieren.
+        help:
+          title: Hilfe-Center
+          text: Antworten auf die häufigsten Fragen.
+      cta:
+        title: Dein nächstes Teil ist einen Klick entfernt
+        browse: Anzeigen ansehen
+        sell: Jetzt verkaufen
+    selling:
+      title: Verkaufen auf PCMarket
+      lede: Deine Ersatz-Grafikkarte ist das Upgrade jemandes. Stelle sie in Minuten ein und werde bezahlt, wenn sie versandt wird.
+      steps:
+        title: Vier Schritte zum ersten Verkauf
+        create:
+          title: Eine starke Anzeige erstellen
+          text: Fotos des tatsächlichen Artikels, ein ehrlicher Zustand und vor allem die vollständige Spezifikationsliste. Strukturierte Spezifikationen bringen Käufer zum Klick.
+        review:
+          title: Eine schnelle Prüfung bestehen
+          text: Ein Moderator prüft die Anzeige, bevor sie öffentlich wird. Die meisten Anzeigen bestehen innerhalb eines Werktags.
+        sell:
+          title: Chatten, reservieren, versenden
+          text: Beantworte Fragen, akzeptiere Angebote, wenn sie dir gefallen, und versende mit Sendungsverfolgung. Die Bestellseite führt dich durch jeden Schritt.
+        get_paid:
+          title: Bezahlt werden
+          text: Die Auszahlung erfolgt, nachdem der Käufer die Lieferung bestätigt. Verifizierte Verkäufer werden schneller ausgezahlt.
+      fees:
+        title: Gebühren
+        pct: PCMarket berechnet %{percent}% Provision auf abgeschlossene Verkäufe.
+        zero: Null Provision während der Startphase von PCMarket — du behältst 100 % jedes Verkaufs.
+        note: Das Einstellen ist kostenlos. Du zahlst erst, wenn ein Verkauf abgeschlossen ist.
+      tips:
+        title: Tipps unserer besten Verkäufer
+        items:
+          a: Fotografiere den Artikel selbst — Stockfotos werden übersehen.
+          b: 'Nenne die Spezifikationen, nach denen Käufer suchen: Sockel, Chipsatz, Kapazität, Betriebsstunden.'
+          c: Preise dich nach verkauften Vergleichsobjekten, nicht nach Hoffnungen.
+          d: Versende innerhalb eines Werktags — Geschwindigkeit ist der wichtigste Bewertungsfaktor.
+          e: Antworte schnell im Chat; späte Antworten kosten Verkäufe.
+          f: Sei ehrlich über Mängel. Ein beschriebener Mangel schlägt eine überraschende Rücksendung.
+      requirements:
+        title: Bevor du einstellst
+        items:
+          a: Der Artikel muss dir gehören und in deinem Land zulässig sein.
+          b: Unzulässige Artikel (Fälschungen, unsichere Teile) werden entfernt — lies zuerst die Regeln.
+          c: Verkäufer müssen 18 sein oder mit elterlicher Einwilligung verkaufen.
+          d: Versand- und Rückgabepflichten unterscheiden sich, wenn du gewerblich statt privat verkaufst.
+        guides_link: Verkäuferhandbuch
+        terms_link: Nutzungsbedingungen
+      cta:
+        title: Bereit, wenn du es bist
+        subtitle: Ein Konto anzulegen ist kostenlos, das Einstellen dauert Minuten.
+        start: Anzeige erstellen
+        trade_in: Oder verkaufe uns die ganze Maschine
+    contact:
+      title: Kontakt
+      lede: Eine Frage zu einer Bestellung, einer Anzeige oder zur Plattform selbst? Hier erreicht sie einen Menschen.
+      form:
+        title: Schreib uns eine Nachricht
+        hint: Wir antworten innerhalb eines Werktags, in der Sprache, in der du schreibst.
+        submit: Nachricht senden
+        rate_limit: Bis zu 5 Nachrichten pro halber Stunde.
+      channels:
+        email_title: Direkte E-Mail
+        email_hint: Lieber klassische E-Mail? Schreib uns hier.
+        phone_title: Telefon
+        phone_hint: Ruf während der Geschäftszeiten an.
+        help_title: Die Antwort existiert vielleicht schon
+        help_hint: Die meisten Fragen sind im Hilfe-Center beantwortet.
+        help_cta: Hilfe-Center öffnen
+        hours_title: Support-Zeiten
+        hours_text: Montag bis Freitag, 9:00–18:00. Bestellungen laufen rund um die Uhr weiter.
+    help:
+      title: Hilfe-Center
+      lede: Kurze Antworten auf die häufigsten Fragen. Suche oder arbeite ein Thema durch.
+      search_label: Hilfethemen durchsuchen
+      search_placeholder: Gib ein Wort ein, wie „Erstattung" oder „Versand"
+      no_results: Dazu passt nichts — versuche ein anderes Wort oder kontaktiere uns.
+      groups:
+        buying: Kauf
+        selling: Verkauf
+        payments: Zahlungen
+        shipping: Versand
+        account: Konto
+      faq:
+        buying:
+          q1: Woran erkenne ich, ob ein Teil kompatibel ist?
+          a1: Jede Anzeige veröffentlicht strukturierte Spezifikationen — Sockel, Chipsatz, Kapazität, Bauform. Die Filter respektieren sie, und Gaming-PCs tragen einen Kompatibilitätshinweis.
+          q2: Kann ich den Preis verhandeln?
+          a2: 'Viele Verkäufer akzeptieren Angebote: Wenn die Anzeige einen „Angebot machen"-Button zeigt, sende eins — der Verkäufer kann im Chat annehmen, ablehnen oder kontern.'
+          q3: Wie beurteile ich einen Verkäufer?
+          a3: Seine Store-Seite zeigt Durchschnittsbewertung, abgeschlossene Verkäufe und ob er das Verifizierungsabzeichen trägt. Neue Konten verdienen besondere Vorsicht.
+        selling:
+          q1: Wie lange dauert die Genehmigung einer Anzeige?
+          a1: Die meisten Anzeigen werden innerhalb eines Werktags geprüft. Du erhältst eine E-Mail, wenn die Anzeige online geht — oder den Grund, wenn sie nicht besteht.
+          q2: Wann werde ich bezahlt?
+          a2: Die Auszahlung erfolgt kurz nach der Lieferbestätigung des Käufers; verifizierte Verkäufer werden schneller ausgezahlt. Die Verkaufsdetails im Dashboard zeigen den genauen Stand.
+          q3: Kann ich einen Verkauf stornieren?
+          a3: Nur vor dem Versand. Ist das Paket unterwegs, laufen Stornierungen über den Streitigkeitsablauf, damit der Käufer geschützt bleibt.
+        payments:
+          q1: Welche Zahlungsmethoden funktionieren?
+          a1: Kartenzahlungen werden an der Kasse verarbeitet. Wo direkte Abwicklung aktiv ist, erklärt die Bestellseite, wie Käufer und Verkäufer sie abschließen.
+          q2: Werden meine Kartendaten gespeichert?
+          a2: Nie. Kartendaten verarbeitet unser Zahlungsanbieter; PCMarket behält nur das Transaktionsprotokoll.
+          q3: Wann wird meine Karte belastet?
+          a3: An der Kasse. Bei geschützten Bestellungen erreicht der Betrag den Verkäufer erst nach bestätigter Lieferung.
+        shipping:
+          q1: Wer zahlt den Versand?
+          a1: Der Käufer, wie an der Kasse ausgewiesen. Verkäufer können auch kostenlosen Versand oder Abholung anbieten.
+          q2: Wie verfolge ich meine Bestellung?
+          a2: Jede Bestellung hat eine Statusseite in deinem Konto, und Verkäufer hängen bei Versand eine Sendungsnummer an.
+          q3: Was, wenn das Paket beschädigt ankommt?
+          a3: Fotografiere es, melde den Schaden möglichst beim Zusteller und eröffne innerhalb von 48 Stunden eine Streitigkeit — Schadensfälle laufen am schnellsten.
+        account:
+          q1: Wie ändere ich mein Passwort?
+          a1: In den Kontoeinstellungen unter Sicherheit. Nutze „Passwort vergessen", wenn du dich nicht anmelden kannst.
+          q2: Kann ich mein Konto löschen?
+          a2: Ja — die Kontoeinstellungen enthalten die Löschung von Daten mit einer kurzen Frist, bevor sie endgültig wird.
+          q3: Kann ich meine Daten exportieren?
+          a3: Ein Klick in den Kontoeinstellungen erzeugt eine maschinenlesbare Kopie deiner Anzeigen, Bestellungen und Nachrichten.
+      still_lost:
+        title: Immer noch nicht fündig?
+        text: Ein Mensch liest jede Nachricht — mit Bestellnummer noch schneller.
+        cta: Kontaktiere uns
+    seller_guides:
+      title: Verkäuferhandbuch
+      lede: Das Vorgehen unserer am besten bewerteten Verkäufer. Sechs kurze Guides.
+      guides:
+        photos:
+          title: Fotografiere den Artikel, den du tatsächlich verkaufst
+          text: Naturalicht, mindestens vier Winkel, dazu Nahaufnahmen von Anschlüssen, Etiketten und etwaigen Mängeln. Halte das Seriennummern-Etikett lesbar.
+          bullets:
+            a: Fotografiere den echten Artikel — niemals ein Stockfoto.
+            b: Zeige das Zubehör und die Kabel, die du wirklich beilegst.
+            c: Fotografiere Mängel aus der Nähe; Ehrlichkeit macht aus Besuchern Käufer.
+        titles:
+          title: Schreibe Titel, die zu Suchen passen
+          text: Käufer tippen echte Modellnummern, nicht „tolle Grafikkarte". Marke, Modell, Kapazität und Zustand gehören in den Titel.
+          bullets:
+            a: 'Modellnummer zuerst: „NVIDIA RTX 3070 8GB".'
+            b: 'Nenne den Zustand: neu, generalüberholt oder gebraucht.'
+            c: Lass GROSSBUCHSTABEN und Emojis weg — sie untergraben Vertrauen.
+        specs:
+          title: Fülle jedes Spezifikationsfeld aus
+          text: Strukturierte Spezifikationen speisen Filter und Kompatibilitätsprüfungen. Ein fehlender Sockel oder Chipsatz versteckt deine Anzeige vor den meisten Suchen.
+          bullets:
+            a: Fülle das strukturierte Spezifikationsfeld aus, nicht nur die Beschreibung.
+            b: Nenne Kapazität, Generation und Schnittstelle, wo sie zutreffen.
+            c: Gib bei GPUs und Konsolen die Betriebsstunden an — Käufer fragen sowieso.
+        pricing:
+          title: Preise dich nach verkauften Vergleichsobjekten
+          text: Der Markt zeigt, zu welchen Preisen ähnliche Anzeigen verkauft wurden. Preise leicht darunter für einen schnellen Verkauf, darüber, wenn du warten kannst.
+          bullets:
+            a: Prüfe kürzlich verkaufte Anzeigen, bevor du den Preis festlegst.
+            b: Rechne den Versand in dein Endergebnis ein, bevor du rabattierst.
+            c: Ein starrer Preis schlägt ein Schnäppchen mit endlosen Feilsch-Chats.
+        shipping:
+          title: Verpacke so, als käme es auf das Teil an — tut es
+          text: Antistatikbeutel, stabiler Karton, großzügige Polsterung an allen Seiten. Grafikkarten und Mainboards verbiegen im Transport ohne Verstrebungen.
+          bullets:
+            a: Versende niemals eine GPU lose in einem Umschlag.
+            b: Bewahre den Einlieferungsbeleg bis zur bestätigten Lieferung auf.
+            c: Hänge die Sendungsnummer sofort auf der Bestellseite an.
+        after:
+          title: Nach dem Verkauf
+          text: Versende innerhalb eines Werktags, hänge das Tracking an und antworte im Chat höflich und schnell. Reibungslose Verkäufe steigern die Conversion beim nächsten.
+          bullets:
+            a: Ein heute versandtes schlägt ein günstigeres, das Montag versandt wird.
+            b: Danke dem Käufer — Bewertungen gelten in beide Richtungen.
+            c: Wenn etwas schiefgeht, erst schreiben; Streitigkeiten zuletzt.
+      cta:
+        title: Setze das um
+        subtitle: Eine guide-konforme Anzeige besteht die Prüfung fast immer beim ersten Versuch.
+        list: Anzeige erstellen
+        selling: Verkaufsüberblick
   sessions:
     new:
       title: Anmelden
@@ -367,6 +632,12 @@ de:
             role:
               cannot_demote_self: Sie können sich nicht selbst die Admin-Rolle entziehen
               last_admin: Die Plattform muss mindestens einen Administrator behalten
+        report:
+          attributes:
+            user_id:
+              already_reported: Du hast diese Anzeige bereits gemeldet
+            base:
+              not_own_listing: Du kannst deine eigene Anzeige nicht melden
     models:
       address: Adresse
       api_token: API-Token
@@ -690,6 +961,18 @@ de:
         status/paid: Bezahlt
         status/rejected: Abgelehnt
         status/expired: Abgelaufen
+      contact_message:
+        name: Name
+        email: E-Mail
+        subject: Betreff
+        body: Nachricht
+        locale: Sprache
+      report:
+        listing: Anzeige
+        user: Melder
+        reason: Grund
+        details: Details
+        resolved_action: Lösung
   shared:
     error_summary:
       title:
@@ -1666,6 +1949,10 @@ de:
           title: Letzte Anmeldungen
           all: Nutzer ansehen
           empty: Noch keine Anmeldungen
+        legal_identity_warning:
+          title: Rechtliche Identität unvollständig
+          body: Rechtsseiten und Fußzeile zeigen weniger Angaben, bis die Unternehmensangaben in den Website-Einstellungen vollständig sind.
+          cta: Unternehmensangaben vervollständigen
     moderations:
       index:
         title: Moderations-Warteschlange
@@ -2531,6 +2818,14 @@ de:
           invalid_url: ist keine gültige URL
         submit: Einstellungen speichern
         cancel: Verwerfen
+        group_company: Firmenidentität
+        company_hint: Wird auf Rechtsseiten und in der Fußzeile angezeigt. Leere Felder blockieren die Website nie — fülle sie aber vor dem öffentlichen Start aus.
+        trade_name_hint: Handelsname; fällt auf den Website-Namen zurück.
+        tax_id_hint: USt-IdNr. oder nationale Identifikationsnummer.
+        contact_email_hint: Öffentliche Rechtskontaktadresse; fällt auf die Support-Adresse zurück.
+        dpo_email_hint: Datenschutzkontakt, angezeigt auf der Datenschutzseite.
+        blog_url_hint: 'Vollständige https://-URL deines Blogs; der Blog-Link in der Fußzeile erscheint nur, wenn gesetzt.'
+        min_public_stat_hint: Statistiken auf der Trust-Seite unter diesem Wert bleiben verborgen (Standard 50).
       update:
         updated: Einstellungen gespeichert
         invalid: Überprüfe die markierten Felder
@@ -2635,6 +2930,101 @@ de:
           paid: Zahlung gesendet
           rejected: Ablehnen
           expired: Als abgelaufen markieren
+    reports:
+      index:
+        title: Meldungen
+        subtitle: "%{open} offen von %{count} gesamt"
+        filters:
+          all_states: Alle Status
+          open: Offen
+          closed: Geschlossen
+          state: Status
+          all_reasons: Alle Gründe
+          reason: Grund
+          apply: Anwenden
+          clear: Zurücksetzen
+        columns:
+          listing: Anzeige
+          reason: Grund
+          reporter: Gemeldet von
+          when: Gemeldet am
+          state: Status
+        reasons:
+          scam: Betrug
+          prohibited: Unzulässiger Artikel
+          wrong_info: Falsche oder irreführende Angaben
+          offensive: Anstößiger Inhalt
+          other: Sonstiges
+        states:
+          open: Offen
+          resolved: Gelöst
+          dismissed: Abgewiesen
+        empty: Keine Meldungen entsprechen diesen Filtern.
+      show:
+        title: Meldung im Detail
+        subtitle: Von der Community gemeldete Anzeige
+        states:
+          open: Offen
+          resolved: Gelöst
+          dismissed: Abgewiesen
+        report_section: Die Meldung
+        columns:
+          reason: Grund
+          when: Eingegangen
+        details_label: Was der Melder geschrieben hat
+        no_details: Der Melder hat keine Details angegeben.
+        closed_at: 'Geschlossen %{time} von %{admin}'
+        sibling_section:
+          one: Eine weitere Meldung zu dieser Anzeige
+          other: "%{count} Meldungen zu dieser Anzeige gesamt"
+        requeued: Zur erneuten Prüfung eingereiht
+        this_report: diese Meldung
+        listing_section: Die Anzeige
+        view_listing: Anzeige öffnen
+        view_store_seller: Verkäufer-Store öffnen
+        reporter_section: Der Melder
+        view_reporter: Nutzerprofil öffnen
+        close_section: Diese Meldung schließen
+        close_hint: Als gelöst zu schließen protokolliert, dass du auf der Anzeige gehandelt hast; Abweisen schließt die Meldung ohne Maßnahme. In beiden Fällen bleibt der Anzeigenplatz für den Nachweis für dich sichtbar.
+        resolve: Als gelöst markieren
+        dismiss: Abweisen
+        already_closed: Diese Meldung ist bereits geschlossen.
+        back: Zurück zu den Meldungen
+    report_resolutions:
+      create:
+        resolved: Meldung als gelöst geschlossen.
+    report_dismissals:
+      create:
+        dismissed: Meldung abgewiesen.
+    contact_messages:
+      index:
+        title: Support-Nachrichten
+        subtitle:
+          one: Eine Nachricht im Posteingang
+          other: "%{count} Nachrichten im Posteingang"
+        filters:
+          all_locales: Alle Sprachen
+          locale: Sprache
+          apply: Anwenden
+          clear: Zurücksetzen
+        columns:
+          from: Von
+          subject: Betreff
+          locale: Sprache
+          when: Eingegangen
+        empty: Der Posteingang ist leer.
+      show:
+        title: Support-Nachricht
+        subtitle: 'Eingegangen %{time}'
+        body_section: Nachricht
+        columns:
+          from: Von
+          subject: Betreff
+          locale: Sprache
+          when: Eingegangen
+        meta_section: Details
+        support_note: Antworte direkt an die Absenderadresse; halte die Nachrichtenreferenz in internen Vermerken.
+        back: Zurück zu den Nachrichten
   legal_pages:
     slugs:
       terms: Nutzungsbedingungen
@@ -2645,6 +3035,22 @@ de:
       buyer_protection: Käuferschutz
       seller_terms: Verkäuferbedingungen
       prohibited_items: Unzulässige Artikel
+    show:
+      updated_at: 'Zuletzt aktualisiert: %{date}'
+      fallback_notice: Diese Seite ist in deiner Sprache noch nicht verfügbar — wir zeigen die %{locale_name}-Fassung.
+      fallback_link: Offizielle Fassung öffnen
+      toc_title: Auf dieser Seite
+      back: Zurück zur Startseite
+      company:
+        title: Unternehmensangaben
+        legal_name: Firmenname (rechtlich)
+        trade_name: Handelsname
+        tax_id: Steuer-ID
+        registered_address: Registrierte Anschrift
+        registry: Handelsregister
+        contact_email: Kontakt-E-Mail
+        dpo_email: Datenschutzkontakt
+        phone: Telefon
   application:
     maintenance:
       title: Geplante Wartung
@@ -2840,3 +3246,137 @@ de:
       accepted: Trade-in angenommen — schicke das Teil, sobald du das Label erhältst.
       expired: Dieses Angebot ist abgelaufen, bevor du angenommen hast.
       invalid: Dieses Angebot kann nicht mehr angenommen werden.
+
+  trusts:
+    show:
+      title: Trust & Safety
+      hero:
+        title: Sicher kaufen und verkaufen auf PCMarket
+        subtitle: Alles darüber, wie wir Bestellungen schützen, Verkäufer prüfen und den Marktplatz sauber halten.
+        badge: Käuferschutz
+        open_policy_badge: Unsere Schutzrichtlinie ist öffentlich
+      stats:
+        completed_orders: Abgeschlossene Bestellungen
+        verified_sellers: Verifizierte Verkäufer
+        reviewed_listings: Geprüfte Anzeigen
+      protection:
+        title: So funktioniert der Käuferschutz
+        subtitle: Drei einfache Schritte von der Kasse bis zur Haustür.
+        one:
+          title: Mit Vertrauen reservieren
+          text: Eine Bestellung sichert den Bestand. Die Anzeige ist in dem Moment reserviert, in dem du bestellst — niemand kann den Artikel kaufen, den du gerade bestellt hast.
+        two:
+          title: Den vereinbarten Betrag zahlen
+          text: 'Du zahlst genau den an der Kasse angezeigten Preis. Keine versteckten Gebühren, keine Überraschungen: Was du siehst, erhält der Verkäufer.'
+        three:
+          title: Erhaltene Ware oder dein Geld zurück
+          text: Wenn der Artikel nie ankommt oder nicht der Anzeige entspricht, eröffne eine Streitigkeit — unsere Moderatoren entscheiden und erstatten bei berechtigter Beschwerde.
+        direct_notice: 'Zahlungen laufen derzeit direkt zwischen Käufer und Verkäufer über die Bestellseite. Diese Tipps halten dich sicher:'
+        direct_tip_a: Führe jede Unterhaltung im PCMarket-Chat — er ist dein Beweisprotokoll.
+        direct_tip_b: Wickle die Zahlung über den Bestellablauf ab, niemals per Überweisung auf ein privates Konto.
+        direct_tip_c: Prüfe Bewertung, abgeschlossene Verkäufe und Verifizierungsstatus des Verkäufers vor der Bestellung.
+        direct_tip_d: Bestätige die Lieferung erst, wenn das Paket tatsächlich in deinen Händen ist.
+      covered:
+        title: Was abgedeckt ist
+        items:
+          a: Volle Erstattung, wenn dein Artikel nie ankommt.
+          b: Volle Erstattung, wenn der Artikel wesentlich von der Anzeige abweicht.
+          c: Teilweise Erstattungen bei geringen Abweichungen, in der Streitigkeit vereinbart.
+          d: Schutz vom Moment der Zahlung bis zur bestätigten Lieferung.
+          e: Ein strukturierter Streitigkeitsablauf, in dem ein Moderator jeden Fall prüft.
+          f: 'Ein transparentes Protokoll: Jeder Schritt der Bestellung ist zeitgestempelt.'
+        fine_print: Der Schutz gilt für Bestellungen über PCMarket. Missbrauch von Erstattungen führt zur Kontosperrung.
+      safeguards:
+        title: So halten wir den Marktplatz sauber
+        review:
+          title: Jede Anzeige wird geprüft
+          text: Neue Anzeigen durchlaufen vor der Veröffentlichung eine Moderationswarteschlange. Moderatoren prüfen Fotos, Beschreibung und Kategorie vor der Freigabe.
+        verified:
+          title: Achte auf das Verifizierungsabzeichen
+          text: Verkäufer können ein Verifizierungsabzeichen erhalten, indem sie ihre Identität bestätigen und eine Bilanz abgeschlossener Verkäufe aufbauen.
+        reporting:
+          title: Melde, was verdächtig ist
+          text: Jeder kann eine Anzeige mit einem Klick melden. Genug offene Meldungen stellen die Anzeige direkt zurück in die Prüfwarteschlange.
+        chat:
+          title: Chats auf der Plattform halten
+          text: In einer Streitigkeit lesen Moderatoren den PCMarket-Chat zwischen Käufer und Verkäufer. Im Chat zu bleiben hält deine Beweise gültig.
+      support:
+        title: Brauchst du Hilfe?
+        email_title: E-Mail
+        email_hint: Wir antworten innerhalb eines Werktags.
+        phone_title: Telefon
+        phone_hint: Während der Geschäftszeiten an Werktagen.
+        contact_title: Kontaktformular
+        contact_hint: Schildere, was passiert ist, und gib die Bestellnummer an, falls du eine hast.
+        contact_cta: Zum Kontaktformular
+      faq:
+        title: Häufige Fragen
+        q1: Wird meine Zahlung direkt vom Verkäufer eingezogen?
+        a1: Jede Bestellung läuft zuerst über unsere Kasse. Wo Kartenzahlungen aktiv sind, wird der Betrag erst nach bestätigter Lieferung an den Verkäufer ausgezahlt; direkte Abwicklung wird auf der Bestellseite immer erklärt.
+        q2: Was, wenn der Artikel nie ankommt?
+        a2: Eröffne eine Streitigkeit auf der Bestellseite. Wenn die Sendungsverfolgung keine Zustellung zeigt, erhältst du eine volle Erstattung.
+        q3: Kann ich wegen Sinneswandels zurückgeben?
+        a3: Käufe bei gewerblichen Verkäufern tragen das gesetzliche 14-tägige Widerrufsrecht. Privatverkäufe folgen der Rückgaberegeln, die der Verkäufer in der Anzeige angibt — immer zuerst nachlesen.
+        q4: Woran erkenne ich, dass ein Verkäufer vertrauenswürdig ist?
+        a4: Achte auf Bewertung, abgeschlossene Verkäufe und Verifizierungsabzeichen. Ein brandneues Konto ohne Bewertungen verlangt besondere Vorsicht — beginne mit einer kleinen Bestellung.
+        q5: Was passiert, wenn ich eine Anzeige melde?
+        a5: Ein Moderator prüft sie. Drei offene Meldungen stellen jede aktive Anzeige automatisch zurück in die Prüfwarteschlange, und Verkäufer gegen die Regeln werden sanktioniert.
+        q6: Lest ihr meine Chats?
+        a6: Chats sind privat. In einer Streitigkeit können Moderatoren die Unterhaltung zwischen Käufer und Verkäufer lesen, um fair zu entscheiden.
+      cta:
+        title: Bereit, mit gutem Gefühl zu kaufen?
+        subtitle: Stöbere in Anzeigen mit PCMarket-Käuferschutz.
+        browse: Anzeigen ansehen
+        how_it_works: So funktioniert's ansehen
+      legal_intro: 'Du kannst auch lesen:'
+  contact_messages:
+    create:
+      created: Deine Nachricht wurde gesendet. Wir antworten per E-Mail.
+      rate_limited: Du hast zu viele Nachrichten gesendet. Versuche es später erneut.
+      invalid: Deine Nachricht konnte nicht gesendet werden. Prüfe die Felder und versuche es erneut.
+  reports:
+    already_closed: Diese Meldung ist bereits geschlossen.
+    new:
+      title: Diese Anzeige melden
+      lede: Sage uns, was damit nicht stimmt. Meldungen sind vertraulich — der Verkäufer sieht nie, wer gemeldet hat.
+      listing_hint: Diese Anzeige wird gemeldet
+      details_hint: Optional. Konkrete Hinweise, die wir kennen sollten — Widersprüche, Links, was ein Screenshot zeigen würde?
+      submit: Meldung senden
+      cancel: Zurück zur Anzeige
+      note: Falsche Meldungen schaden Verkäufern. Melde, was nach deiner ehrlichen Überzeugung gegen die Regeln verstößt, nicht nur, was dir nicht gefällt.
+    create:
+      created: Danke — deine Meldung wurde gesendet. Ein Moderator schaut sie an.
+      invalid: Diese Meldung konnte nicht gesendet werden. Möglicherweise hast du diese Anzeige bereits gemeldet.
+  cookie_consent:
+    banner:
+      text: Wir verwenden notwendige Cookies, damit PCMarket funktioniert. Mit deiner Einwilligung möchten wir zusätzlich anonyme Analyse-Cookies einsetzen, um den Marktplatz zu verbessern.
+      manage: Einstellungen verwalten
+      reject: Nicht notwendige ablehnen
+      accept: Alle akzeptieren
+      label: Cookie-Einwilligung
+    dialog:
+      title: Cookie-Einstellungen
+      intro: Wähle, wie Cookies auf diesem Gerät verwendet werden. Du kannst deine Wahl jederzeit über den Link „Cookie-Einstellungen" in der Fußzeile ändern.
+      categories: Cookie-Kategorien
+      necessary:
+        title: Notwendige
+        text: Erforderlich für Anmeldung, Sicherheit und die Grundfunktionen der Website. Können nicht deaktiviert werden.
+      analytics:
+        title: Anonyme Analyse
+        text: Aggregierte Statistiken zur Nutzung des Marktplatzes. Keine personenbezogenen Daten, nie an Werbetreibende weitergegeben.
+      cancel: Schließen
+      save: Einstellungen speichern
+  report_mailer:
+    listing_flagged:
+      subject: '"%{title}" ist zurück in der Prüfwarteschlange'
+      greeting: Hallo %{name},
+      body:
+        one: Die Anzeige „%{title}" hat jetzt eine offene Meldung und wurde zurück in die Moderationswarteschlange versetzt.
+        other: Die Anzeige „%{title}" hat jetzt %{count} offene Meldungen und wurde zurück in die Moderationswarteschlange versetzt.
+      view_reports: Meldungen prüfen
+  contact_mailer:
+    received:
+      subject: 'Kontaktformular: %{subject}'
+      subject_line: 'Betreff: %{subject}'
+      locale_label: 'Sprache: %{locale}'
+      in_admin: Im Admin-Posteingang lesen

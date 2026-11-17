@@ -1,0 +1,7 @@
+<%= @message.name %> <<%= @message.email %>>
+
+<%= t(".subject_line", subject: @message.subject) %>
+
+<%= @message.body %>
+
+<%= t(".locale_label", locale: @message.locale) %> · <%= t(".in_admin") %>: <%= admin_contact_message_url(@message) %>

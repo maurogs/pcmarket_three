@@ -30,6 +30,9 @@ module Admin
       params.require(:settings).permit(
         :site_name, :support_email, :support_phone, :commission_percent,
         :featured_price_cents, :featured_days, :min_offer_percent,
+        :min_public_stat, :blog_url,
+        :legal_name, :trade_name, :tax_id, :registered_address,
+        :mercantile_registry_data, :contact_email, :dpo_email, :phone,
         :announcement_enabled, :maintenance_mode,
         announcement_text: I18n.available_locales.map(&:to_s),
         social_links: Admin::Settings::SOCIAL_SITES,
@@ -47,6 +50,16 @@ module Admin
         "featured_price_cents" => format("%.2f", Setting.get("featured_price_cents", 0).to_i / 100.0),
         "featured_days" => Setting.get("featured_days", 7),
         "min_offer_percent" => Setting.get("min_offer_percent", 50),
+        "min_public_stat" => Setting.get("min_public_stat", 50),
+        "blog_url" => Setting.get("blog_url", "").to_s,
+        "legal_name" => Setting.get("legal_name", "").to_s,
+        "trade_name" => Setting.get("trade_name", "").to_s,
+        "tax_id" => Setting.get("tax_id", "").to_s,
+        "registered_address" => Setting.get("registered_address", "").to_s,
+        "mercantile_registry_data" => Setting.get("mercantile_registry_data", "").to_s,
+        "contact_email" => Setting.get("contact_email", "").to_s,
+        "dpo_email" => Setting.get("dpo_email", "").to_s,
+        "phone" => Setting.get("phone", "").to_s,
         "announcement_enabled" => announcement["enabled"] == true,
         "announcement_text" => announcement["text"] || {},
         "maintenance_mode" => Setting.get("maintenance_mode", false) == true,
@@ -57,8 +70,9 @@ module Admin
 
     def changed_keys_preview
       %w[site_name support_email support_phone commission_percent featured_price_cents
-         featured_days min_offer_percent announcement maintenance_mode social_links
-         default_meta_description]
+         featured_days min_offer_percent min_public_stat blog_url legal_name trade_name
+         tax_id registered_address mercantile_registry_data contact_email dpo_email phone
+         announcement maintenance_mode social_links default_meta_description]
     end
   end
 end

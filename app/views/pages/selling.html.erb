@@ -1,0 +1,77 @@
+<% content_for :title, t(".title") %>
+<% commissions_on = Flipper.enabled?(:commissions) %>
+<% commission_percent = Setting.get("commission_percent").to_s %>
+
+<div class="mx-auto max-w-3xl">
+  <h1 class="text-2xl font-bold tracking-tight sm:text-3xl"><%= t(".title") %></h1>
+  <p class="mt-3 text-sm leading-6 text-muted sm:text-base"><%= t(".lede") %></p>
+
+  <section class="mt-8">
+    <h2 class="text-lg font-semibold"><%= t(".steps.title") %></h2>
+    <ol class="mt-4 grid gap-3 sm:grid-cols-2">
+      <% %w[create review sell get_paid].each_with_index do |step, i| %>
+        <li class="card p-4">
+          <span class="flex size-8 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary"><%= i + 1 %></span>
+          <h3 class="mt-3 text-sm font-semibold"><%= t(".steps.#{step}.title") %></h3>
+          <p class="mt-1 text-xs leading-5 text-muted"><%= t(".steps.#{step}.text") %></p>
+        </li>
+      <% end %>
+    </ol>
+  </section>
+
+  <section class="mt-8">
+    <h2 class="text-lg font-semibold"><%= t(".fees.title") %></h2>
+    <% if commissions_on && commission_percent.present? %>
+      <p class="mt-3 text-sm leading-6 text-muted"><%= t(".fees.pct", percent: commission_percent) %></p>
+    <% else %>
+      <p class="mt-3 rounded-md border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-900 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-200">
+        <%= t(".fees.zero") %>
+      </p>
+    <% end %>
+    <p class="mt-3 text-xs leading-5 text-muted"><%= t(".fees.note") %></p>
+  </section>
+
+  <section class="mt-8">
+    <h2 class="text-lg font-semibold"><%= t(".tips.title") %></h2>
+    <ul class="mt-4 grid gap-2.5 sm:grid-cols-2">
+      <% %w[a b c d e f].each do |item| %>
+        <li class="card flex items-start gap-3 p-4 text-sm">
+          <span class="mt-0.5 text-green-600 dark:text-green-400"><%= inline_icon :check, classes: "size-5" %></span>
+          <span><%= t(".tips.items.#{item}") %></span>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+
+  <section class="mt-8">
+    <h2 class="text-lg font-semibold"><%= t(".requirements.title") %></h2>
+    <ul class="mt-4 space-y-2 text-sm leading-6 text-muted">
+      <% %w[a b c d].each do |item| %>
+        <li class="flex gap-2">
+          <span class="mt-0.5 text-muted"><%= inline_icon :chevron_down, classes: "size-4 -rotate-90" %></span>
+          <span><%= t(".requirements.items.#{item}") %></span>
+        </li>
+      <% end %>
+    </ul>
+    <p class="mt-3 text-xs leading-5 text-muted">
+      <%= link_to t(".requirements.guides_link"), page_path("seller-guides"), class: "text-primary underline hover:no-underline" %>
+      ·
+      <%= link_to t(".requirements.terms_link"), legal_page_path("terms"), class: "text-primary underline hover:no-underline" if LegalPage.deliverable_slugs(country_code: current_country_code, locale: I18n.locale.to_s).key?("terms") %>
+    </p>
+  </section>
+
+  <section class="mt-10 rounded-lg bg-primary px-6 py-8 text-center text-white">
+    <h2 class="text-lg font-semibold"><%= t(".cta.title") %></h2>
+    <p class="mx-auto mt-2 max-w-xl text-sm text-white/80"><%= t(".cta.subtitle") %></p>
+    <div class="mt-5 flex flex-wrap items-center justify-center gap-3">
+      <% if authenticated? %>
+        <%= link_to t(".cta.start"), new_sell_listing_path, class: "rounded-md bg-white px-4 py-2 text-sm font-medium text-primary hover:bg-white/90" %>
+      <% else %>
+        <%= link_to t(".cta.start"), new_registration_path, class: "rounded-md bg-white px-4 py-2 text-sm font-medium text-primary hover:bg-white/90" %>
+      <% end %>
+      <% if Flipper.enabled?(:sell_to_us) %>
+        <%= link_to t(".cta.trade_in"), new_trade_in_quote_path, class: "rounded-md border border-white/40 px-4 py-2 text-sm font-medium text-white hover:bg-white/10" %>
+      <% end %>
+    </div>
+  </section>
+</div>

@@ -43,6 +43,7 @@ class Listing < ApplicationRecord
   has_many :offers, dependent: :destroy
   has_many :conversations, dependent: :destroy
   has_many :moderation_events, dependent: :destroy
+  has_many :reports, dependent: :destroy
   has_many :listing_labels, dependent: :destroy
   has_many :labels, through: :listing_labels
   has_many :listing_tags, dependent: :destroy

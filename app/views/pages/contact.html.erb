@@ -1,0 +1,67 @@
+<% content_for :title, t(".title") %>
+<% support_email = Setting.get("support_email").to_s %>
+<% support_phone = Setting.get("support_phone").to_s %>
+<% prefill_name = authenticated? ? [current_user.first_name, current_user.last_name].compact.join(" ") : "" %>
+
+<div class="mx-auto max-w-3xl">
+  <h1 class="text-2xl font-bold tracking-tight sm:text-3xl"><%= t(".title") %></h1>
+  <p class="mt-3 text-sm leading-6 text-muted sm:text-base"><%= t(".lede") %></p>
+
+  <div class="mt-8 grid gap-6 lg:grid-cols-[2fr_1fr]">
+    <div class="card p-5 sm:p-6">
+      <h2 class="text-sm font-semibold"><%= t(".form.title") %></h2>
+      <p class="mt-1 text-xs text-muted"><%= t(".form.hint") %></p>
+
+      <%= form_with model: ContactMessage.new, url: contact_messages_path, class: "mt-4 space-y-4" do |form| %>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <%= form.label :name, class: "block text-sm font-medium text-text" %>
+            <%= form.text_field :name, required: true, maxlength: ContactMessage::NAME_MAX, value: prefill_name, class: "input mt-2 w-full" %>
+          </div>
+          <div>
+            <%= form.label :email, class: "block text-sm font-medium text-text" %>
+            <%= form.email_field :email, required: true, autocomplete: "email", value: authenticated? ? current_user.email_address : "", class: "input mt-2 w-full" %>
+          </div>
+        </div>
+        <div>
+          <%= form.label :subject, class: "block text-sm font-medium text-text" %>
+          <%= form.text_field :subject, required: true, maxlength: ContactMessage::SUBJECT_MAX, class: "input mt-2 w-full" %>
+        </div>
+        <div>
+          <%= form.label :body, class: "block text-sm font-medium text-text" %>
+          <%= form.text_area :body, required: true, rows: 6, maxlength: ContactMessage::BODY_MAX, class: "input mt-2 w-full" %>
+        </div>
+        <div class="flex flex-wrap items-center gap-4">
+          <%= form.submit t(".form.submit"), class: "btn-primary cursor-pointer text-sm" %>
+          <p class="text-xs text-muted"><%= t(".form.rate_limit") %></p>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="space-y-3">
+      <% if support_email.present? %>
+        <div class="card p-4">
+          <h2 class="text-sm font-semibold"><%= t(".channels.email_title") %></h2>
+          <p class="mt-1 text-xs text-muted"><%= t(".channels.email_hint") %></p>
+          <%= mail_to support_email, support_email, class: "mt-2 inline-block text-sm font-medium text-primary hover:underline" %>
+        </div>
+      <% end %>
+      <% if support_phone.present? %>
+        <div class="card p-4">
+          <h2 class="text-sm font-semibold"><%= t(".channels.phone_title") %></h2>
+          <p class="mt-1 text-xs text-muted"><%= t(".channels.phone_hint") %></p>
+          <%= phone_to support_phone, support_phone, class: "mt-2 inline-block text-sm font-medium text-primary hover:underline" %>
+        </div>
+      <% end %>
+      <div class="card p-4">
+        <h2 class="text-sm font-semibold"><%= t(".channels.help_title") %></h2>
+        <p class="mt-1 text-xs text-muted"><%= t(".channels.help_hint") %></p>
+        <%= link_to t(".channels.help_cta"), page_path("help"), class: "mt-2 inline-block text-sm font-medium text-primary hover:underline" %>
+      </div>
+      <div class="card p-4">
+        <h2 class="text-sm font-semibold"><%= t(".channels.hours_title") %></h2>
+        <p class="mt-1 text-xs leading-5 text-muted"><%= t(".channels.hours_text") %></p>
+      </div>
+    </div>
+  </div>
+</div>

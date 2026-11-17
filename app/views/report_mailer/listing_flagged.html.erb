@@ -1,0 +1,4 @@
+<p><%= t(".greeting", name: @recipient.display_name) %></p>
+<p><%= t(".body", count: @reports) %></p>
+<p><%= link_to @listing.title, admin_listing_url(@listing) %></p>
+<p><%= link_to t(".view_reports"), admin_reports_url %></p>

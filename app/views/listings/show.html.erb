@@ -202,6 +202,7 @@
       <div>
         <h2 class="text-sm font-semibold"><%= t(".protection_title") %></h2>
         <p class="mt-0.5 text-xs leading-5 text-muted"><%= t(".protection_text") %></p>
+        <p class="mt-1 text-xs"><%= link_to t(".protection_link"), trust_path, class: "text-primary underline hover:no-underline" %></p>
       </div>
     </div>
 
@@ -217,7 +218,7 @@
     <%= render "listings/show_shipping", listing: listing %>
 
     <p class="mt-6 text-xs text-muted">
-      <%= link_to t(".report"), "#", class: "hover:text-primary hover:underline" %>
+      <%= link_to t(".report"), new_listing_report_path(listing), class: "hover:text-primary hover:underline" %>
     </p>
   </div>
 

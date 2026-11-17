@@ -80,6 +80,49 @@ class Admin::SettingsControllerTest < ActionDispatch::IntegrationTest
     assert_response :ok
   end
 
+  test "edit renders the legal identity inputs" do
+    get edit_admin_settings_path
+    assert_response :ok
+    assert_select "input[name='settings[legal_name]']"
+    assert_select "input[name='settings[tax_id]']"
+    assert_select "textarea[name='settings[registered_address]']"
+    assert_select "input[name='settings[dpo_email]']"
+  end
+
+  test "legal identity values are persisted and feed Setting.legal_identity" do
+    patch admin_settings_path, params: form_params(
+      legal_name: "PC Market Iberia S.L.",
+      trade_name: "PCMarket",
+      tax_id: "B12345678",
+      registered_address: "Calle Ejemplo 1, Madrid",
+      mercantile_registry_data: "Registro Mercantil de Madrid, Tomo 1",
+      contact_email: "hola@pcmarket.example",
+      dpo_email: "dpo@pcmarket.example",
+      phone: "+34 910 000 000"
+    )
+
+    assert_redirected_to edit_admin_settings_path
+    assert_equal "PC Market Iberia S.L.", Setting.get("legal_name")
+    assert_predicate Setting, :legal_identity_complete?
+    assert_equal "dpo@pcmarket.example", Setting.legal_identity["dpo_email"]
+    assert_includes AdminAuditLog.where(action: "settings_update").last.details["keys"], "legal_name"
+  end
+
+  test "a blank legal identity is accepted and leaves legal_identity_complete? false" do
+    patch admin_settings_path, params: form_params
+
+    assert_redirected_to edit_admin_settings_path
+    assert_not Setting.legal_identity_complete?
+  end
+
+  test "an invalid dpo_email re-renders without writing legal identity keys" do
+    patch admin_settings_path, params: form_params(dpo_email: "nope")
+
+    assert_response :unprocessable_entity
+    assert_includes response.body, I18n.t("admin.settings.edit.errors.invalid_email")
+    assert_nil Setting.get("dpo_email")
+  end
+
   private
 
   # A complete, valid submission; tests override single fields.
@@ -93,6 +136,7 @@ class Admin::SettingsControllerTest < ActionDispatch::IntegrationTest
         featured_price_cents: "0",
         featured_days: "7",
         min_offer_percent: "50",
+        min_public_stat: "50",
         announcement_enabled: "0",
         announcement_text: {},
         maintenance_mode: "0",

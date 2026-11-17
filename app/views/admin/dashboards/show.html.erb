@@ -17,6 +17,17 @@
   </div>
 </div>
 
+<%# --- legal identity reminder (Phase 7b) -------------------------------- %>
+<% unless Setting.legal_identity_complete? %>
+  <div class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-sm dark:border-amber-500/40 dark:bg-amber-500/10" role="status">
+    <p class="text-amber-900 dark:text-amber-200">
+      <span class="font-semibold"><%= t(".legal_identity_warning.title") %></span>
+      <span class="block text-xs"><%= t(".legal_identity_warning.body") %></span>
+    </p>
+    <%= link_to t(".legal_identity_warning.cta"), edit_admin_settings_path, class: "btn-secondary" %>
+  </div>
+<% end %>
+
 <%# --- KPI tiles ---------------------------------------------------------- %>
 <div class="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
   <% tiles = [

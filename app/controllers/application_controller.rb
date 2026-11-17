@@ -120,6 +120,50 @@ class ApplicationController < ActionController::Base
       @current_country_code ||= Country.enabled.order(:code).first&.code || "ES"
     end
 
+    # GDPR cookie consent (Phase 7b). The preference payload is written by
+    # app/javascript/controllers/cookie_consent_controller.js as URL-encoded
+    # JSON ({version, categories, timestamp}); "necessary" is always on
+    # because it covers the session/CSRF cookies this app cannot run without.
+    CONSENT_COOKIE = :cookie_consent
+    CONSENT_VERSION = 1
+    CONSENT_CATEGORIES = %w[analytics].freeze # "necessary" is implicit
+
+    def cookie_consent_version
+      CONSENT_VERSION
+    end
+    helper_method :cookie_consent_version
+
+    # True while there is no valid consent cookie (banner must be shown).
+    def cookie_consent_needed?
+      consent_categories.nil?
+    end
+    helper_method :cookie_consent_needed?
+
+    def cookie_consent(category)
+      return true if category.to_s == "necessary"
+
+      consent_categories&.include?(category.to_s) == true
+    end
+    helper_method :cookie_consent
+
+    # Parsed category list from the cookie, or nil when absent/corrupt or
+    # written by an older consent version (bump CONSENT_VERSION to force
+    # everyone through the banner again).
+    def consent_categories
+      return @consent_categories if defined?(@consent_categories)
+
+      raw = cookies[CONSENT_COOKIE].to_s
+      @consent_categories = begin
+        payload = JSON.parse(CGI.unescape(raw))
+        categories = payload["categories"]
+        if payload["version"] == CONSENT_VERSION && categories.is_a?(Array)
+          (categories.map(&:to_s) & (CONSENT_CATEGORIES + %w[necessary])).uniq
+        end
+      rescue JSON::ParserError
+        nil
+      end
+    end
+
     # Impersonation (Phase 6a admin support): while an admin "logs in as" a
     # user, the cookie session carries the impersonator's id and the current
     # user is the target. Drives the sticky red banner everywhere.

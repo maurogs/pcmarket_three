@@ -1,0 +1,66 @@
+<% content_for :title, t(".title") %>
+
+<div class="mb-4">
+  <h1 class="text-xl font-bold"><%= t(".title") %></h1>
+  <p class="mt-1 text-sm text-muted"><%= t(".subtitle", open: @open_count, count: @pagy.count) %></p>
+</div>
+
+<form action="<%= admin_reports_path %>" method="get" class="card mb-4 grid gap-3 p-3 sm:grid-cols-3">
+  <%= select_tag :state,
+        options_for_select([[ t(".filters.all_states"), "" ],
+                            [ t(".filters.open"), "open" ],
+                            [ t(".filters.closed"), "closed" ]], params[:state]),
+        class: "input text-sm", aria: { label: t(".filters.state") } %>
+  <%= select_tag :reason,
+        options_for_select(Report.reason_options.map { |r| [ t(".reasons.#{r}"), r ] }, params[:reason]),
+        include_blank: t(".filters.all_reasons"), class: "input text-sm",
+        aria: { label: t(".filters.reason") } %>
+  <div class="flex items-center gap-2">
+    <button type="submit" class="btn-primary"><%= t(".filters.apply") %></button>
+    <%= link_to t(".filters.clear"), admin_reports_path, class: "btn-secondary" %>
+  </div>
+</form>
+
+<% if @reports.any? %>
+  <div class="card overflow-x-auto">
+    <table class="admin-table w-full min-w-[860px] text-sm">
+      <thead>
+        <tr>
+          <th scope="col"><%= t(".columns.listing") %></th>
+          <th scope="col"><%= t(".columns.reason") %></th>
+          <th scope="col"><%= t(".columns.reporter") %></th>
+          <th scope="col"><%= t(".columns.when") %></th>
+          <th scope="col"><%= t(".columns.state") %></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-border">
+        <% @reports.each do |report| %>
+          <tr>
+            <td>
+              <%= link_to admin_report_path(report), class: "font-medium text-text hover:text-primary" do %>
+                <span class="line-clamp-1"><%= report.listing.title %></span>
+              <% end %>
+              <span class="block text-xs text-muted"><%= report.listing.slug %></span>
+              <% if report.details.present? %>
+                <span class="mt-0.5 block text-xs leading-5 text-muted line-clamp-2"><%= report.details %></span>
+              <% end %>
+            </td>
+            <td><span class="chip"><%= t(".reasons.#{report.reason}") %></span></td>
+            <td><%= report.user.display_name %></td>
+            <td class="whitespace-nowrap text-xs text-muted"><%= l(report.created_at, format: :long) %></td>
+            <td>
+              <% if report.open? %>
+                <span class="chip bg-amber-100 text-amber-900 dark:bg-amber-500/20 dark:text-amber-200"><%= t(".states.open") %></span>
+              <% else %>
+                <span class="chip"><%= t(".states.#{report.resolved_action}") %></span>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <div class="mt-4"><%= results_pagination(@pagy) %></div>
+<% else %>
+  <p class="card px-4 py-8 text-center text-sm text-muted"><%= t(".empty") %></p>
+<% end %>

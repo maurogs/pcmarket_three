@@ -10,6 +10,8 @@ class Admin::PageRenderTest < ActionDispatch::IntegrationTest
     sign_in_as users(:admin)
     @disputed = disputed_order
     @legal_page = legal_page
+    @report = open_report
+    @contact_message = contact_message
   end
 
   # Every GET route in the admin namespace (index/new/show/edit for each
@@ -63,6 +65,10 @@ class Admin::PageRenderTest < ActionDispatch::IntegrationTest
       "legal page new"             => new_admin_legal_page_path,
       "legal page copy form"       => new_admin_legal_page_path(country_code: "ES", locale: "en", slug: "terms"),
       "legal page edit"            => edit_admin_legal_page_path(@legal_page),
+      "reports index"              => admin_reports_path,
+      "report show"                => admin_report_path(@report),
+      "contact messages index"     => admin_contact_messages_path,
+      "contact message show"       => admin_contact_message_path(@contact_message),
       "newsletter index"           => admin_newsletter_subscriptions_path,
       "audit logs"                 => admin_audit_logs_path,
       "audit logs filtered"        => admin_audit_logs_path(subject_type: "Listing", event_action: "approve_listing")
@@ -82,7 +88,9 @@ class Admin::PageRenderTest < ActionDispatch::IntegrationTest
     "seller tags index", "seller tag new", "seller tag edit", "countries index",
     "country edit", "feature flags", "settings", "legal pages index",
     "legal page show", "legal page new", "legal page copy form",
-    "legal page edit", "newsletter index", "audit logs", "audit logs filtered"
+    "legal page edit", "reports index", "report show",
+    "contact messages index", "contact message show",
+    "newsletter index", "audit logs", "audit logs filtered"
   ].freeze
 
   # Phase 6b (part 2) routes — also swept for the non-admin 404 guard.
@@ -93,6 +101,7 @@ class Admin::PageRenderTest < ActionDispatch::IntegrationTest
     labels_index label_new label_edit seller_tags_index seller_tag_new seller_tag_edit
     countries_index country_edit feature_flags settings legal_pages_index
     legal_page_show legal_page_new legal_page_copy_form legal_page_edit
+    reports_index report_show contact_messages_index contact_message_show
     newsletter_index audit_logs audit_logs_filtered
   ].freeze
 
@@ -142,5 +151,16 @@ class Admin::PageRenderTest < ActionDispatch::IntegrationTest
   def legal_page
     LegalPage.create!(country_code: "ES", locale: "en", slug: "terms",
                       title: "Terms", body: "## Terms\n\nPlain text.", published: true)
+  end
+
+  def open_report
+    Report.create!(listing: listings(:gigabyte), user: users(:two),
+                   reason: :prohibited, details: "Item looks banned.")
+  end
+
+  def contact_message
+    ContactMessage.create!(name: "Marta García", email: "marta@example.com",
+                           subject: "Problema con el pedido",
+                           body: "No he recibido el pedido todavía.", locale: "es")
   end
 end

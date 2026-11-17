@@ -14,6 +14,11 @@ module LegalPagesHelper
 
   def legal_markdown(body)
     html = Commonmarker.to_html(body.to_s).gsub(HEADING_ANCHOR, "")
-    sanitize(html, tags: ALLOWED_TAGS, attributes: ALLOWED_ATTRIBUTES)
+    # Explicit sanitizer instance: the helper's `sanitize` depends on
+    # ActionView class-level config, which is not set up for plain objects
+    # (LegalPages::Render includes this module outside the view layer).
+    Rails::HTML5::SafeListSanitizer.new.sanitize(
+      html, tags: ALLOWED_TAGS, attributes: ALLOWED_ATTRIBUTES
+    ).to_s.html_safe # rubocop:disable Rails/OutputSafety
   end
 end

@@ -1,0 +1,4 @@
+<p><strong><%= @message.name %></strong> &lt;<%= mail_to @message.email %>&gt;</p>
+<p><%= t(".subject_line", subject: @message.subject) %></p>
+<p style="white-space:pre-line"><%= @message.body %></p>
+<p><small><%= t(".locale_label", locale: @message.locale) %> · <%= t(".in_admin") %>: <%= admin_contact_message_url(@message) %></small></p>

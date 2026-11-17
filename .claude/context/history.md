@@ -1,5 +1,129 @@
 # History
 
+## 2026-11-18 — Phase 7b: trust & safety page, content pages, contact inbox, listing reports, public legal delivery, cookie consent, footer rebuild
+
+**What changed**
+
+- Migrations: `20261118030001` (`contact_messages`: name/email/subject/body,
+  `locale` string, index on created_at), `20261118030002` (`reports`:
+  listing/user FKs, `reason` enum scam/prohibited/wrong_info/offensive/other,
+  `details`, `resolved_at/resolved_action/resolved_by_id`, + **partial unique
+  index on (listing_id, user_id) WHERE resolved_at IS NULL** — one open
+  report per user per listing at the DB level).
+- **Static content pages**: `PagesController#show` (`/pages/:slug`) with a
+  `PAGE_SLUGS` whitelist (about, how-it-works, selling, help, contact,
+  seller-guides) — unknown slugs 404, no Page model; all copy from I18n
+  (`pages.<underscored_slug>.*`). New templates `pages/{about,how_it_works,
+  selling,help,contact,seller_guides}.html.erb`. The contact page embeds the
+  form posting to `contact_messages_path`.
+- **Contact messages**: `ContactMessage` (name, email, subject 1..140,
+  body 10..5000, `locale` captured from the request, `recent` scope).
+  `ContactMessagesController#create` (unauthenticated, `rate_limit to: 5,
+  within: 30.minutes`) stores the row, enqueues `ContactMailer#received`
+  (→ `Setting "support_email"`, recipient locale) and redirects back with
+  `contact_messages.create.{created,invalid,rate_limited}` flashes. Admin
+  read-only inbox: `Admin::ContactMessagesController` index (pagy 25,
+  **locale filter param is `lang`** — `locale` is the routing segment) +
+  show (full body + metadata).
+- **Listing reports**: signed-in `ReportsController#new/#create` nested
+  under listings; "Report this listing" link on `listings/show` now points
+  at `new_listing_report_path`. `Report` model: reason enum, open/closed
+  by `resolved_at`, `close!(action, admin:)` (arg validated FIRST, then
+  `Report::InvalidTransition` on double-close), `not_own_listing` +
+  `no_open_duplicate` (custom validation adding `:already_reported` to
+  `:user_id` — see gotchas), `FLOOD_THRESHOLD = 3`: the 3rd concurrent
+  OPEN report on a live listing re-enters moderation (`request_revalidation!`)
+  and `after_create_commit` e-mails all admins (`ReportMailer#listing_flagged`,
+  per-admin locale). Admin inbox `Admin::ReportsController` (state/reason
+  filters, open-first ordering) + closing via nested singular resources
+  `report_resolutions` (resolve = acted on listing) / `report_dismissals`
+  — both audited (`audit!`), sidebar entries for Reports and Contact
+  messages.
+- **Public legal pages**: `LegalPagesController#show` `/legal/:slug` —
+  resolution chain request locale → `en` → `Country.default_locale`
+  (`LegalPage.find_public`); renders through `LegalPages::Render`
+  (`app/services/legal_pages/`): `{{legal_name}}`-style placeholders from
+  `Setting.legal_identity`, Commonmarker markdown → allowlisted sanitizer
+  (`LegalPagesHelper#legal_markdown`), TOC. Footer legal column lists only
+  slugs that actually deliver for the country (`LegalPage.deliverable_slugs`,
+  one query).
+- **Trust & Safety**: `/trust-and-safety` (`TrustsController#show`) — live
+  counts from `Trust::Stats.visible`, each stat hidden below
+  `Setting "min_public_stat"` (default 50); safeguards grid + support
+  contact block (email/phone from Settings). Trust links added to
+  cart/checkout footers and the listing-show protection line.
+- **Cookie consent (GDPR)**: `layouts/_footer` hosts `shared/_cookie_consent`
+  (Stimulus `cookie_consent_controller.js`); preferences stored in the
+  `cookie_consent` cookie as URL-encoded JSON `{version, categories,
+  timestamp}` — "necessary" implicit, `analytics` optional; `CONSENT_VERSION = 1`
+  in `ApplicationController` (bump it to re-banner everyone). Helpers
+  `cookie_consent?`/`cookie_consent_needed?`/`cookie_consent_version`.
+  No analytics scripts exist yet, so accepting/rejecting only writes the
+  cookie — covered by `test/controllers/cookie_consent_test.rb`.
+- **Footer rebuilt**: link columns (about/trust/blog; help/contact/support
+  email + phone; legal column; social links; language switcher; newsletter
+  form kept) — all Settings read in ONE `Setting.get_many(FOOTER_KEYS)`.
+- **Legal identity in settings**: `Admin::Settings` spec gained
+  `legal_name/trade_name/tax_id/registered_address/mercantile_registry_data/
+  contact_email/dpo_email/phone` (+ `social_links`, `blog_url`); dashboard
+  shows a "legal identity incomplete" banner driven by
+  `Setting.legal_identity_complete?`. `Setting` model: `get_many(keys)`
+  (single query for cache misses, misses still NOT cached), `IDENTITY_KEYS`
+  + `FOOTER_KEYS`, `legal_identity(values = nil)` (accepts pre-batched
+  values — the footer reuses one read), `DEFAULTS` + `min_public_stat`
+  (seeded settings 5 → 6).
+
+**Gotchas / pre-existing bugs fixed along the way**
+
+- **`params[:locale]` is reserved** by the `scope "(:locale)"` routing
+  segment: any URL carrying `?locale=xx` is matched against the segment and
+  404s for unknown locales. The admin contact-inbox filter therefore uses
+  `lang` (controller + view + tests aligned).
+- **Rails 8.1 `uniqueness` validator always reports `:taken`** in
+  `errors.details` (activerecord 8.1 `uniqueness.rb`) — callers/tests that
+  key off a custom symbol (`:already_reported`) need a custom validation;
+  the partial unique index still backstops race conditions.
+- **`sanitize` is an ActionView helper**: plain service objects mixing the
+  helper module get NoMethodError on the class-level sanitizer — call
+  `Rails::HTML5::SafeListSanitizer.new.sanitize(...)` explicitly; its
+  result is an UNSAFE String → `<%= %>` escapes it (admin legal preview
+  showed literal tags until `.html_safe` was added inside `legal_markdown`).
+- Parameterized mailers must be invoked as `Mailer.with(...).action` —
+  several call sites still used the old zero-arg style.
+- `Report#close!` validates the action argument BEFORE the open? guard so
+  a typo on a closed report raises `ArgumentError`, not `InvalidTransition`.
+- Two locale texts were byte-identical (`trusts.show.safeguards.verified.title`
+  vs `stats.verified_sellers`), breaking a "label not contained in" assertion
+  — the safeguard title was reworded in all 6 files.
+- Lazy-lookup locale keys must sit under the action scope the controller
+  uses (`contact_messages.create.rate_limited`; admin resolution/dismissal
+  flash keys under their own controller scopes).
+
+**Pre-existing tests adjusted**
+
+- `test/seeds/reference_data_test.rb`: seeded settings 5 → 6
+  (`min_public_stat` default).
+- `test/controllers/admin/reports_controller_test.rb`: "index filters by
+  state and reason" was self-contradictory (asserted an EMPTY page after
+  filtering by the state the seeded report has) → rewritten to assert the
+  closed report is visible under `state=closed` and hidden under `open`,
+  reason filtering, and the empty-state message.
+- `test/controllers/admin/access_test.rb`: added `access_report` /
+  `access_contact_message` helpers so the shared access matrix covers the
+  two new admin resources.
+- `test/controllers/listings_controller_test.rb` N+1 guard (≤24 queries on
+  the index) forced the footer/identity batching above: layout Setting reads
+  went from one-query-per-key to two batched reads (footer `FOOTER_KEYS` +
+  `maintenance_mode`).
+
+**New tests**: `test/models/{contact_message,report}_test.rb`,
+`test/controllers/{contact_messages,admin/contact_messages,reports,
+admin/reports,legal_pages,trusts}_controller_test.rb`,
+`test/controllers/cookie_consent_test.rb`,
+`test/controllers/admin/dashboards_controller_test.rb` (legal banner);
+`admin/access_test.rb` extended. Suite: **776 runs / 11 779 assertions**
+green; locale tree now **2564 keys** ×6.
+
 ## 2026-11-18 — Phase 7a: PC Finder, performance scoring & sell-to-us trade-ins (flag `sell_to_us`)
 
 **What changed**

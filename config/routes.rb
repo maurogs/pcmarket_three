@@ -7,6 +7,15 @@ Rails.application.routes.draw do
   scope "(:locale)", locale: /es|en|fr|de|it|pt/ do
     root "pages#home"
 
+    # Trust & Safety and static content pages (Phase 7b). Slugs are
+    # whitelisted in the controllers; unknown ones 404. Public legal pages
+    # resolve (country, locale) → en → country default locale in
+    # LegalPagesController.
+    resource :trust, only: :show, path: "trust-and-safety"
+    resources :pages, only: :show, param: :slug
+    resources :legal_pages, only: :show, param: :slug, path: "legal"
+    resources :contact_messages, only: %i[create]
+
     # Public browsing (Phase 2b). `search` renders the same results page as
     # the listings index — it is a canonical SEO entry, not a redirect.
     resources :listings, only: %i[index show], path: "listings"
@@ -73,6 +82,9 @@ Rails.application.routes.draw do
 
     resources :listings, only: [] do
       resources :offers, only: %i[new create]
+      # "Report this listing" (Phase 7b): signed-in users only; one OPEN
+      # report per user per listing (see Report).
+      resources :reports, only: %i[new create]
     end
     resources :offers, only: :index
     resources :offers, only: [] do
@@ -205,6 +217,15 @@ Rails.application.routes.draw do
       resources :countries, only: %i[index edit update]
       resources :feature_flags, only: %i[index update]
       resources :trade_ins, only: %i[index show update]
+
+      # Listing reports inbox (Phase 7b). Closing a report is a nested
+      # singular resource (POST creates the outcome), matching the
+      # state-transition convention; both are audited.
+      resources :reports, only: %i[index show] do
+        resource :resolution, only: :create, controller: "report_resolutions"
+        resource :dismissal, only: :create, controller: "report_dismissals"
+      end
+      resources :contact_messages, only: %i[index show]
       resource :settings, only: %i[edit update]
       resources :legal_pages
       resources :newsletter_subscriptions, only: %i[index destroy]

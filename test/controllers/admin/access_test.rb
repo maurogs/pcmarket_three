@@ -49,7 +49,12 @@ class Admin::AccessTest < ActionDispatch::IntegrationTest
       new_admin_legal_page_path => :get,
       edit_admin_legal_page_path(access_legal_page) => :get,
       admin_newsletter_subscriptions_path => :get,
-      admin_audit_logs_path => :get
+      admin_audit_logs_path => :get,
+      # Phase 7b surfaces (report inbox + contact form inbox).
+      admin_reports_path => :get,
+      admin_report_path(access_report) => :get,
+      admin_contact_messages_path => :get,
+      admin_contact_message_path(access_contact_message) => :get
     }
   end
 
@@ -173,6 +178,12 @@ class Admin::AccessTest < ActionDispatch::IntegrationTest
          params: { legal_page: { country_code: "ES", locale: "en", slug: "cookies", title: "Hijacked", body: "x" } }
     assert_response :not_found
 
+    post admin_report_resolution_path(access_report)
+    assert_response :not_found
+
+    post admin_report_dismissal_path(access_report)
+    assert_response :not_found
+
     # Nothing above may have changed any state.
     assert Listing.where(id: listings(:pending).id).where(status: :approved).none?
     assert_nil users(:one).reload.banned_at
@@ -199,6 +210,10 @@ class Admin::AccessTest < ActionDispatch::IntegrationTest
     assert_not Flipper.enabled?(:commissions)
     assert_nil Setting.get("commission_percent") # nothing was written
     assert_equal legal_page_count, LegalPage.count
+
+    # 7b state: the report stays open and nothing was audited for it.
+    assert_nil access_report.reload.resolved_at
+    assert_equal 0, AdminAuditLog.where(action: %w[report_resolve report_dismiss]).count
   end
 
   test "admins get through and the layout is the admin one" do
@@ -222,5 +237,17 @@ class Admin::AccessTest < ActionDispatch::IntegrationTest
     @access_review ||= Review.create!(order: orders(:one), reviewer: users(:one),
                                       store: stores(:one), seller: users(:one),
                                       rating: 4, body: "Keep me")
+  end
+
+  def access_report
+    @access_report ||= Report.create!(listing: listings(:gigabyte), user: users(:two),
+                                      reason: :wrong_info, details: "Leave this one open")
+  end
+
+  def access_contact_message
+    @access_contact_message ||= ContactMessage.create!(name: "Ana Inbox", email: "ana@example.com",
+                                                       subject: "Keep this inbox row",
+                                                       body: "This row must survive the access checks.",
+                                                       locale: "en")
   end
 end

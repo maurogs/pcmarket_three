@@ -29,6 +29,13 @@
         <%= form.telephone_field :support_phone, value: @values["support_phone"], class: "input text-sm" %>
         <%= error_for.call(:support_phone) %>
       </div>
+      <div class="sm:col-span-3">
+        <%= form.label :blog_url, class: "block text-sm font-medium" %>
+        <%= form.url_field :blog_url, value: @values["blog_url"], class: "input text-sm",
+              placeholder: "https://blog.example.com" %>
+        <p class="mt-1 text-xs text-muted"><%= t(".blog_url_hint") %></p>
+        <%= error_for.call(:blog_url) %>
+      </div>
     </div>
   </section>
 
@@ -60,6 +67,66 @@
               step: 1, min: 0, max: 100, class: "input text-sm" %>
         <p class="mt-1 text-xs text-muted"><%= t(".min_offer_hint") %></p>
         <%= error_for.call(:min_offer_percent) %>
+      </div>
+      <div>
+        <%= form.label :min_public_stat, class: "block text-sm font-medium" %>
+        <%= form.number_field :min_public_stat, value: @values["min_public_stat"],
+              step: 1, min: 0, class: "input text-sm" %>
+        <p class="mt-1 text-xs text-muted"><%= t(".min_public_stat_hint") %></p>
+        <%= error_for.call(:min_public_stat) %>
+      </div>
+    </div>
+  </section>
+
+  <section class="card p-4">
+    <h2 class="mb-3 text-sm font-semibold text-muted"><%= t(".group_company") %></h2>
+    <p class="mb-3 text-xs text-muted"><%= t(".company_hint") %></p>
+    <div class="grid gap-3 sm:grid-cols-2">
+      <div>
+        <%= form.label :legal_name, class: "block text-sm font-medium" %>
+        <%= form.text_field :legal_name, value: @values["legal_name"], class: "input text-sm" %>
+        <%= error_for.call(:legal_name) %>
+      </div>
+      <div>
+        <%= form.label :trade_name, class: "block text-sm font-medium" %>
+        <%= form.text_field :trade_name, value: @values["trade_name"], class: "input text-sm" %>
+        <p class="mt-1 text-xs text-muted"><%= t(".trade_name_hint") %></p>
+        <%= error_for.call(:trade_name) %>
+      </div>
+      <div>
+        <%= form.label :tax_id, class: "block text-sm font-medium" %>
+        <%= form.text_field :tax_id, value: @values["tax_id"], class: "input text-sm" %>
+        <p class="mt-1 text-xs text-muted"><%= t(".tax_id_hint") %></p>
+        <%= error_for.call(:tax_id) %>
+      </div>
+      <div>
+        <%= form.label :phone, class: "block text-sm font-medium" %>
+        <%= form.telephone_field :phone, value: @values["phone"], class: "input text-sm" %>
+        <%= error_for.call(:phone) %>
+      </div>
+      <div class="sm:col-span-2">
+        <%= form.label :registered_address, class: "block text-sm font-medium" %>
+        <%= form.text_area :registered_address, value: @values["registered_address"], rows: 2,
+              class: "input text-sm" %>
+        <%= error_for.call(:registered_address) %>
+      </div>
+      <div class="sm:col-span-2">
+        <%= form.label :mercantile_registry_data, class: "block text-sm font-medium" %>
+        <%= form.text_area :mercantile_registry_data, value: @values["mercantile_registry_data"], rows: 2,
+              class: "input text-sm" %>
+        <%= error_for.call(:mercantile_registry_data) %>
+      </div>
+      <div>
+        <%= form.label :contact_email, class: "block text-sm font-medium" %>
+        <%= form.email_field :contact_email, value: @values["contact_email"], class: "input text-sm" %>
+        <p class="mt-1 text-xs text-muted"><%= t(".contact_email_hint") %></p>
+        <%= error_for.call(:contact_email) %>
+      </div>
+      <div>
+        <%= form.label :dpo_email, class: "block text-sm font-medium" %>
+        <%= form.email_field :dpo_email, value: @values["dpo_email"], class: "input text-sm" %>
+        <p class="mt-1 text-xs text-muted"><%= t(".dpo_email_hint") %></p>
+        <%= error_for.call(:dpo_email) %>
       </div>
     </div>
   </section>

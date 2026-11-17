@@ -1,0 +1,41 @@
+<% content_for :title, t(".title") %>
+
+<div class="mx-auto max-w-3xl">
+  <h1 class="text-2xl font-bold tracking-tight sm:text-3xl"><%= t(".title") %></h1>
+  <p class="mt-3 text-sm leading-6 text-muted sm:text-base"><%= t(".lede") %></p>
+
+  <div class="mt-8 space-y-4">
+    <% %w[photos titles specs pricing shipping after].each_with_index do |guide, i| %>
+      <section class="card p-5">
+        <div class="flex items-start gap-4">
+          <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary"><%= i + 1 %></span>
+          <div class="min-w-0">
+            <h2 class="text-sm font-semibold"><%= t(".guides.#{guide}.title") %></h2>
+            <p class="mt-1 text-sm leading-6 text-muted"><%= t(".guides.#{guide}.text") %></p>
+            <ul class="mt-3 space-y-1.5 text-xs leading-5 text-muted">
+              <% %w[a b c].each do |bullet| %>
+                <li class="flex gap-2">
+                  <span class="mt-0.5 text-green-600 dark:text-green-400"><%= inline_icon :check, classes: "size-3.5 shrink-0" %></span>
+                  <span><%= t(".guides.#{guide}.bullets.#{bullet}") %></span>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </section>
+    <% end %>
+  </div>
+
+  <section class="mt-10 rounded-lg bg-primary px-6 py-8 text-center text-white">
+    <h2 class="text-lg font-semibold"><%= t(".cta.title") %></h2>
+    <p class="mx-auto mt-2 max-w-xl text-sm text-white/80"><%= t(".cta.subtitle") %></p>
+    <div class="mt-5 flex flex-wrap items-center justify-center gap-3">
+      <% if authenticated? %>
+        <%= link_to t(".cta.list"), new_sell_listing_path, class: "rounded-md bg-white px-4 py-2 text-sm font-medium text-primary hover:bg-white/90" %>
+      <% else %>
+        <%= link_to t(".cta.list"), new_registration_path, class: "rounded-md bg-white px-4 py-2 text-sm font-medium text-primary hover:bg-white/90" %>
+      <% end %>
+      <%= link_to t(".cta.selling"), page_path("selling"), class: "rounded-md border border-white/40 px-4 py-2 text-sm font-medium text-white hover:bg-white/10" %>
+    </div>
+  </section>
+</div>

@@ -27,6 +27,8 @@ module Admin
       [ "admin/seller_tags", "layouts.admin.nav.seller_tags", :seller_tags ],
       [ "admin/countries", "layouts.admin.nav.countries", :countries ],
       [ "admin/feature_flags", "layouts.admin.nav.feature_flags", :feature_flags ],
+      [ "admin/reports", "layouts.admin.nav.reports", :reports ],
+      [ "admin/contact_messages", "layouts.admin.nav.contact_messages", :contact_messages ],
       [ "admin/settings", "layouts.admin.nav.settings", :settings ],
       [ "admin/legal_pages", "layouts.admin.nav.legal_pages", :legal_pages ],
       [ "admin/newsletter_subscriptions", "layouts.admin.nav.newsletter", :newsletter ],
@@ -49,6 +51,8 @@ module Admin
       "admin/seller_tags" => :admin_seller_tags_path,
       "admin/countries" => :admin_countries_path,
       "admin/feature_flags" => :admin_feature_flags_path,
+      "admin/reports" => :admin_reports_path,
+      "admin/contact_messages" => :admin_contact_messages_path,
       "admin/settings" => :edit_admin_settings_path,
       "admin/legal_pages" => :admin_legal_pages_path,
       "admin/newsletter_subscriptions" => :admin_newsletter_subscriptions_path,
@@ -71,6 +75,8 @@ module Admin
       "admin/seller_tags" => %w[seller_tags],
       "admin/countries" => %w[countries],
       "admin/feature_flags" => %w[feature_flags],
+      "admin/reports" => %w[reports report_resolutions report_dismissals],
+      "admin/contact_messages" => %w[contact_messages],
       "admin/settings" => %w[settings],
       "admin/legal_pages" => %w[legal_pages],
       "admin/newsletter_subscriptions" => %w[newsletter_subscriptions],
@@ -112,6 +118,8 @@ module Admin
       settings: "M12 15a3 3 0 100-6 3 3 0 000 6zM12 3.75l1.5 2.25h2.6l.65 2.6L18.75 12l-2 3.4-.65 2.6h-2.6L12 20.25l-1.5-2.25h-2.6l-.65-2.6-2-3.4.65-2.6h2.6L12 3.75z",
       legal_pages: "M6.75 3.75h7.5l3.75 3.75v12a1.5 1.5 0 01-1.5 1.5h-9.75a1.5 1.5 0 01-1.5-1.5V5.25a1.5 1.5 0 011.5-1.5zM14.25 3.75v3.75h3.75M8.25 12h7.5m-7.5 3.75h5.25",
       newsletter: "M3.75 6.75A1.5 1.5 0 015.25 5.25h13.5a1.5 1.5 0 011.5 1.5v10.5a1.5 1.5 0 01-1.5 1.5h-13.5a1.5 1.5 0 01-1.5-1.5V6.75zM4.5 7l7.5 5.25L19.5 7",
+      reports: "M4.5 20.25V4.5m0 1.5h6.375l1.5 2.25-1.5 2.25H4.5m7.875 0H19.5v6.75h-7.125l-1.5-2.25",
+      contact_messages: "M4.5 5.25h15a1.5 1.5 0 011.5 1.5v9a1.5 1.5 0 01-1.5 1.5H9.75L6 20.25v-3h-1.5a1.5 1.5 0 01-1.5-1.5v-9a1.5 1.5 0 011.5-1.5zM7.5 9h9m-9 3.75h6",
       audit_logs: "M9 4.5h6a1.1 1.1 0 011.1 1.1v.4h1.4a1.5 1.5 0 011.5 1.5v10.5a1.5 1.5 0 01-1.5 1.5h-11a1.5 1.5 0 01-1.5-1.5V7.5a1.5 1.5 0 011.5-1.5h1.4v-.4A1.1 1.1 0 019 4.5zM9.75 12.75l1.5 1.5 3-3"
     }.freeze
 

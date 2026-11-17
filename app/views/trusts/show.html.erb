@@ -1,0 +1,154 @@
+<% content_for :title, t(".title") %>
+<% escrow = Flipper.enabled?(:stripe_checkout) %>
+<% legal = LegalPage.deliverable_slugs(country_code: current_country_code, locale: I18n.locale.to_s) %>
+
+<div class="mx-auto max-w-4xl">
+  <%# --- hero ------------------------------------------------------------- %>
+  <section class="rounded-lg border border-border bg-surface p-6 sm:p-10">
+    <h1 class="text-2xl font-bold tracking-tight sm:text-3xl"><%= t(".hero.title") %></h1>
+    <p class="mt-3 max-w-2xl text-sm leading-6 text-muted sm:text-base"><%= t(".hero.subtitle") %></p>
+    <div class="mt-4 flex flex-wrap gap-3 text-xs">
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 font-medium text-primary dark:bg-primary/20">
+        <span class="text-primary"><%= inline_icon :shield, classes: "size-4" %></span>
+        <%= t(".hero.badge") %>
+      </span>
+      <% if legal.key?("buyer_protection") %>
+        <%= link_to legal_page_path("buyer_protection"), class: "inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1 font-medium text-text hover:border-primary hover:text-primary" do %>
+          <%= inline_icon :check, classes: "size-4" %>
+          <%= t(".hero.open_policy_badge") %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <% if @stats.any? %>
+      <dl class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <% @stats.each do |key, value| %>
+          <div class="rounded-md border border-border bg-surface-muted px-4 py-3">
+            <dt class="text-xs text-muted"><%= t(".stats.#{key}") %></dt>
+            <dd class="mt-1 text-xl font-bold text-text"><%= number_with_delimiter(value) %></dd>
+          </div>
+        <% end %>
+      </dl>
+    <% end %>
+  </section>
+
+  <%# --- how buyer protection works (3 steps) ------------------------------ %>
+  <section class="mt-8">
+    <h2 class="text-lg font-semibold"><%= t(".protection.title") %></h2>
+    <p class="mt-1 text-sm text-muted"><%= t(".protection.subtitle") %></p>
+    <ol class="mt-4 grid gap-3 sm:grid-cols-3">
+      <% %w[one two three].each_with_index do |step, i| %>
+        <li class="card p-4">
+          <span class="flex size-8 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary"><%= i + 1 %></span>
+          <h3 class="mt-3 text-sm font-semibold"><%= t(".protection.#{step}.title") %></h3>
+          <p class="mt-1 text-xs leading-5 text-muted"><%= t(".protection.#{step}.text") %></p>
+        </li>
+      <% end %>
+    </ol>
+    <% unless escrow %>
+      <p class="mt-3 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200">
+        <%= t(".protection.direct_notice") %>
+      </p>
+      <ul class="mt-3 grid gap-1.5 text-xs text-muted sm:grid-cols-2">
+        <% %w[a b c d].each do |tip| %>
+          <li class="flex gap-2">
+            <span class="text-primary"><%= inline_icon :check, classes: "mt-0.5 size-4" %></span>
+            <%= t(".protection.direct_tip_#{tip}") %>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+  </section>
+
+  <%# --- what's covered ---------------------------------------------------- %>
+  <section class="mt-8">
+    <h2 class="text-lg font-semibold"><%= t(".covered.title") %></h2>
+    <ul class="mt-4 grid gap-2.5 sm:grid-cols-2">
+      <% %w[a b c d e f].each do |item| %>
+        <li class="card flex items-start gap-3 p-4 text-sm">
+          <span class="mt-0.5 text-green-600 dark:text-green-400"><%= inline_icon :check, classes: "size-5" %></span>
+          <span><%= t(".covered.items.#{item}") %></span>
+        </li>
+      <% end %>
+    </ul>
+    <p class="mt-3 text-xs text-muted"><%= t(".covered.fine_print") %></p>
+  </section>
+
+  <%# --- how we keep the marketplace safe ---------------------------------- %>
+  <section class="mt-8">
+    <h2 class="text-lg font-semibold"><%= t(".safeguards.title") %></h2>
+    <div class="mt-4 grid gap-3 sm:grid-cols-2">
+      <% %w[review verified reporting chat].each do |key| %>
+        <div class="card p-4">
+          <h3 class="text-sm font-semibold"><%= t(".safeguards.#{key}.title") %></h3>
+          <p class="mt-1 text-xs leading-5 text-muted"><%= t(".safeguards.#{key}.text") %></p>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <%# --- support channels ---------------------------------------------------- %>
+  <% support_email = Setting.get("support_email").to_s %>
+  <% support_phone = Setting.get("support_phone").to_s %>
+  <section class="mt-8">
+    <h2 class="text-lg font-semibold"><%= t(".support.title") %></h2>
+    <div class="mt-4 grid gap-3 sm:grid-cols-3">
+      <% if support_email.present? %>
+        <div class="card p-4">
+          <h3 class="text-sm font-semibold"><%= t(".support.email_title") %></h3>
+          <p class="mt-1 text-xs text-muted"><%= t(".support.email_hint") %></p>
+          <%= mail_to support_email, support_email, class: "mt-2 inline-block text-sm font-medium text-primary hover:underline" %>
+        </div>
+      <% end %>
+      <% if support_phone.present? %>
+        <div class="card p-4">
+          <h3 class="text-sm font-semibold"><%= t(".support.phone_title") %></h3>
+          <p class="mt-1 text-xs text-muted"><%= t(".support.phone_hint") %></p>
+          <%= phone_to support_phone, support_phone, class: "mt-2 inline-block text-sm font-medium text-primary hover:underline" %>
+        </div>
+      <% end %>
+      <div class="card p-4">
+        <h3 class="text-sm font-semibold"><%= t(".support.contact_title") %></h3>
+        <p class="mt-1 text-xs text-muted"><%= t(".support.contact_hint") %></p>
+        <%= link_to t(".support.contact_cta"), page_path("contact"), class: "mt-2 inline-block text-sm font-medium text-primary hover:underline" %>
+      </div>
+    </div>
+  </section>
+
+  <%# --- FAQ (6 Q&A accordion) ------------------------------------------------ %>
+  <section class="mt-8">
+    <h2 class="text-lg font-semibold"><%= t(".faq.title") %></h2>
+    <div class="mt-4 space-y-2">
+      <% (1..6).each do |n| %>
+        <details class="card group p-0 [&_summary::-webkit-details-marker]:hidden">
+          <summary class="flex min-h-11 cursor-pointer items-center justify-between gap-3 px-4 py-3 text-sm font-medium">
+            <%= t(".faq.q#{n}") %>
+            <span class="text-muted transition group-open:rotate-180" aria-hidden="true">
+              <%= inline_icon :chevron_down, classes: "size-4" %>
+            </span>
+          </summary>
+          <p class="border-t border-border px-4 py-3 text-sm leading-6 text-muted"><%= t(".faq.a#{n}") %></p>
+        </details>
+      <% end %>
+    </div>
+  </section>
+
+  <%# --- CTA ----------------------------------------------------------------- %>
+  <section class="mt-10 rounded-lg bg-primary px-6 py-8 text-center text-white">
+    <h2 class="text-lg font-semibold"><%= t(".cta.title") %></h2>
+    <p class="mx-auto mt-2 max-w-xl text-sm text-white/80"><%= t(".cta.subtitle") %></p>
+    <div class="mt-5 flex flex-wrap items-center justify-center gap-3">
+      <%= link_to t(".cta.browse"), listings_path, class: "rounded-md bg-white px-4 py-2 text-sm font-medium text-primary hover:bg-white/90" %>
+      <%= link_to t(".cta.how_it_works"), page_path("how-it-works"), class: "rounded-md border border-white/40 px-4 py-2 text-sm font-medium text-white hover:bg-white/10" %>
+    </div>
+  </section>
+
+  <% legal_links = %w[terms privacy returns buyer_protection].filter_map do |slug|
+       link_to t("legal_pages.slugs.#{slug}"), legal_page_path(slug), class: "text-primary hover:underline" if legal.key?(slug)
+     end %>
+  <% if legal_links.any? %>
+    <p class="mt-6 text-xs text-muted">
+      <%= t(".legal_intro") %> <%= safe_join(legal_links, tag.span(" · ", class: "text-muted")) %>
+    </p>
+  <% end %>
+</div>

@@ -1,0 +1,37 @@
+<% content_for :title, t(".title") %>
+
+<div class="mx-auto max-w-xl">
+  <h1 class="text-2xl font-bold tracking-tight"><%= t(".title") %></h1>
+  <p class="mt-2 text-sm leading-6 text-muted"><%= t(".lede") %></p>
+
+  <div class="mt-4 flex items-center gap-3 rounded-md border border-border bg-surface-muted px-4 py-3">
+    <% if @listing.photos.attached? %>
+      <%= image_tag url_for(@listing.photos.first), alt: @listing.title, class: "size-12 rounded object-cover" %>
+    <% end %>
+    <div class="min-w-0">
+      <p class="truncate text-sm font-medium"><%= @listing.title %></p>
+      <p class="text-xs text-muted"><%= t(".listing_hint") %></p>
+    </div>
+  </div>
+
+  <%= form_with model: @report, url: listing_reports_path(@listing), class: "mt-6 space-y-5" do |form| %>
+    <div>
+      <%= form.label :reason, class: "block text-sm font-medium text-text" %>
+      <%= form.select :reason, Report.reason_options.map { |reason|
+            [ Report.human_attribute_name("reason/#{reason}"), reason ]
+          }, {}, class: "input mt-2 w-full" %>
+    </div>
+
+    <div>
+      <%= form.label :details, class: "block text-sm font-medium text-text" %>
+      <p class="mt-1 text-xs text-muted"><%= t(".details_hint") %></p>
+      <%= form.text_area :details, rows: 5, maxlength: 2000, class: "input mt-2 w-full" %>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-4">
+      <%= form.submit t(".submit"), class: "btn-primary cursor-pointer text-sm" %>
+      <%= link_to t(".cancel"), listing_path(@listing), class: "text-sm text-muted underline hover:no-underline hover:text-text" %>
+    </div>
+    <p class="text-xs leading-5 text-muted"><%= t(".note") %></p>
+  <% end %>
+</div>

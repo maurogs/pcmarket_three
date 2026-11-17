@@ -376,4 +376,86 @@
     font-size: 0.7rem;
     font-weight: 600;
   }
+
+  /* Typography for sanitized legal-page markdown (public /legal pages). */
+  .prose-market {
+    color: var(--color-muted);
+    font-size: 0.875rem;
+    line-height: 1.7;
+  }
+  .prose-market h1,
+  .prose-market h2,
+  .prose-market h3,
+  .prose-market h4 {
+    color: var(--color-text);
+    font-weight: 600;
+    line-height: 1.35;
+    margin-top: 1.75rem;
+    scroll-margin-top: 5rem; /* sticky header offset for in-page anchors */
+  }
+  .prose-market h1 { font-size: 1.35rem; }
+  .prose-market h2 { font-size: 1.1rem; }
+  .prose-market h3 { font-size: 0.95rem; }
+  .prose-market h4 { font-size: 0.875rem; }
+  .prose-market > h2:first-child,
+  .prose-market > h3:first-child { margin-top: 0; }
+  .prose-market p { margin-top: 0.85rem; }
+  .prose-market ul,
+  .prose-market ol {
+    margin-top: 0.85rem;
+    padding-left: 1.4rem;
+  }
+  .prose-market ul { list-style: disc; }
+  .prose-market ol { list-style: decimal; }
+  .prose-market li { margin-top: 0.35rem; }
+  .prose-market a {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+  .prose-market blockquote {
+    border-left: 3px solid var(--color-border);
+    margin-top: 1rem;
+    padding: 0.25rem 0 0.25rem 1rem;
+    font-style: italic;
+  }
+  .prose-market code {
+    background-color: var(--color-surface-muted);
+    border: 1px solid var(--color-border);
+    border-radius: 0.25rem;
+    padding: 0.05rem 0.3rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+  }
+  .prose-market pre {
+    background-color: var(--color-surface-muted);
+    border: 1px solid var(--color-border);
+    border-radius: 0.4rem;
+    margin-top: 1rem;
+    overflow-x: auto;
+    padding: 0.75rem 1rem;
+  }
+  .prose-market pre code { border: 0; background: none; padding: 0; }
+  .prose-market hr {
+    border: 0;
+    border-top: 1px solid var(--color-border);
+    margin-top: 1.75rem;
+  }
+  .prose-market table {
+    border-collapse: collapse;
+    margin-top: 1rem;
+    width: 100%;
+    font-size: 0.8rem;
+  }
+  .prose-market th,
+  .prose-market td {
+    border: 1px solid var(--color-border);
+    padding: 0.45rem 0.6rem;
+    text-align: left;
+    vertical-align: top;
+  }
+  .prose-market th {
+    background-color: var(--color-surface-muted);
+    color: var(--color-text);
+    font-weight: 600;
+  }
 }

@@ -1,0 +1,8 @@
+<%= t(".greeting", name: @recipient.display_name) %>
+
+<%= t(".body", count: @reports) %>
+
+<%= @listing.title %>
+<%= admin_listing_url(@listing) %>
+
+<%= t(".view_reports") %>: <%= admin_reports_url %>

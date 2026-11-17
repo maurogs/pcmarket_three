@@ -39,6 +39,8 @@ en:
         newsletter: Newsletter
         audit_logs: Audit log
         trade_ins: Trade-ins
+        reports: Reports
+        contact_messages: Contact messages
   nav:
     search_placeholder: Search graphics cards, processors, laptops…
     search_submit: Search
@@ -93,6 +95,25 @@ en:
     selling_requirements: Selling requirements
     language: Language
     copyright: "© %{year} %{brand}. All rights reserved."
+    trust_safety: Trust & Safety
+    blog: Blog
+    help_centre: Help centre
+    how_it_works: How it works
+    sell_on: Sell on PCMarket
+    seller_guides: Seller guides
+    pc_finder: PC Finder
+    sell_to_us: Sell to us
+    legal: Legal
+    cookie_preferences: Cookie preferences
+    follow_us: Follow us
+    no_social: Our social profiles are on their way.
+    country_indicator: Showing results for %{country}
+    social:
+      instagram: Instagram
+      tiktok: TikTok
+      youtube: YouTube
+      x: X
+      discord: Discord
   locales:
     es: Español
     en: English
@@ -151,6 +172,250 @@ en:
         under_budget_title: Gaming PCs under 1.000 €
         under_budget_more: See all gaming PCs under 1.000 €
         best_for_title: Best PCs for popular games
+    about:
+      title: About PCMarket
+      lede: PCMarket is the marketplace dedicated to PC hardware in our market — new and second-hand, built by people who build PCs.
+      cards:
+        mission:
+          title: One category, done properly
+          text: General marketplaces bury PC parts in noise. We go deep on specs, sockets and compatibility instead.
+        wide:
+          title: New and second-hand side by side
+          text: Upgraders, repair shops and hobbyists share the same catalogue — every listing type is welcome as long as it is honest.
+        fair:
+          title: Fair for both sides
+          text: Clear protection for buyers, clear rules and prompt payouts for sellers.
+      story:
+        title: Why we started
+        p1: 'Anyone who has hunted for a compatible graphics card, CPU socket or laptop panel knows the pain: half the listings omit the one spec that decides compatibility, and nobody protects the transaction.'
+        p2: PCMarket fixes both problems. Structured specifications on every listing, human moderation before publication and buyer protection on every order.
+      values:
+        title: What we hold to
+        items:
+          a: Honest listings — enforced by real moderators, not bots alone.
+          b: Fast, human support.
+          c: 'Transparent rules: read them, they are short.'
+          d: Privacy by default — only the data a sale actually needs.
+      promise:
+        title: Our promise
+        text: Every order on PCMarket is protected. If something goes wrong, we fix it.
+        trust_cta: How we protect you
+        contact_cta: Talk to us
+    how_it_works:
+      title: How it works
+      lede: From search to doorstep in a handful of small steps.
+      search:
+        title: Find the part
+        filter:
+          title: Filters that respect specs
+          text: Filter by socket, chipset, capacity, condition and more. Specs are structured on every listing, so the filters actually work.
+        series:
+          title: Curated series
+          text: Browse curated roundups of the best components by range.
+        pc_finder:
+          title: PC Finder quiz
+          text: Not sure what you need? Answer a few questions and we suggest ready-to-buy gaming PCs.
+      buy:
+        title: Buy safely
+        reserve:
+          title: Reserve the item
+          text: Ordering locks stock — the listing is reserved the moment you check out.
+        pay:
+          title: Pay at checkout
+          text: One checkout, one clear total. Card details are processed by our payment provider and never stored by us.
+        receive:
+          title: Receive and confirm
+          text: Track the order, confirm delivery, leave a review. If something is off, open a dispute before confirming.
+        escrow_note: Card payments are captured by our payment provider and released to the seller once you confirm delivery.
+        direct_note: After checkout, payment and delivery are arranged on the order page. Always settle through PCMarket and keep the conversation in chat.
+        trust_link: Read the full buyer protection guide.
+      pay:
+        title: One clear total
+        items:
+          methods: Pay by card, or settle directly where that mode is enabled.
+          hold: The listing is held for you the moment you order.
+          receipt: Every order has an itemised record you can revisit at any time.
+      more:
+        title: Good to know
+        tracking:
+          title: Track your orders
+          text: Orders have a status page inside your account with every recorded step.
+        trust:
+          title: Buyer protection
+          text: What is covered, what is not, and how disputes work.
+        help:
+          title: Help centre
+          text: Answers to the questions we get most often.
+      cta:
+        title: Your next part is one click away
+        browse: Browse listings
+        sell: Start selling
+    selling:
+      title: Sell on PCMarket
+      lede: Your spare graphics card is someone's upgrade. List it in minutes and get paid when it ships.
+      steps:
+        title: Four steps to your first sale
+        create:
+          title: Create a great listing
+          text: Photos of the actual item, an honest condition and — above all — the full specification list. Structured specs are what make buyers click.
+        review:
+          title: Pass a quick review
+          text: A moderator checks the listing before it goes public. Most listings pass within one business day.
+        sell:
+          title: Chat, reserve, ship
+          text: Answer questions, accept offers if you like them, then ship with tracking. The order page walks you through each step.
+        get_paid:
+          title: Get paid
+          text: Funds settle after the buyer confirms delivery. Verified sellers settle faster.
+      fees:
+        title: Fees
+        pct: PCMarket charges a %{percent}% commission on completed sales.
+        zero: Zero commission while PCMarket is in its launch period — you keep 100% of every sale.
+        note: Listing is free. You are only charged when a sale completes.
+      tips:
+        title: Tips from our best sellers
+        items:
+          a: Photograph the item itself — stock photos get scrolled past.
+          b: 'List the specs buyers search for: socket, chipset, capacity, hours used.'
+          c: Price from sold comparables, not from hopes.
+          d: Ship within one business day — speed is the number-one review driver.
+          e: Answer chat messages quickly; slow replies lose sales.
+          f: Be honest about faults. A described flaw beats a surprise return.
+      requirements:
+        title: Before you list
+        items:
+          a: The item must be yours to sell and legal in your country.
+          b: Prohibited items (counterfeits, unsafe parts) are removed — read the rules first.
+          c: Sellers must be 18 or selling with parental consent.
+          d: Shipping and return duties differ when you sell as a business rather than privately.
+        guides_link: Seller guides
+        terms_link: Terms of service
+      cta:
+        title: Ready when you are
+        subtitle: Creating an account is free and listing takes minutes.
+        start: Create a listing
+        trade_in: Or sell the whole machine to us
+    contact:
+      title: Contact us
+      lede: A question about an order, a listing or the platform itself? This reaches a human.
+      form:
+        title: Send us a message
+        hint: We answer within one business day, in the language you write in.
+        submit: Send message
+        rate_limit: Up to 5 messages per half hour.
+      channels:
+        email_title: Direct e-mail
+        email_hint: Prefer plain e-mail? Write to us here.
+        phone_title: Phone
+        phone_hint: Call during business hours.
+        help_title: The answer may already exist
+        help_hint: Most questions are covered in the help centre.
+        help_cta: Open the help centre
+        hours_title: Support hours
+        hours_text: Monday to Friday, 9:00–18:00. Orders keep moving around the clock.
+    help:
+      title: Help centre
+      lede: Short answers to the questions we get most. Search, or dig through a topic.
+      search_label: Search help topics
+      search_placeholder: Type a word, like "refund" or "shipping"
+      no_results: Nothing matches that search — try another word, or contact us.
+      groups:
+        buying: Buying
+        selling: Selling
+        payments: Payments
+        shipping: Shipping
+        account: Account
+      faq:
+        buying:
+          q1: How do I know if a part is compatible?
+          a1: Every listing publishes structured specs — socket, chipset, capacity, form factor. Filters respect them, and gaming PCs carry a compatibility note.
+          q2: Can I negotiate the price?
+          a2: 'Many sellers accept offers: if the listing shows a "Make offer" button, send one and the seller can accept, decline or counter in chat.'
+          q3: How do I judge a seller?
+          a3: Their store page shows average rating, completed sales and whether they hold the verified badge. New accounts deserve extra caution.
+        selling:
+          q1: How long does listing approval take?
+          a1: Most listings are reviewed within one business day. You get an e-mail when the listing goes live — or the reason if it does not pass.
+          q2: When do I get paid?
+          a2: Funds settle shortly after the buyer confirms delivery; verified sellers settle faster. The sale detail in your dashboard shows the exact state.
+          q3: Can I cancel a sale?
+          a3: Only before you ship. Once the parcel is on its way, cancellations go through the dispute flow so the buyer stays protected.
+        payments:
+          q1: Which payment methods work?
+          a1: Card payments are processed at checkout. Where direct settlement is enabled, the order page explains how buyer and seller complete it.
+          q2: Are my card details stored?
+          a2: Never. Card data is handled by our payment provider; PCMarket keeps only the transaction record.
+          q3: When is my card charged?
+          a3: At checkout. On protected orders, funds reach the seller only after delivery is confirmed.
+        shipping:
+          q1: Who pays for shipping?
+          a1: The buyer, as shown at checkout. Sellers can also offer free shipping or in-person pickup.
+          q2: How do I track my order?
+          a2: Each order has a status page in your account, and sellers attach a tracking reference when they ship.
+          q3: What if the parcel arrives damaged?
+          a3: Photograph it, note the damage with the carrier if possible, and open a dispute within 48 hours — damage claims move fastest.
+        account:
+          q1: How do I change my password?
+          a1: In account settings under Security. Use "Forgot password" if you cannot sign in.
+          q2: Can I delete my account?
+          a2: Yes — account settings includes data deletion with a short grace period before it becomes final.
+          q3: Can I export my data?
+          a3: One click in account settings produces a machine-readable copy of your listings, orders and messages.
+      still_lost:
+        title: Still stuck?
+        text: A human reads every message — with an order number, even faster.
+        cta: Contact us
+    seller_guides:
+      title: Seller guides
+      lede: The playbook our best-rated sellers follow. Six short guides.
+      guides:
+        photos:
+          title: Photograph the item you actually sell
+          text: Natural light, at least four angles, plus close-ups of ports, labels and any fault. Keep the serial label readable.
+          bullets:
+            a: Shoot the actual item — never a stock photo.
+            b: Show the accessories and cables you will really include.
+            c: Photograph faults up close; honesty turns browsers into buyers.
+        titles:
+          title: Write titles that match searches
+          text: Buyers type real model numbers, not "awesome graphics card". Brand, model, capacity and condition belong in the title.
+          bullets:
+            a: 'Model number first: "NVIDIA RTX 3070 8GB".'
+            b: 'State the condition: new, refurbished or used.'
+            c: Skip ALL-CAPS and emoji — they erode trust.
+        specs:
+          title: Fill in every spec field
+          text: Structured specs power filters and compatibility checks. A missing socket or chipset hides your listing from most searches.
+          bullets:
+            a: Complete the structured spec panel, not just the description.
+            b: Include capacity, generation and interface where they apply.
+            c: Add hours used for GPUs and consoles — buyers ask anyway.
+        pricing:
+          title: Price from sold comparables
+          text: The market shows what comparable listings sold for. Price slightly under them for a fast sale, above them if you can wait.
+          bullets:
+            a: Check recently sold listings before setting the price.
+            b: Factor shipping into your bottom line before discounting.
+            c: A firm price beats a bargain followed by endless lowball chats.
+        shipping:
+          title: Pack like the part matters — it does
+          text: Anti-static bag, rigid box, generous padding on every face. Graphics cards and motherboards bend in transit without stiffeners.
+          bullets:
+            a: Never ship a GPU loose in an envelope.
+            b: Keep the carrier receipt until delivery is confirmed.
+            c: Attach the tracking reference on the order page immediately.
+        after:
+          title: After the sale
+          text: Ship within one business day, attach tracking, and answer chat politely and fast. Smooth sales are what raise conversion on the next one.
+          bullets:
+            a: A shipped today beats a cheaper listing shipped Monday.
+            b: Thank the buyer — reviews are a two-way street.
+            c: If something goes wrong, message first; disputes last.
+      cta:
+        title: Put these into practice
+        subtitle: A guide-conformant listing passes review on the first try almost every time.
+        list: Create a listing
+        selling: Selling overview
   sessions:
     new:
       title: Log in
@@ -358,6 +623,12 @@ en:
             role:
               cannot_demote_self: You can't remove your own admin role
               last_admin: The platform must keep at least one admin
+        report:
+          attributes:
+            user_id:
+              already_reported: You have already reported this listing
+            base:
+              not_own_listing: You cannot report your own listing
     models:
       address: Address
       api_token: API token
@@ -681,6 +952,18 @@ en:
         status/paid: Paid
         status/rejected: Rejected
         status/expired: Expired
+      contact_message:
+        name: Name
+        email: E-mail
+        subject: Subject
+        body: Message
+        locale: Language
+      report:
+        listing: Listing
+        user: Reporter
+        reason: Reason
+        details: Details
+        resolved_action: Resolution
   shared:
     error_summary:
       title:
@@ -1635,6 +1918,10 @@ en:
           title: Latest signups
           all: View users
           empty: No signups yet
+        legal_identity_warning:
+          title: Legal identity incomplete
+          body: Legal pages and the footer show fewer details until the company information in site settings is complete.
+          cta: Complete company details
     moderations:
       index:
         title: Moderation queue
@@ -2499,6 +2786,14 @@ en:
           invalid_url: is not a valid URL
         submit: Save settings
         cancel: Discard
+        group_company: Company identity
+        company_hint: Shown on legal pages and in the footer. Blank fields never block the site — but complete them before the public launch.
+        trade_name_hint: Trading name; falls back to the site name.
+        tax_id_hint: VAT or national identification number.
+        contact_email_hint: Public legal contact; falls back to the support address.
+        dpo_email_hint: Data-protection contact shown on the privacy page.
+        blog_url_hint: 'Full https:// URL of your blog; the footer Blog link appears only when set.'
+        min_public_stat_hint: Trust-page statistics below this number stay hidden (default 50).
       update:
         updated: Settings saved
         invalid: Check the marked fields
@@ -2602,6 +2897,101 @@ en:
           paid: Payment sent
           rejected: Reject
           expired: Mark expired
+    reports:
+      index:
+        title: Reports
+        subtitle: "%{open} open of %{count} total"
+        filters:
+          all_states: All states
+          open: Open
+          closed: Closed
+          state: State
+          all_reasons: All reasons
+          reason: Reason
+          apply: Apply
+          clear: Clear
+        columns:
+          listing: Listing
+          reason: Reason
+          reporter: Reporter
+          when: Reported
+          state: State
+        reasons:
+          scam: Scam
+          prohibited: Prohibited item
+          wrong_info: Wrong or misleading information
+          offensive: Offensive content
+          other: Something else
+        states:
+          open: Open
+          resolved: Resolved
+          dismissed: Dismissed
+        empty: No reports match these filters.
+      show:
+        title: Report detail
+        subtitle: Flagged listing reported by the community
+        states:
+          open: Open
+          resolved: Resolved
+          dismissed: Dismissed
+        report_section: The report
+        columns:
+          reason: Reason
+          when: Received
+        details_label: What the reporter said
+        no_details: The reporter did not add details.
+        closed_at: 'Closed %{time} by %{admin}'
+        sibling_section:
+          one: One more report on this listing
+          other: "%{count} reports on this listing in total"
+        requeued: Sent back for review
+        this_report: this report
+        listing_section: The listing
+        view_listing: Open listing
+        view_store_seller: Open seller store
+        reporter_section: The reporter
+        view_reporter: Open user profile
+        close_section: Close this report
+        close_hint: Resolving records that you acted on the listing; dismissing clears the report without action. Either way the listing slot stays visible to you for the audit trail.
+        resolve: Mark resolved
+        dismiss: Dismiss
+        already_closed: This report is already closed.
+        back: Back to reports
+    report_resolutions:
+      create:
+        resolved: Report closed as resolved.
+    report_dismissals:
+      create:
+        dismissed: Report dismissed.
+    contact_messages:
+      index:
+        title: Contact messages
+        subtitle:
+          one: One message in the inbox
+          other: "%{count} messages in the inbox"
+        filters:
+          all_locales: All languages
+          locale: Language
+          apply: Apply
+          clear: Clear
+        columns:
+          from: From
+          subject: Subject
+          locale: Language
+          when: Received
+        empty: The inbox is empty.
+      show:
+        title: Contact message
+        subtitle: 'Received %{time}'
+        body_section: Message
+        columns:
+          from: From
+          subject: Subject
+          locale: Language
+          when: Received
+        meta_section: Details
+        support_note: Reply straight to the sender's address; keep the message reference in internal notes.
+        back: Back to messages
   legal_pages:
     slugs:
       terms: Terms of service
@@ -2612,6 +3002,22 @@ en:
       buyer_protection: Buyer protection
       seller_terms: Seller terms
       prohibited_items: Prohibited items
+    show:
+      updated_at: 'Last updated: %{date}'
+      fallback_notice: This page is not available in your language yet — we are showing the %{locale_name} version.
+      fallback_link: Open the canonical version
+      toc_title: On this page
+      back: Back to home
+      company:
+        title: Company information
+        legal_name: Legal name
+        trade_name: Trading as
+        tax_id: Tax ID
+        registered_address: Registered address
+        registry: Commercial registry
+        contact_email: Contact e-mail
+        dpo_email: Data protection contact
+        phone: Phone
   application:
     maintenance:
       title: Scheduled maintenance
@@ -2805,3 +3211,137 @@ en:
       accepted: Trade-in accepted — ship the part when you receive the label.
       expired: This offer expired before you accepted it.
       invalid: This offer can no longer be accepted.
+
+  trusts:
+    show:
+      title: Trust & Safety
+      hero:
+        title: Buying and selling safely on PCMarket
+        subtitle: Everything you need to know about how we protect orders, vet sellers and keep the marketplace clean.
+        badge: Buyer protection
+        open_policy_badge: Our protection policy is public
+      stats:
+        completed_orders: Completed orders
+        verified_sellers: Verified sellers
+        reviewed_listings: Reviewed listings
+      protection:
+        title: How buyer protection works
+        subtitle: Three simple steps from checkout to doorstep.
+        one:
+          title: Reserve with confidence
+          text: Placing an order locks the stock. The listing is reserved the moment you check out, so nobody can buy the item you just ordered.
+        two:
+          title: Pay the agreed amount
+          text: 'You pay exactly the price shown at checkout. No hidden charges, no surprises: what you see is what the seller receives.'
+        three:
+          title: Receive it or get your money back
+          text: If the item never arrives or doesn't match the listing, open a dispute and our moderators decide — with refunds when they agree with you.
+        direct_notice: 'Payments are currently settled directly between buyer and seller on the order page. Follow these tips to stay safe:'
+        direct_tip_a: Keep every conversation inside PCMarket chat — it is your evidence trail.
+        direct_tip_b: Settle payment through the order flow, never by transfer to a stranger's personal account.
+        direct_tip_c: Check the seller's rating, completed sales and verified badge before committing.
+        direct_tip_d: Confirm delivery once — and only once — the parcel is actually in your hands.
+      covered:
+        title: What is covered
+        items:
+          a: Full refund if your item never arrives.
+          b: Full refund if the item is materially different from the listing.
+          c: Partial refunds for minor discrepancies, agreed through the dispute.
+          d: Protection from the moment you pay until delivery is confirmed.
+          e: A structured dispute flow where a moderator reviews every case.
+          f: 'A transparent record: every step of the order is time-stamped.'
+        fine_print: Protection applies to orders placed through PCMarket. Abusing refunds is grounds for account suspension.
+      safeguards:
+        title: How we keep the marketplace clean
+        review:
+          title: Every listing is reviewed
+          text: New listings pass through a moderation queue before going live. Moderators check photos, description and category before approving.
+        verified:
+          title: Look for the verified badge
+          text: Sellers can earn a verification badge by confirming their identity and building a record of completed sales.
+        reporting:
+          title: Report anything suspicious
+          text: Anyone can report a listing in one click. Enough open reports put the listing straight back into the review queue.
+        chat:
+          title: Keep chats on the platform
+          text: In a dispute, moderators read the PCMarket chat between buyer and seller. Staying in chat keeps your evidence valid.
+      support:
+        title: Need a hand?
+        email_title: E-mail
+        email_hint: We answer within one business day.
+        phone_title: Phone
+        phone_hint: During weekday business hours.
+        contact_title: Contact form
+        contact_hint: Tell us what happened and include the order number if you have one.
+        contact_cta: Go to the contact form
+      faq:
+        title: Frequently asked questions
+        q1: Is my payment taken directly by the seller?
+        a1: Every order runs through our checkout first. Where card payments are enabled, funds are released to the seller only after delivery is confirmed; direct settlement is always explained on the order page.
+        q2: What if the item never arrives?
+        a2: Open a dispute from the order page. When tracking shows no delivery, you get a full refund.
+        q3: Can I return something because I changed my mind?
+        a3: Purchases from professional sellers carry the legal 14-day withdrawal right. Private sales follow the return policy the seller states on the listing — always check it first.
+        q4: How do I know a seller is trustworthy?
+        a4: Look at their rating, completed sales and verified badge. A brand-new account without reviews deserves extra caution — start with a small order.
+        q5: What happens when I report a listing?
+        a5: A moderator reviews it. Three open reports put any live listing back into the review queue automatically, and sellers who break the rules get sanctioned.
+        q6: Do you read my chats?
+        a6: Chats are private. In a dispute, moderators can read the conversation between buyer and seller so they can decide fairly.
+      cta:
+        title: Ready to buy with peace of mind?
+        subtitle: Browse listings covered by PCMarket buyer protection.
+        browse: Browse listings
+        how_it_works: See how it works
+      legal_intro: 'You can also read our:'
+  contact_messages:
+    create:
+      created: Your message has been sent. We will answer by e-mail.
+      rate_limited: You have sent too many messages. Please try again later.
+      invalid: We could not send your message. Please check the fields and try again.
+  reports:
+    already_closed: This report is already closed.
+    new:
+      title: Report this listing
+      lede: Tell us what is wrong with it. Reports are confidential — the seller never sees who reported.
+      listing_hint: Reporting this listing
+      details_hint: Optional. Anything concrete we should know — contradictions, links, what a screenshot would show?
+      submit: Send report
+      cancel: Back to listing
+      note: False reports harm sellers. Report what you genuinely believe breaks the rules, not what you merely dislike.
+    create:
+      created: Thanks — your report has been sent. A moderator will take a look.
+      invalid: We could not send this report. You may already have reported this listing.
+  cookie_consent:
+    banner:
+      text: We use essential cookies to make PCMarket work. With your consent, we would also like to use anonymous analytics cookies to improve the marketplace.
+      manage: Manage preferences
+      reject: Reject non-essential
+      accept: Accept all
+      label: Cookie consent
+    dialog:
+      title: Cookie preferences
+      intro: Choose how cookies are used on this device. You can change your mind at any time from the "Cookie preferences" link in the footer.
+      categories: Cookie categories
+      necessary:
+        title: Essential
+        text: Required for signing in, security and the basic functioning of the site. Cannot be switched off.
+      analytics:
+        title: Anonymous analytics
+        text: Aggregate statistics about how the marketplace is used. No personal data, never shared with advertisers.
+      cancel: Close
+      save: Save preferences
+  report_mailer:
+    listing_flagged:
+      subject: '"%{title}" is back in the review queue'
+      greeting: Hi %{name},
+      body:
+        one: Listing "%{title}" now has one open report and has been moved back into the moderation queue.
+        other: Listing "%{title}" now has %{count} open reports and has been moved back into the moderation queue.
+      view_reports: Review the reports
+  contact_mailer:
+    received:
+      subject: 'Contact form: %{subject}'
+      subject_line: 'Subject: %{subject}'
+      locale_label: 'Written in: %{locale}'
+      in_admin: Read it in the admin inbox

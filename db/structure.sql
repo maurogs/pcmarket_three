@@ -434,6 +434,41 @@ ALTER SEQUENCE public.category_spec_attributes_id_seq OWNED BY public.category_s
 
 
 --
+-- Name: contact_messages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.contact_messages (
+    id bigint NOT NULL,
+    name character varying NOT NULL,
+    email character varying NOT NULL,
+    subject character varying NOT NULL,
+    body text NOT NULL,
+    locale character varying DEFAULT 'es'::character varying NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: contact_messages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.contact_messages_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: contact_messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.contact_messages_id_seq OWNED BY public.contact_messages.id;
+
+
+--
 -- Name: conversations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1165,6 +1200,43 @@ ALTER SEQUENCE public.orders_id_seq OWNED BY public.orders.id;
 
 
 --
+-- Name: reports; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.reports (
+    id bigint NOT NULL,
+    listing_id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    reason integer NOT NULL,
+    details text,
+    resolved_action integer,
+    resolved_at timestamp(6) without time zone,
+    resolved_by_id bigint,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: reports_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.reports_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: reports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.reports_id_seq OWNED BY public.reports.id;
+
+
+--
 -- Name: reviews; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1626,6 +1698,13 @@ ALTER TABLE ONLY public.category_spec_attributes ALTER COLUMN id SET DEFAULT nex
 
 
 --
+-- Name: contact_messages id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.contact_messages ALTER COLUMN id SET DEFAULT nextval('public.contact_messages_id_seq'::regclass);
+
+
+--
 -- Name: conversations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1763,6 +1842,13 @@ ALTER TABLE ONLY public.order_notes ALTER COLUMN id SET DEFAULT nextval('public.
 --
 
 ALTER TABLE ONLY public.orders ALTER COLUMN id SET DEFAULT nextval('public.orders_id_seq'::regclass);
+
+
+--
+-- Name: reports id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.reports ALTER COLUMN id SET DEFAULT nextval('public.reports_id_seq'::regclass);
 
 
 --
@@ -1932,6 +2018,14 @@ ALTER TABLE ONLY public.category_spec_attributes
 
 
 --
+-- Name: contact_messages contact_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.contact_messages
+    ADD CONSTRAINT contact_messages_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: conversations conversations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2089,6 +2183,14 @@ ALTER TABLE ONLY public.order_notes
 
 ALTER TABLE ONLY public.orders
     ADD CONSTRAINT orders_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: reports reports_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.reports
+    ADD CONSTRAINT reports_pkey PRIMARY KEY (id);
 
 
 --
@@ -2345,6 +2447,13 @@ CREATE INDEX index_category_spec_attributes_on_category_id ON public.category_sp
 --
 
 CREATE INDEX index_category_spec_attributes_on_spec_attribute_id ON public.category_spec_attributes USING btree (spec_attribute_id);
+
+
+--
+-- Name: index_contact_messages_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_contact_messages_on_created_at ON public.contact_messages USING btree (created_at);
 
 
 --
@@ -2775,6 +2884,41 @@ CREATE INDEX index_orders_on_status ON public.orders USING btree (status);
 
 
 --
+-- Name: index_reports_on_listing_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_reports_on_listing_id ON public.reports USING btree (listing_id);
+
+
+--
+-- Name: index_reports_on_listing_id_and_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_reports_on_listing_id_and_user_id ON public.reports USING btree (listing_id, user_id) WHERE (resolved_at IS NULL);
+
+
+--
+-- Name: index_reports_on_resolved_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_reports_on_resolved_at ON public.reports USING btree (resolved_at);
+
+
+--
+-- Name: index_reports_on_resolved_by_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_reports_on_resolved_by_id ON public.reports USING btree (resolved_by_id);
+
+
+--
+-- Name: index_reports_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_reports_on_user_id ON public.reports USING btree (user_id);
+
+
+--
 -- Name: index_reviews_on_hidden_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2994,6 +3138,14 @@ ALTER TABLE ONLY public.messages
 
 
 --
+-- Name: reports fk_rails_2608b92ec4; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.reports
+    ADD CONSTRAINT fk_rails_2608b92ec4 FOREIGN KEY (listing_id) REFERENCES public.listings(id);
+
+
+--
 -- Name: order_items fk_rails_2e2a2d0c16; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3162,6 +3314,14 @@ ALTER TABLE ONLY public.saved_searches
 
 
 --
+-- Name: reports fk_rails_87004f508b; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.reports
+    ADD CONSTRAINT fk_rails_87004f508b FOREIGN KEY (resolved_by_id) REFERENCES public.users(id);
+
+
+--
 -- Name: active_storage_variant_records fk_rails_993965df05; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3247,6 +3407,14 @@ ALTER TABLE ONLY public.blocks
 
 ALTER TABLE ONLY public.active_storage_attachments
     ADD CONSTRAINT fk_rails_c3b3935057 FOREIGN KEY (blob_id) REFERENCES public.active_storage_blobs(id);
+
+
+--
+-- Name: reports fk_rails_c7699d537d; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.reports
+    ADD CONSTRAINT fk_rails_c7699d537d FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --
@@ -3344,6 +3512,8 @@ ALTER TABLE ONLY public.moderation_events
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261118030002'),
+('20261118030001'),
 ('20261118020002'),
 ('20261118020001'),
 ('20261118015003'),

@@ -1,0 +1,70 @@
+<%# Cookie consent (Phase 7b). The banner only renders while no valid
+    consent cookie exists; the dialog is always present so the footer's
+    "Cookie preferences" button can reopen it later. Native <dialog> gives
+    us the focus trap and Escape-to-close for free. %>
+<div data-cookie-consent-target="root">
+  <% if cookie_consent_needed? %>
+    <div data-cookie-consent-target="banner"
+         class="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-surface p-4 shadow-lg">
+      <div class="mx-auto flex max-w-6xl flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <p class="text-sm leading-6 text-muted">
+          <%= t("cookie_consent.banner.text") %>
+        </p>
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" data-action="cookie-consent#openPreferences"
+                  class="btn-secondary text-sm"><%= t("cookie_consent.banner.manage") %></button>
+          <button type="button" data-action="cookie-consent#rejectNonEssential"
+                  class="btn-secondary text-sm"><%= t("cookie_consent.banner.reject") %></button>
+          <button type="button" data-action="cookie-consent#acceptAll"
+                  class="btn-primary text-sm"><%= t("cookie_consent.banner.accept") %></button>
+        </div>
+      </div>
+      <p class="sr-only" role="note"><%= t("cookie_consent.banner.label") %></p>
+    </div>
+  <% end %>
+
+  <dialog data-cookie-consent-target="dialog"
+          class="card m-auto w-[min(92vw,28rem)] p-0 backdrop:bg-black/50">
+    <form method="dialog" class="p-5">
+      <h2 class="text-sm font-semibold"><%= t("cookie_consent.dialog.title") %></h2>
+      <p class="mt-2 text-xs leading-5 text-muted"><%= t("cookie_consent.dialog.intro") %></p>
+
+      <fieldset class="mt-4 space-y-3">
+        <legend class="sr-only"><%= t("cookie_consent.dialog.categories") %></legend>
+
+        <div class="rounded-md border border-border p-3">
+          <div class="flex items-center justify-between gap-3">
+            <span class="text-sm font-medium"><%= t("cookie_consent.dialog.necessary.title") %></span>
+            <input type="checkbox" checked disabled aria-label="<%= t("cookie_consent.dialog.necessary.title") %>"
+                   class="size-4 accent-primary">
+          </div>
+          <p class="mt-1 text-xs leading-5 text-muted"><%= t("cookie_consent.dialog.necessary.text") %></p>
+        </div>
+
+        <div class="rounded-md border border-border p-3">
+          <div class="flex items-center justify-between gap-3">
+            <label for="cookie_consent_analytics" class="text-sm font-medium">
+              <%= t("cookie_consent.dialog.analytics.title") %>
+            </label>
+            <input id="cookie_consent_analytics" type="checkbox"
+                   data-cookie-consent-target="analytics"
+                   <%= "checked" if cookie_consent("analytics") %>
+                   class="size-4 accent-primary">
+          </div>
+          <p class="mt-1 text-xs leading-5 text-muted"><%= t("cookie_consent.dialog.analytics.text") %></p>
+        </div>
+      </fieldset>
+
+      <div class="mt-5 flex flex-wrap items-center justify-end gap-2">
+        <button type="button" data-action="cookie-consent#closePreferences"
+                class="text-sm text-muted underline hover:no-underline hover:text-text">
+          <%= t("cookie_consent.dialog.cancel") %>
+        </button>
+        <button type="submit" data-action="cookie-consent#savePreferences"
+                class="btn-primary cursor-pointer text-sm">
+          <%= t("cookie_consent.dialog.save") %>
+        </button>
+      </div>
+    </form>
+  </dialog>
+</div>
