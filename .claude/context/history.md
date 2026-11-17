@@ -1,5 +1,86 @@
 # History
 
+## 2026-11-18 — Phase 7e: legal corpus for France (FR/fr) and Germany (DE/de)
+
+**What changed**
+
+- `db/seeds/legal/FR/fr/` — eight French templates adapted to French law
+  (EU regulations kept): legal_notice cites LCEN art. 6-III identity
+  disclosure ({{legal_name}}, {{registry}}, {{registered_address}},
+  {{tax_id}}, RCS), directeur de publication and hébergeur as bracketed
+  TODO markers; terms cite LCEN art. 6-I-2 + DSA notice-and-action /
+  statement of reasons / complaints (arts. 16–17, 20–21, 23), ranking
+  transparency via Reg. 2019/1150 + DSA art. 27 + Code de la consommation
+  L111-7 (ranking criteria, pro-vs-private seller flag, consumer-law
+  applicability), 18+, 0 % fees with 15-day notice, consommation mediator
+  right (L612-1) with a `[médiateur de la consommation à désigner]`
+  marker, French governing law; privacy cites RGPD + loi 78-17, DAC7 as
+  CGI art. 1649 ter A (DGFiP reporting), CNIL complaint (cnil.fr), rights
+  incl. post-mortem directives (art. 85 loi I&L); cookies cites art. 82
+  loi I&L + CNIL guidelines (refusal as easy as acceptance, consent
+  recommended valid 6 months, cookie lifetime 13 months) with the same
+  strictly-necessary first-party cookie table as ES; returns covers C2C
+  (no rétractation) vs B2C (14-day droit de rétractation, L221-18 s. and
+  the R. 221-1 model form; garantie légale de conformité 2 years,
+  reducible to 12 months for second-hand goods, 12-month presumption,
+  L217-3 s.; garantie des vices cachés, C. civ. 1641 s.); seller_terms
+  adds L111-7 display support, DSA art. 30 traceability and DAC7/CGI
+  reporting; prohibited_items keeps the ES list plus contrefaçon under
+  the Code de la propriété intellectuelle (L335-2, L716-4 s.).
+- `db/seeds/legal/DE/de/` — eight German templates: legal_notice cites
+  § 5 DDG (Name, Vertretungsberechtigte, Handelsregister {{registry}},
+  USt-IdNr. {{tax_id}}) and § 18 Abs. 2 MStV with bracketed markers for
+  the managing director and the content-responsible person; terms cover
+  the intermediary role, DSA duties, ranking transparency via § 5b Abs.
+  2 UWG + Reg. 2019/1150 + DSA art. 27 (plus § 5b Abs. 1 Nr. 6 UWG
+  trader flag), 18+, 0 % fees with 15-day notice, the § 36 VSBG default
+  non-participation statement with a confirm-before-publish marker,
+  German law with habitual-residence consumer protections preserved;
+  privacy cites DSGVO + BDSG, § 25 TDDDG (formerly TTDSG) for device
+  access, PStTG/DAC7 reporting to the BZSt, supervisory-authority
+  complaint; cookies cites § 25 TDDDG with the same necessary-cookie
+  table; returns covers C2C (private warranty exclusion allowed) vs B2C
+  (Widerruf §§ 312g, 355 BGB with the official model Widerrufsbelehrung
+  and Muster-Widerrufsformular — Anlagen 1/2 EGBGB — as templates for
+  traders; Gewährleistung 2 years § 438, used-goods reduction to 1 year
+  § 476 Abs. 2 BGB, § 477 presumption); seller_terms adds trader
+  Impressum/§ 18 MStV shop duties, PAngV gross-price-with-VAT and
+  Grundpreis rules, DSA art. 30, PStTG/BZSt data; prohibited_items keeps
+  the ES list plus § 86a StGB symbols, § 130 StGB / BpjM-indexed media
+  and ProdSG/GPSR product safety.
+- No ODR platform is mentioned anywhere (deliberately omitted). Only the
+  allowed placeholders are used; the loader and the folder-driven seed
+  test needed no changes — the new folders are picked up automatically.
+  No commits (per instructions).
+
+**Why**
+
+FR and DE storefronts need day-one legal texts that reflect national
+consumer, hosting and privacy law (LCEN/Code de la consommation + loi
+I&L; DDG/UWG/BGB/VSBG/TDDDG/PStTG) on top of the directly applicable EU
+regulations (GDPR, DSA, Reg. 2019/1150, DAC7); texts are originals, not
+translations of the Spanish set.
+
+**Files touched**: db/seeds/legal/FR/fr/*.md (8 new),
+db/seeds/legal/DE/de/*.md (8 new).
+
+**TODO markers inserted** (bracketed, template must be completed by the
+operator before legal review): FR/fr/legal_notice.md
+`[forme sociale et montant du capital social à compléter]`,
+`[nom, prénom et qualité du directeur de la publication à compléter]`,
+`[hébergeur à compléter — raison sociale, adresse et numéro de téléphone
+de l'hébergeur]`; FR/fr/terms.md
+`[médiateur de la consommation à désigner]`; DE/de/legal_notice.md
+`[vertretungsberechtigte Geschäftsführung zu ergänzen]`,
+`[verantwortliche Person i.S.d. § 18 Abs. 2 MStV zu ergänzen]`;
+DE/de/terms.md `[Hinweis: Diese Erklärung nach § 36 VSBG ist vor
+Veröffentlichung zu bestätigen; …]`.
+
+**Gates**: `bin/rails db:seed` run twice (40 legal pages: ES/es 8,
+ES/en 8, GB/en 8, FR/fr 8, DE/de 8; second run idempotent); legal seed
+test 8 runs / 509 assertions 0 failures; `bin/rails test` 789 runs /
+12315 assertions / 0 failures; `bin/rubocop` 427 files, no offenses.
+
 ## 2026-11-18 — Phase 7d: legal corpus for Spain-in-English (ES/en) and the United Kingdom (GB/en)
 
 **What changed**
