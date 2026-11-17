@@ -1,0 +1,42 @@
+<%# locals: form (form builder), category %>
+<% if category.errors.any? %>
+  <div class="mb-4 rounded border border-red-300 bg-red-50 p-3 text-sm text-red-800">
+    <ul class="list-inside list-disc">
+      <% category.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<div class="grid gap-4">
+  <div class="grid gap-3 sm:grid-cols-3">
+    <div>
+      <%= form.label :parent_id, class: "block text-sm font-medium" %>
+      <%= form.collection_select :parent_id,
+            Category.order(:slug).where.not(id: category.self_and_descendant_ids),
+            :id, :name, { include_blank: t(".parent_none") }, class: "input text-sm" %>
+    </div>
+    <div>
+      <%= form.label :icon, class: "block text-sm font-medium" %>
+      <%= form.text_field :icon, class: "input text-sm", placeholder: t(".icon_placeholder") %>
+    </div>
+    <label class="flex items-center gap-2 self-end pb-2 text-sm">
+      <%= form.check_box :active, class: "size-4 accent-indigo-600" %>
+      <%= t(".active") %>
+    </label>
+  </div>
+
+  <%= render "admin/shared/translation_fields",
+        name_base: "category[names]", values: category.names, multiline: false,
+        label: t(".names_label") %>
+
+  <%= render "admin/shared/translation_fields",
+        name_base: "category[seo_descriptions]", values: category.seo_descriptions, multiline: true,
+        label: t(".seo_label") %>
+
+  <div class="flex gap-2">
+    <%= form.submit t(".submit"), class: "btn-primary" %>
+    <%= link_to t(".cancel"), admin_categories_path, class: "btn-secondary" %>
+  </div>
+</div>

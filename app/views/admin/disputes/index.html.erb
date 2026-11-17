@@ -1,0 +1,58 @@
+<% content_for :title, t(".title") %>
+
+<div class="mb-4">
+  <h1 class="text-xl font-bold"><%= t(".title") %></h1>
+  <p class="mt-1 text-sm text-muted"><%= t(".subtitle", count: @pagy.count) %></p>
+</div>
+
+<form action="<%= admin_disputes_path %>" method="get" class="card mb-4 grid gap-3 p-3 sm:grid-cols-2 lg:grid-cols-4">
+  <% status_options = Order.statuses.keys.map { |s| [ Order.human_attribute_name("status/#{s}"), s ] } %>
+  <%= select_tag :status, options_for_select(status_options, params[:status]),
+        include_blank: t(".filters.all_statuses"), class: "input text-sm",
+        aria: { label: t(".filters.status") } %>
+  <%= text_field_tag :seller, params[:seller], placeholder: t(".filters.seller"), class: "input text-sm" %>
+  <%= text_field_tag :buyer, params[:buyer], placeholder: t(".filters.buyer"), class: "input text-sm" %>
+  <%= search_field_tag :q, params[:q], placeholder: t(".filters.q"), class: "input text-sm" %>
+  <div class="flex items-center gap-2">
+    <button type="submit" class="btn-primary"><%= t(".filters.apply") %></button>
+    <%= link_to t(".filters.clear"), admin_disputes_path, class: "btn-secondary" %>
+  </div>
+</form>
+
+<% if @orders.any? %>
+  <div class="card overflow-x-auto">
+    <table class="admin-table w-full min-w-[760px] text-sm">
+      <thead>
+        <tr>
+          <th scope="col"><%= t(".columns.number") %></th>
+          <th scope="col"><%= t(".columns.buyer") %></th>
+          <th scope="col"><%= t(".columns.seller") %></th>
+          <th scope="col"><%= t(".columns.status") %></th>
+          <th scope="col"><%= t(".columns.total") %></th>
+          <th scope="col"><%= t(".columns.opened") %></th>
+          <th scope="col"><span class="sr-only"><%= t(".columns.actions") %></span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @orders.each do |order| %>
+          <tr>
+            <td class="whitespace-nowrap font-medium">
+              <%= link_to order.number, admin_dispute_path(order), class: "hover:text-primary hover:underline" %>
+            </td>
+            <td><%= order.buyer&.username %></td>
+            <td><%= order.seller&.username %></td>
+            <td><%= order_status_badge(order) %></td>
+            <td class="whitespace-nowrap"><%= money(order.total_cents, order.currency) %></td>
+            <td class="whitespace-nowrap text-muted"><%= l(order.updated_at.to_date, format: :delivery) %></td>
+            <td class="whitespace-nowrap text-right">
+              <%= link_to t(".actions.review"), admin_dispute_path(order), class: "btn-secondary" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <div class="mt-4"><%= results_pagination(@pagy) %></div>
+<% else %>
+  <div class="card p-6 text-center text-sm text-muted"><%= t(".empty") %></div>
+<% end %>

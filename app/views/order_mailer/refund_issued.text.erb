@@ -1,0 +1,6 @@
+<%= t(".greeting", name: @recipient.display_name) %>
+
+<%= t(".intro", number: @order.number) %>
+<%= t(".amount", amount: money(@order.refund_cents, @order.currency)) %>
+
+<%= t(".view_order") %>: <%= order_url(@order, locale: @recipient.locale) %>

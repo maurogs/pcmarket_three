@@ -1,0 +1,57 @@
+<% content_for :title, t(".title", number: @order.number) %>
+
+<div class="mb-4">
+  <h1 class="text-xl font-bold"><%= t(".title", number: @order.number) %></h1>
+  <p class="mt-1 text-sm text-muted"><%= t(".subtitle") %></p>
+</div>
+
+<div class="grid gap-4 lg:grid-cols-2">
+  <section class="card p-4">
+    <h2 class="mb-2 text-sm font-semibold text-muted"><%= t(".order_title") %></h2>
+    <dl class="space-y-1 text-sm">
+      <div class="flex justify-between"><dt class="text-muted"><%= t(".buyer") %></dt><dd><%= @order.buyer.username %></dd></div>
+      <div class="flex justify-between"><dt class="text-muted"><%= t(".seller") %></dt><dd><%= @order.seller.username %></dd></div>
+      <div class="flex justify-between"><dt class="text-muted"><%= t(".total") %></dt><dd><%= money(@order.total_cents, @order.currency) %></dd></div>
+      <div class="flex justify-between">
+        <dt class="text-muted"><%= t(".payment_provider") %></dt>
+        <dd><%= @order.payment_provider.presence || t(".payment_direct") %></dd>
+      </div>
+    </dl>
+    <p class="mt-3 text-xs text-muted"><%= t(".provider_hint") %></p>
+  </section>
+
+  <section class="card p-4">
+    <h2 class="mb-3 text-sm font-semibold text-muted"><%= t(".form_title") %></h2>
+    <%= form_with url: admin_dispute_resolution_path(@order), method: :post, class: "space-y-4" do |form| %>
+      <fieldset class="space-y-2">
+        <legend class="text-sm font-medium"><%= t(".action_legend") %></legend>
+        <label class="flex items-start gap-2 text-sm">
+          <%= form.radio_button :action, "refund", checked: true %>
+          <span>
+            <span class="font-medium"><%= t(".action_refund") %></span>
+            <span class="block text-xs text-muted"><%= t(".action_refund_hint") %></span>
+          </span>
+        </label>
+        <label class="flex items-start gap-2 text-sm">
+          <%= form.radio_button :action, "release" %>
+          <span>
+            <span class="font-medium"><%= t(".action_release") %></span>
+            <span class="block text-xs text-muted"><%= t(".action_release_hint") %></span>
+          </span>
+        </label>
+      </fieldset>
+
+      <div>
+        <%= form.label :amount, t(".amount_label"), class: "block text-sm font-medium" %>
+        <%= form.number_field :amount, step: 0.01, min: 0.01, max: format("%.2f", @payment_cents / 100.0),
+              value: format("%.2f", @payment_cents / 100.0), class: "input text-sm" %>
+        <p class="mt-1 text-xs text-muted"><%= t(".amount_hint", amount: money(@payment_cents, @order.currency)) %></p>
+      </div>
+
+      <div class="flex gap-2">
+        <%= form.submit t(".submit"), class: "btn-primary", data: { turbo_confirm: t(".confirm") } %>
+        <%= link_to t(".cancel"), admin_dispute_path(@order), class: "btn-secondary" %>
+      </div>
+    <% end %>
+  </section>
+</div>

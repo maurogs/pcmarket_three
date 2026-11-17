@@ -1,0 +1,5 @@
+<%= t(".greeting", name: @recipient.display_name) %>
+
+<%= t(".intro", number: @order.number) %>
+
+<%= t(".view_order") %>: <%= order_url(@order, locale: @recipient.locale) %>

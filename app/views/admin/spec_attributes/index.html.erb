@@ -1,0 +1,53 @@
+<% content_for :title, t(".title") %>
+
+<div class="mb-4 flex flex-wrap items-end justify-between gap-3">
+  <div>
+    <h1 class="text-xl font-bold"><%= t(".title") %></h1>
+    <p class="mt-1 text-sm text-muted"><%= t(".subtitle") %></p>
+  </div>
+  <%= link_to t(".new"), new_admin_spec_attribute_path, class: "btn-primary" %>
+</div>
+
+<% if @spec_attributes.any? %>
+  <div class="card overflow-x-auto">
+    <table class="admin-table w-full min-w-[760px] text-sm">
+      <thead>
+        <tr>
+          <th scope="col"><%= t(".columns.key") %></th>
+          <th scope="col"><%= t(".columns.name") %></th>
+          <th scope="col"><%= t(".columns.input_type") %></th>
+          <th scope="col"><%= t(".columns.options") %></th>
+          <th scope="col"><%= t(".columns.filterable") %></th>
+          <th scope="col"><%= t(".columns.categories") %></th>
+          <th scope="col"><span class="sr-only"><%= t(".columns.actions") %></span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @spec_attributes.each do |spec_attribute| %>
+          <tr>
+            <td class="font-mono text-xs"><%= spec_attribute.key %></td>
+            <td><%= spec_attribute.name %><% if spec_attribute.unit.present? %> <span class="text-muted">(<%= spec_attribute.unit %>)</span><% end %></td>
+            <td class="text-muted"><%= SpecAttribute.human_attribute_name("input_type/#{spec_attribute.input_type}") %></td>
+            <td><%= spec_attribute.spec_options.size %></td>
+            <td>
+              <% if spec_attribute.filterable? %>
+                <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800"><%= t(".yes_chip") %></span>
+              <% else %>
+                <span class="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600"><%= t(".no_chip") %></span>
+              <% end %>
+            </td>
+            <td class="text-muted"><%= spec_attribute.categories.map(&:name).join(", ") %></td>
+            <td class="whitespace-nowrap text-right">
+              <%= link_to t(".actions.edit"), edit_admin_spec_attribute_path(spec_attribute), class: "btn-secondary" %>
+              <%= button_to t(".actions.destroy"), admin_spec_attribute_path(spec_attribute), method: :delete,
+                    class: "btn-secondary text-red-600",
+                    form: { data: { turbo_confirm: t(".actions.destroy_confirm") } } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <div class="card p-6 text-center text-sm text-muted"><%= t(".empty") %></div>
+<% end %>

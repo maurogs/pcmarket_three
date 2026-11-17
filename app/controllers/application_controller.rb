@@ -7,9 +7,22 @@ class ApplicationController < ActionController::Base
 
   around_action :switch_locale
 
+  before_action :enforce_maintenance_mode
+
   helper_method :current_country_code
 
   private
+    # Maintenance mode (Phase 6b settings): while the maintenance_mode
+    # setting is on, every public page renders a translated 503. The admin
+    # area and signed-in admins keep browsing normally.
+    def enforce_maintenance_mode
+      return if self.class.module_parent_name == "Admin"
+      return if Current.user&.admin?
+
+      return unless Setting.get("maintenance_mode") == true
+
+      render "application/maintenance", layout: false, status: :service_unavailable
+    end
     # The rest of the app reads the signed-in user through Current.user;
     # current_user is the classic name views and controllers prefer.
     def current_user

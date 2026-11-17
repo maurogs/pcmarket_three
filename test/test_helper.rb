@@ -14,6 +14,12 @@ module ActiveSupport
     # Fixture inserts bypass the listings_tsv trigger, so keyword search would
     # see empty vectors without this.
     setup { Listing.reindex_search_vectors! }
+
+    # Rails.cache is NOT transactional: Setting.set/get (and fragment caches)
+    # survive the per-test rollback, so one test's writes would leak into the
+    # next (e.g. a rolled-back maintenance_mode=true row cached true 503s
+    # every later public request). Bust it between tests.
+    setup { Rails.cache.clear }
   end
 end
 

@@ -3,3 +3,7 @@
 # of truth for these defaults), so this loader is idempotent.
 Country.seed_defaults!
 Setting.seed_defaults!
+
+# Register every known feature flag (defaults OFF) so the admin flags page
+# and any enable/disable calls never hit unknown-feature adapter warnings.
+FeatureFlags.register_all!

@@ -1,0 +1,93 @@
+<% content_for :title, t(".title", name: @spec_attribute.name) %>
+
+<div class="mb-4 flex flex-wrap items-end justify-between gap-3">
+  <div>
+    <h1 class="text-xl font-bold"><%= t(".title", name: @spec_attribute.name) %></h1>
+    <p class="mt-1 text-sm text-muted"><%= t(".subtitle") %></p>
+  </div>
+  <%= link_to t(".back"), admin_spec_attributes_path, class: "btn-secondary" %>
+</div>
+
+<div class="card mb-4 p-4">
+  <%= form_with model: @spec_attribute, url: admin_spec_attribute_path(@spec_attribute), method: :patch do |form| %>
+    <%= render "form", form: form, spec_attribute: @spec_attribute %>
+  <% end %>
+</div>
+
+<div class="grid gap-4 lg:grid-cols-2">
+  <section class="card p-4">
+    <h2 class="mb-3 text-sm font-semibold text-muted"><%= t(".options_title", count: @spec_options.size) %></h2>
+    <% if @spec_options.any? %>
+      <ul class="space-y-3 text-sm">
+        <% @spec_options.each do |option| %>
+          <li class="rounded border p-3">
+            <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <span class="font-mono text-xs"><%= option.value %></span>
+              <span class="text-xs text-muted">
+                <%= t(".in_use", count: option.listings_using_count) %>
+              </span>
+            </div>
+
+            <%= form_with url: admin_spec_attribute_spec_option_path(@spec_attribute, option), method: :patch,
+                  class: "space-y-2" do |form| %>
+              <%= render "admin/shared/translation_fields",
+                    name_base: "spec_option[names]", values: option.names, multiline: false %>
+              <div class="flex flex-wrap items-center gap-3">
+                <label class="flex items-center gap-1 text-xs">
+                  <%= check_box_tag "spec_option[popular]", "1", option.popular, class: "size-4 accent-indigo-600" %>
+                  <%= t(".popular") %>
+                </label>
+                <%= number_field_tag "spec_option[position]", option.position,
+                      class: "input w-16 text-xs", "aria-label": t(".position") %>
+                <%= form.submit t(".option_save"), class: "btn-secondary text-xs" %>
+              </div>
+            <% end %>
+
+            <div class="mt-2 flex flex-wrap items-center gap-2 border-t pt-2">
+              <% if option.listings_using_count.positive? %>
+                <%= form_with url: admin_spec_attribute_spec_option_merge_path(@spec_attribute, option), method: :post,
+                      class: "flex items-center gap-2 text-xs" do |form| %>
+                  <%= select_tag "merge[target_id]",
+                        options_from_collection_for_select(
+                          @spec_options.reject { |o| o.id == option.id }, :id, :value
+                        ), include_blank: t(".merge_pick"), class: "input text-xs" %>
+                  <%= form.submit t(".merge"), class: "btn-secondary text-xs" %>
+                <% end %>
+                <span class="text-xs text-muted"><%= t(".delete_blocked") %></span>
+              <% else %>
+                <%= button_to t(".option_delete"), admin_spec_attribute_spec_option_path(@spec_attribute, option),
+                      method: :delete, class: "btn-secondary text-xs text-red-600",
+                      form: { data: { turbo_confirm: t(".option_delete_confirm") } } %>
+              <% end %>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="text-sm text-muted"><%= t(".options_empty") %></p>
+    <% end %>
+  </section>
+
+  <section class="card space-y-3 p-4">
+    <h2 class="text-sm font-semibold text-muted"><%= t(".add_title") %></h2>
+    <%= form_with url: admin_spec_attribute_spec_options_path(@spec_attribute), method: :post,
+          class: "flex flex-wrap items-center gap-2 text-sm" do |form| %>
+      <%= form.text_field :value, required: true, placeholder: t(".add_value_placeholder"),
+            class: "input w-32 text-sm font-mono" %>
+      <label class="flex items-center gap-1 text-xs">
+        <%= form.check_box :popular, class: "size-4 accent-indigo-600" %>
+        <%= t(".popular") %>
+      </label>
+      <%= form.number_field :position, value: (@spec_options.map(&:position).max || 0) + 1,
+            class: "input w-16 text-sm", "aria-label": t(".position") %>
+      <%= form.submit t(".add"), class: "btn-primary" %>
+    <% end %>
+
+    <h3 class="pt-2 text-sm font-semibold text-muted"><%= t(".bulk_title") %></h3>
+    <p class="text-xs text-muted"><%= t(".bulk_hint") %></p>
+    <%= form_with url: admin_spec_attribute_bulk_option_path(@spec_attribute), method: :post, class: "space-y-2" do |form| %>
+      <%= form.text_area :values, rows: 6, placeholder: t(".bulk_placeholder"), class: "input text-sm font-mono" %>
+      <%= form.submit t(".bulk_submit"), class: "btn-secondary" %>
+    <% end %>
+  </section>
+</div>

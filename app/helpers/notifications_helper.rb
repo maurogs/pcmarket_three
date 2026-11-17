@@ -19,7 +19,10 @@ module NotificationsHelper
     "order_delivered" => :box,
     "order_completed" => :check,
     "order_cancelled" => :close,
-    "order_disputed" => :shield
+    "order_disputed" => :shield,
+    "order_updated" => :box,
+    "order_refunded" => :bolt,
+    "order_resolved" => :shield
   }.freeze
 
   FALLBACK_ICON = :bell

@@ -1,0 +1,70 @@
+<% content_for :title, t(".title") %>
+
+<div class="mb-4">
+  <h1 class="text-xl font-bold"><%= t(".title") %></h1>
+  <p class="mt-1 text-sm text-muted"><%= t(".subtitle", count: @pagy.count) %></p>
+</div>
+
+<form action="<%= admin_audit_logs_path %>" method="get" class="card mb-4 grid gap-3 p-3 sm:grid-cols-2 lg:grid-cols-5">
+  <%= select_tag :admin_id,
+        options_for_select(@admins.map { |u| [ u.username, u.id ] }, params[:admin_id]),
+        include_blank: t(".filters.all_admins"), class: "input text-sm",
+        aria: { label: t(".filters.admin") } %>
+  <%= select_tag :event_action,
+        options_for_select(@actions, params[:event_action]),
+        include_blank: t(".filters.all_actions"), class: "input text-sm",
+        aria: { label: t(".filters.action") } %>
+  <%= select_tag :subject_type,
+        options_for_select(Admin::AuditLogsController::SUBJECT_TYPES, params[:subject_type]),
+        include_blank: t(".filters.all_subjects"), class: "input text-sm",
+        aria: { label: t(".filters.subject") } %>
+  <%= date_field_tag :from, params[:from], "aria-label": t(".filters.created_from"), class: "input text-sm" %>
+  <%= date_field_tag :to, params[:to], "aria-label": t(".filters.created_to"), class: "input text-sm" %>
+  <div class="flex items-center gap-2">
+    <button type="submit" class="btn-primary"><%= t(".filters.apply") %></button>
+    <%= link_to t(".filters.clear"), admin_audit_logs_path, class: "btn-secondary" %>
+  </div>
+</form>
+
+<% if @logs.any? %>
+  <div class="card overflow-x-auto">
+    <table class="admin-table w-full min-w-[860px] text-sm">
+      <thead>
+        <tr>
+          <th scope="col"><%= t(".columns.when") %></th>
+          <th scope="col"><%= t(".columns.admin") %></th>
+          <th scope="col"><%= t(".columns.action") %></th>
+          <th scope="col"><%= t(".columns.subject") %></th>
+          <th scope="col"><%= t(".columns.details") %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @logs.each do |log| %>
+          <tr>
+            <td class="whitespace-nowrap text-muted"><%= l(log.created_at, format: :long) %></td>
+            <td><%= log.admin&.display_name || t(".deleted_admin") %></td>
+            <td><span class="rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium"><%= log.action %></span></td>
+            <td class="whitespace-nowrap">
+              <% if log.subject_type %>
+                <span class="font-mono text-xs"><%= log.subject_type %> #<%= log.subject_id %></span>
+              <% else %>
+                <span class="text-muted">—</span>
+              <% end %>
+            </td>
+            <td class="max-w-[24rem]">
+              <% details = log.details.to_h %>
+              <% if details.any? %>
+                <code class="block truncate text-xs text-muted"><%= details.map { |k, v| "#{k}=#{v}" }.join(" ") %></code>
+              <% else %>
+                <span class="text-muted">—</span>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <div class="mt-4"><%= results_pagination(@pagy) %></div>
+<% else %>
+  <div class="card p-6 text-center text-sm text-muted"><%= t(".empty") %></div>
+<% end %>

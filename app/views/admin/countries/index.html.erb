@@ -1,0 +1,50 @@
+<% content_for :title, t(".title") %>
+
+<div class="mb-4">
+  <h1 class="text-xl font-bold"><%= t(".title") %></h1>
+  <p class="mt-1 text-sm text-muted"><%= t(".subtitle") %></p>
+</div>
+
+<div class="card overflow-x-auto">
+  <table class="admin-table w-full min-w-[760px] text-sm">
+    <thead>
+      <tr>
+        <th scope="col"><%= t(".columns.country") %></th>
+        <th scope="col"><%= t(".columns.currency") %></th>
+        <th scope="col"><%= t(".columns.locale") %></th>
+        <th scope="col"><%= t(".columns.vat") %></th>
+        <th scope="col"><%= t(".columns.legal_pages") %></th>
+        <th scope="col"><%= t(".columns.status") %></th>
+        <th scope="col"><span class="sr-only"><%= t(".columns.actions") %></span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @countries.each do |country| %>
+        <% missing = country.missing_legal_slugs %>
+        <tr>
+          <td class="font-medium"><%= country.display_name %> <span class="font-mono text-xs text-muted"><%= country.code %></span></td>
+          <td><%= country.currency %></td>
+          <td class="text-muted"><%= t("locales.#{country.default_locale}") %></td>
+          <td><%= number_to_percentage(country.vat_rate, precision: 0) %></td>
+          <td>
+            <% if missing.empty? %>
+              <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800"><%= t(".legal_complete") %></span>
+            <% else %>
+              <span class="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800"><%= t(".legal_missing", count: missing.size) %></span>
+            <% end %>
+          </td>
+          <td>
+            <% if country.enabled? %>
+              <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800"><%= t(".enabled_chip") %></span>
+            <% else %>
+              <span class="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600"><%= t(".disabled_chip") %></span>
+            <% end %>
+          </td>
+          <td class="whitespace-nowrap text-right">
+            <%= link_to t(".actions.edit"), edit_admin_country_path(country), class: "btn-secondary" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

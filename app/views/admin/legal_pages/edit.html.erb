@@ -1,0 +1,14 @@
+<% content_for :title, t(".title", title: @legal_page.title) %>
+
+<div class="mb-4">
+  <h1 class="mb-1 text-xl font-bold"><%= t(".title", title: @legal_page.title) %></h1>
+  <% if @copy_source %>
+    <p class="text-sm text-muted"><%= t(".copy_note", language: t("locales.#{@copy_source.locale}")) %></p>
+  <% end %>
+</div>
+
+<div class="card p-4">
+  <%= form_with model: @legal_page, url: admin_legal_page_path(@legal_page), method: :patch do |form| %>
+    <%= render "form", form: form, legal_page: @legal_page %>
+  <% end %>
+</div>

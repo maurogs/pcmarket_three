@@ -21,13 +21,18 @@ class Order < ApplicationRecord
   belongs_to :buyer, class_name: "User"
   belongs_to :seller, class_name: "User"
   has_many :order_items, dependent: :destroy
+  has_many :order_notes, dependent: :destroy
   has_one :review, dependent: :nullify
 
   validates :number, presence: true, uniqueness: true
   validates :carrier, inclusion: { in: CARRIERS }, allow_nil: true
-  validates :subtotal_cents, :shipping_cents, :commission_cents, :total_cents,
+  validates :subtotal_cents, :shipping_cents, :commission_cents, :total_cents, :refund_cents,
             numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :currency, presence: true
+  validate :refund_within_total
+
+  # Disputes: open (unresolved) vs. the ones an admin has already resolved.
+  scope :disputed, -> { where(status: :disputed) }
 
   before_validation :assign_number, on: :create
   before_validation :recalculate_total
@@ -101,6 +106,43 @@ class Order < ApplicationRecord
     update!(status: :disputed)
   end
 
+  # --- Dispute resolutions (admin-only, Disputes::Resolve is the caller) ---
+
+  # Full or partial refund of a disputed order. `amount_cents` nil refunds
+  # the whole total; partial refunds must not exceed it (Disputes::Resolve
+  # checks first, this guard keeps the column self-consistent).
+  def refund!(amount_cents = nil)
+    ensure_transition!(from: [ :disputed ], to: :refunded)
+    amount = amount_cents.nil? ? total_cents : Integer(amount_cents)
+    update!(status: :refunded, refund_cents: amount)
+  end
+
+  # "The seller was right": close the dispute in the seller's favour.
+  def release_to_seller!
+    ensure_transition!(from: [ :disputed ], to: :completed)
+    update!(status: :completed, completed_at: completed_at || Time.current)
+  end
+
+  # Admin override: move an order to any other status regardless of the
+  # buyer/seller state machine (reason + audit are enforced upstream in
+  # Orders::ForceTransition / the controller). Timestamps follow the target
+  # status; cancelling a fulfilled order also restores the listings.
+  def force_status!(to)
+    to = to.to_s
+    raise InvalidTransition, I18n.t("orders.transition.invalid", from: self.class.human_attribute_name("status/#{status}"),
+                                                                  to: self.class.human_attribute_name("status/#{to}")) if !self.class.statuses.key?(to) || to == status.to_s
+
+    attrs = { status: to }
+    now = Time.current
+    attrs[:paid_at] = now if to == "paid" && paid_at.nil?
+    attrs[:shipped_at] = now if to == "shipped" && shipped_at.nil?
+    attrs[:delivered_at] = now if to == "delivered" && delivered_at.nil?
+    attrs[:completed_at] = now if to == "completed" && completed_at.nil?
+    attrs[:cancelled_at] = now if to == "cancelled" && cancelled_at.nil?
+    transaction { update!(attrs) }
+    restore_listings! if to == "cancelled"
+  end
+
   def protection_open?
     buyer_protection_until.nil? || buyer_protection_until > Time.current
   end
@@ -159,5 +201,11 @@ class Order < ApplicationRecord
 
   def recalculate_total
     self.total_cents = subtotal_cents + shipping_cents + commission_cents
+  end
+
+  def refund_within_total
+    return if refund_cents.nil? || total_cents.nil? || refund_cents <= total_cents
+
+    errors.add(:refund_cents, :greater_than_total)
   end
 end

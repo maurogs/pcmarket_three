@@ -1,0 +1,60 @@
+<% content_for :title, t(".title", name: @category.name) %>
+
+<div class="mb-4 flex flex-wrap items-end justify-between gap-3">
+  <div>
+    <h1 class="text-xl font-bold"><%= t(".title", name: @category.name) %></h1>
+    <p class="mt-1 text-sm text-muted"><%= t(".subtitle") %></p>
+  </div>
+  <%= link_to t(".back"), admin_categories_path, class: "btn-secondary" %>
+</div>
+
+<div class="grid gap-4 lg:grid-cols-2">
+  <section class="card p-4">
+    <h2 class="mb-3 text-sm font-semibold text-muted"><%= t(".attached_title") %></h2>
+    <% if @attachments.any? %>
+      <ul class="space-y-2 text-sm">
+        <% @attachments.each do |row| %>
+          <li class="flex flex-wrap items-center gap-2 rounded border p-2">
+            <%= form_with url: admin_category_spec_attribute_path(@category, row), method: :patch,
+                  class: "flex items-center gap-2" do |form| %>
+              <span class="min-w-[12rem] font-medium"><%= row.spec_attribute.name %></span>
+              <span class="text-xs text-muted"><code><%= row.spec_attribute.key %></code></span>
+              <label class="flex items-center gap-1 text-xs">
+                <%= check_box_tag "category_spec_attribute[required]", "1", row.required,
+                      class: "size-4 accent-indigo-600" %>
+                <%= t(".required") %>
+              </label>
+              <%= number_field_tag "category_spec_attribute[position]", row.position,
+                    class: "input w-16 text-xs", "aria-label": t(".position") %>
+              <%= hidden_field_tag "category_spec_attribute[spec_attribute_id]", row.spec_attribute_id %>
+              <%= submit_tag t(".save"), class: "btn-secondary text-xs" %>
+            <% end %>
+            <%= button_to t(".detach"), admin_category_spec_attribute_path(@category, row), method: :delete,
+                  class: "btn-secondary text-xs",
+                  form: { data: { turbo_confirm: t(".detach_confirm") } } %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="text-sm text-muted"><%= t(".attached_empty") %></p>
+    <% end %>
+  </section>
+
+  <section class="card p-4">
+    <h2 class="mb-3 text-sm font-semibold text-muted"><%= t(".attach_title") %></h2>
+    <% if @available.any? %>
+      <%= form_with url: admin_category_spec_attributes_path(@category), method: :post,
+            class: "flex flex-wrap items-center gap-2 text-sm" do |form| %>
+        <%= form.collection_select :spec_attribute_id, @available, :id, :name,
+              { include_blank: t(".attach_pick") }, class: "input text-sm" %>
+        <label class="flex items-center gap-1 text-xs">
+          <%= form.check_box :required, class: "size-4 accent-indigo-600" %>
+          <%= t(".required") %>
+        </label>
+        <%= form.submit t(".attach"), class: "btn-primary" %>
+      <% end %>
+    <% else %>
+      <p class="text-sm text-muted"><%= t(".attach_all_attached") %></p>
+    <% end %>
+  </section>
+</div>

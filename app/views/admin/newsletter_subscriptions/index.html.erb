@@ -1,0 +1,63 @@
+<% content_for :title, t(".title") %>
+
+<div class="mb-4 flex flex-wrap items-end justify-between gap-3">
+  <div>
+    <h1 class="text-xl font-bold"><%= t(".title") %></h1>
+    <p class="mt-1 text-sm text-muted"><%= t(".subtitle", count: @pagy.count) %></p>
+  </div>
+  <%# CSV export streams the whole filtered set (formula-safe). %>
+  <%= link_to t(".export_csv"), admin_newsletter_subscriptions_path(request.query_parameters.merge(format: "csv")),
+        class: "btn-secondary" %>
+</div>
+
+<form action="<%= admin_newsletter_subscriptions_path %>" method="get" class="card mb-4 grid gap-3 p-3 sm:grid-cols-3">
+  <%= search_field_tag :q, params[:q], placeholder: t(".filters.q"), class: "input text-sm" %>
+  <%= select_tag :locale,
+        options_for_select(I18n.available_locales.map { |l| [ t("locales.#{l}"), l.to_s ] }, params[:locale]),
+        include_blank: t(".filters.all_locales"), class: "input text-sm",
+        aria: { label: t(".filters.locale") } %>
+  <div class="flex items-center gap-2">
+    <button type="submit" class="btn-primary"><%= t(".filters.apply") %></button>
+    <%= link_to t(".filters.clear"), admin_newsletter_subscriptions_path, class: "btn-secondary" %>
+  </div>
+</form>
+
+<% if @subscriptions.any? %>
+  <div class="card overflow-x-auto">
+    <table class="admin-table w-full min-w-[640px] text-sm">
+      <thead>
+        <tr>
+          <th scope="col"><%= t(".columns.email") %></th>
+          <th scope="col"><%= t(".columns.locale") %></th>
+          <th scope="col"><%= t(".columns.state") %></th>
+          <th scope="col"><%= t(".columns.created") %></th>
+          <th scope="col"><span class="sr-only"><%= t(".columns.actions") %></span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @subscriptions.each do |subscription| %>
+          <tr>
+            <td class="font-medium"><%= subscription.email %></td>
+            <td class="text-muted"><%= t("locales.#{subscription.locale}") %></td>
+            <td>
+              <% if subscription.confirmed_at %>
+                <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800"><%= t(".confirmed_chip") %></span>
+              <% else %>
+                <span class="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800"><%= t(".pending_chip") %></span>
+              <% end %>
+            </td>
+            <td class="whitespace-nowrap text-muted"><%= l(subscription.created_at.to_date, format: :delivery) %></td>
+            <td class="whitespace-nowrap text-right">
+              <%= button_to t(".unsubscribe"), admin_newsletter_subscription_path(subscription), method: :delete,
+                    class: "btn-secondary text-xs text-red-600",
+                    form: { data: { turbo_confirm: t(".unsubscribe_confirm") } } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <div class="mt-4"><%= results_pagination(@pagy) %></div>
+<% else %>
+  <div class="card p-6 text-center text-sm text-muted"><%= t(".empty") %></div>
+<% end %>

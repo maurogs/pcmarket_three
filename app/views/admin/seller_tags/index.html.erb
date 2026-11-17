@@ -1,0 +1,41 @@
+<% content_for :title, t(".title") %>
+
+<div class="mb-4 flex flex-wrap items-end justify-between gap-3">
+  <div>
+    <h1 class="text-xl font-bold"><%= t(".title") %></h1>
+    <p class="mt-1 text-sm text-muted"><%= t(".subtitle") %></p>
+  </div>
+  <%= link_to t(".new"), new_admin_seller_tag_path, class: "btn-primary" %>
+</div>
+
+<% if @seller_tags.any? %>
+  <div class="card overflow-x-auto">
+    <table class="admin-table w-full min-w-[560px] text-sm">
+      <thead>
+        <tr>
+          <th scope="col"><%= t(".columns.name") %></th>
+          <th scope="col"><%= t(".columns.slug") %></th>
+          <th scope="col"><%= t(".columns.listings") %></th>
+          <th scope="col"><span class="sr-only"><%= t(".columns.actions") %></span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @seller_tags.each do |seller_tag| %>
+          <tr>
+            <td class="font-medium"><%= seller_tag.name %></td>
+            <td class="font-mono text-xs"><%= seller_tag.slug %></td>
+            <td class="text-muted"><%= seller_tag.listings.size %></td>
+            <td class="whitespace-nowrap text-right">
+              <%= link_to t(".actions.edit"), edit_admin_seller_tag_path(seller_tag), class: "btn-secondary" %>
+              <%= button_to t(".actions.destroy"), admin_seller_tag_path(seller_tag), method: :delete,
+                    class: "btn-secondary text-red-600",
+                    form: { data: { turbo_confirm: t(".actions.destroy_confirm") } } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <div class="card p-6 text-center text-sm text-muted"><%= t(".empty") %></div>
+<% end %>

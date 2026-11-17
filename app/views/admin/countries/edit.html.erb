@@ -1,0 +1,85 @@
+<% content_for :title, t(".title", country: @country.display_name) %>
+
+<div class="mb-4 flex flex-wrap items-end justify-between gap-3">
+  <div>
+    <h1 class="text-xl font-bold"><%= t(".title", country: @country.display_name) %></h1>
+    <p class="mt-1 text-sm text-muted"><%= t(".subtitle") %></p>
+  </div>
+  <%= link_to t(".back"), admin_countries_path, class: "btn-secondary" %>
+</div>
+
+<div class="grid gap-4 lg:grid-cols-2">
+  <section class="card p-4">
+    <% if @country.errors.any? %>
+      <div class="mb-4 rounded border border-red-300 bg-red-50 p-3 text-sm text-red-800">
+        <ul class="list-inside list-disc">
+          <% @country.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%= form_with model: @country, url: admin_country_path(@country), method: :patch, class: "grid gap-3" do |form| %>
+      <div>
+        <%= form.label :currency, class: "block text-sm font-medium" %>
+        <%= form.text_field :currency, class: "input text-sm w-24 font-mono" %>
+      </div>
+      <div>
+        <%= form.label :default_locale, class: "block text-sm font-medium" %>
+        <%= form.select :default_locale,
+              I18n.available_locales.map { |l| [ t("locales.#{l}"), l.to_s ] },
+              {}, class: "input text-sm" %>
+      </div>
+      <div>
+        <%= form.label :vat_rate, class: "block text-sm font-medium" %>
+        <%= form.number_field :vat_rate, step: 0.01, min: 0, class: "input text-sm w-28" %>
+      </div>
+      <label class="flex items-start gap-2 text-sm">
+        <%= form.check_box :enabled, class: "size-4 accent-indigo-600 mt-0.5" %>
+        <span>
+          <span class="font-medium"><%= t(".enabled") %></span>
+          <span class="block text-xs text-muted"><%= t(".enabled_hint") %></span>
+        </span>
+      </label>
+      <div class="flex gap-2">
+        <%= form.submit t(".submit"), class: "btn-primary" %>
+        <%= link_to t(".cancel"), admin_countries_path, class: "btn-secondary" %>
+      </div>
+    <% end %>
+  </section>
+
+  <section class="card p-4">
+    <h2 class="mb-3 text-sm font-semibold text-muted"><%= t(".checklist_title") %></h2>
+    <% checklist = @country.launch_checklist %>
+    <ul class="space-y-2 text-sm">
+      <li class="flex items-center gap-2">
+        <% if checklist[:legal_pages] %>
+          <span class="text-emerald-700">✓</span> <%= t(".checklist.legal_pages_ok") %>
+        <% else %>
+          <span class="text-red-600">✗</span>
+          <%= t(".checklist.legal_pages_missing", slugs: @country.missing_legal_slugs.join(", ")) %>
+        <% end %>
+      </li>
+      <li class="flex items-center gap-2">
+        <% if checklist[:categories] %>
+          <span class="text-emerald-700">✓</span> <%= t(".checklist.categories_ok") %>
+        <% else %>
+          <span class="text-red-600">✗</span> <%= t(".checklist.categories_missing") %>
+        <% end %>
+      </li>
+      <li class="flex items-center gap-2">
+        <% if checklist[:support_email] %>
+          <span class="text-emerald-700">✓</span> <%= t(".checklist.support_email_ok") %>
+        <% else %>
+          <span class="text-red-600">✗</span> <%= t(".checklist.support_email_missing") %>
+        <% end %>
+      </li>
+    </ul>
+    <% unless checklist[:legal_pages] %>
+      <%= link_to t(".create_legal_pages"),
+            new_admin_legal_page_path(country_code: @country.code, locale: @country.default_locale),
+            class: "btn-secondary mt-3 inline-block" %>
+    <% end %>
+  </section>
+</div>

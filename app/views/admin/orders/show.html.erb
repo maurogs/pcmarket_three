@@ -1,0 +1,136 @@
+<% content_for :title, t(".title", number: @order.number) %>
+
+<div class="mb-4 flex flex-wrap items-end justify-between gap-3">
+  <div>
+    <h1 class="text-xl font-bold"><%= t(".title", number: @order.number) %></h1>
+    <p class="mt-1 flex items-center gap-2 text-sm text-muted">
+      <%= order_status_badge(@order) %>
+      <span><%= t(".placed_at", time: l(@order.created_at, format: :long)) %></span>
+    </p>
+  </div>
+  <div class="flex gap-2">
+    <% if (conversation = @order.conversation) %>
+      <%= link_to t(".conversation"), conversation_path(conversation), class: "btn-secondary" %>
+    <% end %>
+    <% if @order.disputed? %>
+      <%= link_to t(".resolve"), new_admin_dispute_resolution_path(@order), class: "btn-primary" %>
+    <% end %>
+  </div>
+</div>
+
+<div class="grid gap-4 lg:grid-cols-3">
+  <%# --- money ------------------------------------------------------------ %>
+  <section class="card p-4 lg:col-span-2">
+    <h2 class="mb-3 text-sm font-semibold text-muted"><%= t(".items_title") %></h2>
+    <ul class="divide-y text-sm">
+      <% @order.order_items.each do |item| %>
+        <li class="flex items-baseline justify-between gap-3 py-2">
+          <span class="min-w-0">
+            <% if item.listing %>
+              <%= link_to item.title, admin_listing_path(item.listing), class: "hover:text-primary hover:underline" %>
+            <% else %>
+              <%= item.title %>
+            <% end %>
+            <span class="text-muted">× <%= item.quantity %></span>
+          </span>
+          <span class="whitespace-nowrap"><%= money(item.line_total_cents, @order.currency) %></span>
+        </li>
+      <% end %>
+    </ul>
+    <dl class="mt-3 space-y-1 border-t pt-3 text-sm">
+      <div class="flex justify-between"><dt class="text-muted"><%= t(".subtotal") %></dt><dd><%= money(@order.subtotal_cents, @order.currency) %></dd></div>
+      <div class="flex justify-between"><dt class="text-muted"><%= t(".shipping") %></dt><dd><%= money(@order.shipping_cents, @order.currency) %></dd></div>
+      <div class="flex justify-between"><dt class="text-muted"><%= t(".commission") %></dt><dd><%= money(@order.commission_cents, @order.currency) %></dd></div>
+      <div class="flex justify-between font-semibold"><dt><%= t(".total") %></dt><dd><%= money(@order.total_cents, @order.currency) %></dd></div>
+      <% if @order.refund_cents.positive? %>
+        <div class="flex justify-between text-orange-700 dark:text-orange-400">
+          <dt><%= t(".refunded") %></dt><dd><%= money(@order.refund_cents, @order.currency) %></dd>
+        </div>
+      <% end %>
+    </dl>
+  </section>
+
+  <%# --- people & payment -------------------------------------------------- %>
+  <section class="card space-y-3 p-4 text-sm">
+    <h2 class="text-sm font-semibold text-muted"><%= t(".details_title") %></h2>
+    <div>
+      <p class="text-xs text-muted"><%= t(".buyer") %></p>
+      <%= link_to @order.buyer.username, admin_user_path(@order.buyer), class: "font-medium hover:text-primary hover:underline" %>
+    </div>
+    <div>
+      <p class="text-xs text-muted"><%= t(".seller") %></p>
+      <%= link_to @order.seller.username, admin_user_path(@order.seller), class: "font-medium hover:text-primary hover:underline" %>
+    </div>
+    <div>
+      <p class="text-xs text-muted"><%= t(".payment_provider") %></p>
+      <p><%= @order.payment_provider.presence || t(".payment_direct") %></p>
+    </div>
+    <% if @order.payment_reference.present? %>
+      <div>
+        <p class="text-xs text-muted"><%= t(".payment_reference") %></p>
+        <p class="break-all font-mono text-xs"><%= @order.payment_reference %></p>
+      </div>
+    <% end %>
+    <% if @order.tracking_number.present? %>
+      <div>
+        <p class="text-xs text-muted"><%= t(".tracking") %></p>
+        <p><%= @order.carrier %> · <span class="font-mono text-xs"><%= @order.tracking_number %></span></p>
+      </div>
+    <% end %>
+    <% if @order.shipping_address.present? %>
+      <div>
+        <p class="text-xs text-muted"><%= t(".shipping_address") %></p>
+        <address class="text-xs not-italic"><%= [@order.shipping_address["name"], @order.shipping_address["line1"], @order.shipping_address["postal_code"], @order.shipping_address["city"]].compact_blank.join(", ") %></address>
+      </div>
+    <% end %>
+  </section>
+
+  <%# --- forced status transition ------------------------------------------ %>
+  <section class="card p-4 lg:col-span-2">
+    <h2 class="mb-1 text-sm font-semibold text-muted"><%= t(".transition_title") %></h2>
+    <p class="mb-3 text-xs text-muted"><%= t(".transition_hint") %></p>
+    <%= form_with url: admin_order_path(@order), method: :patch, class: "grid gap-3 sm:grid-cols-[minmax(0,12rem)_1fr_auto] sm:items-start" do |form| %>
+      <%= hidden_field_tag :from_status, @order.status %>
+      <%= form.select :status,
+            (Order.statuses.keys - [@order.status]).map { |s| [ Order.human_attribute_name("status/#{s}"), s ] },
+            include_blank: t(".transition_pick"), class: "input text-sm" %>
+      <%= form.text_area :reason, rows: 2, required: true,
+            placeholder: t(".transition_reason_placeholder"), class: "input text-sm" %>
+      <%= form.submit t(".transition_submit"), class: "btn-primary",
+            data: { turbo_confirm: t(".transition_confirm") } %>
+    <% end %>
+  </section>
+
+  <%# --- audit events ------------------------------------------------------- %>
+  <%= render "admin/shared/audit_events", events: @events %>
+
+  <%# --- internal notes ------------------------------------------------------ %>
+  <section class="card p-4 lg:col-span-3">
+    <h2 class="mb-3 text-sm font-semibold text-muted"><%= t(".notes_title") %></h2>
+    <%= form_with url: admin_order_notes_path(@order), class: "mb-3 flex items-start gap-2" do |form| %>
+      <%= form.text_area :body, rows: 2, required: true,
+            placeholder: t(".notes_placeholder"), class: "input text-sm grow" %>
+      <%= form.submit t(".notes_add"), class: "btn-primary" %>
+    <% end %>
+    <% if @notes.any? %>
+      <ul class="space-y-2 text-sm">
+        <% @notes.each do |note| %>
+          <li class="rounded border p-2">
+            <div class="flex items-baseline justify-between gap-2">
+              <span class="text-xs text-muted">
+                <%= t(".note_by", admin: note.admin&.display_name || t(".deleted_admin"),
+                      time: l(note.created_at, format: :long)) %>
+              </span>
+              <%= button_to t(".note_delete"), admin_order_note_path(@order, note), method: :delete,
+                    class: "text-xs text-red-600 hover:underline",
+                    form: { data: { turbo_confirm: t(".note_confirm") } } %>
+            </div>
+            <p class="mt-1 whitespace-pre-line"><%= note.body %></p>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="text-sm text-muted"><%= t(".notes_empty") %></p>
+    <% end %>
+  </section>
+</div>

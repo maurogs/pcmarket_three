@@ -1,0 +1,7 @@
+<% content_for :title, t(".subject", number: @order.number) %>
+<p><%= t(".greeting", name: @recipient.display_name) %></p>
+<p><%= t(".intro", number: @order.number, status: Order.human_attribute_name("status/#{@order.status}")) %></p>
+<p>
+  <%= link_to t(".view_order"), order_url(@order, locale: @recipient.locale),
+        style: "display:inline-block;background:#4f46e5;color:#fff;padding:0.6rem 1rem;border-radius:6px;" %>
+</p>

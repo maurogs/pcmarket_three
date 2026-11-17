@@ -1,0 +1,9 @@
+<% content_for :title, t(".title", name: @category.name) %>
+
+<h1 class="mb-4 text-xl font-bold"><%= t(".title", name: @category.name) %></h1>
+
+<div class="card p-4">
+  <%= form_with model: @category, url: admin_category_path(@category), method: :patch do |form| %>
+    <%= render "form", form: form, category: @category %>
+  <% end %>
+</div>

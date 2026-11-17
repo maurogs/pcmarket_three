@@ -1,5 +1,6 @@
 class Category < ApplicationRecord
   extend FriendlyId
+  include TranslatableJsonb
 
   friendly_id :slug_candidates, use: :slugged
 
@@ -19,6 +20,32 @@ class Category < ApplicationRecord
   scope :roots, -> { where(parent_id: nil) }
   scope :active, -> { where(active: true) }
   scope :ordered, -> { order(position: :asc, id: :asc) }
+
+  validate :parent_not_descendant
+
+  # Swap positions with the adjacent sibling (admin up/down buttons).
+  # Returns true when a swap happened.
+  def move!(direction)
+    offset = { "up" => -1, "down" => 1 }.fetch(direction.to_s) do
+      raise ArgumentError, "direction must be up or down"
+    end
+
+    siblings = self.class.where(parent_id: parent_id).order(position: :asc, id: :asc).to_a
+    index = siblings.index { |sibling| sibling.id == id }
+    target = index + offset
+    # Explicit bounds: Array#[] with a negative index would wrap around and
+    # "move" the first row to the end instead of refusing.
+    return false if target.negative? || target >= siblings.size
+
+    other = siblings[target]
+
+    transaction do
+      my_position = position
+      update!(position: other.position)
+      other.update!(position: my_position)
+    end
+    true
+  end
 
   # Localised name for the current I18n locale, English as fallback.
   def name
@@ -78,6 +105,14 @@ class Category < ApplicationRecord
   end
 
   private
+
+  # A category can never be its own parent or sit under one of its own
+  # descendants (would break the recursive tree CTEs).
+  def parent_not_descendant
+    return if parent_id.nil? || new_record?
+
+    errors.add(:parent_id, :cyclic) if parent_id == id || self_and_descendant_ids.include?(parent_id)
+  end
 
   # Join rows for every spec attribute attached to this category or an
   # ancestor; own-category attachments override inherited ones.

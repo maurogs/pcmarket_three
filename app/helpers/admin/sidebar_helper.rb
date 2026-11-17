@@ -15,24 +15,63 @@ module Admin
       [ "admin/dashboards", "layouts.admin.nav.dashboard", :dashboard ],
       [ "admin/moderations", "layouts.admin.nav.moderations", :moderations ],
       [ "admin/listings", "layouts.admin.nav.listings", :listings ],
+      [ "admin/orders", "layouts.admin.nav.orders", :orders ],
+      [ "admin/disputes", "layouts.admin.nav.disputes", :disputes ],
+      [ "admin/reviews", "layouts.admin.nav.reviews", :reviews ],
       [ "admin/users", "layouts.admin.nav.users", :users ],
-      [ "admin/stores", "layouts.admin.nav.stores", :stores ]
+      [ "admin/stores", "layouts.admin.nav.stores", :stores ],
+      [ "admin/categories", "layouts.admin.nav.categories", :categories ],
+      [ "admin/spec_attributes", "layouts.admin.nav.spec_attributes", :spec_attributes ],
+      [ "admin/labels", "layouts.admin.nav.labels", :labels ],
+      [ "admin/seller_tags", "layouts.admin.nav.seller_tags", :seller_tags ],
+      [ "admin/countries", "layouts.admin.nav.countries", :countries ],
+      [ "admin/feature_flags", "layouts.admin.nav.feature_flags", :feature_flags ],
+      [ "admin/settings", "layouts.admin.nav.settings", :settings ],
+      [ "admin/legal_pages", "layouts.admin.nav.legal_pages", :legal_pages ],
+      [ "admin/newsletter_subscriptions", "layouts.admin.nav.newsletter", :newsletter ],
+      [ "admin/audit_logs", "layouts.admin.nav.audit_logs", :audit_logs ]
     ].freeze
 
     ADMIN_NAV_PATHS = {
       "admin/dashboards" => :admin_dashboard_path,
       "admin/moderations" => :admin_moderations_path,
       "admin/listings" => :admin_listings_path,
+      "admin/orders" => :admin_orders_path,
+      "admin/disputes" => :admin_disputes_path,
+      "admin/reviews" => :admin_reviews_path,
       "admin/users" => :admin_users_path,
-      "admin/stores" => :admin_stores_path
+      "admin/stores" => :admin_stores_path,
+      "admin/categories" => :admin_categories_path,
+      "admin/spec_attributes" => :admin_spec_attributes_path,
+      "admin/labels" => :admin_labels_path,
+      "admin/seller_tags" => :admin_seller_tags_path,
+      "admin/countries" => :admin_countries_path,
+      "admin/feature_flags" => :admin_feature_flags_path,
+      "admin/settings" => :edit_admin_settings_path,
+      "admin/legal_pages" => :admin_legal_pages_path,
+      "admin/newsletter_subscriptions" => :admin_newsletter_subscriptions_path,
+      "admin/audit_logs" => :admin_audit_logs_path
     }.freeze
 
     ADMIN_SECTIONS = {
       "admin/dashboards" => %w[dashboards],
       "admin/moderations" => %w[moderations approvals rejections bulk_moderations],
       "admin/listings" => %w[listings unpublications],
+      "admin/orders" => %w[orders notes],
+      "admin/disputes" => %w[disputes resolutions],
+      "admin/reviews" => %w[reviews],
       "admin/users" => %w[users bans impersonations],
-      "admin/stores" => %w[stores verifications hidings]
+      "admin/stores" => %w[stores verifications hidings],
+      "admin/categories" => %w[categories positions category_spec_attributes],
+      "admin/spec_attributes" => %w[spec_attributes spec_options bulk_options spec_option_merges],
+      "admin/labels" => %w[labels],
+      "admin/seller_tags" => %w[seller_tags],
+      "admin/countries" => %w[countries],
+      "admin/feature_flags" => %w[feature_flags],
+      "admin/settings" => %w[settings],
+      "admin/legal_pages" => %w[legal_pages],
+      "admin/newsletter_subscriptions" => %w[newsletter_subscriptions],
+      "admin/audit_logs" => %w[audit_logs]
     }.freeze
 
     def admin_active?(section)
@@ -53,8 +92,31 @@ module Admin
 
     private
 
-    # Tiny inline heroicons (outline) keyed by nav entry.
+    # Tiny inline heroicons (outline) keyed by nav entry. Phase 6b entries
+    # use simple hand-drawn 24x24 strokes (same stroke width and size as
+    # the heroicons above) to keep the helper readable.
+    SIMPLE_NAV_ICONS = {
+      orders: "M8.25 6.75h7.5M8.25 12h7.5m-7.5 5.25h4.5M6 3.75h12a1.5 1.5 0 011.5 1.5v13.5a1.5 1.5 0 01-1.5 1.5H6a1.5 1.5 0 01-1.5-1.5V5.25A1.5 1.5 0 016 3.75z",
+      disputes: "M12 3.75L21 19H3l9-15.25zM12 10v4m0 2.5v.01",
+      reviews: "M12 4.5l2.3 4.7 5.2.8-3.7 3.6.9 5.1-4.7-2.5-4.7 2.5.9-5.1L4.5 10l5.2-.8L12 4.5z",
+      categories: "M3.75 6.75A1.5 1.5 0 015.25 5.25h3.6l1.9 2.25h8.25a1.5 1.5 0 011.5 1.5v8.25a1.5 1.5 0 01-1.5 1.5h-13.5a1.5 1.5 0 01-1.5-1.5v-10.5z",
+      spec_attributes: "M5 7.5h14M5 12h14M5 16.5h14M8.25 5.25v4.5m7.5-1.5v4.5m-6 1.5v4.5",
+      labels: "M7.5 6.75h.01M4.5 4.5h7l8.5 8.5-7 7-8.5-8.5v-7zM9 15.5l5.5-5.5",
+      seller_tags: "M7.5 3.75h9a1.5 1.5 0 011.5 1.5v15l-6-3-6 3v-15a1.5 1.5 0 011.5-1.5z",
+      countries: "M12 3.75a8.25 8.25 0 100 16.5 8.25 8.25 0 000-16.5zM3.75 12h16.5M12 3.75c2.2 2.1 3.3 5.2 3.3 8.25S14.2 18.15 12 20.25c-2.2-2.1-3.3-5.2-3.3-8.25S9.8 5.85 12 3.75z",
+      feature_flags: "M6.75 20.25V4.5m0 1.5h10.5l-2.25 3.75 2.25 3.75H6.75",
+      settings: "M12 15a3 3 0 100-6 3 3 0 000 6zM12 3.75l1.5 2.25h2.6l.65 2.6L18.75 12l-2 3.4-.65 2.6h-2.6L12 20.25l-1.5-2.25h-2.6l-.65-2.6-2-3.4.65-2.6h2.6L12 3.75z",
+      legal_pages: "M6.75 3.75h7.5l3.75 3.75v12a1.5 1.5 0 01-1.5 1.5h-9.75a1.5 1.5 0 01-1.5-1.5V5.25a1.5 1.5 0 011.5-1.5zM14.25 3.75v3.75h3.75M8.25 12h7.5m-7.5 3.75h5.25",
+      newsletter: "M3.75 6.75A1.5 1.5 0 015.25 5.25h13.5a1.5 1.5 0 011.5 1.5v10.5a1.5 1.5 0 01-1.5 1.5h-13.5a1.5 1.5 0 01-1.5-1.5V6.75zM4.5 7l7.5 5.25L19.5 7",
+      audit_logs: "M9 4.5h6a1.1 1.1 0 011.1 1.1v.4h1.4a1.5 1.5 0 011.5 1.5v10.5a1.5 1.5 0 01-1.5 1.5h-11a1.5 1.5 0 01-1.5-1.5V7.5a1.5 1.5 0 011.5-1.5h1.4v-.4A1.1 1.1 0 019 4.5zM9.75 12.75l1.5 1.5 3-3"
+    }.freeze
+
     def admin_nav_icon(key)
+      if (simple = SIMPLE_NAV_ICONS[key])
+        return '<svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.8" ' \
+               "stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"#{simple}\"/></svg>"
+      end
+
       case key
       when :dashboard
         '<svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 018.25 20.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>'

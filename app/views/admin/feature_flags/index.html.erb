@@ -1,0 +1,42 @@
+<% content_for :title, t(".title") %>
+
+<div class="mb-4">
+  <h1 class="text-xl font-bold"><%= t(".title") %></h1>
+  <p class="mt-1 text-sm text-muted"><%= t(".subtitle") %></p>
+</div>
+
+<div class="grid gap-4 lg:grid-cols-2">
+  <% @flags.each do |flag| %>
+    <section class="card p-4">
+      <div class="flex items-baseline justify-between gap-2">
+        <h2 class="font-mono text-sm font-semibold"><%= flag[:key] %></h2>
+        <% if flag[:enabled] && flag[:percentage].positive? %>
+          <span class="rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-semibold text-sky-800"><%= t(".rollout", percent: flag[:percentage]) %></span>
+        <% elsif flag[:enabled] %>
+          <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800"><%= t(".on_chip") %></span>
+        <% else %>
+          <span class="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600"><%= t(".off_chip") %></span>
+        <% end %>
+      </div>
+      <p class="mt-1 text-sm text-muted"><%= t(flag[:description_key]) %></p>
+
+      <% if flag[:warning] %>
+        <p class="mt-2 rounded bg-amber-50 px-2 py-1 text-xs text-amber-800"><%= flag[:warning] %></p>
+      <% end %>
+
+      <div class="mt-3 flex flex-wrap items-center gap-2">
+        <%= button_to t(".turn_on"), admin_feature_flag_path(flag[:key]),
+              params: { switch: "on" }, class: "btn-secondary text-xs" %>
+        <%= button_to t(".turn_off"), admin_feature_flag_path(flag[:key]),
+              params: { switch: "off" }, class: "btn-secondary text-xs" %>
+        <%= form_with url: admin_feature_flag_path(flag[:key]), method: :patch,
+              class: "flex items-center gap-1 text-xs" do %>
+          <%= number_field_tag :percentage, flag[:percentage].zero? ? 50 : flag[:percentage],
+                min: 1, max: 99, class: "input w-16 text-xs", "aria-label": t(".percentage") %>
+          <%= hidden_field_tag :switch, "percentage" %>
+          <%= submit_tag t(".rollout_set"), class: "btn-secondary text-xs" %>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+</div>

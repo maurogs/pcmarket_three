@@ -1,0 +1,14 @@
+<% content_for :title, t(".title") %>
+
+<div class="mb-4">
+  <h1 class="mb-1 text-xl font-bold"><%= t(".title") %></h1>
+  <% if @legal_page.persisted? %>
+    <p class="text-sm text-muted"><%= t(".prefilled_note") %></p>
+  <% end %>
+</div>
+
+<div class="card p-4">
+  <%= form_with model: @legal_page, url: admin_legal_pages_path, method: :post do |form| %>
+    <%= render "form", form: form, legal_page: @legal_page %>
+  <% end %>
+</div>

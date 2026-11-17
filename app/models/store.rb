@@ -80,7 +80,7 @@ class Store < ApplicationRecord
   # Recomputes rating_average/reviews_count from persisted reviews.
   # Called from Review after_create/after_destroy callbacks.
   def refresh_rating!
-    rated = reviews.where.not(rating: nil)
+    rated = reviews.where(hidden_at: nil).where.not(rating: nil)
     update_columns(reviews_count: rated.count, rating_average: (rated.average(:rating) || 0).round(2))
   end
 

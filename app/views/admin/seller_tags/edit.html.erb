@@ -1,0 +1,9 @@
+<% content_for :title, t(".title", name: @seller_tag.name) %>
+
+<h1 class="mb-4 text-xl font-bold"><%= t(".title", name: @seller_tag.name) %></h1>
+
+<div class="card p-4">
+  <%= form_with model: @seller_tag, url: admin_seller_tag_path(@seller_tag), method: :patch do |form| %>
+    <%= render "form", form: form, seller_tag: @seller_tag %>
+  <% end %>
+</div>

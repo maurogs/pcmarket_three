@@ -1,4 +1,7 @@
 class Label < ApplicationRecord
+  include TranslatableJsonb
+  include LocalizedSlug
+
   has_many :listing_labels, dependent: :destroy
   has_many :listings, through: :listing_labels
 

@@ -1,0 +1,49 @@
+<% content_for :title, t(".title") %>
+
+<div class="mb-4 flex flex-wrap items-end justify-between gap-3">
+  <div>
+    <h1 class="text-xl font-bold"><%= t(".title") %></h1>
+    <p class="mt-1 text-sm text-muted"><%= t(".subtitle") %></p>
+  </div>
+  <%= link_to t(".new"), new_admin_category_path, class: "btn-primary" %>
+</div>
+
+<%# Renders a root and its children; each row gets position, active and action controls. %>
+<% row_for = lambda do |category, depth| %>
+  <div class="flex flex-wrap items-center gap-2 border-t py-2 <%= depth.positive? ? "pl-6" : "" %>">
+    <span class="min-w-[14rem]">
+      <% if depth.positive? %><span aria-hidden="true" class="text-muted">└ </span><% end %>
+      <span class="font-medium"><%= category.name %></span>
+      <span class="text-xs text-muted">(<%= category.slug %>)</span>
+      <% if category.active? %>
+        <span class="ml-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800"><%= t(".active_chip") %></span>
+      <% else %>
+        <span class="ml-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600"><%= t(".inactive_chip") %></span>
+      <% end %>
+    </span>
+    <span class="text-xs text-muted"><%= t(".position", position: category.position) %></span>
+    <span class="text-xs text-muted"><%= t(".listings_count", count: category.listings.count) %></span>
+
+    <span class="ml-auto flex items-center gap-1">
+      <% %w[up down].each do |direction| %>
+        <%= button_to admin_category_position_path(category), class: "inline" do %>
+          <%= hidden_field_tag :direction, direction %>
+          <%= submit_tag t(".move_#{direction}"), class: "btn-secondary text-xs" %>
+        <% end %>
+      <% end %>
+      <%= link_to t(".specs"), admin_category_spec_attributes_path(category), class: "btn-secondary text-xs" %>
+      <%= link_to t(".edit"), edit_admin_category_path(category), class: "btn-secondary text-xs" %>
+    </span>
+  </div>
+<% end %>
+
+<div class="card p-3">
+  <% if @categories.any? %>
+    <% @categories.each do |root| %>
+      <%= row_for.call(root, 0) %>
+      <% root.children.each { |child| row_for.call(child, 1) } %>
+    <% end %>
+  <% else %>
+    <p class="p-3 text-center text-sm text-muted"><%= t(".empty") %></p>
+  <% end %>
+</div>

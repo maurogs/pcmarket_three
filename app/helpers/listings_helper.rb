@@ -202,11 +202,14 @@ module ListingsHelper
     end
   end
 
-  def photo_variant_tag(photo, variant: :gallery, alt: nil, sizes: nil)
+  # Extra HTML options (e.g. `class:`) are merged into the image tag, so
+  # callers can restyle the thumbnail instead of relying on the gallery default.
+  def photo_variant_tag(photo, variant: :gallery, alt: nil, sizes: nil, **html_options)
     size = photo_dimensions(variant)
     image_tag(variant_url(photo, variant),
-              alt: alt || photo.filename.to_s, loading: "lazy", decoding: "async",
-              width: size[0], height: size[1], class: "size-full object-contain")
+              **{ alt: alt || photo.filename.to_s, loading: "lazy", decoding: "async",
+                  width: size[0], height: size[1], class: "size-full object-contain" }
+                .merge(html_options))
   end
 
   def photo_placeholder_tag(alt)

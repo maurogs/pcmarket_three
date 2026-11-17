@@ -1068,6 +1068,39 @@ ALTER SEQUENCE public.order_items_id_seq OWNED BY public.order_items.id;
 
 
 --
+-- Name: order_notes; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.order_notes (
+    id bigint NOT NULL,
+    order_id bigint NOT NULL,
+    admin_id bigint NOT NULL,
+    body text NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: order_notes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.order_notes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: order_notes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.order_notes_id_seq OWNED BY public.order_notes.id;
+
+
+--
 -- Name: order_number_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -1107,7 +1140,8 @@ CREATE TABLE public.orders (
     paid_at timestamp(6) without time zone,
     completed_at timestamp(6) without time zone,
     cancelled_at timestamp(6) without time zone,
-    checkout_token character varying
+    checkout_token character varying,
+    refund_cents integer DEFAULT 0 NOT NULL
 );
 
 
@@ -1143,7 +1177,8 @@ CREATE TABLE public.reviews (
     rating integer NOT NULL,
     body text,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    hidden_at timestamp(6) without time zone
 );
 
 
@@ -1679,6 +1714,13 @@ ALTER TABLE ONLY public.order_items ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
+-- Name: order_notes id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.order_notes ALTER COLUMN id SET DEFAULT nextval('public.order_notes_id_seq'::regclass);
+
+
+--
 -- Name: orders id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1986,6 +2028,14 @@ ALTER TABLE ONLY public.offers
 
 ALTER TABLE ONLY public.order_items
     ADD CONSTRAINT order_items_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: order_notes order_notes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.order_notes
+    ADD CONSTRAINT order_notes_pkey PRIMARY KEY (id);
 
 
 --
@@ -2602,6 +2652,20 @@ CREATE INDEX index_order_items_on_order_id ON public.order_items USING btree (or
 
 
 --
+-- Name: index_order_notes_on_admin_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_order_notes_on_admin_id ON public.order_notes USING btree (admin_id);
+
+
+--
+-- Name: index_order_notes_on_order_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_order_notes_on_order_id ON public.order_notes USING btree (order_id);
+
+
+--
 -- Name: index_orders_on_buyer_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2648,6 +2712,13 @@ CREATE INDEX index_orders_on_seller_id_and_status ON public.orders USING btree (
 --
 
 CREATE INDEX index_orders_on_status ON public.orders USING btree (status);
+
+
+--
+-- Name: index_reviews_on_hidden_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_reviews_on_hidden_at ON public.reviews USING btree (hidden_at);
 
 
 --
@@ -3018,6 +3089,22 @@ ALTER TABLE ONLY public.reviews
 
 
 --
+-- Name: order_notes fk_rails_a1d6c841a7; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.order_notes
+    ADD CONSTRAINT fk_rails_a1d6c841a7 FOREIGN KEY (admin_id) REFERENCES public.users(id);
+
+
+--
+-- Name: order_notes fk_rails_a3803c5248; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.order_notes
+    ADD CONSTRAINT fk_rails_a3803c5248 FOREIGN KEY (order_id) REFERENCES public.orders(id);
+
+
+--
 -- Name: listings fk_rails_a855f030e2; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3168,6 +3255,9 @@ ALTER TABLE ONLY public.moderation_events
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261118015003'),
+('20261118015002'),
+('20261118015001'),
 ('20261118010002'),
 ('20261118010001'),
 ('20261117230003'),

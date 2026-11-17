@@ -26,6 +26,19 @@ fr:
         listings: Annonces
         users: Utilisateurs
         stores: Boutiques
+        orders: Commandes
+        disputes: Litiges
+        reviews: Avis
+        categories: Catégories
+        spec_attributes: Attributs techniques
+        labels: Étiquettes
+        seller_tags: Tags de vendeur
+        countries: Pays
+        feature_flags: Fonctionnalités beta
+        settings: Paramètres du site
+        legal_pages: Mentions légales
+        newsletter: Newsletter
+        audit_logs: Journal d'activité
   nav:
     search_placeholder: Recherchez cartes graphiques, processeurs, ordinateurs portables…
     search_submit: Rechercher
@@ -321,6 +334,8 @@ fr:
         cannot_block_self: ne peut pas être vous-même
         not_purchasable: n'est pas disponible à l'achat
         spanish_tax_id_invalid: n'est pas un identifiant fiscal espagnol valide (NIF/CIF/NIE)
+        missing_legal_pages: "ne peut pas être activé : pages légales manquantes : %{slugs}"
+        immutable: ne peut pas être modifié après la création
         logo_content_type_invalid: doit être une image JPEG, PNG ou WebP
         logo_too_large: doit faire %{max} Mo ou moins
         banner_content_type_invalid: doit être une image JPEG, PNG ou WebP
@@ -400,6 +415,7 @@ fr:
       category:
         parent: Catégorie parente
         slug: Slug
+        parent_id: Catégorie parente
         names: Noms
         seo_descriptions: Descriptions SEO
         position: Position
@@ -537,6 +553,7 @@ fr:
         shipping_cents: Livraison
         commission_cents: Commission
         total_cents: Total
+        refund_cents: Montant remboursé
         currency: Devise
         shipping_address: Adresse de livraison
         payment_provider: Prestataire de paiement
@@ -546,6 +563,10 @@ fr:
         shipped_at: Expédiée le
         delivered_at: Livrée le
         buyer_protection_until: Protection acheteur jusqu'au
+      order_note:
+        body: Note
+        admin: Administrateur
+        created_at: Créée
       order_item:
         order: Commande
         listing: Annonce
@@ -576,12 +597,12 @@ fr:
       spec_attribute:
         key: Clé
         names: Noms
-        input_type:
-          select: Choix unique
-          multi_select: Choix multiple
-          number: Nombre
-          text: Texte
-          boolean: Oui/Non
+        input_type: Type de saisie
+        input_type/select: Choix unique
+        input_type/multi_select: Choix multiple
+        input_type/number: Nombre
+        input_type/text: Texte
+        input_type/boolean: Oui/Non
         unit: Unité
         filterable: Filtrable
         position: Position
@@ -1242,6 +1263,22 @@ fr:
       safety: Expédiez avec un numéro de suivi pour protéger votre vente.
       subject: 'Paiement confirmé : commande %{number}'
       view_sale: Voir la vente
+    status_changed:
+      subject: Commande %{number} mise à jour
+      greeting: "Bonjour %{name} :"
+      intro: Le statut de votre commande %{number} est passé à « %{status} ».
+      view_order: Voir la commande
+    refund_issued:
+      subject: Remboursement de la commande %{number}
+      greeting: "Bonjour %{name} :"
+      intro: Nous avons émis un remboursement pour la commande %{number}.
+      amount: "Montant remboursé : %{amount}"
+      view_order: Voir la commande
+    dispute_resolved:
+      subject: Litige de la commande %{number} résolu
+      greeting: "Bonjour %{name} :"
+      intro: Nous avons résolu le litige de la commande %{number}.
+      view_order: Voir la commande
   orders:
     carrier:
       Correos: Correos
@@ -1388,6 +1425,9 @@ fr:
       order_completed: Commande %{number} terminée
       order_cancelled: Commande %{number} annulée
       order_disputed: Commande %{number} en litige
+      order_updated: Commande %{number} mise à jour
+      order_refunded: Commande %{number} remboursée
+      order_resolved: Litige de la commande %{number} résolu
       unknown: "%{kind}"
       listing_approved: Votre annonce « %{title} » a passé la modération
       listing_rejected: Votre annonce « %{title} » doit être corrigée
@@ -1905,6 +1945,12 @@ fr:
           view: Voir
           edit: Modifier
         empty: Aucune boutique ne correspond à ces filtres.
+      edit:
+        title: Modifier « %{name} »
+        subtitle: Profil public et politiques
+        back: Retour à la boutique
+        submit: Enregistrer les modifications
+        cancel: Annuler
       show:
         title: "%{name}"
         back_to_stores: Toutes les boutiques
@@ -1958,6 +2004,12 @@ fr:
         badges:
           banned: Banni
     shared:
+      audit_events:
+        title: Activité d'administration
+        by: "%{admin} · %{time}"
+        deleted_admin: (administrateur supprimé)
+        empty: Aucune activité pour le moment
+      translation_tabs: Traductions
       seller_card:
         seller: Vendeur
         view_profile: Voir l'utilisateur
@@ -1968,6 +2020,568 @@ fr:
         by: "%{admin} - %{time}"
         deleted_admin: "(admin supprimé)"
         empty: Aucun événement de modération.
+    orders:
+      index:
+        title: Commandes
+        subtitle: Toutes les commandes de la plateforme
+        empty: Aucune commande ne correspond aux filtres
+        filters:
+          q: N° de commande
+          status: Statut
+          all_statuses: Tous les statuts
+          buyer: Acheteur (e-mail)
+          seller: Vendeur (e-mail)
+          provider: Passerelle de paiement
+          all_providers: Toutes les passerelles
+          provider_direct: Paiement direct
+          provider_stripe: Stripe
+          created_from: Depuis
+          created_to: Jusqu'au
+          apply: Filtrer
+          clear: Effacer
+        columns:
+          number: Numéro
+          buyer: Acheteur
+          seller: Vendeur
+          total: Total
+          status: Statut
+          created: Date
+          actions: Actions
+        actions:
+          view: Voir
+      show:
+        title: Commande %{number}
+        items_title: Articles
+        details_title: Récapitulatif de la commande
+        buyer: Acheteur
+        seller: Vendeur
+        placed_at: Passée le
+        shipping_address: Adresse de livraison
+        subtotal: Sous-total
+        shipping: Livraison
+        commission: Commission
+        total: Total
+        refunded: Remboursé
+        payment_provider: Passerelle de paiement
+        payment_direct: Paiement direct
+        payment_reference: Référence
+        tracking: Suivi
+        conversation: Voir la conversation
+        resolve: Résoudre le litige
+        transition_title: Changement manuel de statut
+        transition_hint: Remplace le flux normal ; acheteur et vendeur sont notifiés. Le motif est obligatoire.
+        transition_pick: Nouveau statut
+        transition_reason_placeholder: Motif du changement…
+        transition_submit: Appliquer le changement
+        transition_confirm: Forcer ce changement de statut ?
+        notes_title: Notes internes
+        notes_empty: Aucune note pour le moment
+        notes_placeholder: Écrivez une note pour l'équipe…
+        notes_add: Ajouter une note
+        note_by: "%{admin}, %{time}"
+        note_delete: Supprimer
+        note_confirm: Supprimer cette note ?
+        deleted_admin: (administrateur supprimé)
+      update:
+        updated: Commande %{number} mise à jour
+        errors:
+          reason_missing: Un motif est obligatoire
+          invalid_status: Statut non valide
+          stale: La commande a changé pendant votre action ; réessayez
+    notes:
+      create:
+        created: Note ajoutée
+      destroy:
+        destroyed: Note supprimée
+    disputes:
+      index:
+        title: Litiges
+        subtitle: Commandes en litige, ouvertes et résolues
+        empty: Aucun litige
+        filters:
+          q: N° de commande
+          status: Statut
+          all_statuses: Tous
+          buyer: Acheteur (e-mail)
+          seller: Vendeur (e-mail)
+          apply: Filtrer
+          clear: Effacer
+        columns:
+          number: Commande
+          buyer: Acheteur
+          seller: Vendeur
+          total: Total
+          status: Statut
+          opened: Ouvert
+          actions: Actions
+        actions:
+          review: Examiner
+      show:
+        title: Litige sur la commande %{number}
+        opened_at: Ouverte le %{time}
+        summary_title: La commande
+        buyer: Acheteur
+        seller: Vendeur
+        total: Total
+        payment_provider: Passerelle
+        payment_direct: Paiement direct
+        conversation: Conversation de la commande
+        open_order: Voir la commande
+        resolve: Résoudre le litige
+        refunded: "Montant remboursé : %{amount}"
+    resolutions:
+      new:
+        title: Résoudre le litige
+        subtitle: Choisissez entre rembourser l'acheteur ou donner raison au vendeur
+        order_title: Commande %{number}
+        buyer: Acheteur
+        seller: Vendeur
+        total: "Total payé : %{amount}"
+        payment_provider: "Passerelle : %{provider}"
+        payment_direct: Paiement direct (sans passerelle)
+        form_title: Décision
+        action_legend: Résultat
+        action_refund: Rembourser l'acheteur
+        action_refund_hint: Total ou partiel. Les paiements Stripe sont réellement remboursés.
+        action_release: Donner raison au vendeur
+        action_release_hint: Clôture le litige en terminant la commande ; le vendeur garde l'argent.
+        provider_hint: "Aucune référence de paiement : le remboursement sera consigné manuellement."
+        amount_label: Montant du remboursement (centimes, vide = total)
+        amount_hint: Maximum %{amount}
+        confirm: Résoudre le litige maintenant ?
+        submit: Résoudre
+        cancel: Annuler
+      create:
+        resolved:
+          refund: Litige résolu avec remboursement
+          release: Litige résolu en faveur du vendeur
+    reviews:
+      index:
+        title: Avis
+        subtitle: Avis des acheteurs ; masquez ceux qui enfreignent les règles
+        empty: Aucun avis ne correspond
+        filters:
+          store: Boutique
+          rating: Note
+          rating_all: Toutes
+          state: État
+          state_all: Tous
+          state_visible: Visibles
+          state_hidden: Masqués
+          apply: Filtrer
+          clear: Effacer
+        columns:
+          body: Avis
+          reviewer: Auteur
+          store: Boutique
+          order: Commande
+          rating: ★
+          created: Date
+          actions: Actions
+        hidden_chip: Masqué
+        hide: Masquer
+        hide_reason_placeholder: Motif (facultatif)…
+      destroy:
+        hidden: Avis masqué
+        reason_required: Saisissez un motif pour masquer l'avis
+    audit_logs:
+      index:
+        title: Journal d'activité
+        subtitle: Chaque action d'administration est enregistrée
+        empty: Aucun événement
+        deleted_admin: (administrateur supprimé)
+        filters:
+          admin: Administrateur
+          all_admins: Tous
+          action: Action
+          all_actions: Toutes
+          subject: Cible
+          all_subjects: Tous
+          created_from: Depuis
+          created_to: Jusqu'au
+          apply: Filtrer
+          clear: Effacer
+        columns:
+          when: Quand
+          admin: Administrateur
+          action: Action
+          subject: Cible
+          details: Détails
+    positions:
+      create:
+        moved: « %{name} » déplacée
+        boundary: Elle est déjà en bout de son niveau
+    categories:
+      index:
+        title: Catégories
+        subtitle: Arborescence du catalogue et spécifications
+        empty: Aucune catégorie pour le moment
+        new: Nouvelle catégorie
+        edit: Modifier
+        position: Position
+        listings_count: "%{count} annonces"
+        move_up: Monter
+        move_down: Descendre
+        specs: Spécifications
+        active_chip: Active
+        inactive_chip: Inactive
+      new:
+        title: Nouvelle catégorie
+      edit:
+        title: Modifier « %{name} »
+      form:
+        parent_none: Aucune catégorie parente
+        icon_placeholder: nom d'icône (facultatif)
+        active: Active
+        names_label: Nom (par langue)
+        seo_label: Description SEO (par langue)
+        submit: Enregistrer
+        cancel: Annuler
+      create:
+        created: Catégorie « %{name} » créée
+      update:
+        updated: Catégorie « %{name} » mise à jour
+    category_spec_attributes:
+      index:
+        title: Spécifications de « %{name} »
+        subtitle: Quels attributs demandent les annonces de cette catégorie
+        back: Retour aux catégories
+        attached_title: Assignés à cette catégorie
+        attached_empty: Aucun attribut assigné pour le moment
+        attach_title: Ajouter un attribut
+        attach_pick: Choisir un attribut…
+        attach: Assigner
+        attach_all_attached: Tous les attributs sont déjà assignés
+        detach: Retirer
+        detach_confirm: Retirer cet attribut de la catégorie ?
+        required: Obligatoire
+        position: Position
+        save: Enregistrer l'ordre
+      create:
+        attached: Attribut assigné
+      update:
+        updated: Assignement mis à jour
+      destroy:
+        detached: Attribut retiré
+    spec_attributes:
+      index:
+        title: Attributs techniques
+        subtitle: Glossaire global des spécifications réutilisable par catégorie
+        empty: Aucun attribut pour le moment
+        new: Nouvel attribut
+        yes_chip: Oui
+        no_chip: Non
+        columns:
+          name: Nom
+          key: Clé
+          input_type: Type de saisie
+          filterable: Filtrable
+          options: Options
+          categories: Catégories
+          actions: Actions
+        actions:
+          edit: Modifier
+          destroy: Supprimer
+          destroy_confirm: Supprimer cet attribut ? Il sera aussi retiré des catégories.
+      new:
+        title: Nouvel attribut technique
+      edit:
+        title: Modifier « %{name} »
+        subtitle: Valeurs disponibles et utilisation dans les annonces
+        back: Retour aux attributs
+        options_title: Valeurs autorisées
+        options_empty: Aucune valeur définie
+        option_save: Enregistrer
+        option_delete: Supprimer
+        option_delete_confirm: Supprimer cette valeur ? Les annonces ne l'afficheront plus.
+        in_use: Utilisé par %{count} annonces ; la suppression le retirera
+        add: Ajouter
+        add_title: Ajouter une valeur
+        add_value_placeholder: valeur (ex. 12 Go)
+        bulk_title: Ajout en bloc
+        bulk_hint: Une valeur par ligne ; l'existant est ignoré
+        bulk_placeholder: "8 Go\n16 Go\n32 Go"
+        bulk_submit: Ajouter la liste
+        merge: Fusionner dans…
+        merge_pick: Valeur à remplacer…
+        popular: "%{count} annonces"
+        position: Ordre
+        delete_blocked: Retirez d'abord la valeur des annonces
+      form:
+        key_placeholder: clé interne (ex. vram)
+        key_frozen: La clé ne peut pas être modifiée
+        names_label: Nom (par langue)
+        filterable: Utilisable comme filtre
+        submit: Enregistrer
+        cancel: Annuler
+      create:
+        created: Attribut « %{key} » créé
+      update:
+        updated: Attribut « %{key} » mis à jour
+      destroy:
+        destroyed: Attribut « %{key} » supprimé
+    spec_options:
+      create:
+        created: Valeur « %{value} » ajoutée
+      update:
+        updated: Valeur « %{value} » mise à jour
+      destroy:
+        destroyed: Valeur « %{value} » supprimée
+        in_use: « %{value} » est utilisé par %{count} annonces ; retirez-la d'abord
+    bulk_options:
+      create:
+        done: "%{created} valeurs ajoutées, %{skipped} déjà présentes"
+    spec_option_merges:
+      create:
+        merged: « %{source} » fusionnée dans « %{target} » (%{count} annonces)
+        invalid_target: Choisissez une valeur cible différente
+    labels:
+      index:
+        title: Étiquettes
+        subtitle: Étiquettes globales pour les annonces
+        empty: Aucune étiquette pour le moment
+        new: Nouvelle étiquette
+        columns:
+          name: Nom
+          slug: Slug
+          color: Couleur
+          actions: Actions
+        actions:
+          edit: Modifier
+          destroy: Supprimer
+          destroy_confirm: Supprimer cette étiquette ?
+      new:
+        title: Nouvelle étiquette
+      edit:
+        title: Modifier « %{name} »
+      form:
+        names_label: Nom (par langue)
+        submit: Enregistrer
+        cancel: Annuler
+      create:
+        created: Étiquette « %{name} » créée
+      update:
+        updated: Étiquette « %{name} » mise à jour
+      destroy:
+        destroyed: Étiquette supprimée
+    seller_tags:
+      index:
+        title: Tags de vendeur
+        subtitle: Badges qui distinguent certains vendeurs
+        empty: Aucun tag pour le moment
+        new: Nouveau tag
+        columns:
+          name: Nom
+          slug: Slug
+          listings: Annonces
+          actions: Actions
+        actions:
+          edit: Modifier
+          destroy: Supprimer
+          destroy_confirm: Supprimer ce tag ?
+      new:
+        title: Nouveau tag vendeur
+      edit:
+        title: Modifier « %{name} »
+      form:
+        names_label: Nom (par langue)
+        submit: Enregistrer
+        cancel: Annuler
+      create:
+        created: Tag « %{name} » créé
+      update:
+        updated: Tag « %{name} » mis à jour
+      destroy:
+        destroyed: Tag supprimé
+    countries:
+      index:
+        title: Pays
+        subtitle: Devise, TVA et exigences légales par marché
+        columns:
+          country: Pays
+          currency: Devise
+          locale: Langue
+          vat: TVA
+          status: Statut
+          legal_pages: Mentions légales
+          actions: Actions
+        enabled_chip: Activé
+        disabled_chip: Désactivé
+        legal_complete: Complètes
+        legal_missing: "%{count} manquantes"
+        actions:
+          edit: Modifier
+      edit:
+        title: Modifier %{country}
+        subtitle: Paramètres du marché et liste de lancement
+        back: Retour aux pays
+        enabled: Pays activé
+        enabled_hint: Les utilisateurs peuvent acheter et vendre sur ce marché
+        checklist_title: Liste de lancement
+        checklist:
+          legal_pages_ok: Mentions légales publiées
+          legal_pages_missing: "Mentions légales manquantes : %{slugs}"
+          categories_ok: Des catégories actives existent
+          categories_missing: Créez au moins une catégorie active
+          support_email_ok: E-mail d'assistance configuré
+          support_email_missing: Configurez l'e-mail d'assistance
+        create_legal_pages: Créer les pages manquantes
+        submit: Enregistrer
+        cancel: Annuler
+      update:
+        updated: Pays %{code} mis à jour
+    feature_flags:
+      index:
+        title: Fonctionnalités beta
+        subtitle: Activez les fonctions par marché ou pourcentage d'utilisateurs
+        on_chip: Activée
+        off_chip: Désactivée
+        rollout: "Déploiement : %{percent} %"
+        percentage: Pourcentage d'utilisateurs
+        rollout_set: Appliquer
+        turn_on: Activer
+        turn_off: Désactiver
+      flags:
+        commissions:
+          description: Applique la commission de la plateforme à chaque vente
+        featured_listings:
+          description: Annonces sponsorisées payantes en accueil et recherche
+        stripe_checkout:
+          description: Paiement par carte via Stripe ; clés API requises
+        sell_to_us:
+          description: Les utilisateurs vendent du matériel directement à la plateforme
+        google_login:
+          description: Connexion avec un compte Google
+      warnings:
+        missing_stripe_env: "STRIPE_SECRET_KEY / STRIPE_WEBHOOK_SECRET absents : les paiements échoueront"
+        commission_percent_zero: "commission_percent vaut 0 : aucune commission ne sera facturée"
+      update:
+        updated: "Fonction « %{key} » : %{outcome}"
+    settings:
+      edit:
+        title: Paramètres du site
+        group_general: Général
+        group_commerce: Commerce
+        group_announcement: Bannière du site
+        group_maintenance: Maintenance
+        group_social: Réseaux sociaux
+        group_meta: SEO
+        maintenance_mode: Mode maintenance
+        maintenance_hint: Une fois activé, le site public affiche une alerte 503 ; les administrateurs naviguent normalement
+        commission_hint: Pourcentage facturé à chaque vendeur (0-20)
+        min_offer_hint: Pourcentage minimal du prix pour accepter une offre
+        announcement_enabled: Afficher la bannière
+        announcement_text_label: Texte de la bannière (par langue)
+        meta_label: Méta-description (par langue)
+        social:
+          instagram: Instagram
+          tiktok: TikTok
+          youtube: YouTube
+          x: X (Twitter)
+          discord: Discord
+        errors:
+          blank: est obligatoire
+          too_long: est trop long
+          invalid_email: n'est pas un e-mail valide
+          out_of_range: est hors plage
+          invalid_number: n'est pas un nombre valide
+          invalid_url: n'est pas une URL valide
+        submit: Enregistrer les paramètres
+        cancel: Annuler
+      update:
+        updated: Paramètres enregistrés
+        invalid: Vérifiez les champs signalés
+    legal_pages:
+      index:
+        title: Mentions légales
+        subtitle: Textes par pays et langue requis avant l'ouverture d'un marché
+        empty: Aucune page légale pour le moment
+        new: Nouvelle page légale
+        published_chip: Publiée
+        draft_chip: Brouillon
+        filters:
+          country: Pays
+          all_countries: Tous
+          locale: Langue
+          all_locales: Tous
+          apply: Filtrer
+          clear: Effacer
+        columns:
+          title: Titre
+          slug: Slug
+          country: Pays
+          locale: Langue
+          state: État
+          actions: Actions
+        actions:
+          view: Voir
+          edit: Modifier
+          copy: Dupliquer
+          destroy: Supprimer
+          destroy_confirm: Supprimer cette page légale ?
+      new:
+        title: Nouvelle page légale
+        prefilled_note: "Astuce : dupliquez une page existante pour partir d'un brouillon traduit"
+      edit:
+        title: Modifier « %{title} »
+        copy_note: Copie créée depuis « %{language} »
+      form:
+        slug_pick: Type de page
+        published: Publiée
+        body_hint: Markdown ; le HTML est assaini à l'affichage
+        submit: Enregistrer
+        cancel: Annuler
+      show:
+        title: « %{title} » (%{country} · %{language})
+        back: Retour aux pages légales
+        edit: Modifier
+        published_chip: Publiée
+        draft_chip: Brouillon
+      create:
+        created: Page « %{slug} » créée
+      update:
+        updated: Page « %{slug} » mise à jour
+      destroy:
+        destroyed: Page « %{slug} » supprimée
+    newsletter_subscriptions:
+      index:
+        title: Newsletter
+        subtitle: Abonnés confirmés et en attente
+        empty: Aucun abonné ne correspond
+        export_csv: Exporter CSV
+        unsubscribe: Désabonner
+        unsubscribe_confirm: Désabonner cet e-mail ?
+        pending_chip: En attente
+        confirmed_chip: Confirmé
+        filters:
+          q: E-mail
+          locale: Langue
+          all_locales: Tous
+          apply: Filtrer
+          clear: Effacer
+        columns:
+          email: E-mail
+          locale: Langue
+          state: État
+          created: Date
+          actions: Actions
+      destroy:
+        destroyed: "%{email} désabonné"
+  legal_pages:
+    slugs:
+      terms: Conditions d'utilisation
+      privacy: Politique de confidentialité
+      cookies: Politique de cookies
+      legal_notice: Mentions légales
+      returns: Retours
+      buyer_protection: Protection de l'acheteur
+      seller_terms: Conditions vendeur
+      prohibited_items: Articles interdits
+  application:
+    maintenance:
+      title: Maintenance programmée
+      body: Nous améliorons la plateforme. Elle reviendra très bientôt. Merci de votre patience.
+      contact: "Une question ? Écrivez-nous à %{email}"
   moderation_mailer:
     approved:
       subject: Votre annonce « %{title} » a passé la modération

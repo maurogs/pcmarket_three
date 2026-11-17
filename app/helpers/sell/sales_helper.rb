@@ -15,7 +15,9 @@ module Sell
 
     def order_status_badge(order)
       classes = STATUS_BADGE_CLASSES.fetch(order.status.to_sym, "bg-surface-muted text-muted")
-      tag.span(t("activerecord.attributes.order.status.#{order.status}"),
+      # Slash key (see Phase 6a): `order.status.completed` is a nested YAML
+      # lookup that no longer exists — labels live as "status/completed".
+      tag.span(Order.human_attribute_name("status/#{order.status}"),
                class: "shrink-0 rounded px-2 py-0.5 text-xs font-semibold #{classes}")
     end
   end

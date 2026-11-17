@@ -39,6 +39,34 @@ class OrderMailer < ApplicationMailer
     end
   end
 
+  # Phase 6b admin actions: forced status change and dispute outcomes.
+  def status_changed
+    @order = params[:order]
+    @recipient = params[:recipient]
+
+    mail_to_locale do
+      mail to: @recipient.email_address, subject: t(".subject", number: @order.number)
+    end
+  end
+
+  def refund_issued
+    @order = params[:order]
+    @recipient = params[:recipient]
+
+    mail_to_locale do
+      mail to: @recipient.email_address, subject: t(".subject", number: @order.number)
+    end
+  end
+
+  def dispute_resolved
+    @order = params[:order]
+    @recipient = params[:recipient]
+
+    mail_to_locale do
+      mail to: @recipient.email_address, subject: t(".subject", number: @order.number)
+    end
+  end
+
   private
 
   def mail_to_locale(&block)

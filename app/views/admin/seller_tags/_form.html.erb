@@ -1,0 +1,21 @@
+<%# locals: form (form builder), seller_tag %>
+<% if seller_tag.errors.any? %>
+  <div class="mb-4 rounded border border-red-300 bg-red-50 p-3 text-sm text-red-800">
+    <ul class="list-inside list-disc">
+      <% seller_tag.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<div class="grid gap-4">
+  <%= render "admin/shared/translation_fields",
+        name_base: "seller_tag[names]", values: seller_tag.names, multiline: false,
+        label: t(".names_label") %>
+
+  <div class="flex gap-2">
+    <%= form.submit t(".submit"), class: "btn-primary" %>
+    <%= link_to t(".cancel"), admin_seller_tags_path, class: "btn-secondary" %>
+  </div>
+</div>

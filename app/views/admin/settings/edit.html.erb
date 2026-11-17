@@ -1,0 +1,128 @@
+<% content_for :title, t(".title") %>
+
+<h1 class="mb-4 text-xl font-bold"><%= t(".title") %></h1>
+
+<%# @errors maps field => error key; messages live under admin.settings.edit.errors.* %>
+<% error_for = lambda do |field| %>
+  <% key = @errors[field.to_s] %>
+  <% if key %>
+    <p class="mt-1 text-xs text-red-600"><%= t(".errors.#{key}") %></p>
+  <% end %>
+<% end %>
+
+<%= form_with url: admin_settings_path, method: :patch, scope: :settings, class: "grid gap-4" do |form| %>
+  <section class="card p-4">
+    <h2 class="mb-3 text-sm font-semibold text-muted"><%= t(".group_general") %></h2>
+    <div class="grid gap-3 sm:grid-cols-3">
+      <div>
+        <%= form.label :site_name, class: "block text-sm font-medium" %>
+        <%= form.text_field :site_name, value: @values["site_name"], class: "input text-sm" %>
+        <%= error_for.call(:site_name) %>
+      </div>
+      <div>
+        <%= form.label :support_email, class: "block text-sm font-medium" %>
+        <%= form.email_field :support_email, value: @values["support_email"], class: "input text-sm" %>
+        <%= error_for.call(:support_email) %>
+      </div>
+      <div>
+        <%= form.label :support_phone, class: "block text-sm font-medium" %>
+        <%= form.telephone_field :support_phone, value: @values["support_phone"], class: "input text-sm" %>
+        <%= error_for.call(:support_phone) %>
+      </div>
+    </div>
+  </section>
+
+  <section class="card p-4">
+    <h2 class="mb-3 text-sm font-semibold text-muted"><%= t(".group_commerce") %></h2>
+    <div class="grid gap-3 sm:grid-cols-4">
+      <div>
+        <%= form.label :commission_percent, class: "block text-sm font-medium" %>
+        <%= form.number_field :commission_percent, value: @values["commission_percent"],
+              step: 0.01, min: 0, max: 20, class: "input text-sm" %>
+        <p class="mt-1 text-xs text-muted"><%= t(".commission_hint") %></p>
+        <%= error_for.call(:commission_percent) %>
+      </div>
+      <div>
+        <%= form.label :featured_price_cents, class: "block text-sm font-medium" %>
+        <%= form.number_field :featured_price_cents, value: @values["featured_price_cents"],
+              step: 0.01, min: 0, class: "input text-sm" %>
+        <%= error_for.call(:featured_price_cents) %>
+      </div>
+      <div>
+        <%= form.label :featured_days, class: "block text-sm font-medium" %>
+        <%= form.number_field :featured_days, value: @values["featured_days"],
+              step: 1, min: 1, max: 90, class: "input text-sm" %>
+        <%= error_for.call(:featured_days) %>
+      </div>
+      <div>
+        <%= form.label :min_offer_percent, class: "block text-sm font-medium" %>
+        <%= form.number_field :min_offer_percent, value: @values["min_offer_percent"],
+              step: 1, min: 0, max: 100, class: "input text-sm" %>
+        <p class="mt-1 text-xs text-muted"><%= t(".min_offer_hint") %></p>
+        <%= error_for.call(:min_offer_percent) %>
+      </div>
+    </div>
+  </section>
+
+  <section class="card p-4">
+    <h2 class="mb-3 text-sm font-semibold text-muted"><%= t(".group_announcement") %></h2>
+    <label class="flex items-center gap-2 text-sm">
+      <%= check_box_tag "settings[announcement_enabled]", "1", @values.dig("announcement", "enabled"),
+            class: "size-4 accent-indigo-600" %>
+      <%= t(".announcement_enabled") %>
+    </label>
+    <%= render "admin/shared/translation_fields",
+          name_base: "settings[announcement_text]", values: @values["announcement_text"],
+          multiline: false, label: t(".announcement_text_label") %>
+    <% @errors.each do |field, key| %>
+      <% if field.to_s.start_with?("announcement_text.") %>
+        <p class="mt-1 text-xs text-red-600"><%= t(".errors.#{key}") %> · <%= field.to_s.split(".").second %></p>
+      <% end %>
+    <% end %>
+  </section>
+
+  <section class="card p-4">
+    <h2 class="mb-3 text-sm font-semibold text-muted"><%= t(".group_maintenance") %></h2>
+    <label class="flex items-start gap-2 text-sm">
+      <%= check_box_tag "settings[maintenance_mode]", "1", @values["maintenance_mode"],
+            class: "size-4 accent-indigo-600 mt-0.5" %>
+      <span>
+        <span class="font-medium"><%= t(".maintenance_mode") %></span>
+        <span class="block text-xs text-muted"><%= t(".maintenance_hint") %></span>
+      </span>
+    </label>
+    <%= error_for.call(:maintenance_mode) %>
+  </section>
+
+  <section class="card p-4">
+    <h2 class="mb-3 text-sm font-semibold text-muted"><%= t(".group_social") %></h2>
+    <div class="grid gap-3 sm:grid-cols-3">
+      <% Admin::Settings::SOCIAL_SITES.each do |site| %>
+        <div>
+          <%= label_tag "settings_social_links_#{site}", t(".social.#{site}"), class: "block text-sm font-medium" %>
+          <%= url_field_tag "settings[social_links][#{site}]", @values.dig("social_links", site),
+                class: "input text-sm", id: "settings_social_links_#{site}" %>
+          <% key = @errors["social_links.#{site}"] %>
+          <% if key %><p class="mt-1 text-xs text-red-600"><%= t(".errors.#{key}") %></p><% end %>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="card p-4">
+    <h2 class="mb-3 text-sm font-semibold text-muted"><%= t(".group_meta") %></h2>
+    <%= render "admin/shared/translation_fields",
+          name_base: "settings[default_meta_description]", values: @values["default_meta_description"],
+          multiline: false, label: t(".meta_label") %>
+    <% @errors.each do |field, key| %>
+      <% if field.to_s.start_with?("default_meta_description.") %>
+        <p class="mt-1 text-xs text-red-600"><%= t(".errors.#{key}") %> · <%= field.to_s.split(".").second %></p>
+      <% end %>
+    <% end %>
+  </section>
+
+  <div class="flex gap-2">
+    <%= form.submit t(".submit"), class: "btn-primary" %>
+    <%= link_to t(".cancel"), admin_dashboard_path, class: "btn-secondary" %>
+  </div>
+<% end %>

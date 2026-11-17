@@ -154,6 +154,47 @@ Rails.application.routes.draw do
         resource :verification, only: %i[create destroy]
         resource :hiding, only: %i[create destroy]
       end
+
+      # Orders & disputes (Phase 6b). The order `update` is the audited
+      # forced status transition; internal notes are nested rows. The
+      # dispute resolution form is a nested singular resource (POST creates
+      # the outcome), matching the project's state-transition convention.
+      resources :orders, only: %i[index show update] do
+        resources :notes, only: %i[create destroy]
+      end
+      resources :disputes, only: %i[index show] do
+        resource :resolution, only: %i[new create]
+      end
+
+      # Review moderation: DELETE hides (sets hidden_at) with a reason.
+      resources :reviews, only: %i[index destroy]
+
+      # Taxonomy (Phase 6b). Category ordering uses up/down buttons posting
+      # to the nested singular :position resource (swap with the adjacent
+      # sibling). Spec attributes are attached to categories through the
+      # nested collection (CategorySpecAttribute join rows).
+      resources :categories do
+        resource :position, only: :create
+        resources :spec_attributes, only: %i[index create update destroy],
+                  controller: "category_spec_attributes"
+      end
+      resources :spec_attributes, except: :show do
+        resources :spec_options, only: %i[create update destroy] do
+          resource :merge, only: :create, controller: "spec_option_merges"
+        end
+        resource :bulk_option, only: :create
+      end
+      resources :labels, except: :show
+      resources :seller_tags, except: :show
+
+      # Platform settings: countries launch toggles, feature flags (Flipper),
+      # site settings, legal pages, newsletter list and the audit log browse.
+      resources :countries, only: %i[index edit update]
+      resources :feature_flags, only: %i[index update]
+      resource :settings, only: %i[edit update]
+      resources :legal_pages
+      resources :newsletter_subscriptions, only: %i[index destroy]
+      resources :audit_logs, only: :index
     end
   end
 

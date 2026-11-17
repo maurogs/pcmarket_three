@@ -1,0 +1,9 @@
+<% content_for :title, t(".title") %>
+
+<h1 class="mb-4 text-xl font-bold"><%= t(".title") %></h1>
+
+<div class="card p-4">
+  <%= form_with model: @spec_attribute, url: admin_spec_attributes_path, method: :post do |form| %>
+    <%= render "form", form: form, spec_attribute: @spec_attribute %>
+  <% end %>
+</div>

@@ -40,16 +40,15 @@ module Listings
 
     attr_reader :scope
 
-    # Minimal RFC-4180 writer (Ruby 4 dropped csv from the default gems).
     def csv_line(fields)
-      fields.map { |field| csv_field(field) }.join(",")
+      CsvBuilder.line(fields)
     end
 
+    # Formula/CSV-injection guard lives in CsvBuilder: seller-controlled
+    # text starting with = + - @ TAB or CR is prefixed with ' so Excel does
+    # not execute it.
     def csv_field(value)
-      string = value.to_s
-      return string unless string.match?(/[",\n\r]/)
-
-      %("#{string.gsub('"', '""')}")
+      CsvBuilder.field(value)
     end
 
     def row(listing)

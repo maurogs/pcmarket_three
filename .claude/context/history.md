@@ -1,5 +1,100 @@
 # History
 
+## 2026-11-18 — Phase 6b: admin panel part 2 — orders/disputes/refunds, review moderation, taxonomy, countries, feature flags, settings, legal pages, audit log browse
+
+**What changed**
+
+- Migrations: `20261118015001` (`order_notes`: order FK, admin FK, body),
+  `20261118015002` (orders `refund_cents`), `20261118015003`
+  (reviews `hidden_at` — moderation hides, row kept).
+- **Orders**: `Admin::OrdersController` (index with filters via
+  `Admin::OrderFilter` + search, show with timeline/notes, `update` = audited
+  FORCED status transition with reason — admins bypass the buyer/seller
+  guards) and nested `Admin::NotesController` (create/destroy internal notes).
+- **Disputes**: `Admin::DisputesController` (disputed orders first workspace)
+  + nested `resource :resolution` → `Admin::ResolutionsController` (new/create)
+  driving `Disputes::Resolve` service: refund (Stripe charge refund through
+  `Payments::StripeRefund` when the order has a `payment_reference`, else
+  direct mark) or release-to-seller; order → `refunded` state stamping
+  `refund_cents` (no listing restock — the buyer kept the goods) or
+  `disputed → completed` for the seller, Notification to buyer + seller +
+  `OrderMailer#refund_issued`/`#dispute_resolved`. `Order` gained `refund!`/
+  `release_to_seller!` transitions; admin forced transitions go through
+  `Orders::ForceTransition` (reason + notify required).
+- **Review moderation**: `Admin::ReviewsController#index` (state/rating/store
+  filters) + `destroy` = hide with a REQUIRED reason (blank → alert, nothing
+  happens); `Review#hide!/unhide!/hidden?` + `visible/hidden` scopes; store
+  rating recomputed by the existing `after_update` callback.
+- **Taxonomy**: `Admin::CategoriesController` (tree index, create/edit with
+  translated `names` + `seo_descriptions` tabs, archive via `active`), nested
+  `Admin::PositionsController` (up/down → `Category#move!`),
+  `Admin::CategorySpecAttributesController` (attach/update/detach spec attrs
+  per category). `Admin::SpecAttributesController` (CRUD except show; `key`
+  is immutable after create — update filters it out, model error key
+  `:immutable`), nested `Admin::SpecOptionsController` +
+  `Admin::SpecOptionMergesController` (merge rewrites every referencing
+  `listings.specs` entry with ONE UPDATE; delete blocked while in use) +
+  `Admin::BulkOptionsController` (one option per textarea line). `Label`s and
+  `SellerTag`s CRUD with translated names.
+- **Platform**: `Admin::CountriesController` (edit currency/locale/VAT +
+  enable toggle; `Country` validation blocks enabling while legal pages are
+  missing — `missing_legal_slugs` vs `LegalPage::SLUGS` (6 slugs) published
+  in the country's default locale; error `activerecord.errors.messages.missing_legal_pages`
+  interpolates `%{slugs}`). `Admin::FeatureFlagsController` — registry
+  `FeatureFlags::FEATURES` in `config/initializers/flipper.rb` (5 flags,
+  `description_key` + optional `warning`), `FeatureFlags.warning_for`
+  (soft, never blocks: `stripe_checkout` warns while STRIPE env keys missing,
+  `commissions` warns while `commission_percent` is 0) and
+  `FeatureFlags.register_all!` (idempotent `Flipper.add`).
+  `Admin::SettingsController` (singular resource) → `Admin::Settings::Update`
+  validates EVERY field before touching any Setting row (commission_percent
+  0..20 etc., e-mail format, integers; errors keyed
+  `admin.settings.edit.errors.{out_of_range,invalid_email,invalid_number}`,
+  422 re-render showing what was typed; one `settings_update` audit row).
+  `maintenance_mode` → `ApplicationController#enforce_maintenance_mode`
+  renders `application/maintenance` 503 for public pages; the Admin module +
+  signed-in admins bypass. `Admin::LegalPagesController` CRUD (markdown body
+  via `LegalPagesHelper#render_legal_page_body`).
+  `Admin::NewsletterSubscriptionsController` (index + CSV via the generic
+  `CsvBuilder` service + destroy). `Admin::AuditLogsController#index`
+  (read-only browse, action/subject filters).
+- `TranslatableJsonb` concern gained `assign_translations(attr, hashes)` —
+  the controller-written pattern for JSONB locale maps (`permit(names: {})`
+  + per-locale merge, untouched tabs survive).
+- Tests: `access_test.rb` now sweeps EVERY admin GET route (30 new 6b
+  entries) and 6b write routes with state-not-changed assertions; new
+  `test/controllers/admin/{countries,feature_flags,settings}_controller_test.rb`;
+  page_render/disputes/orders/reviews/categories/spec_*/labels/seller_tags/
+  legal_pages/audit_logs/csv tests from the build itself. Admin dir: 203 runs.
+
+**Gotchas learned**
+
+- Strong params gotcha: `permit(foo: {})` (unrestricted hash for translations)
+  keeps `Parameters`; passing raw params to services raises
+  `UnfilteredParameters` at `.to_h`. The `names: {}` permit is what makes
+  `assign_translations` work.
+- Flipper 1.4 has NO `Flipper.disabled?` module method (use
+  `!Flipper.enabled?`); a percentage gate's `Feature#state` is `"conditional"`.
+- **Rails.cache is not transactional** — a `Setting.set` in one test survives
+  the rollback inside the cache (maintenance_mode stayed true for the whole
+  next test in the worker → public 503s everywhere). `test_helper.rb` now has
+  a global `setup { Rails.cache.clear }`.
+- Category fixture `rtx` has slug `rtx-series` — `Category.friendly.find`
+  needs the slug, not the fixture key.
+- `Category#move!` needs explicit bounds (`target.negative? || target >=
+  siblings.size`) — negative offsets used to wrap to the end.
+- `assert_not_match` does not exist; the alias is `assert_no_match`.
+  Ruby 4 forbids bare `super` inside `define_method` blocks
+  (`super(*args, **kwargs)`).
+- Commonmarker 2.10 injects empty `<a class="anchor">` self-anchors per
+  heading with no disable option — `LegalPagesHelper` strips them before
+  sanitize.
+- Fixture order numbers are `PCM-2025-*` (sequence collision, see Phase 4b note).
+
+**Verification** — `bin/rails test` 655 runs / 3702 assertions / 0F 0E;
+`bin/rubocop` clean (377 files); locale linter green (6 files × 1980 keys);
+`tailwindcss:build` OK; `Rails.application.eager_load!` OK. Not committed.
+
 ## 2026-11-18 — Phase 6a: admin panel part 1 — moderation queue, listings, users (ban/impersonation), stores, dashboard, audit log
 
 **What changed**

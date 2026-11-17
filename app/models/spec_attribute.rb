@@ -1,4 +1,6 @@
 class SpecAttribute < ApplicationRecord
+  include TranslatableJsonb
+
   # prefixed: bare values like `select`/`number` would clash with AR query methods
   enum :input_type, { select: 0, multi_select: 1, number: 2, text: 3, boolean: 4 },
        prefix: true
@@ -18,6 +20,10 @@ class SpecAttribute < ApplicationRecord
   scope :filterable, -> { where(filterable: true) }
   scope :ordered, -> { order(position: :asc, id: :asc) }
 
+  # `key` maps listing specs jsonb keys and saved filters to the attribute —
+  # changing it after create would silently orphan both, so it is frozen.
+  validate :key_immutable, on: :update
+
   def name
     names[I18n.locale.to_s].presence || names["en"].presence
   end
@@ -32,5 +38,11 @@ class SpecAttribute < ApplicationRecord
   # jsonb so containment comparisons match (booleans are stored as JSON true/false).
   def spec_json_scalar(value)
     input_type_boolean? ? ActiveRecord::Type::Boolean.new.cast(value) : value.to_s
+  end
+
+  private
+
+  def key_immutable
+    errors.add(:key, :immutable) if key_changed?
   end
 end

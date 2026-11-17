@@ -24,7 +24,7 @@ class StoresController < ApplicationController
     @tab = params[:tab].presence_in(TABS) || "listings"
 
     if @tab == "reviews"
-      @reviews_pagy, @reviews = pagy(@store.reviews.recent_first.includes(:reviewer),
+      @reviews_pagy, @reviews = pagy(@store.reviews.visible.recent_first.includes(:reviewer),
                              limit: REVIEWS_PER_PAGE)
     else
       # The browse sidebar + results frame read @result (shared with listings

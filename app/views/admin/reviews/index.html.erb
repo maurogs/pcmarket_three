@@ -1,0 +1,78 @@
+<% content_for :title, t(".title") %>
+
+<div class="mb-4">
+  <h1 class="text-xl font-bold"><%= t(".title") %></h1>
+  <p class="mt-1 text-sm text-muted"><%= t(".subtitle", count: @pagy.count) %></p>
+</div>
+
+<form action="<%= admin_reviews_path %>" method="get" class="card mb-4 grid gap-3 p-3 sm:grid-cols-2 lg:grid-cols-4">
+  <%= select_tag :state,
+        options_for_select([ [ t(".filters.state_visible"), "visible" ],
+                             [ t(".filters.state_hidden"), "hidden" ] ], params[:state]),
+        include_blank: t(".filters.state_all"), class: "input text-sm",
+        aria: { label: t(".filters.state") } %>
+
+  <%= select_tag :rating,
+        options_for_select((1..5).to_a.reverse, params[:rating]),
+        include_blank: t(".filters.rating_all"), class: "input text-sm",
+        aria: { label: t(".filters.rating") } %>
+
+  <%= text_field_tag :store, params[:store], placeholder: t(".filters.store"), class: "input text-sm" %>
+
+  <div class="flex items-center gap-2">
+    <button type="submit" class="btn-primary"><%= t(".filters.apply") %></button>
+    <%= link_to t(".filters.clear"), admin_reviews_path, class: "btn-secondary" %>
+  </div>
+</form>
+
+<% if @reviews.any? %>
+  <div class="card overflow-x-auto">
+    <table class="admin-table w-full min-w-[860px] text-sm">
+      <thead>
+        <tr>
+          <th scope="col"><%= t(".columns.rating") %></th>
+          <th scope="col"><%= t(".columns.store") %></th>
+          <th scope="col"><%= t(".columns.reviewer") %></th>
+          <th scope="col"><%= t(".columns.body") %></th>
+          <th scope="col"><%= t(".columns.order") %></th>
+          <th scope="col"><%= t(".columns.created") %></th>
+          <th scope="col"><%= t(".columns.actions") %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @reviews.each do |review| %>
+          <tr>
+            <td class="whitespace-nowrap">
+              <span class="font-semibold"><%= review.rating %></span>
+              <span class="text-muted">/5</span>
+              <% if review.hidden? %>
+                <span class="ml-1 rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-semibold text-rose-700"><%= t(".hidden_chip") %></span>
+              <% end %>
+            </td>
+            <td><%= review.store&.name %></td>
+            <td><%= review.reviewer&.username %></td>
+            <td class="max-w-[22rem] truncate text-muted"><%= review.body %></td>
+            <td class="whitespace-nowrap">
+              <% if review.order %>
+                <%= link_to review.order.number, admin_order_path(review.order), class: "hover:text-primary hover:underline" %>
+              <% end %>
+            </td>
+            <td class="whitespace-nowrap text-muted"><%= l(review.created_at.to_date, format: :delivery) %></td>
+            <td class="whitespace-nowrap">
+              <% unless review.hidden? %>
+                <%= button_to admin_review_path(review), method: :delete, class: "flex items-center gap-1" do %>
+                  <%= text_field_tag :reason, nil, required: true,
+                        placeholder: t(".hide_reason_placeholder"), class: "input w-36 text-xs" %>
+                  <%= submit_tag t(".hide"), class: "btn-secondary text-xs" %>
+                <% end %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <div class="mt-4"><%= results_pagination(@pagy) %></div>
+<% else %>
+  <div class="card p-6 text-center text-sm text-muted"><%= t(".empty") %></div>
+<% end %>

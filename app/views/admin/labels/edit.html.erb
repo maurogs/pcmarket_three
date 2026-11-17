@@ -1,0 +1,9 @@
+<% content_for :title, t(".title", name: @label.name) %>
+
+<h1 class="mb-4 text-xl font-bold"><%= t(".title", name: @label.name) %></h1>
+
+<div class="card p-4">
+  <%= form_with model: @label, url: admin_label_path(@label), method: :patch do |form| %>
+    <%= render "form", form: form, label: @label %>
+  <% end %>
+</div>

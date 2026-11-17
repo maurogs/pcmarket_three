@@ -5,7 +5,7 @@ class Notification < ApplicationRecord
     new_message price_drop saved_search_match listing_submitted
     listing_approved listing_rejected
     order_paid order_shipped order_delivered order_completed
-    order_cancelled order_disputed
+    order_cancelled order_disputed order_updated order_refunded order_resolved
   ].freeze
 
   belongs_to :user

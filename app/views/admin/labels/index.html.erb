@@ -1,0 +1,44 @@
+<% content_for :title, t(".title") %>
+
+<div class="mb-4 flex flex-wrap items-end justify-between gap-3">
+  <div>
+    <h1 class="text-xl font-bold"><%= t(".title") %></h1>
+    <p class="mt-1 text-sm text-muted"><%= t(".subtitle") %></p>
+  </div>
+  <%= link_to t(".new"), new_admin_label_path, class: "btn-primary" %>
+</div>
+
+<% if @labels.any? %>
+  <div class="card overflow-x-auto">
+    <table class="admin-table w-full min-w-[640px] text-sm">
+      <thead>
+        <tr>
+          <th scope="col"><%= t(".columns.name") %></th>
+          <th scope="col"><%= t(".columns.slug") %></th>
+          <th scope="col"><%= t(".columns.color") %></th>
+          <th scope="col"><span class="sr-only"><%= t(".columns.actions") %></span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @labels.each do |label| %>
+          <tr>
+            <td>
+              <span class="mr-2 inline-block size-3 rounded-full align-middle" style="background-color: <%= label.color %>"></span>
+              <span class="font-medium"><%= label.name %></span>
+            </td>
+            <td class="font-mono text-xs"><%= label.slug %></td>
+            <td class="font-mono text-xs text-muted"><%= label.color %></td>
+            <td class="whitespace-nowrap text-right">
+              <%= link_to t(".actions.edit"), edit_admin_label_path(label), class: "btn-secondary" %>
+              <%= button_to t(".actions.destroy"), admin_label_path(label), method: :delete,
+                    class: "btn-secondary text-red-600",
+                    form: { data: { turbo_confirm: t(".actions.destroy_confirm") } } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <div class="card p-6 text-center text-sm text-muted"><%= t(".empty") %></div>
+<% end %>

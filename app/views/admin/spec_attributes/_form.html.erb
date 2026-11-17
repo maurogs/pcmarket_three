@@ -1,0 +1,55 @@
+<%# locals: form (form builder), spec_attribute %>
+<% if spec_attribute.errors.any? %>
+  <div class="mb-4 rounded border border-red-300 bg-red-50 p-3 text-sm text-red-800">
+    <ul class="list-inside list-disc">
+      <% spec_attribute.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<div class="grid gap-4">
+  <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <div>
+      <%= form.label :key, class: "block text-sm font-medium" %>
+      <% if spec_attribute.persisted? %>
+        <%= text_field_tag "spec_attribute[key]", spec_attribute.key, disabled: true, class: "input text-sm" %>
+        <p class="mt-1 text-xs text-muted"><%= t(".key_frozen") %></p>
+      <% else %>
+        <%= form.text_field :key, class: "input text-sm font-mono", placeholder: t(".key_placeholder") %>
+      <% end %>
+    </div>
+    <div>
+      <%= form.label :input_type, class: "block text-sm font-medium" %>
+      <%= form.select :input_type,
+            SpecAttribute.input_types.keys.map { |type| [ SpecAttribute.human_attribute_name("input_type/#{type}"), type ] },
+            {}, class: "input text-sm" %>
+    </div>
+    <div>
+      <%= form.label :unit, class: "block text-sm font-medium" %>
+      <%= form.text_field :unit, class: "input text-sm" %>
+    </div>
+    <div>
+      <%= form.label :group, class: "block text-sm font-medium" %>
+      <%= form.text_field :group, class: "input text-sm" %>
+    </div>
+    <div>
+      <%= form.label :position, class: "block text-sm font-medium" %>
+      <%= form.number_field :position, class: "input text-sm" %>
+    </div>
+    <label class="flex items-center gap-2 self-end pb-2 text-sm">
+      <%= form.check_box :filterable, class: "size-4 accent-indigo-600" %>
+      <%= t(".filterable") %>
+    </label>
+  </div>
+
+  <%= render "admin/shared/translation_fields",
+        name_base: "spec_attribute[names]", values: spec_attribute.names, multiline: false,
+        label: t(".names_label") %>
+
+  <div class="flex gap-2">
+    <%= form.submit t(".submit"), class: "btn-primary" %>
+    <%= link_to t(".cancel"), admin_spec_attributes_path, class: "btn-secondary" %>
+  </div>
+</div>

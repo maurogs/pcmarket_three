@@ -103,6 +103,14 @@ class Listing < ApplicationRecord
     where(user_id: user.id, status: :rejected).order(updated_at: :desc, id: :desc)
   }
 
+  # Listings whose `specs` jsonb carries this value for the attribute key —
+  # as the scalar form (select/number/text) or as an array member
+  # (multi_select). Used to block deleting an in-use spec option.
+  scope :using_spec_value, ->(key, value) {
+    where("specs -> ? = to_jsonb(?::text) OR (jsonb_typeof(specs -> ?) = 'array' AND specs -> ? @> to_jsonb(?::text))",
+          key, value, key, key, value)
+  }
+
   # Has at least one photo attachment (admin index filter).
   scope :with_photos, -> {
     where(id: ActiveStorage::Attachment.where(record_type: "Listing", name: "photos").select(:record_id))

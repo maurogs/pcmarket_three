@@ -1,0 +1,51 @@
+<%# locals: form (form builder), legal_page %>
+<% if legal_page.errors.any? %>
+  <div class="mb-4 rounded border border-red-300 bg-red-50 p-3 text-sm text-red-800">
+    <ul class="list-inside list-disc">
+      <% legal_page.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<div class="grid gap-4">
+  <div class="grid gap-3 sm:grid-cols-3">
+    <div>
+      <%= form.label :country_code, class: "block text-sm font-medium" %>
+      <%= form.select :country_code, Country.order(:code).map { |c| [ "#{c.code} — #{c.display_name}", c.code ] },
+            {}, class: "input text-sm" %>
+    </div>
+    <div>
+      <%= form.label :locale, class: "block text-sm font-medium" %>
+      <%= form.select :locale, I18n.available_locales.map { |l| [ t("locales.#{l}"), l.to_s ] },
+            {}, class: "input text-sm" %>
+    </div>
+    <div>
+      <%= form.label :slug, class: "block text-sm font-medium" %>
+      <%= form.select :slug, LegalPage::SLUGS.map { |s| [ t("legal_pages.slugs.#{s}"), s ] },
+            { include_blank: t(".slug_pick") }, class: "input text-sm" %>
+    </div>
+  </div>
+
+  <div>
+    <%= form.label :title, class: "block text-sm font-medium" %>
+    <%= form.text_field :title, class: "input text-sm" %>
+  </div>
+
+  <div>
+    <%= form.label :body, class: "block text-sm font-medium" %>
+    <%= form.text_area :body, rows: 16, class: "input text-sm font-mono" %>
+    <p class="mt-1 text-xs text-muted"><%= t(".body_hint") %></p>
+  </div>
+
+  <label class="flex items-center gap-2 text-sm">
+    <%= form.check_box :published, class: "size-4 accent-indigo-600" %>
+    <%= t(".published") %>
+  </label>
+
+  <div class="flex gap-2">
+    <%= form.submit t(".submit"), class: "btn-primary" %>
+    <%= link_to t(".cancel"), admin_legal_pages_path, class: "btn-secondary" %>
+  </div>
+</div>

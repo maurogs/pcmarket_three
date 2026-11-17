@@ -1,0 +1,31 @@
+<%# Shared per-locale translation inputs for jsonb columns.
+    locals: name_base (form name prefix, e.g. "category[names]"),
+            values (locale => text hash), multiline: false,
+            rows: 3, label (optional visible field label) %>
+<% multiline = local_assigns.fetch(:multiline, false) %>
+<div class="mt-1" data-controller="admin-tabs">
+  <% if local_assigns[:label] %>
+    <p class="text-xs font-medium text-muted"><%= local_assigns[:label] %></p>
+  <% end %>
+  <div role="tablist" class="mt-1 flex flex-wrap gap-1" aria-label="<%= t("admin.shared.translation_tabs") %>">
+    <% I18n.available_locales.each do |locale| %>
+      <button type="button" role="tab" aria-selected="false" class="chip py-1 text-xs"
+              data-admin-tabs-target="tab" data-admin-tabs-key="<%= locale %>"
+              data-admin-tabs-initial="<%= I18n.locale.to_s == locale.to_s %>">
+        <%= t("locales.#{locale}") %>
+      </button>
+    <% end %>
+  </div>
+  <% I18n.available_locales.each do |locale| %>
+    <div data-admin-tabs-target="panel" data-admin-tabs-key="<%= locale %>" class="mt-2">
+      <% value = values.is_a?(Hash) ? values[locale.to_s] : nil %>
+      <% if multiline %>
+        <%= text_area_tag "#{name_base}[#{locale}]", value, rows: local_assigns.fetch(:rows, 3),
+              class: "input text-sm", id: "#{name_base}_#{locale}".parameterize(separator: "_") %>
+      <% else %>
+        <%= text_field_tag "#{name_base}[#{locale}]", value,
+              class: "input text-sm", id: "#{name_base}_#{locale}".parameterize(separator: "_") %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

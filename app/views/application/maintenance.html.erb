@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= t(".title") %></title>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  </head>
+  <body class="bg-surface text-text antialiased">
+    <main class="mx-auto flex min-h-dvh max-w-xl flex-col items-center justify-center px-4 text-center">
+      <h1 class="text-2xl font-bold"><%= t(".title") %></h1>
+      <p class="mt-3 text-muted"><%= t(".body") %></p>
+      <% support_email = Setting.get("support_email").to_s %>
+      <% if support_email.present? %>
+        <p class="mt-2 text-sm text-muted">
+          <%= t(".contact", email: support_email) %>
+        </p>
+      <% end %>
+    </main>
+  </body>
+</html>

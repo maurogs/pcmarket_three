@@ -25,6 +25,19 @@ en:
         listings: Listings
         users: Users
         stores: Stores
+        orders: Orders
+        disputes: Disputes
+        reviews: Reviews
+        categories: Categories
+        spec_attributes: Spec attributes
+        labels: Labels
+        seller_tags: Seller tags
+        countries: Countries
+        feature_flags: Feature flags
+        settings: Site settings
+        legal_pages: Legal pages
+        newsletter: Newsletter
+        audit_logs: Audit log
   nav:
     search_placeholder: Search graphics cards, processors, laptops…
     search_submit: Search
@@ -313,6 +326,8 @@ en:
         cannot_block_self: can't be yourself
         not_purchasable: is not available for purchase
         spanish_tax_id_invalid: is not a valid Spanish tax ID (NIF/CIF/NIE)
+        missing_legal_pages: "cannot be enabled: missing legal pages: %{slugs}"
+        immutable: cannot be changed after creation
         logo_content_type_invalid: must be a JPEG, PNG or WebP image
         logo_too_large: must be %{max} MB or smaller
         banner_content_type_invalid: must be a JPEG, PNG or WebP image
@@ -392,6 +407,7 @@ en:
       category:
         parent: Parent category
         slug: Slug
+        parent_id: Parent
         names: Names
         seo_descriptions: SEO descriptions
         position: Position
@@ -529,6 +545,7 @@ en:
         shipping_cents: Shipping
         commission_cents: Commission
         total_cents: Total
+        refund_cents: Refunded amount
         currency: Currency
         shipping_address: Shipping address
         payment_provider: Payment provider
@@ -538,6 +555,10 @@ en:
         shipped_at: Shipped at
         delivered_at: Delivered at
         buyer_protection_until: Buyer protection until
+      order_note:
+        body: Note
+        admin: Admin
+        created_at: Created
       order_item:
         order: Order
         listing: Listing
@@ -568,12 +589,12 @@ en:
       spec_attribute:
         key: Key
         names: Names
-        input_type:
-          select: Single choice
-          multi_select: Multiple choice
-          number: Number
-          text: Text
-          boolean: Yes/No
+        input_type: Input type
+        input_type/select: Single choice
+        input_type/multi_select: Multiple choice
+        input_type/number: Number
+        input_type/text: Text
+        input_type/boolean: Yes/No
         unit: Unit
         filterable: Filterable
         position: Position
@@ -1217,6 +1238,22 @@ en:
       safety: Ship with a tracking number to keep your sale protected.
       subject: 'Payment confirmed: order %{number}'
       view_sale: View sale
+    status_changed:
+      subject: Order %{number} updated
+      greeting: "Hi %{name}:"
+      intro: The status of your order %{number} changed to “%{status}”.
+      view_order: View order
+    refund_issued:
+      subject: Refund issued for order %{number}
+      greeting: "Hi %{name}:"
+      intro: We issued a refund for order %{number}.
+      amount: "Refunded amount: %{amount}"
+      view_order: View order
+    dispute_resolved:
+      subject: Dispute for order %{number} resolved
+      greeting: "Hi %{name}:"
+      intro: We resolved the dispute on order %{number}.
+      view_order: View order
   orders:
     carrier:
       Correos: Correos
@@ -1361,6 +1398,9 @@ en:
       order_completed: Order %{number} completed
       order_cancelled: Order %{number} cancelled
       order_disputed: Order %{number} disputed
+      order_updated: Order %{number} updated
+      order_refunded: Order %{number} refunded
+      order_resolved: Dispute for order %{number} resolved
       unknown: "%{kind}"
       listing_approved: Your listing "%{title}" passed moderation
       listing_rejected: Your listing "%{title}" needs changes
@@ -1872,6 +1912,12 @@ en:
           view: View
           edit: Edit
         empty: No stores match these filters.
+      edit:
+        title: Edit “%{name}”
+        subtitle: Public profile and policy details
+        back: Back to store
+        submit: Save changes
+        cancel: Cancel
       show:
         title: "%{name}"
         back_to_stores: All stores
@@ -1925,6 +1971,12 @@ en:
         badges:
           banned: Banned
     shared:
+      audit_events:
+        title: Admin activity
+        by: "%{admin} · %{time}"
+        deleted_admin: (deleted admin)
+        empty: No activity yet
+      translation_tabs: Translations
       seller_card:
         seller: Seller
         view_profile: Open user page
@@ -1935,6 +1987,568 @@ en:
         by: "%{admin} - %{time}"
         deleted_admin: "(deleted admin)"
         empty: No moderation events yet.
+    orders:
+      index:
+        title: Orders
+        subtitle: Every order on the platform
+        empty: No orders match these filters
+        filters:
+          q: Order number
+          status: Status
+          all_statuses: All statuses
+          buyer: Buyer (email)
+          seller: Seller (email)
+          provider: Payment provider
+          all_providers: All providers
+          provider_direct: Direct payment
+          provider_stripe: Stripe
+          created_from: From
+          created_to: To
+          apply: Filter
+          clear: Clear
+        columns:
+          number: Number
+          buyer: Buyer
+          seller: Seller
+          total: Total
+          status: Status
+          created: Placed
+          actions: Actions
+        actions:
+          view: View
+      show:
+        title: Order %{number}
+        items_title: Items
+        details_title: Order summary
+        buyer: Buyer
+        seller: Seller
+        placed_at: Placed
+        shipping_address: Shipping address
+        subtotal: Subtotal
+        shipping: Shipping
+        commission: Commission
+        total: Total
+        refunded: Refunded
+        payment_provider: Payment provider
+        payment_direct: Direct payment
+        payment_reference: Reference
+        tracking: Tracking
+        conversation: View conversation
+        resolve: Resolve dispute
+        transition_title: Manual status change
+        transition_hint: Overrides the normal flow; buyer and seller are notified. A reason is required.
+        transition_pick: New status
+        transition_reason_placeholder: Reason for the change…
+        transition_submit: Apply change
+        transition_confirm: Force this status change?
+        notes_title: Internal notes
+        notes_empty: No notes yet
+        notes_placeholder: Write a note for the team…
+        notes_add: Add note
+        note_by: "%{admin}, %{time}"
+        note_delete: Delete
+        note_confirm: Delete this note?
+        deleted_admin: (deleted admin)
+      update:
+        updated: Order %{number} updated
+        errors:
+          reason_missing: A reason is required
+          invalid_status: Invalid status
+          stale: The order changed while you were working; try again
+    notes:
+      create:
+        created: Note added
+      destroy:
+        destroyed: Note deleted
+    disputes:
+      index:
+        title: Disputes
+        subtitle: Open and resolved disputed orders
+        empty: No disputes
+        filters:
+          q: Order number
+          status: Status
+          all_statuses: All
+          buyer: Buyer (email)
+          seller: Seller (email)
+          apply: Filter
+          clear: Clear
+        columns:
+          number: Order
+          buyer: Buyer
+          seller: Seller
+          total: Total
+          status: Status
+          opened: Opened
+          actions: Actions
+        actions:
+          review: Review
+      show:
+        title: Dispute on order %{number}
+        opened_at: Opened %{time}
+        summary_title: The order
+        buyer: Buyer
+        seller: Seller
+        total: Total
+        payment_provider: Payment provider
+        payment_direct: Direct payment
+        conversation: Order conversation
+        open_order: View the order
+        resolve: Resolve the dispute
+        refunded: "Refunded amount: %{amount}"
+    resolutions:
+      new:
+        title: Resolve dispute
+        subtitle: Choose between refunding the buyer or siding with the seller
+        order_title: Order %{number}
+        buyer: Buyer
+        seller: Seller
+        total: "Paid total: %{amount}"
+        payment_provider: "Provider: %{provider}"
+        payment_direct: Direct payment (no provider)
+        form_title: Decision
+        action_legend: Outcome
+        action_refund: Refund the buyer
+        action_refund_hint: Full or partial. Stripe payments are actually refunded.
+        action_release: Side with the seller
+        action_release_hint: Closes the dispute by completing the order; the seller keeps the money.
+        provider_hint: "No payment reference: the refund will be recorded manually."
+        amount_label: Refund amount (cents, blank = full)
+        amount_hint: Maximum %{amount}
+        confirm: Resolve the dispute now?
+        submit: Resolve
+        cancel: Cancel
+      create:
+        resolved:
+          refund: Dispute resolved with a refund
+          release: Dispute resolved in the seller's favour
+    reviews:
+      index:
+        title: Reviews
+        subtitle: Buyer reviews; hide the ones that break the rules
+        empty: No reviews match
+        filters:
+          store: Store
+          rating: Rating
+          rating_all: All
+          state: State
+          state_all: All
+          state_visible: Visible
+          state_hidden: Hidden
+          apply: Filter
+          clear: Clear
+        columns:
+          body: Review
+          reviewer: Reviewer
+          store: Store
+          order: Order
+          rating: ★
+          created: Date
+          actions: Actions
+        hidden_chip: Hidden
+        hide: Hide
+        hide_reason_placeholder: Reason (optional)…
+      destroy:
+        hidden: Review hidden
+        reason_required: Enter a reason to hide the review
+    audit_logs:
+      index:
+        title: Audit log
+        subtitle: Every admin action is recorded
+        empty: No events
+        deleted_admin: (deleted admin)
+        filters:
+          admin: Admin
+          all_admins: All
+          action: Action
+          all_actions: All
+          subject: Subject
+          all_subjects: All
+          created_from: From
+          created_to: To
+          apply: Filter
+          clear: Clear
+        columns:
+          when: When
+          admin: Admin
+          action: Action
+          subject: Subject
+          details: Details
+    positions:
+      create:
+        moved: “%{name}” moved
+        boundary: It's already at the edge of its level
+    categories:
+      index:
+        title: Categories
+        subtitle: Catalog tree and specifications
+        empty: No categories yet
+        new: New category
+        edit: Edit
+        position: Position
+        listings_count: "%{count} listings"
+        move_up: Move up
+        move_down: Move down
+        specs: Specifications
+        active_chip: Active
+        inactive_chip: Inactive
+      new:
+        title: New category
+      edit:
+        title: Edit “%{name}”
+      form:
+        parent_none: No parent
+        icon_placeholder: icon name (optional)
+        active: Active
+        names_label: Name (per language)
+        seo_label: SEO description (per language)
+        submit: Save
+        cancel: Cancel
+      create:
+        created: Category “%{name}” created
+      update:
+        updated: Category “%{name}” updated
+    category_spec_attributes:
+      index:
+        title: Specifications for “%{name}”
+        subtitle: Which attributes listings in this category ask for
+        back: Back to categories
+        attached_title: Attached to this category
+        attached_empty: No attributes attached yet
+        attach_title: Add an attribute
+        attach_pick: Choose attribute…
+        attach: Attach
+        attach_all_attached: All attributes are already attached
+        detach: Detach
+        detach_confirm: Detach this attribute from the category?
+        required: Required
+        position: Position
+        save: Save order
+      create:
+        attached: Attribute attached
+      update:
+        updated: Attachment updated
+      destroy:
+        detached: Attribute detached
+    spec_attributes:
+      index:
+        title: Spec attributes
+        subtitle: Global specification glossary reusable per category
+        empty: No attributes yet
+        new: New attribute
+        yes_chip: "Yes"
+        no_chip: "No"
+        columns:
+          name: Name
+          key: Key
+          input_type: Input type
+          filterable: Filterable
+          options: Options
+          categories: Categories
+          actions: Actions
+        actions:
+          edit: Edit
+          destroy: Delete
+          destroy_confirm: Delete this attribute? It will also be removed from categories.
+      new:
+        title: New spec attribute
+      edit:
+        title: Edit “%{name}”
+        subtitle: Available values and listing usage
+        back: Back to attributes
+        options_title: Allowed values
+        options_empty: No values defined
+        option_save: Save
+        option_delete: Delete
+        option_delete_confirm: Delete this value? Listings will stop showing it.
+        in_use: Used by %{count} listings; deleting will un-set it
+        add: Add
+        add_title: Add a value
+        add_value_placeholder: value (e.g. 12 GB)
+        bulk_title: Bulk add
+        bulk_hint: One value per line; existing ones are skipped
+        bulk_placeholder: "8 GB\n16 GB\n32 GB"
+        bulk_submit: Add list
+        merge: Merge into…
+        merge_pick: Value to replace…
+        popular: "%{count} listings"
+        position: Order
+        delete_blocked: Remove the value from listings first
+      form:
+        key_placeholder: internal key (e.g. vram)
+        key_frozen: The key cannot be changed
+        names_label: Name (per language)
+        filterable: Usable as a filter
+        submit: Save
+        cancel: Cancel
+      create:
+        created: Attribute “%{key}” created
+      update:
+        updated: Attribute “%{key}” updated
+      destroy:
+        destroyed: Attribute “%{key}” deleted
+    spec_options:
+      create:
+        created: Value “%{value}” added
+      update:
+        updated: Value “%{value}” updated
+      destroy:
+        destroyed: Value “%{value}” deleted
+        in_use: “%{value}” is used by %{count} listings; remove it first
+    bulk_options:
+      create:
+        done: "%{created} values added, %{skipped} already existed"
+    spec_option_merges:
+      create:
+        merged: “%{source}” merged into “%{target}” (%{count} listings)
+        invalid_target: Choose a different target value
+    labels:
+      index:
+        title: Labels
+        subtitle: Global labels for listings
+        empty: No labels yet
+        new: New label
+        columns:
+          name: Name
+          slug: Slug
+          color: Color
+          actions: Actions
+        actions:
+          edit: Edit
+          destroy: Delete
+          destroy_confirm: Delete this label?
+      new:
+        title: New label
+      edit:
+        title: Edit “%{name}”
+      form:
+        names_label: Name (per language)
+        submit: Save
+        cancel: Cancel
+      create:
+        created: Label “%{name}” created
+      update:
+        updated: Label “%{name}” updated
+      destroy:
+        destroyed: Label deleted
+    seller_tags:
+      index:
+        title: Seller tags
+        subtitle: Badges that highlight certain sellers
+        empty: No tags yet
+        new: New tag
+        columns:
+          name: Name
+          slug: Slug
+          listings: Listings
+          actions: Actions
+        actions:
+          edit: Edit
+          destroy: Delete
+          destroy_confirm: Delete this tag?
+      new:
+        title: New seller tag
+      edit:
+        title: Edit “%{name}”
+      form:
+        names_label: Name (per language)
+        submit: Save
+        cancel: Cancel
+      create:
+        created: Tag “%{name}” created
+      update:
+        updated: Tag “%{name}” updated
+      destroy:
+        destroyed: Tag deleted
+    countries:
+      index:
+        title: Countries
+        subtitle: Currency, VAT and legal requirements per market
+        columns:
+          country: Country
+          currency: Currency
+          locale: Locale
+          vat: VAT
+          status: Status
+          legal_pages: Legal pages
+          actions: Actions
+        enabled_chip: Enabled
+        disabled_chip: Disabled
+        legal_complete: Complete
+        legal_missing: "%{count} missing"
+        actions:
+          edit: Edit
+      edit:
+        title: Edit %{country}
+        subtitle: Market settings and launch checklist
+        back: Back to countries
+        enabled: Country enabled
+        enabled_hint: Users can buy and sell in this market
+        checklist_title: Launch checklist
+        checklist:
+          legal_pages_ok: Legal pages published
+          legal_pages_missing: "Missing legal pages: %{slugs}"
+          categories_ok: Active categories exist
+          categories_missing: Create at least one active category
+          support_email_ok: Support email configured
+          support_email_missing: Configure the support email
+        create_legal_pages: Create the missing pages
+        submit: Save
+        cancel: Cancel
+      update:
+        updated: Country %{code} updated
+    feature_flags:
+      index:
+        title: Feature flags
+        subtitle: Enable features per market or percentage of users
+        on_chip: "On"
+        off_chip: "Off"
+        rollout: "Rollout: %{percent}%"
+        percentage: Percentage of users
+        rollout_set: Set
+        turn_on: Turn on
+        turn_off: Turn off
+      flags:
+        commissions:
+          description: Applies the platform commission to every sale
+        featured_listings:
+          description: Paid featured listings in home and search
+        stripe_checkout:
+          description: Card payments via Stripe; requires API keys
+        sell_to_us:
+          description: Users sell hardware directly to the platform
+        google_login:
+          description: Sign in with a Google account
+      warnings:
+        missing_stripe_env: "STRIPE_SECRET_KEY / STRIPE_WEBHOOK_SECRET are missing: payments will fail"
+        commission_percent_zero: "commission_percent is 0: no commission will be charged"
+      update:
+        updated: "Feature “%{key}”: %{outcome}"
+    settings:
+      edit:
+        title: Site settings
+        group_general: General
+        group_commerce: Commerce
+        group_announcement: Site announcement
+        group_maintenance: Maintenance
+        group_social: Social links
+        group_meta: SEO
+        maintenance_mode: Maintenance mode
+        maintenance_hint: While on, the public site shows a 503 notice; admins can still browse
+        commission_hint: Percentage charged to each seller (0-20)
+        min_offer_hint: Minimum percentage of the price to accept an offer
+        announcement_enabled: Show the announcement
+        announcement_text_label: Announcement text (per language)
+        meta_label: Meta description (per language)
+        social:
+          instagram: Instagram
+          tiktok: TikTok
+          youtube: YouTube
+          x: X (Twitter)
+          discord: Discord
+        errors:
+          blank: is required
+          too_long: is too long
+          invalid_email: is not a valid email
+          out_of_range: is out of range
+          invalid_number: is not a valid number
+          invalid_url: is not a valid URL
+        submit: Save settings
+        cancel: Discard
+      update:
+        updated: Settings saved
+        invalid: Check the marked fields
+    legal_pages:
+      index:
+        title: Legal pages
+        subtitle: Per-country, per-language texts required before a market goes live
+        empty: No legal pages yet
+        new: New legal page
+        published_chip: Published
+        draft_chip: Draft
+        filters:
+          country: Country
+          all_countries: All
+          locale: Language
+          all_locales: All
+          apply: Filter
+          clear: Clear
+        columns:
+          title: Title
+          slug: Slug
+          country: Country
+          locale: Language
+          state: State
+          actions: Actions
+        actions:
+          view: View
+          edit: Edit
+          copy: Copy
+          destroy: Delete
+          destroy_confirm: Delete this legal page?
+      new:
+        title: New legal page
+        prefilled_note: "Tip: copy an existing page to start from a translated draft"
+      edit:
+        title: Edit “%{title}”
+        copy_note: Copy created from “%{language}”
+      form:
+        slug_pick: Page type
+        published: Published
+        body_hint: Markdown; HTML is sanitized when rendering
+        submit: Save
+        cancel: Cancel
+      show:
+        title: “%{title}” (%{country} · %{language})
+        back: Back to legal pages
+        edit: Edit
+        published_chip: Published
+        draft_chip: Draft
+      create:
+        created: Page “%{slug}” created
+      update:
+        updated: Page “%{slug}” updated
+      destroy:
+        destroyed: Page “%{slug}” deleted
+    newsletter_subscriptions:
+      index:
+        title: Newsletter
+        subtitle: Confirmed and pending subscribers
+        empty: No subscribers match
+        export_csv: Export CSV
+        unsubscribe: Unsubscribe
+        unsubscribe_confirm: Unsubscribe this email?
+        pending_chip: Pending
+        confirmed_chip: Confirmed
+        filters:
+          q: Email
+          locale: Language
+          all_locales: All
+          apply: Filter
+          clear: Clear
+        columns:
+          email: Email
+          locale: Language
+          state: State
+          created: Date
+          actions: Actions
+      destroy:
+        destroyed: "%{email} unsubscribed"
+  legal_pages:
+    slugs:
+      terms: Terms of service
+      privacy: Privacy policy
+      cookies: Cookie policy
+      legal_notice: Legal notice
+      returns: Returns
+      buyer_protection: Buyer protection
+      seller_terms: Seller terms
+      prohibited_items: Prohibited items
+  application:
+    maintenance:
+      title: Scheduled maintenance
+      body: We're making improvements. The platform will be back shortly. Thanks for your patience.
+      contact: "Questions? Write to us at %{email}"
   moderation_mailer:
     approved:
       subject: Your listing "%{title}" passed moderation

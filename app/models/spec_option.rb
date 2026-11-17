@@ -1,4 +1,6 @@
 class SpecOption < ApplicationRecord
+  include TranslatableJsonb
+
   belongs_to :spec_attribute
 
   validates :value, presence: true, uniqueness: { scope: :spec_attribute_id },
@@ -12,5 +14,11 @@ class SpecOption < ApplicationRecord
 
   def name
     names[I18n.locale.to_s].presence || names["en"].presence
+  end
+
+  # Listings currently carrying this value in their specs jsonb — the count
+  # that blocks a plain delete (use SpecOptions::Merge instead).
+  def listings_using_count
+    Listing.using_spec_value(spec_attribute.key, value).count
   end
 end

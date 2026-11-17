@@ -1,0 +1,42 @@
+<% content_for :title, t(".title", number: @order.number) %>
+
+<div class="mb-4 flex flex-wrap items-end justify-between gap-3">
+  <div>
+    <h1 class="text-xl font-bold"><%= t(".title", number: @order.number) %></h1>
+    <p class="mt-1 flex items-center gap-2 text-sm text-muted">
+      <%= order_status_badge(@order) %>
+      <span><%= t(".opened_at", time: l(@order.updated_at, format: :long)) %></span>
+    </p>
+  </div>
+  <div class="flex gap-2">
+    <%= link_to t(".open_order"), admin_order_path(@order), class: "btn-secondary" %>
+    <% if @order.disputed? %>
+      <%= link_to t(".resolve"), new_admin_dispute_resolution_path(@order), class: "btn-primary" %>
+    <% end %>
+  </div>
+</div>
+
+<div class="grid gap-4 lg:grid-cols-3">
+  <section class="card space-y-2 p-4 text-sm lg:col-span-2">
+    <h2 class="text-sm font-semibold text-muted"><%= t(".summary_title") %></h2>
+    <dl class="space-y-1">
+      <div class="flex justify-between"><dt class="text-muted"><%= t(".buyer") %></dt><dd><%= link_to @order.buyer.username, admin_user_path(@order.buyer), class: "hover:text-primary hover:underline" %></dd></div>
+      <div class="flex justify-between"><dt class="text-muted"><%= t(".seller") %></dt><dd><%= link_to @order.seller.username, admin_user_path(@order.seller), class: "hover:text-primary hover:underline" %></dd></div>
+      <div class="flex justify-between"><dt class="text-muted"><%= t(".total") %></dt><dd><%= money(@order.total_cents, @order.currency) %></dd></div>
+      <% if @order.refund_cents.positive? %>
+        <div class="flex justify-between text-orange-700 dark:text-orange-400">
+          <dt><%= t(".refunded") %></dt><dd><%= money(@order.refund_cents, @order.currency) %></dd>
+        </div>
+      <% end %>
+      <div class="flex justify-between">
+        <dt class="text-muted"><%= t(".payment_provider") %></dt>
+        <dd><%= @order.payment_provider.presence || t(".payment_direct") %></dd>
+      </div>
+    </dl>
+    <% if (conversation = @order.conversation) %>
+      <%= link_to t(".conversation"), conversation_path(conversation), class: "btn-secondary mt-2 inline-block" %>
+    <% end %>
+  </section>
+
+  <%= render "admin/shared/audit_events", events: @events %>
+</div>

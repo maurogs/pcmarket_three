@@ -1,0 +1,24 @@
+<% content_for :title, t(".title", title: @legal_page.title, country: @legal_page.country_code, language: t("locales.#{@legal_page.locale}")) %>
+
+<div class="mb-4 flex flex-wrap items-end justify-between gap-3">
+  <div>
+    <h1 class="text-xl font-bold"><%= t(".title", title: @legal_page.title, country: @legal_page.country_code, language: t("locales.#{@legal_page.locale}")) %></h1>
+    <p class="mt-1 text-sm text-muted">
+      <%= @legal_page.country_code %> · <%= t("locales.#{@legal_page.locale}") %>
+      <% if @legal_page.published? %>
+        <span class="ml-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800"><%= t(".published_chip") %></span>
+      <% else %>
+        <span class="ml-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600"><%= t(".draft_chip") %></span>
+      <% end %>
+    </p>
+  </div>
+  <div class="flex gap-2">
+    <%= link_to t(".edit"), edit_admin_legal_page_path(@legal_page), class: "btn-primary" %>
+    <%= link_to t(".back"), admin_legal_pages_path, class: "btn-secondary" %>
+  </div>
+</div>
+
+<div class="card p-4">
+  <h2 class="mb-1 text-lg font-semibold"><%= @legal_page.title %></h2>
+  <div class="prose prose-sm max-w-none"><%= legal_markdown(@legal_page.body) %></div>
+</div>

@@ -1,0 +1,21 @@
+<%# locals: events (AdminAuditLog rows, most recent first) %>
+<section class="card p-4">
+  <h2 class="mb-3 text-sm font-semibold text-muted"><%= t(".title") %></h2>
+  <% if events.any? %>
+    <ol class="space-y-2 text-sm">
+      <% events.each do |event| %>
+        <li class="flex flex-wrap items-baseline gap-2">
+          <span class="shrink-0 rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium">
+            <%= event.action %>
+          </span>
+          <span class="text-xs text-muted">
+            <%= t(".by", admin: event.admin&.display_name || t(".deleted_admin"),
+                  time: l(event.created_at, format: :long)) %>
+          </span>
+        </li>
+      <% end %>
+    </ol>
+  <% else %>
+    <p class="text-sm text-muted"><%= t(".empty") %></p>
+  <% end %>
+</section>
