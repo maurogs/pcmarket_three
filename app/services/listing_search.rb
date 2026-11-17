@@ -146,14 +146,17 @@ class ListingSearch
       attribute = filterable_attributes_by_key[key]
       next if attribute.nil? || values.empty?
 
-      clauses = values.map do |value|
+      jsons = values.flat_map do |value|
         scalar = attribute.spec_json_scalar(value)
-        [ { key => scalar }.to_json, { key => [ scalar ] }.to_json ].map do |json|
-          "specs @> #{Listing.connection.quote(json)}::jsonb"
-        end
-      end.flatten
+        [ { key => scalar }.to_json, { key => [ scalar ] }.to_json ]
+      end
 
-      scope = scope.where("(#{clauses.join(" OR ")})")
+      # One bind-param condition per candidate json, OR-ed into a single
+      # Arel predicate (no hand-built SQL strings for Brakeman to flag).
+      or_relation = jsons
+        .map { |json| Listing.all.where("specs @> CAST(? AS jsonb)", json) }
+        .reduce(:or)
+      scope = scope.where(or_relation.where_clause.ast)
     end
     scope
   end

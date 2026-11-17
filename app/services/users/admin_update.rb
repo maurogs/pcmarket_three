@@ -6,14 +6,17 @@ module Users
   class AdminUpdate
     Result = Struct.new(:user, :saved?, keyword_init: true)
 
-    def self.call(user, raw, acting_admin:)
-      new(user, raw, acting_admin).call
+    def self.call(user, raw, acting_admin:, role: nil)
+      new(user, raw, acting_admin, role).call
     end
 
-    def initialize(user, raw, acting_admin)
+    def initialize(user, raw, acting_admin, role)
       @user = user
       @raw = raw.to_h.symbolize_keys
       @acting_admin = acting_admin
+      # Role is passed explicitly (never through strong params) and only
+      # applied when it is one of User.roles.keys.
+      @requested_role = role
     end
 
     def call
@@ -32,7 +35,7 @@ module Users
 
     private
 
-    attr_reader :user, :raw, :acting_admin
+    attr_reader :user, :raw, :acting_admin, :requested_role
 
     def profile_attrs
       raw.slice(:first_name, :last_name, :email_address, :username,
@@ -43,9 +46,10 @@ module Users
     # applied. Guard order matters: demoting the last admin is what stays
     # broken for everyone, so it wins over the self-demotion message.
     def apply_role
-      return nil unless raw.key?(:role) && raw[:role].present?
+      return nil if requested_role.blank?
 
-      target = raw[:role].to_s
+      target = requested_role.to_s
+      # Only role enum keys are ever applied; anything else is ignored.
       return nil unless User.roles.key?(target)
       return nil if user.role == target
 

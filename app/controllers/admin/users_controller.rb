@@ -29,7 +29,14 @@ module Admin
     end
 
     def update
-      result = Users::AdminUpdate.call(@user, form_params, acting_admin: Current.user)
+      # :role is deliberately NOT in form_params. It is read separately and
+      # passed as an explicit keyword the service validates against
+      # User.roles.keys (Brakeman: mass assignment of :role).
+      result = Users::AdminUpdate.call(
+        @user, form_params,
+        acting_admin: Current.user,
+        role: params.dig(:user, :role)
+      )
       @user = result.user
 
       if result.saved?
@@ -48,7 +55,7 @@ module Admin
 
     def form_params
       params.require(:user).permit(:first_name, :last_name, :email_address, :username,
-                                   :country_code, :locale, :role)
+                                   :country_code, :locale)
     end
   end
 end
