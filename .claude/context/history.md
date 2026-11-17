@@ -1,5 +1,59 @@
 # History
 
+## 2026-11-18 — Phase 7d: legal corpus for Spain-in-English (ES/en) and the United Kingdom (GB/en)
+
+**What changed**
+
+- `db/seeds/legal/ES/en/` — eight British-English translations of the ES/es
+  templates (same slugs, same structure, Spanish law still governs; Spanish
+  statutes keep their names with an English gloss on first use, e.g. TRLGDCU,
+  LSSI-CE, LOPDGDD, AEAT/DAC7).
+- `db/seeds/legal/GB/en/` — eight documents adapted to UK law (no EU-law
+  citations): legal_notice uses the Electronic Commerce (EC Directive)
+  Regulations 2002 reg. 6 + Companies Act 2006 identity disclosure
+  ({{legal_name}}, {{registry}} as Companies House number, {{registered_address}},
+  {{tax_id}} as VAT number); terms cover the intermediary role, 18+ accounts,
+  pre-publication moderation, ranking parameters, Online Safety Act 2023
+  user-to-user duties (illegal-content reports, complaints procedure,
+  action on reports, appeals), suspension, direct-at-launch payments,
+  0 % fees with 15-day notice, England & Wales governing law with Scottish
+  and Northern Irish consumers keeping their local courts; privacy uses
+  UK GDPR + DPA 2018, ICO complaint (ico.org.uk), IDTA/Addendum and
+  adequacy regulations for transfers, and The Platform Operators (Due
+  Diligence and Reporting Requirements) Regulations 2023 for HMRC seller
+  reporting; cookies cites PECR 2003 + ICO guidance with the same
+  strictly-necessary first-party cookie table; returns covers C2C (no
+  statutory cancellation) vs B2C (CCRs 2013 14-day cancellation and refund,
+  CRA 2015 satisfactory quality / fit for purpose / as described, 30-day
+  short-term reject, repair/replacement, 6-month reversed burden of proof);
+  seller_terms adds trader identification, the DMCC Act 2024 unfair
+  commercial practices regime and HMRC reporting data; prohibited_items
+  keeps the ES list plus UK-only illegality (Offensive Weapons Act 2019,
+  Criminal Justice Act 1988 offensive weapons, Trade Marks Act 1994,
+  UKCA/OPSS product safety) and OSA-based reporting.
+- `test/seeds/legal_pages_seeds_test.rb` — two new tests derive the shipped
+  country/locale sets from the filesystem and assert each set has exactly
+  the 8 slugs on disk and in the DB, 4+ `##` headings, the italic template
+  note as the body's first line, no placeholder outside
+  `Setting.legal_identity.keys` (checked via `LegalPages::Render::PLACEHOLDER`),
+  and renders with a 4+ entry TOC and no raw placeholders left.
+- Only the allowed placeholders appear in the 16 new docs; the loader needed
+  no changes. No commits (per instructions).
+
+**Why**
+
+English-speaking users on the Spain site need the same texts, and the GB
+country needs a UK-law corpus from day one; the folder-driven test keeps
+any future country/locale set honest.
+
+**Files touched**: db/seeds/legal/ES/en/*.md (8 new),
+db/seeds/legal/GB/en/*.md (8 new), test/seeds/legal_pages_seeds_test.rb.
+
+**Gates**: `bin/rails db:seed` run twice (24 legal pages: ES/es 8, ES/en 8,
+GB/en 8; second run idempotent); legal seed test 8 runs / 345 assertions
+0 failures; `bin/rails test` 789 runs / 12151 assertions / 0 failures;
+`bin/rubocop` 427 files, no offenses.
+
 ## 2026-11-18 — Phase 7c: Spanish legal templates (seeded), needs_legal_review flag, admin review workflow
 
 **What changed**

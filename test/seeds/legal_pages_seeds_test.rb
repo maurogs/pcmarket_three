@@ -5,9 +5,14 @@ require "test_helper"
 # (country, locale, slug), and an admin-approved page (needs_legal_review
 # false) is never overwritten. Also checks the shipped ES/es set: all 8
 # slugs, headings for the TOC, and that the identity placeholders the docs
-# use resolve once the identity Settings are configured.
+# use resolve once the identity Settings are configured. Phase 7d: every
+# country/locale folder shipped under db/seeds/legal (ES/es, ES/en, GB/en)
+# must satisfy the same structural contract — complete slug set, h2
+# headings, italic template note first, and no placeholder outside the set
+# the renderer can resolve.
 class LegalPagesSeedsTest < ActiveSupport::TestCase
   LOADER = Rails.root.join("db", "seeds", "legal_pages.rb").to_s
+  LEGAL_ROOT = Rails.root.join("db", "seeds", "legal")
 
   setup { run_loader }
 
@@ -62,6 +67,54 @@ class LegalPagesSeedsTest < ActiveSupport::TestCase
     end
   end
 
+  # Phase 7d: every country/locale set shipped under db/seeds/legal must
+  # satisfy the same structural contract, so a new set cannot ship half a
+  # corpus or sneak in a placeholder the renderer cannot resolve.
+  test "every shipped country/locale set is complete, structured and placeholder-clean" do
+    allowed = Setting.legal_identity.keys
+
+    legal_sets.each do |country_code, locale|
+      set = "#{country_code}/#{locale}"
+      files = Dir.glob(LEGAL_ROOT.join(country_code, locale, "*.md")).sort
+                  .map { |path| File.basename(path, ".md") }
+      assert_equal LegalPage::SLUGS.sort, files, "#{set} must ship exactly the eight slugs"
+
+      pages = LegalPage.where(country_code: country_code, locale: locale).index_by(&:slug)
+      assert_equal files, pages.keys.sort, "#{set} must seed exactly the eight slugs"
+
+      pages.each_value do |page|
+        assert_operator page.body.scan(/^## /).size, :>=, 4, "#{set}/#{page.slug} needs 4+ '##' headings"
+
+        first_line = page.body.lines.first.to_s.strip
+        assert_match(/\A_.+._\z/, first_line, "#{set}/#{page.slug} must open with the italic template note")
+
+        unresolved = page.body.scan(LegalPages::Render::PLACEHOLDER).flatten.uniq - allowed
+        assert_empty unresolved, "#{set}/#{page.slug} uses placeholders the renderer cannot resolve"
+      end
+    end
+  end
+
+  test "every shipped set renders with a 4+ entry TOC and no raw placeholders left" do
+    Setting.set("site_name", "PCMarket")
+    Setting.set("legal_name", "Template Test Ltd")
+    Setting.set("tax_id", "GB123456789")
+    Setting.set("registered_address", "1 Example Street, London")
+    Setting.set("mercantile_registry_data", "Companies House 12345678")
+    Setting.set("contact_email", "legal@pcmarket.example")
+    Setting.set("dpo_email", "dpo@pcmarket.example")
+
+    legal_sets.each do |country_code, locale|
+      set = "#{country_code}/#{locale}"
+
+      LegalPage.where(country_code: country_code, locale: locale).find_each do |page|
+        result = LegalPages::Render.call(page)
+
+        assert_operator result.toc.size, :>=, 4, "#{set}/#{page.slug} TOC must have 4+ entries"
+        assert_no_match(/\{\{|\}\}/, result.body_html, "#{set}/#{page.slug} still has a raw {{placeholder}}")
+      end
+    end
+  end
+
   test "rendering with configured identity settings leaves no unresolved placeholder" do
     Setting.set("site_name", "PCMarket")
     Setting.set("legal_name", "PC Market Iberia, S.L.")
@@ -80,6 +133,16 @@ class LegalPagesSeedsTest < ActiveSupport::TestCase
   end
 
   private
+
+  # Country/locale pairs that actually ship template folders — the loader's
+  # contract, read off the filesystem rather than hardcoded.
+  def legal_sets
+    @legal_sets ||= Dir.glob(LEGAL_ROOT.join("*", "*")).filter_map do |dir|
+      next unless File.directory?(dir)
+
+      Pathname.new(dir).relative_path_from(LEGAL_ROOT).each_filename.to_a
+    end.sort
+  end
 
   def run_loader
     load LOADER

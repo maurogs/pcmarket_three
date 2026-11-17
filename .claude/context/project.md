@@ -455,7 +455,7 @@ GDPR cookie consent and a rebuilt footer.
   virtual attr) flips it false on save (audited — update details include
   needs_legal_review); dashboard footnote counts published pages pending
   review (`DashboardStats#legal_pages_pending_review`, cached with stats).
-  ES/es ships 8 Spanish templates (db/seeds/legal/ES/es/) using only the
+  ES/es ships 8 Spanish templates (db/seeds/legal/ES/es/), ES/en their British-English translations (Spanish law still governs, Phase 7d) and GB/en a UK-law set (OSA 2023, UK GDPR + DPA 2018 + ICO, PECR, CCRs 2013, CRA 2015, DMCC Act 2024, Platform Operators Regs 2023/HMRC, E-Commerce Regs 2002 reg. 6 + Companies Act 2006 disclosure), using only the
   `Setting.legal_identity` placeholders and Spain/EU-accurate content
   (LSSI-CE, RGPD/LOPDGDD+AEPD, DSA, Reg. 2019/1150, TRLGDCU arts. 102–108
   & 120/RDL 7/2021, DAC7 Ley 13/2023, 48h buyer-protection window, 0% fees
