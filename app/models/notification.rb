@@ -3,6 +3,7 @@ class Notification < ApplicationRecord
   # notifications.kinds.*, icons under NotificationsHelper::KIND_ICONS).
   KINDS = %w[
     new_message price_drop saved_search_match listing_submitted
+    listing_approved listing_rejected
     order_paid order_shipped order_delivered order_completed
     order_cancelled order_disputed
   ].freeze

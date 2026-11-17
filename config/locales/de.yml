@@ -12,6 +12,20 @@ de:
       notification_preferences: Benachrichtigungen
       addresses: Adressen
       deletion: Konto löschen
+    admin:
+      title: Administration
+      toggle_nav: Navigation ein-/ausblenden
+      nav_label: Admin-Menü
+      back_to_site: Zurück zur Website
+      search_label: Globale Suche
+      search_placeholder: Anzeige, Bestellnummer, E-Mail...
+      search: Suchen
+      nav:
+        dashboard: Übersicht
+        moderations: Moderation
+        listings: Anzeigen
+        users: Nutzer
+        stores: Shops
   nav:
     search_placeholder: Grafikkarten, Prozessoren, Laptops suchen…
     search_submit: Suchen
@@ -127,6 +141,7 @@ de:
       invalid_credentials: Versuchen Sie eine andere E-Mail-Adresse oder ein anderes
         Passwort.
       rate_limited: Versuchen Sie es später erneut.
+      banned: Dieses Konto wurde gesperrt.
   passwords:
     new:
       title: Passwort vergessen?
@@ -318,6 +333,11 @@ de:
           attributes:
             base:
               saved_search_limit: Du kannst höchstens %{count} Suchen speichern
+        user:
+          attributes:
+            role:
+              cannot_demote_self: Sie können sich nicht selbst die Admin-Rolle entziehen
+              last_admin: Die Plattform muss mindestens einen Administrator behalten
     models:
       address: Adresse
       api_token: API-Token
@@ -424,20 +444,20 @@ de:
         description: Beschreibung
         price_cents: Preis
         original_price_cents: Ursprünglicher Preis
-        condition:
-          brand_new: Neu
-          open_box: Open Box
-          used_like_new: Gebraucht – wie neu
-          used_good: Gebraucht – guter Zustand
-          for_parts: Für Ersatzteile
-        status:
-          draft: Entwurf
-          pending_review: Wartet auf Prüfung
-          approved: Genehmigt
-          rejected: Abgelehnt
-          sold: Verkauft
-          archived: Archiviert
-          reserved: Reserviert
+        condition: Zustand
+        condition/brand_new: Neu
+        condition/open_box: Open Box
+        condition/used_like_new: Gebraucht – wie neu
+        condition/used_good: Gebraucht – guter Zustand
+        condition/for_parts: Für Ersatzteile
+        status: Status
+        status/draft: Entwurf
+        status/pending_review: Wartet auf Prüfung
+        status/approved: Genehmigt
+        status/rejected: Abgelehnt
+        status/sold: Verkauft
+        status/archived: Archiviert
+        status/reserved: Reserviert
         currency: Währung
         rejection_reason: Ablehnungsgrund
         quantity: Menge
@@ -458,6 +478,7 @@ de:
         favorites_count: Anzahl Favoriten
         performance_score: Leistungsindex
         photos: Fotos
+        labels: Merkmale
       listing_label:
         listing: Anzeige
         label: Label
@@ -472,11 +493,11 @@ de:
       moderation_event:
         listing: Anzeige
         admin: Moderator
-        action:
-          approved: Genehmigt
-          rejected: Abgelehnt
-          edited: Bearbeitet
-          unpublished: Nicht veröffentlicht
+        action: Aktion
+        action/approved: Genehmigt
+        action/rejected: Abgelehnt
+        action/edited: Bearbeitet
+        action/unpublished: Nicht veröffentlicht
         note: Notiz
       newsletter_subscription:
         email: E-Mail-Adresse
@@ -491,26 +512,26 @@ de:
         listing: Anzeige
         buyer: Käufer
         amount_cents: Betrag
-        status:
-          pending: Ausstehend
-          accepted: Angenommen
-          declined: Abgelehnt
-          withdrawn: Zurückgezogen
-          expired: Abgelaufen
+        status: Status
+        status/pending: Ausstehend
+        status/accepted: Angenommen
+        status/declined: Abgelehnt
+        status/withdrawn: Zurückgezogen
+        status/expired: Abgelaufen
         expires_at: Läuft ab am
       order:
         buyer: Käufer
         seller: Verkäufer
         number: Bestellnummer
-        status:
-          pending_payment: Zahlung ausstehend
-          paid: Bezahlt
-          shipped: Versandt
-          delivered: Zugestellt
-          completed: Abgeschlossen
-          cancelled: Storniert
-          refunded: Erstattet
-          disputed: Im Streitfall
+        status: Status
+        status/pending_payment: Zahlung ausstehend
+        status/paid: Bezahlt
+        status/shipped: Versandt
+        status/delivered: Zugestellt
+        status/completed: Abgeschlossen
+        status/cancelled: Storniert
+        status/refunded: Erstattet
+        status/disputed: Im Streitfall
         subtotal_cents: Zwischensumme
         shipping_cents: Versand
         commission_cents: Provision
@@ -603,9 +624,9 @@ de:
         first_name: Vorname
         last_name: Nachname
         phone: Telefonnummer
-        role:
-          user: Benutzer
-          admin: Administrator
+        role: Rolle
+        role/user: Benutzer
+        role/admin: Administrator
         locale: Sprache
         country_code: Land
         confirmed_at: Bestätigt am
@@ -1363,6 +1384,8 @@ de:
       order_cancelled: Bestellung %{number} storniert
       order_disputed: Bestellung %{number} im Streitfall
       unknown: "%{kind}"
+      listing_approved: Ihre Anzeige „%{title}“ wurde freigegeben
+      listing_rejected: Ihre Anzeige „%{title}“ braucht Änderungen
   account:
     profiles:
       show:
@@ -1499,3 +1522,457 @@ de:
         werden.
       download: Meine Daten herunterladen
       expires: Der Download-Link bleibt %{days} Tage gültig.
+  admin:
+    access:
+      banned: Dieses Konto kann sich nicht anmelden.
+    audit:
+      actions:
+        approve_listing: Anzeige freigeschaltet
+        reject_listing: Anzeige abgelehnt
+        edit_listing: Anzeige bearbeitet
+        unpublish_listing: Anzeige deaktiviert
+        delete_listing: Anzeige gelöscht
+        bulk_approve: Sammelfreischaltung
+        bulk_reject: Sammelablehnung
+        ban_user: Nutzer gesperrt
+        unban_user: Sperre aufgehoben
+        impersonation_start: Identitätswechsel gestartet
+        impersonation_stop: Identitätswechsel beendet
+        edit_user: Nutzer bearbeitet
+        verify_store: Shop verifiziert
+        unverify_store: Verifizierung entfernt
+        hide_store: Shop verborgen
+        unhide_store: Shop sichtbar gemacht
+        edit_store: Shop bearbeitet
+    impersonation:
+      banner: Moderation als %{name}
+      stop: Zurück zum Admin-Konto
+      create:
+        started: Sie surfen jetzt als %{name}.
+        not_allowed: Dieses Konto können Sie nicht übernehmen.
+      destroy:
+        stopped: Sie sind wieder in Ihrem Admin-Konto.
+    dashboards:
+      show:
+        title: Übersicht
+        subtitle: Marktplatz-Aktivität der letzten drei Monate
+        period:
+          label: Zeitraum
+          days: "%{count} T"
+        kpis:
+          new_users: Neue Nutzer
+          new_listings: Neue Anzeigen
+          pending: Ausstehende Moderation
+          approval_rate: Freischaltequote
+          orders: Bestellungen
+          gmv: Umsatzvolumen
+        footnote:
+          commission: 'Provision: %{amount}'
+          active_sellers: "%{count} aktive Verkäufer"
+          open_disputes: "%{count} offene Streitfälle"
+          oldest_pending: 'Ältester Fall: %{time}'
+          queue_empty: Warteschlange leer
+        chart:
+          listings_title: Neue Anzeigen pro Tag
+          users_title: Neuanmeldungen pro Tag
+          aria: Aktivität der letzten %{days} Tage
+          listings: "%{count} Anzeigen"
+          users: "%{count} Anmeldungen"
+        pending:
+          title: Ältester in der Warteschlange
+          all: Warteschlange ansehen
+          waited: wartet %{time}
+          empty: Die Warteschlange ist leer
+        signups:
+          title: Letzte Anmeldungen
+          all: Nutzer ansehen
+          empty: Noch keine Anmeldungen
+    moderations:
+      index:
+        title: Moderations-Warteschlange
+        subtitle: "%{count} Anzeigen warten"
+        filters:
+          category: Kategorie
+          country: Land
+          seller: Verkäufer-ID
+          apply: Filtern
+          clear: Zurücksetzen
+          all: Alle
+        bulk_hint: Bis zu %{count} Anzeigen auswählen, um sie gemeinsam freizuschalten.
+        bulk_approve: Auswahl freigeben
+        bulk_confirm: Ausgewählte Anzeigen freigeben?
+        bulk_select: Alle auswählen
+        bulk_select_one: Anzeige auswählen
+        columns:
+          listing: Anzeige
+          price: Preis
+          category: Kategorie
+          seller: Verkäufer
+          photos: Fotos
+          waited: Wartet
+          actions: Aktionen
+        review: Prüfen
+        empty: Nichts ausstehend. Die Warteschlange ist leer.
+      show:
+        title: 'Prüfung: %{title}'
+        back_to_queue: Zurück zur Warteschlange
+        shortcuts_hint: 'Tastatur: a freigeben - r ablehnen - j vorherige - k nächste'
+        shortcut:
+          approve: freigeben
+          reject: ablehnen
+          prev: vorherige
+          next: nächste
+        submitted: Eingereicht %{time}
+        no_photos: Keine Fotos
+        description: Beschreibung
+        specs: Details
+        price_context: Preiskontext
+        median_comparison:
+          above: "%{percent}% über dem Median (%{median})"
+          below: "%{percent}% unter dem Median (%{median})"
+          'on': Genau beim Median (%{median})
+        median_unavailable: Noch kein Median in dieser Kategorie
+        duplicates:
+          title: Mögliche Duplikate dieses Verkäufers
+          none: Keine ähnlichen Anzeigen gefunden
+          unavailable: Duplikaterkennung nicht verfügbar
+        risky_words:
+          title: Risikowörter
+          none: Keine gefunden
+          words:
+          - benutzt
+          - gebraucht
+          - generalüberholt
+          - fake
+          - replika
+          - neu
+          - defekt
+          - wie neu
+          - klon
+          - fälschung
+        decision:
+          title: Entscheidung
+          approve: Freigeben
+          reject: Ablehnen
+          edit: Anzeige bearbeiten
+          unpublish: Deaktivieren
+          prev_next_hint: j / k wechseln zwischen ausstehenden Anzeigen
+        already_reviewed: Diese Anzeige wurde bereits %{status}.
+    rejections:
+      new:
+        title: 'Ablehnen: %{title}'
+        back: Zurück zur Prüfung
+        subtitle: Hauptgrund wählen, damit der Verkäufer weiß, was zu ändern ist.
+        reason_label: Grund
+        note_label: Nachricht an den Verkäufer (optional)
+        note_placeholder: Was genau soll geändert werden?
+        note_hint: Grund und diese Nachricht gehen an den Verkäufer.
+        submit: Anzeige ablehnen
+        cancel: Abbrechen
+      create:
+        reason_required: Bitte einen Ablehnungsgrund wählen.
+        rejected: "„%{title}“ abgelehnt."
+        already_reviewed: Diese Anzeige wurde bereits %{status}.
+      reasons:
+        blurry_photos: Unklare oder fehlende Fotos
+        missing_info: Fehlende Angaben
+        prohibited_item: Unzulässiger Artikel
+        price_misleading: Irreführender Preis
+        duplicate: Doppelte Anzeige
+        wrong_category: Falsche Kategorie
+        other: Sonstiges
+    approvals:
+      create:
+        approved: "„%{title}“ freigegeben."
+        already_reviewed: Diese Anzeige wurde bereits %{status}.
+    bulk_moderations:
+      create:
+        done: "%{count} Anzeigen freigegeben, %{skipped} übersprungen."
+        none_done: Nichts freizugeben.
+        invalid_decision: Nicht unterstützte Aktion.
+    unpublications:
+      create:
+        unpublished: "„%{title}“ deaktiviert."
+        not_unpublishable: Die Anzeige ist nicht öffentlich.
+    listings:
+      index:
+        title: Anzeigen
+        subtitle: "%{count} Anzeigen"
+        export_csv: CSV exportieren
+        filters:
+          all_statuses: Alle Status
+          all_categories: Alle Kategorien
+          all_countries: Alle Länder
+          status: Status
+          category: Kategorie
+          country: Land
+          seller: Verkäufer-ID
+          min_price: Preis min.
+          max_price: Preis max.
+          created_from: Von
+          created_to: Bis
+          has_photos: Fotos
+          featured: Hervorgehoben
+          featured_all: Alle
+          featured_active: Aktiv
+          featured_none: Nicht hervorgehoben
+          q: Suchen
+          apply: Filtern
+          clear: Zurücksetzen
+        columns:
+          listing: Anzeige
+          price: Preis
+          status: Status
+          category: Kategorie
+          seller: Verkäufer
+          created: Erstellt
+          actions: Aktionen
+        featured: Hervorgehoben
+        actions:
+          view: Ansehen
+          edit: Bearbeiten
+        empty: Keine Anzeigen passen zu diesen Filtern.
+      show:
+        back_to_listings: Alle Anzeigen
+        view_public: Öffentliche Seite ansehen
+        free: Gratis
+        location: Standort
+        seller_location: Standort des Verkäufers
+        description: Beschreibung
+        moderate: Moderieren
+        confirm_delete: "„%{title}“ endgültig löschen? Fotos und Moderationsverlauf
+          werden entfernt."
+        actions:
+          title: Aktionen
+          edit: Bearbeiten
+          unpublish: Deaktivieren
+          delete: Löschen
+      edit:
+        title: 'Bearbeiten: %{title}'
+        back: Zurück zur Anzeige
+        subtitle: Änderungen werden im Protokoll erfasst.
+        status_hint: Status „ausstehend“ oder „abgelehnt“ entfernt die Anzeige aus
+          dem Marktplatz.
+        free_shipping_placeholder: Leer lassen, um Versandkosten beizubehalten
+        specs_label: Details (JSON)
+        specs_hint: Schlüssel/Wert-Details auf der Anzeigenseite.
+        submit: Speichern
+        cancel: Abbrechen
+      update:
+        updated: "„%{title}“ aktualisiert."
+      destroy:
+        destroyed: "„%{title}“ gelöscht."
+        destroy_denied: Bei offenen Bestellungen kann nicht gelöscht werden.
+    users:
+      index:
+        title: Nutzer
+        subtitle: "%{count} Nutzer"
+        filters:
+          q: Suchen
+          role: Rolle
+          all_roles: Alle Rollen
+          banned: Status
+          banned_yes: Gesperrt
+          banned_no: Aktiv
+          banned_any: Alle
+          country: Land
+          all_countries: Alle Länder
+          has_store: Shop
+          has_store_yes: Mit Shop
+          has_store_no: Ohne Shop
+          has_store_any: Alle
+          signup_from: Anmeldung von
+          signup_to: Anmeldung bis
+          apply: Filtern
+          clear: Zurücksetzen
+        columns:
+          user: Nutzer
+          email: E-Mail
+          role: Rolle
+          status: Status
+          country: Land
+          store: Shop
+          created: Anmeldung
+        roles:
+          admin: Admin
+          user: Nutzer
+        badges:
+          banned: Gesperrt
+          anonymized: Anonymisiert
+          active: Aktiv
+        empty: Keine Nutzer passen zu diesen Filtern.
+      show:
+        title: "%{name}"
+        back_to_users: Alle Nutzer
+        view_public_store: Öffentlicher Shop
+        roles:
+          admin: Admin
+        badges:
+          banned: Gesperrt
+          anonymized: Anonymisiert
+        member_since: Mitglied seit %{date}
+        ban:
+          banned_on: Gesperrt %{date}
+          ban: Nutzer sperren
+          unban: Sperre aufheben
+        actions:
+          edit: Bearbeiten
+          impersonate: Als dieser Nutzer handeln
+        confirm_impersonate: Sie sehen die Website genau wie %{name}. Abbruch jederzeit
+          über das rote Banner.
+        store:
+          title: Shop
+          manage: Shop verwalten
+          verified: Verifiziert
+          hidden: Verborgen
+        sessions:
+          title: Aktive Sitzungen
+          empty: Keine aktiven Sitzungen.
+        listings:
+          title: Anzeigen
+        orders:
+          buyer: Als Käufer
+          seller: Als Verkäufer
+          empty: Keine Bestellungen.
+        audit:
+          title: Letzte Aktionen zu diesem Nutzer
+          columns:
+            action: Aktion
+            admin: Admin
+            changes: Änderungen
+            time: Zeit
+          deleted_admin: "(gelöschter Admin)"
+          empty: Keine Admin-Aktionen erfasst.
+      update:
+        updated: "%{name} aktualisiert."
+      edit:
+        title: "%{name} bearbeiten"
+        back: Zurück zum Nutzer
+        subtitle: Alle Änderungen werden protokolliert.
+        roles:
+          user: Nutzer
+          admin: Admin
+        role_hint: Admins moderieren Anzeigen, Nutzer und Shops.
+        submit: Speichern
+        cancel: Abbrechen
+    bans:
+      new:
+        title: "%{name} sperren"
+        back: Zurück zum Nutzer
+        warning: Eine Sperre archiviert öffentliche Anzeigen, widerruft alle Sitzungen
+          und blockiert neue Anmeldungen. Die Sperre kann später aufgehoben werden.
+        reason_label: Grund
+        reason_placeholder: Welche Regel wurde verletzt?
+        reason_hint: Der Nutzer sieht diesen Grund bei der nächsten Anmeldung.
+        submit: Nutzer sperren
+        cancel: Abbrechen
+      create:
+        cannot_ban_self: Sie können Ihr eigenes Konto nicht sperren.
+        banned: "%{name} wurde gesperrt."
+      destroy:
+        unbanned: Die Sperre von %{name} wurde aufgehoben.
+    stores:
+      index:
+        title: Shops
+        subtitle: "%{count} Shops"
+        filters:
+          q: Suchen
+          verified: Verifizierung
+          verified_yes: Verifiziert
+          verified_any: Alle
+          hidden: Sichtbarkeit
+          hidden_yes: Verborgen
+          visible_yes: Sichtbar
+          hidden_any: Alle
+          apply: Filtern
+          clear: Zurücksetzen
+        columns:
+          store: Shop
+          owner: Inhaber
+          listings: Anzeigen
+          rating: Bewertung
+          badges: Merkmale
+          created: Erstellt
+          actions: Aktionen
+        badges:
+          verified: Verifiziert
+          hidden: Verborgen
+        actions:
+          view: Ansehen
+          edit: Bearbeiten
+        empty: Keine Shops passen zu diesen Filtern.
+      show:
+        title: "%{name}"
+        back_to_stores: Alle Shops
+        view_public: Öffentliche Seite ansehen
+        badges:
+          verified: Verifiziert
+          hidden: Verborgen
+          vacation: Urlaubsmodus
+        owner: 'Inhaber: %{owner}'
+        location: Standort
+        counters:
+          listings: Anzeigen
+          sales: Verkäufe
+          followers: Follower
+          rating: Bewertung
+        recent_listings: Letzte Anzeigen
+        recent_listings_empty: Noch keine Anzeigen.
+        actions:
+          title: Shop-Aktionen
+          edit: Shop bearbeiten
+          verify: Shop verifizieren
+          unverify: Verifizierung entfernen
+          hide: Shop verbergen
+          reveal: Shop sichtbar machen
+        confirm_hide: Diesen Shop aus dem Marktplatz verbergen?
+      update:
+        updated: Shop aktualisiert.
+      verifications:
+        create:
+          verified: "%{name} ist jetzt verifiziert."
+        destroy:
+          unverified: Verifizierung von %{name} entfernt.
+      hidings:
+        create:
+          hidden: "%{name} ist jetzt verborgen."
+        destroy:
+          unhidden: "%{name} ist wieder sichtbar."
+    searches:
+      show:
+        title: Ergebnisse für „%{query}“
+        too_short: Mindestens zwei Zeichen eingeben.
+        users:
+          title: "%{count} Nutzer"
+          empty: Keine passenden Nutzer.
+        listings:
+          title: "%{count} Anzeigen"
+          empty: Keine passenden Anzeigen.
+        orders:
+          title: "%{count} Bestellungen"
+          empty: Keine passenden Bestellungen.
+        badges:
+          banned: Gesperrt
+    shared:
+      seller_card:
+        seller: Verkäufer
+        view_profile: Nutzer ansehen
+        member_since: Mitglied seit %{date}
+        banned: Gesperrt
+      events:
+        title: Moderationsverlauf
+        by: "%{admin} - %{time}"
+        deleted_admin: "(gelöschter Admin)"
+        empty: Noch keine Moderationsereignisse.
+  moderation_mailer:
+    approved:
+      subject: Ihre Anzeige „%{title}“ wurde freigegeben
+      greeting: Hallo %{name},
+      body: Wir haben „%{title}“ geprüft – sie ist jetzt auf PCMarket live.
+      view_listing: Anzeige ansehen
+    rejected:
+      subject: Ihre Anzeige „%{title}“ braucht Änderungen
+      greeting: Hallo %{name},
+      body: Wir haben „%{title}“ geprüft – sie erfüllt unsere Regeln noch nicht.
+      view_listing: Anzeige ansehen
+      edit_hint: Sie können die Anzeige bearbeiten und erneut zur Prüfung einreichen.

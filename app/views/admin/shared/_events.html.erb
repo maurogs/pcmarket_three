@@ -1,0 +1,23 @@
+<%# locals: events (moderation_events, most recent first) %>
+<section class="card p-4">
+  <h2 class="mb-3 text-sm font-semibold text-muted"><%= t(".title") %></h2>
+  <% if events.any? %>
+    <ol class="space-y-2 text-sm">
+      <% events.each do |event| %>
+        <li class="flex items-baseline gap-2">
+          <span class="shrink-0 rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium">
+            <%= ModerationEvent.human_attribute_name("action/#{event.action}") %>
+          </span>
+          <span class="text-xs text-muted">
+            <%= t(".by", admin: event.admin&.display_name || t(".deleted_admin"), time: l(event.created_at.to_date, format: :delivery)) %>
+          </span>
+        </li>
+        <% if event.note.present? %>
+          <li class="text-xs text-muted"><%= event.note %></li>
+        <% end %>
+      <% end %>
+    </ol>
+  <% else %>
+    <p class="text-sm text-muted"><%= t(".empty") %></p>
+  <% end %>
+</section>

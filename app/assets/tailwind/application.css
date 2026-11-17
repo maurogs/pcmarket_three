@@ -108,6 +108,46 @@
     opacity: 0.5;
   }
 
+  /* Quiet outlined variant and destructive variant (used across the sell
+     area and the admin panel). */
+  .btn-secondary {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface);
+    padding: 0 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  .btn-danger {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    border-radius: var(--radius-md);
+    background-color: rgb(220 38 38); /* red-600 */
+    padding: 0 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #fff;
+  }
+
+  .btn-danger:hover {
+    background-color: rgb(185 28 28); /* red-700 */
+  }
+
   /* Tab/pill control (inbox tabs, offer statuses, secondary actions). */
   .chip {
     display: inline-flex;
@@ -143,7 +183,9 @@
   /* button_to wraps its button in a form; the wrapper carries the visual
      style, so strip the UA chrome from the inner button. */
   .chip > button,
-  .btn-primary > button {
+  .btn-primary > button,
+  .btn-secondary > button,
+  .btn-danger > button {
     background: transparent;
     border: 0;
     margin: 0;
@@ -226,5 +268,112 @@
     scroll-snap-type: x mandatory;
     overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
+  }
+}
+
+@layer components {
+  /* Admin area: icon rail that expands to a full sidebar (toggle in
+     rail_controller.js; expanded by default from md up). */
+  .admin-rail {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-shrink: 0;
+    flex-direction: column;
+    height: 100dvh;
+    width: 4.5rem;
+    border-right: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+    transition: width 150ms ease-in-out;
+  }
+
+  .admin-rail--expanded {
+    width: 15rem;
+  }
+
+  .admin-rail:not(.admin-rail--expanded) .admin-rail__label,
+  .admin-rail:not(.admin-rail--expanded) .admin-rail__badge {
+    display: none;
+  }
+
+  .admin-rail__link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-radius: var(--radius-md);
+    padding: 0.5rem 0.75rem;
+    min-height: 2.75rem;
+    color: var(--color-muted);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .admin-rail__link:hover {
+    background-color: var(--color-surface-muted);
+    color: var(--color-text);
+  }
+
+  .admin-rail__item--active > .admin-rail__link {
+    background-color: color-mix(in srgb, var(--color-primary) 14%, transparent);
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  .admin-rail__badge {
+    margin-left: auto;
+    border-radius: 9999px;
+    background-color: var(--color-accent);
+    padding: 0.05rem 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .admin-rail__toggle {
+    display: none;
+    border-radius: var(--radius-md);
+    padding: 0.5rem;
+    color: var(--color-muted);
+  }
+
+  .admin-rail__toggle:hover {
+    background-color: var(--color-surface-muted);
+  }
+
+  @media (min-width: 40rem) {
+    .admin-rail__toggle {
+      display: inline-flex;
+    }
+  }
+
+  /* Compact data tables in admin index pages. */
+  .admin-table th {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-muted);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .admin-table td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--color-border);
+    vertical-align: middle;
+  }
+
+  /* Keyboard-shortcut hints on the moderation page. */
+  .kbd {
+    display: inline-block;
+    border: 1px solid var(--color-border);
+    border-bottom-width: 2px;
+    border-radius: 0.3rem;
+    background-color: var(--color-surface-muted);
+    padding: 0 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
   }
 }

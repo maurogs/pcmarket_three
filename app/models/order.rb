@@ -146,8 +146,8 @@ class Order < ApplicationRecord
     return if from.map(&:to_s).include?(status.to_s)
 
     raise InvalidTransition,
-          I18n.t("orders.transition.invalid", from: self.class.human_attribute_name("status.#{status}"),
-                                              to: self.class.human_attribute_name("status.#{to}"))
+          I18n.t("orders.transition.invalid", from: self.class.human_attribute_name("status/#{status}"),
+                                              to: self.class.human_attribute_name("status/#{to}"))
   end
 
   def assign_number

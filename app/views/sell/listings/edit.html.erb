@@ -1,7 +1,7 @@
 <header class="mb-4">
   <h1 class="text-xl font-bold tracking-tight sm:text-2xl"><%= t(".title") %></h1>
   <div class="mt-2 flex flex-wrap items-center gap-3">
-    <span class="<%= status_badge_class(@listing.status) %>"><%= Listing.human_attribute_name("status.#{@listing.status}") %></span>
+    <span class="<%= status_badge_class(@listing.status) %>"><%= Listing.human_attribute_name("status/#{@listing.status}") %></span>
     <span class="text-sm text-muted"><%= t(".updated_at", time: time_ago_in_words(@listing.updated_at)) %></span>
   </div>
   <% if @listing.rejected? && @listing.rejection_reason.present? %>

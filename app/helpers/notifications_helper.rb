@@ -10,6 +10,8 @@ module NotificationsHelper
     "price_drop" => :tag,
     "saved_search_match" => :search,
     "listing_submitted" => :shield,
+    "listing_approved" => :check,
+    "listing_rejected" => :close,
     "order_placed" => :box,
     "order_confirmed" => :box,
     "order_paid" => :bolt,
@@ -41,6 +43,10 @@ module NotificationsHelper
       t("notifications.kinds.saved_search_match", name: payload["saved_search_name"], title: payload["title"])
     when "listing_submitted"
       t("notifications.kinds.listing_submitted", title: payload["title"])
+    when "listing_approved"
+      t("notifications.kinds.listing_approved", title: payload["title"])
+    when "listing_rejected"
+      t("notifications.kinds.listing_rejected", title: payload["title"])
     when "new_offer"
       t("notifications.kinds.new_offer", title: notification_offer(notification)&.listing&.title)
     when "offer_accepted"
@@ -63,7 +69,8 @@ module NotificationsHelper
       conversation_id = payload["conversation_id"] and conversation_path(conversation_id)
     when "new_offer", "offer_accepted"
       offers_path
-    when "price_drop", "saved_search_match", "listing_submitted"
+    when "price_drop", "saved_search_match", "listing_submitted",
+         "listing_approved", "listing_rejected"
       listing = Listing.find_by(id: payload["listing_id"]) and listing_path(listing)
     when /\Aorder_/
       order_id = payload["order_id"] and order_path(order_id)

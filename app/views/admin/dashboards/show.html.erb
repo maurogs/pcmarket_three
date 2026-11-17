@@ -1,0 +1,122 @@
+<% content_for :title, t(".title") %>
+
+<div class="mb-6 flex flex-wrap items-end justify-between gap-3">
+  <div>
+    <h1 class="text-xl font-bold"><%= t(".title") %></h1>
+    <p class="mt-1 text-sm text-muted"><%= t(".subtitle") %></p>
+  </div>
+
+  <div class="flex items-center gap-1" role="group" aria-label="<%= t(".period.label") %>">
+    <% Admin::DashboardStats::PERIODS.each do |days| %>
+      <% if days == @period %>
+        <span class="chip chip-active" aria-current="true"><%= t(".period.days", count: days) %></span>
+      <% else %>
+        <%= link_to t(".period.days", count: days), admin_dashboard_path(period: days), class: "chip" %>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<%# --- KPI tiles ---------------------------------------------------------- %>
+<div class="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+  <% tiles = [
+       [ t(".kpis.new_users"), number_with_delimiter(@stats.new_users) ],
+       [ t(".kpis.new_listings"), number_with_delimiter(@stats.new_listings) ],
+       [ t(".kpis.pending"), number_with_delimiter(@stats.pending_count) ],
+       [ t(".kpis.approval_rate"), number_to_percentage(@stats.approval_rate * 100, precision: 0) ],
+       [ t(".kpis.orders"), number_with_delimiter(@stats.orders_count) ],
+       [ t(".kpis.gmv"), money(@stats.gmv_cents) ]
+     ] %>
+  <% tiles.each do |label, value| %>
+    <div class="card px-3 py-3">
+      <p class="truncate text-xs font-medium text-muted"><%= label %></p>
+      <p class="mt-1 text-xl font-bold"><%= value %></p>
+    </div>
+  <% end %>
+</div>
+
+<div class="mb-6 grid grid-cols-2 gap-3 text-xs text-muted sm:grid-cols-4">
+  <p><%= t(".footnote.commission", amount: money(@stats.commission_cents)) %></p>
+  <p><%= t(".footnote.active_sellers", count: @stats.active_sellers) %></p>
+  <p><%= t(".footnote.open_disputes", count: @stats.open_disputes) %></p>
+  <p>
+    <% if @stats.oldest_pending_at %>
+      <%= t(".footnote.oldest_pending", time: time_ago_in_words(@stats.oldest_pending_at)) %>
+    <% else %>
+      <%= t(".footnote.queue_empty") %>
+    <% end %>
+  </p>
+</div>
+
+<%# --- daily activity charts (pure CSS bars, like the seller dashboard) --- %>
+<div class="mb-6 grid gap-4 lg:grid-cols-2">
+  <% [ [ :listings, t(".chart.listings_title") ], [ :users, t(".chart.users_title") ] ].each do |key, heading| %>
+    <% peak = @stats.daily.map { |day| day[key] }.max || 0 %>
+    <section class="card p-4">
+      <h2 class="mb-3 text-sm font-semibold"><%= heading %></h2>
+      <div class="flex h-28 items-end gap-px" role="img"
+           aria-label="<%= t(".chart.aria", days: @stats.daily.size) %>">
+        <% @stats.daily.each do |day| %>
+          <% value = day[key] %>
+          <% height = peak.positive? ? [(value.fdiv(peak) * 100).round, value.positive? ? 6 : 2].max : 2 %>
+          <div class="flex h-full flex-1 flex-col justify-end">
+            <div class="w-full rounded-t bg-primary/70 hover:bg-primary" style="height: <%= height %>%"
+                 title="<%= l(day[:date], format: :delivery) %>: <%= t(".chart.#{key}", count: value) %>"></div>
+          </div>
+        <% end %>
+      </div>
+      <div class="mt-2 flex justify-between text-[10px] text-muted">
+        <span><%= l(@stats.daily.first[:date], format: :delivery) %></span>
+        <span><%= l(@stats.daily.last[:date], format: :delivery) %></span>
+      </div>
+    </section>
+  <% end %>
+</div>
+
+<div class="grid gap-4 lg:grid-cols-2">
+  <%# --- oldest pending (FIFO backlog preview) ---------------------------- %>
+  <section class="card p-4">
+    <div class="mb-3 flex items-center justify-between">
+      <h2 class="text-sm font-semibold"><%= t(".pending.title") %></h2>
+      <%= link_to t(".pending.all"), admin_moderations_path, class: "text-xs font-medium text-primary hover:underline" %>
+    </div>
+    <% if @oldest_pending.any? %>
+      <ul class="space-y-2 text-sm">
+        <% @oldest_pending.each do |listing| %>
+          <li class="flex items-center gap-3">
+            <span class="min-w-0 flex-1 truncate">
+              <%= link_to listing.title, admin_moderation_path(listing), class: "font-medium hover:text-primary hover:underline" %>
+            </span>
+            <span class="shrink-0 text-xs text-muted"><%= money(listing.price_cents, listing.currency) %></span>
+            <span class="shrink-0 text-xs text-muted"><%= t(".pending.waited", time: time_ago_in_words(listing.created_at)) %></span>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="text-sm text-muted"><%= t(".pending.empty") %></p>
+    <% end %>
+  </section>
+
+  <%# --- latest signups ---------------------------------------------------- %>
+  <section class="card p-4">
+    <div class="mb-3 flex items-center justify-between">
+      <h2 class="text-sm font-semibold"><%= t(".signups.title") %></h2>
+      <%= link_to t(".signups.all"), admin_users_path, class: "text-xs font-medium text-primary hover:underline" %>
+    </div>
+    <% if @latest_signups.any? %>
+      <ul class="space-y-2 text-sm">
+        <% @latest_signups.each do |user| %>
+          <li class="flex items-center gap-3">
+            <span class="min-w-0 flex-1 truncate">
+              <%= link_to user.display_name, admin_user_path(user), class: "font-medium hover:text-primary hover:underline" %>
+            </span>
+            <span class="min-w-0 truncate text-xs text-muted"><%= user.email_address %></span>
+            <span class="shrink-0 text-xs text-muted"><%= l(user.created_at.to_date, format: :delivery) %></span>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="text-sm text-muted"><%= t(".signups.empty") %></p>
+    <% end %>
+  </section>
+</div>

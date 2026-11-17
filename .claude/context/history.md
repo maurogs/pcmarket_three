@@ -1,5 +1,86 @@
 # History
 
+## 2026-11-18 — Phase 6a: admin panel part 1 — moderation queue, listings, users (ban/impersonation), stores, dashboard, audit log
+
+**What changed**
+
+- Routes: `namespace :admin` inside the locale scope (no `as:` on root —
+  `admin_root` comes from the namespace). All controllers inherit
+  `Admin::BaseController` (`layout "admin"` + `require_admin!`): **non-admins
+  get 404, never 403** (existence is a leak); banned admins get the sign-in
+  page with an alert instead.
+- **Audit trail**: `AdminAuditLog` (append-only: admin, polymorphic subject,
+  action, details jsonb; migration `20261118010002`) written through the
+  `Admin::Auditable` concern (`audit!(action, subject, **details)`). Bulk
+  moderation logs ONE `bulk_approve`/`bulk_reject` row per batch.
+- **Migration `20261118010001`**: `pg_trgm` extension + GIN index on
+  `listings.title` (`Listing.potential_duplicates_of` — duplicate hints on
+  the moderation cockpit).
+- **Moderation**: `Admin::ModerationsController` (queue oldest-first,
+  cockpit show with seller card + pg_trgm duplicate hints),
+  `Moderations::{Approve,Reject}` services (status transition + Notification
+  + `ModerationMailer` deliver_later + ModerationEvent), `RejectionsController`
+  (form with fixed `REASONS` keys, labels under `admin.rejections.reasons.*`,
+  unknown/blank reason → 422 re-render), `Admin::BulkModerationsController`
+  (≤50 ids, per-listing events + one aggregate audit row).
+- **Listings admin**: index with status/country filters (`Admin::ListingFilter`),
+  CSV export (`Listings::CsvExport` — builds a String, headers + rows),
+  edit via `Listings::AdminUpdate` (status changes recorded as moderation
+  events, unpublish event when pulled down), `UnpublicationsController`
+  (approved→archived), destroy only for draft/rejected/archived
+  (`destroy_denied` flash otherwise), global search (`Admin::GlobalSearch`
+  across listings/users/orders).
+- **Users admin**: index + user page (listings, store, moderation trail),
+  role edits through `Users::AdminUpdate` — guards return error-key symbols
+  (`:last_admin` checked BEFORE `:cannot_demote_self`) and the save is SKIPPED
+  when blocked (a `save` would clear manually-added errors).
+  `Users::Ban` (ban! + destroy sessions/api_tokens + archive approved
+  listings) / `Users::Unban`. Login itself rejects banned users
+  (`sessions/create.banned` alert).
+- **Impersonation**: `Admin::ImpersonationsController#create` refuses
+  admins/self/deleted, stores `session[:impersonator_id]`, then
+  `start_new_session_for(target)`; the sticky red banner
+  (`shared/_impersonation_banner`) posts DELETE `destroy`, which SKIPS
+  `require_admin!` (Current.user is the target then) and re-authenticates
+  the impersonator after validating the stored id. While impersonating, all
+  admin routes 404 (Current.user is the non-admin target).
+- **Stores admin**: index (verified filter, hidden still listed),
+  verify/unverify + hide/unhide controllers (`admin_store_verification_path`
+  / `admin_store_hiding_path` POST/DELETE), edit name/slug bits.
+- **Dashboard**: `Admin::DashboardStats.call` → `Result` struct (counts,
+  pending queue, approval rate + daily series from ModerationEvents,
+  `oldest_pending_listings`/`latest_signups` as CLASS methods, latest audit
+  activity).
+- **i18n follow-up (big one)**: every enum whose label is rendered via
+  `Model.human_attribute_name` now uses FLATTENED slash keys in all 6
+  locales — `attributes.listing: { "status/draft": Draft, … , status: Status }`
+  (same for `listing/condition`, `user/role`, `moderation_event/action`,
+  `offer.status`, `order.status`). The old nested `{status: {draft: …}}`
+  shape NEVER resolved through `human_attribute_name("status/draft")` and
+  crashed plain `"status"` lookups with "can not be used with :count => 1"
+  (hash + pluralization). Locale tree is now **1496 keys**.
+- **Tests**: `test/controllers/admin/{access,listings,moderations,stores,users}_test.rb`
+  (access = 404 sweep over EVERY admin GET + write routes incl. bulk,
+  impersonation, updates, state-not-changed assertions) +
+  `test/services/admin/dashboard_stats_test.rb`. Suite: **471 runs, green**;
+  rubocop / locale lint / tailwind build / eager-load all pass.
+
+**Gotchas learned**
+
+- `human_attribute_name("status/draft")` resolves ONLY when the YAML has a
+  literal quoted key `"status/draft"` under `attributes.<model>`; dots in the
+  argument mean YAML NAMESPACE, slash keys are literal.
+- `Category` has NO `name` column (JSONB `names`) — never `order(:name)`;
+  use `Category.ordered` / `roots.active.ordered`.
+- Only `date.formats.delivery` exists (no `time.formats.*`) — pass `.to_date`
+  to `l(..., format: :delivery)`.
+- Locale keys must match the CONTROLLER's lexical scope: the impersonation
+  node is `admin.impersonation.*` (singular) while the controller is
+  `ImpersonationsController`, so its flashes use absolute `t()` keys.
+- Flash strings with `%{interpolation}` need the args passed at the call
+  site (`t(".destroyed", title:)`, `t(".updated", name:)`) — missing args
+  leak `%{...}` into the flash.
+
 ## 2026-11-17 — Phase 5: wishlists + price-drop alerts, store follows, saved searches & digest, notification centre, account settings (profile/security/GDPR)
 
 **What changed**

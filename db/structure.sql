@@ -10,6 +10,20 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
+-- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
+
+
+--
 -- Name: listings_tsv_trigger(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -166,6 +180,41 @@ CREATE SEQUENCE public.addresses_id_seq
 --
 
 ALTER SEQUENCE public.addresses_id_seq OWNED BY public.addresses.id;
+
+
+--
+-- Name: admin_audit_logs; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.admin_audit_logs (
+    id bigint NOT NULL,
+    admin_id bigint NOT NULL,
+    action character varying NOT NULL,
+    subject_type character varying,
+    subject_id bigint,
+    details jsonb DEFAULT '{}'::jsonb NOT NULL,
+    ip character varying,
+    created_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: admin_audit_logs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.admin_audit_logs_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: admin_audit_logs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.admin_audit_logs_id_seq OWNED BY public.admin_audit_logs.id;
 
 
 --
@@ -1455,6 +1504,13 @@ ALTER TABLE ONLY public.addresses ALTER COLUMN id SET DEFAULT nextval('public.ad
 
 
 --
+-- Name: admin_audit_logs id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.admin_audit_logs ALTER COLUMN id SET DEFAULT nextval('public.admin_audit_logs_id_seq'::regclass);
+
+
+--
 -- Name: api_tokens id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1722,6 +1778,14 @@ ALTER TABLE ONLY public.active_storage_variant_records
 
 ALTER TABLE ONLY public.addresses
     ADD CONSTRAINT addresses_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: admin_audit_logs admin_audit_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.admin_audit_logs
+    ADD CONSTRAINT admin_audit_logs_pkey PRIMARY KEY (id);
 
 
 --
@@ -2059,6 +2123,27 @@ CREATE UNIQUE INDEX index_active_storage_variant_records_uniqueness ON public.ac
 --
 
 CREATE INDEX index_addresses_on_user_id ON public.addresses USING btree (user_id);
+
+
+--
+-- Name: index_admin_audit_logs_on_admin_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_admin_audit_logs_on_admin_id ON public.admin_audit_logs USING btree (admin_id);
+
+
+--
+-- Name: index_admin_audit_logs_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_admin_audit_logs_on_created_at ON public.admin_audit_logs USING btree (created_at);
+
+
+--
+-- Name: index_admin_audit_logs_on_subject_type_and_subject_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_admin_audit_logs_on_subject_type_and_subject_id ON public.admin_audit_logs USING btree (subject_type, subject_id);
 
 
 --
@@ -2409,6 +2494,13 @@ CREATE INDEX index_listings_on_user_id ON public.listings USING btree (user_id);
 --
 
 CREATE INDEX index_listings_on_user_id_and_status ON public.listings USING btree (user_id, status);
+
+
+--
+-- Name: index_listings_title_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_listings_title_trgm ON public.listings USING gin (title public.gin_trgm_ops);
 
 
 --
@@ -2782,6 +2874,14 @@ ALTER TABLE ONLY public.follows
 
 
 --
+-- Name: admin_audit_logs fk_rails_4546916c73; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.admin_audit_logs
+    ADD CONSTRAINT fk_rails_4546916c73 FOREIGN KEY (admin_id) REFERENCES public.users(id);
+
+
+--
 -- Name: addresses fk_rails_48c9e0c5a2; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3068,6 +3168,8 @@ ALTER TABLE ONLY public.moderation_events
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261118010002'),
+('20261118010001'),
 ('20261117230003'),
 ('20261117230002'),
 ('20261117230001'),

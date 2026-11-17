@@ -11,6 +11,20 @@ en:
       notification_preferences: Notifications
       addresses: Addresses
       deletion: Delete account
+    admin:
+      title: Admin
+      toggle_nav: Toggle navigation
+      nav_label: Admin menu
+      back_to_site: Back to site
+      search_label: Search everything
+      search_placeholder: Listing, order number, email...
+      search: Search
+      nav:
+        dashboard: Dashboard
+        moderations: Moderation
+        listings: Listings
+        users: Users
+        stores: Stores
   nav:
     search_placeholder: Search graphics cards, processors, laptops…
     search_submit: Search
@@ -124,6 +138,7 @@ en:
     create:
       invalid_credentials: Try another email address or password.
       rate_limited: Try again later.
+      banned: This account has been suspended.
   passwords:
     new:
       title: Forgot your password?
@@ -311,6 +326,11 @@ en:
           attributes:
             base:
               saved_search_limit: You can save at most %{count} searches
+        user:
+          attributes:
+            role:
+              cannot_demote_self: You can't remove your own admin role
+              last_admin: The platform must keep at least one admin
     models:
       address: Address
       api_token: API token
@@ -417,20 +437,20 @@ en:
         description: Description
         price_cents: Price
         original_price_cents: Original price
-        condition:
-          brand_new: Brand new
-          open_box: Open box
-          used_like_new: Used – like new
-          used_good: Used – good
-          for_parts: For parts
-        status:
-          draft: Draft
-          pending_review: Pending review
-          approved: Approved
-          rejected: Rejected
-          sold: Sold
-          archived: Archived
-          reserved: Reserved
+        condition: Condition
+        condition/brand_new: Brand new
+        condition/open_box: Open box
+        condition/used_like_new: Used – like new
+        condition/used_good: Used – good
+        condition/for_parts: For parts
+        status: Status
+        status/draft: Draft
+        status/pending_review: Pending review
+        status/approved: Approved
+        status/rejected: Rejected
+        status/sold: Sold
+        status/archived: Archived
+        status/reserved: Reserved
         currency: Currency
         rejection_reason: Rejection reason
         quantity: Quantity
@@ -451,6 +471,7 @@ en:
         favorites_count: Wishlist count
         performance_score: Performance score
         photos: Photos
+        labels: Labels
       listing_label:
         listing: Listing
         label: Label
@@ -465,11 +486,11 @@ en:
       moderation_event:
         listing: Listing
         admin: Moderator
-        action:
-          approved: Approved
-          rejected: Rejected
-          edited: Edited
-          unpublished: Unpublished
+        action: Action
+        action/approved: Approved
+        action/rejected: Rejected
+        action/edited: Edited
+        action/unpublished: Unpublished
         note: Note
       newsletter_subscription:
         email: Email address
@@ -484,26 +505,26 @@ en:
         listing: Listing
         buyer: Buyer
         amount_cents: Amount
-        status:
-          pending: Pending
-          accepted: Accepted
-          declined: Declined
-          withdrawn: Withdrawn
-          expired: Expired
+        status: Status
+        status/pending: Pending
+        status/accepted: Accepted
+        status/declined: Declined
+        status/withdrawn: Withdrawn
+        status/expired: Expired
         expires_at: Expires at
       order:
         buyer: Buyer
         seller: Seller
         number: Order number
-        status:
-          pending_payment: Pending payment
-          paid: Paid
-          shipped: Shipped
-          delivered: Delivered
-          completed: Completed
-          cancelled: Cancelled
-          refunded: Refunded
-          disputed: Disputed
+        status: Status
+        status/pending_payment: Pending payment
+        status/paid: Paid
+        status/shipped: Shipped
+        status/delivered: Delivered
+        status/completed: Completed
+        status/cancelled: Cancelled
+        status/refunded: Refunded
+        status/disputed: Disputed
         subtotal_cents: Subtotal
         shipping_cents: Shipping
         commission_cents: Commission
@@ -596,9 +617,9 @@ en:
         first_name: First name
         last_name: Last name
         phone: Phone number
-        role:
-          user: User
-          admin: Administrator
+        role: Role
+        role/user: User
+        role/admin: Administrator
         locale: Language
         country_code: Country
         confirmed_at: Confirmed at
@@ -1341,6 +1362,8 @@ en:
       order_cancelled: Order %{number} cancelled
       order_disputed: Order %{number} disputed
       unknown: "%{kind}"
+      listing_approved: Your listing "%{title}" passed moderation
+      listing_rejected: Your listing "%{title}" needs changes
   account:
     profiles:
       show:
@@ -1470,3 +1493,457 @@ en:
       intro: Your copy of the data we hold about you is ready to download.
       download: Download my data
       expires: The download link stays available for %{days} days.
+  admin:
+    access:
+      banned: This account cannot sign in.
+    audit:
+      actions:
+        approve_listing: Approved listing
+        reject_listing: Rejected listing
+        edit_listing: Edited listing
+        unpublish_listing: Unpublished listing
+        delete_listing: Deleted listing
+        bulk_approve: Bulk approve
+        bulk_reject: Bulk reject
+        ban_user: Ban user
+        unban_user: Unban user
+        impersonation_start: Start impersonation
+        impersonation_stop: Stop impersonation
+        edit_user: Edit user
+        verify_store: Verify store
+        unverify_store: Remove store verification
+        hide_store: Hide store
+        unhide_store: Make store visible
+        edit_store: Edit store
+    impersonation:
+      banner: Moderating as %{name}
+      stop: Back to admin account
+      create:
+        started: Now browsing as %{name}.
+        not_allowed: You cannot moderate this account.
+      destroy:
+        stopped: You are back in your admin account.
+    dashboards:
+      show:
+        title: Dashboard
+        subtitle: Marketplace health over the last three months
+        period:
+          label: Period
+          days: "%{count}d"
+        kpis:
+          new_users: New users
+          new_listings: New listings
+          pending: Pending moderation
+          approval_rate: Approval rate
+          orders: Orders
+          gmv: Sales volume
+        footnote:
+          commission: 'Commission: %{amount}'
+          active_sellers: "%{count} active sellers"
+          open_disputes: "%{count} open disputes"
+          oldest_pending: 'Oldest pending: %{time}'
+          queue_empty: Queue empty
+        chart:
+          listings_title: New listings per day
+          users_title: New signups per day
+          aria: Activity of the last %{days} days
+          listings: "%{count} listings"
+          users: "%{count} signups"
+        pending:
+          title: Oldest in queue
+          all: View queue
+          waited: waiting %{time}
+          empty: The queue is empty
+        signups:
+          title: Latest signups
+          all: View users
+          empty: No signups yet
+    moderations:
+      index:
+        title: Moderation queue
+        subtitle: "%{count} listings waiting"
+        filters:
+          category: Category
+          country: Country
+          seller: Seller ID
+          apply: Filter
+          clear: Clear
+          all: All
+        bulk_hint: Select up to %{count} listings to approve in one action.
+        bulk_approve: Approve selected
+        bulk_confirm: Approve the selected listings?
+        bulk_select: Select all on this page
+        bulk_select_one: Select listing
+        columns:
+          listing: Listing
+          price: Price
+          category: Category
+          seller: Seller
+          photos: Photos
+          waited: Waiting
+          actions: Actions
+        review: Review
+        empty: Nothing waiting. The queue is clear.
+      show:
+        title: 'Review: %{title}'
+        back_to_queue: Back to queue
+        shortcuts_hint: 'Keyboard: a approve - r reject - j previous - k next'
+        shortcut:
+          approve: approve
+          reject: reject
+          prev: previous
+          next: next
+        submitted: Submitted %{time}
+        no_photos: No photos
+        description: Description
+        specs: Specifications
+        price_context: Price context
+        median_comparison:
+          above: "%{percent}% above the category median (%{median})"
+          below: "%{percent}% below the category median (%{median})"
+          'on': Right at the category median (%{median})
+        median_unavailable: No median for this category yet
+        duplicates:
+          title: Possible duplicates from this seller
+          none: No similar listings found
+          unavailable: Duplicate detection unavailable
+        risky_words:
+          title: Risk words
+          none: None found
+          words:
+          - used
+          - secondhand
+          - refurbished
+          - fake
+          - replica
+          - new
+          - broken
+          - as new
+          - clone
+          - counterfeit
+        decision:
+          title: Decision
+          approve: Approve
+          reject: Reject
+          edit: Edit listing
+          unpublish: Unpublish
+          prev_next_hint: j / k switch between pending listings
+        already_reviewed: This listing was already %{status}.
+    rejections:
+      new:
+        title: 'Reject: %{title}'
+        back: Back to review
+        subtitle: Pick the main reason so the seller knows what to fix.
+        reason_label: Reason
+        note_label: Message to the seller (optional)
+        note_placeholder: What exactly should they change?
+        note_hint: The reason and this note are sent to the seller.
+        submit: Reject listing
+        cancel: Cancel
+      create:
+        reason_required: Pick a rejection reason.
+        rejected: Rejected "%{title}".
+        already_reviewed: This listing was already %{status}.
+      reasons:
+        blurry_photos: Blurry or missing photos
+        missing_info: Missing details
+        prohibited_item: Prohibited item
+        price_misleading: Misleading price
+        duplicate: Duplicate listing
+        wrong_category: Wrong category
+        other: Other
+    approvals:
+      create:
+        approved: Approved "%{title}".
+        already_reviewed: This listing was already %{status}.
+    bulk_moderations:
+      create:
+        done: "%{count} listings approved, %{skipped} skipped."
+        none_done: Nothing to approve.
+        invalid_decision: Unsupported action.
+    unpublications:
+      create:
+        unpublished: Unpublished "%{title}".
+        not_unpublishable: The listing is not public.
+    listings:
+      index:
+        title: Listings
+        subtitle: "%{count} listings"
+        export_csv: Export CSV
+        filters:
+          all_statuses: All statuses
+          all_categories: All categories
+          all_countries: All countries
+          status: Status
+          category: Category
+          country: Country
+          seller: Seller ID
+          min_price: Min price
+          max_price: Max price
+          created_from: From
+          created_to: To
+          has_photos: Photos
+          featured: Featured
+          featured_all: Any
+          featured_active: Active
+          featured_none: Not featured
+          q: Search
+          apply: Filter
+          clear: Clear
+        columns:
+          listing: Listing
+          price: Price
+          status: Status
+          category: Category
+          seller: Seller
+          created: Created
+          actions: Actions
+        featured: Featured
+        actions:
+          view: View
+          edit: Edit
+        empty: No listings match these filters.
+      show:
+        back_to_listings: All listings
+        view_public: View public page
+        free: Free
+        location: Location
+        seller_location: Seller location
+        description: Description
+        moderate: Moderate
+        confirm_delete: Delete "%{title}" permanently? Photos and moderation history
+          are removed.
+        actions:
+          title: Actions
+          edit: Edit
+          unpublish: Unpublish
+          delete: Delete
+      edit:
+        title: 'Edit: %{title}'
+        back: Back to listing
+        subtitle: Changes are logged in the audit trail.
+        status_hint: Setting the status to pending or rejected removes the listing
+          from the marketplace.
+        free_shipping_placeholder: Leave blank to keep the shipping price
+        specs_label: Specifications (JSON)
+        specs_hint: Key/value details shown on the listing page.
+        submit: Save changes
+        cancel: Cancel
+      update:
+        updated: Updated "%{title}".
+      destroy:
+        destroyed: Deleted "%{title}".
+        destroy_denied: This listing cannot be deleted while it has open orders.
+    users:
+      index:
+        title: Users
+        subtitle: "%{count} users"
+        filters:
+          q: Search
+          role: Role
+          all_roles: All roles
+          banned: Ban status
+          banned_yes: Banned
+          banned_no: Active
+          banned_any: Any
+          country: Country
+          all_countries: All countries
+          has_store: Store
+          has_store_yes: With store
+          has_store_no: Without store
+          has_store_any: Any
+          signup_from: Signed up from
+          signup_to: Signed up to
+          apply: Filter
+          clear: Clear
+        columns:
+          user: User
+          email: Email
+          role: Role
+          status: Status
+          country: Country
+          store: Store
+          created: Sign-up
+        roles:
+          admin: Admin
+          user: User
+        badges:
+          banned: Banned
+          anonymized: Anonymised
+          active: Active
+        empty: No users match these filters.
+      show:
+        title: "%{name}"
+        back_to_users: All users
+        view_public_store: Public store page
+        roles:
+          admin: Admin
+        badges:
+          banned: Banned
+          anonymized: Anonymised
+        member_since: Member since %{date}
+        ban:
+          banned_on: Banned %{date}
+          ban: Ban user
+          unban: Lift ban
+        actions:
+          edit: Edit
+          impersonate: Act as this user
+        confirm_impersonate: You will see the site exactly as %{name} does. You can
+          stop at any time from the red banner.
+        store:
+          title: Store
+          manage: Admin store page
+          verified: Verified
+          hidden: Hidden
+        sessions:
+          title: Active sessions
+          empty: No active sessions.
+        listings:
+          title: Listings
+        orders:
+          buyer: As buyer
+          seller: As seller
+          empty: No orders.
+        audit:
+          title: Recent actions on this user
+          columns:
+            action: Action
+            admin: Admin
+            changes: Changes
+            time: Time
+          deleted_admin: "(deleted admin)"
+          empty: No admin actions recorded.
+      update:
+        updated: Updated %{name}.
+      edit:
+        title: Edit %{name}
+        back: Back to user
+        subtitle: All changes are recorded.
+        roles:
+          user: User
+          admin: Admin
+        role_hint: Admins can moderate listings, users and stores.
+        submit: Save changes
+        cancel: Cancel
+    bans:
+      new:
+        title: Ban %{name}
+        back: Back to user
+        warning: Banning archives the public listings, revokes every session and blocks
+          new logins. The ban can be lifted later.
+        reason_label: Reason
+        reason_placeholder: Which rule did they break?
+        reason_hint: The user sees this reason when they try to log in again.
+        submit: Ban user
+        cancel: Cancel
+      create:
+        cannot_ban_self: You cannot ban your own account.
+        banned: "%{name} has been banned."
+      destroy:
+        unbanned: "%{name} has been unbanned."
+    stores:
+      index:
+        title: Stores
+        subtitle: "%{count} stores"
+        filters:
+          q: Search
+          verified: Verification
+          verified_yes: Verified
+          verified_any: Any
+          hidden: Visibility
+          hidden_yes: Hidden
+          visible_yes: Visible
+          hidden_any: Any
+          apply: Filter
+          clear: Clear
+        columns:
+          store: Store
+          owner: Owner
+          listings: Listings
+          rating: Rating
+          badges: Flags
+          created: Created
+          actions: Actions
+        badges:
+          verified: Verified
+          hidden: Hidden
+        actions:
+          view: View
+          edit: Edit
+        empty: No stores match these filters.
+      show:
+        title: "%{name}"
+        back_to_stores: All stores
+        view_public: View public page
+        badges:
+          verified: Verified
+          hidden: Hidden
+          vacation: Vacation mode
+        owner: 'Owner: %{owner}'
+        location: Location
+        counters:
+          listings: Listings
+          sales: Sales
+          followers: Followers
+          rating: Rating
+        recent_listings: Recent listings
+        recent_listings_empty: No listings yet.
+        actions:
+          title: Store actions
+          edit: Edit store
+          verify: Verify store
+          unverify: Remove verification
+          hide: Hide store
+          reveal: Make store visible
+        confirm_hide: Hide this store from the marketplace?
+      update:
+        updated: Store updated.
+      verifications:
+        create:
+          verified: "%{name} is now verified."
+        destroy:
+          unverified: Verification removed from %{name}.
+      hidings:
+        create:
+          hidden: "%{name} is now hidden."
+        destroy:
+          unhidden: "%{name} is visible again."
+    searches:
+      show:
+        title: Results for "%{query}"
+        too_short: Type at least two characters to search.
+        users:
+          title: "%{count} users"
+          empty: No matching users.
+        listings:
+          title: "%{count} listings"
+          empty: No matching listings.
+        orders:
+          title: "%{count} orders"
+          empty: No matching orders.
+        badges:
+          banned: Banned
+    shared:
+      seller_card:
+        seller: Seller
+        view_profile: Open user page
+        member_since: Member since %{date}
+        banned: Banned
+      events:
+        title: Moderation history
+        by: "%{admin} - %{time}"
+        deleted_admin: "(deleted admin)"
+        empty: No moderation events yet.
+  moderation_mailer:
+    approved:
+      subject: Your listing "%{title}" passed moderation
+      greeting: Hi %{name},
+      body: We reviewed "%{title}" and it is now live on PCMarket.
+      view_listing: View listing
+    rejected:
+      subject: Your listing "%{title}" needs changes
+      greeting: Hi %{name},
+      body: We reviewed "%{title}" but it does not meet our listing rules yet.
+      view_listing: View listing
+      edit_hint: You can edit the listing and submit it for review again.

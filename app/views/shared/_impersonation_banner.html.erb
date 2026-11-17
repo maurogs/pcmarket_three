@@ -1,0 +1,15 @@
+<%# Sticky red strip while an admin is browsing as someone else; the stop
+    button POSTs DELETE to admin/users/:id/impersonation (the controller
+    authenticates through the stored impersonator id, so this works even
+    though the guard on other admin routes would 404 for the target). %>
+<% if (target = impersonation_target) %>
+  <div class="sticky top-0 z-50 bg-red-600 text-white" role="alert" data-controller="">
+    <div class="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2 text-sm">
+      <svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+      <p class="font-medium"><%= t("admin.impersonation.banner", name: target.display_name) %></p>
+      <%= button_to t("admin.impersonation.stop"), admin_user_impersonation_path(target),
+            method: :delete,
+            class: "ml-auto rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-red-700 hover:bg-red-50" %>
+    </div>
+  </div>
+<% end %>

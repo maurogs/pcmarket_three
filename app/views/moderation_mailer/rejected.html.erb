@@ -1,0 +1,7 @@
+<p><%= t(".greeting", name: @recipient.display_name) %></p>
+<p><%= t(".body", title: @listing.title) %></p>
+<% if @listing.rejection_reason.present? %>
+  <blockquote><%= @listing.rejection_reason %></blockquote>
+<% end %>
+<p><%= t(".edit_hint") %></p>
+<p><%= link_to t(".view_listing"), edit_sell_listing_url(@listing) %></p>

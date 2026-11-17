@@ -72,7 +72,7 @@
           <label class="flex min-h-11 cursor-pointer items-start gap-3 rounded-lg border border-border bg-surface p-3 transition has-[:checked]:border-primary has-[:checked]:ring-1 has-[:checked]:ring-primary">
             <%= form.radio_button :condition, name, class: "mt-1 size-4 accent-primary" %>
             <span>
-              <span class="block text-sm font-medium text-text"><%= Listing.human_attribute_name("condition.#{name}") %></span>
+              <span class="block text-sm font-medium text-text"><%= Listing.human_attribute_name("condition/#{name}") %></span>
               <span class="mt-0.5 block text-xs text-muted"><%= t("sell.form.condition_explanations.#{name}") %></span>
             </span>
           </label>

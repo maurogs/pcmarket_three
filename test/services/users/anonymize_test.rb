@@ -2,6 +2,8 @@ require "test_helper"
 
 module Users
   class AnonymizeTest < ActiveSupport::TestCase
+    include ActiveJob::TestHelper
+
     setup do
       @user = users(:two)
       Favorite.create!(user: @user, listing: listings(:gigabyte))
@@ -46,6 +48,23 @@ module Users
     test "anonymized users cannot receive e-mail" do
       Users::Anonymize.call(users(:two))
       assert_not users(:two).reload.wants_email?("orders")
+    end
+
+    test "avatar and GDPR export attachments are purged after the commit" do
+      user = users(:two)
+      user.avatar.attach(io: StringIO.new("avatar-bytes"), filename: "me.jpg", content_type: "image/jpeg")
+      user.export.attach(io: StringIO.new(%({"personal":true})), filename: "export.json",
+                         content_type: "application/json")
+      user.reload
+
+      Users::Anonymize.call(user)
+
+      assert_equal 2, enqueued_jobs.count { |job| job["job_class"] == "ActiveStorage::PurgeJob" }
+      perform_enqueued_jobs
+
+      user.reload
+      assert_not user.avatar.attached?
+      assert_not user.export.attached?
     end
   end
 end

@@ -1,0 +1,102 @@
+<% content_for :title, t(".title") %>
+
+<h1 class="text-xl font-bold"><%= t(".title") %></h1>
+<p class="mb-4 mt-1 text-sm text-muted">
+  <%= t(".subtitle", count: @pagy.count) %>
+</p>
+
+<%# --- queue filters ------------------------------------------------------ %>
+<form action="<%= admin_moderations_path %>" method="get" class="card mb-4 flex flex-wrap items-end gap-3 p-3">
+  <label class="text-xs font-medium text-muted">
+    <span><%= t(".filters.category") %></span>
+    <%= select_tag :category,
+          options_for_select(Category.roots.active.ordered.flat_map { |root|
+            [[ root.name, root.slug, { "data-depth" => 0 } ]].concat(
+              root.children.map { |child| [ "&nbsp;&nbsp;&nbsp;#{child.name}", child.slug ] })
+          }, @filter_category&.slug),
+          include_blank: t(".filters.all"), class: "input mt-1 block text-sm" %>
+  </label>
+
+  <label class="text-xs font-medium text-muted">
+    <span><%= t(".filters.country") %></span>
+    <%= select_tag :country,
+          options_for_select(Country.enabled.order(:code).map { |c| [ t("countries.#{c.code.downcase}"), c.code ] },
+                             @filter_country),
+          include_blank: t(".filters.all"), class: "input mt-1 block text-sm" %>
+  </label>
+
+  <label class="text-xs font-medium text-muted">
+    <span><%= t(".filters.seller") %></span>
+    <%= text_field_tag :seller, @filter_seller, class: "input mt-1 block text-sm", autocomplete: "off" %>
+  </label>
+
+  <div class="flex items-center gap-2">
+    <button type="submit" class="btn-primary"><%= t(".filters.apply") %></button>
+    <% if @filter_category || @filter_country || @filter_seller %>
+      <%= link_to t(".filters.clear"), admin_moderations_path, class: "btn-secondary" %>
+    <% end %>
+  </div>
+</form>
+
+<% if @listings.any? %>
+  <%# Bulk approval: check rows, submit; rejections always go through the
+      reason form one listing at a time. %>
+  <%= form_with url: admin_bulk_moderation_path, method: :post,
+        data: { turbo_confirm: t(".bulk_confirm") } do |form| %>
+    <%= hidden_field_tag :decision, "approve" %>
+
+    <div class="card mb-3 flex flex-wrap items-center justify-between gap-3 p-3">
+      <p class="text-sm text-muted"><%= t(".bulk_hint", count: @pagy.count) %></p>
+      <div class="flex items-center gap-2">
+        <%= form.submit t(".bulk_approve"), class: "btn-primary" %>
+      </div>
+    </div>
+
+    <div class="card overflow-x-auto">
+      <table class="admin-table w-full min-w-[720px] text-sm">
+        <thead>
+          <tr>
+            <th scope="col" class="w-10">
+              <span class="sr-only"><%= t(".bulk_select") %></span>
+            </th>
+            <th scope="col"><%= t(".columns.listing") %></th>
+            <th scope="col"><%= t(".columns.price") %></th>
+            <th scope="col"><%= t(".columns.category") %></th>
+            <th scope="col"><%= t(".columns.seller") %></th>
+            <th scope="col"><%= t(".columns.photos") %></th>
+            <th scope="col"><%= t(".columns.waited") %></th>
+            <th scope="col"><span class="sr-only"><%= t(".columns.actions") %></span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @listings.each do |listing| %>
+            <tr>
+              <td>
+                <%= check_box_tag "listing_ids[]", listing.id, false, title: t(".bulk_select_one") %>
+              </td>
+              <td class="max-w-[16rem]">
+                <%= link_to listing.title, admin_moderation_path(listing),
+                      class: "font-medium hover:text-primary hover:underline" %>
+                <p class="truncate text-xs text-muted"><%= listing.created_at.strftime("%Y-%m-%d %H:%M") %></p>
+              </td>
+              <td class="whitespace-nowrap"><%= money(listing.price_cents, listing.currency) %></td>
+              <td class="text-muted"><%= listing.category&.name %></td>
+              <td><%= listing.user&.username %></td>
+              <td class="text-muted"><%= listing.photos.size %></td>
+              <td class="whitespace-nowrap text-muted"><%= time_ago_in_words(listing.created_at) %></td>
+              <td class="text-right">
+                <%= link_to t(".review"), admin_moderation_path(listing), class: "btn-secondary" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+
+  <div class="mt-4"><%= results_pagination(@pagy) %></div>
+<% else %>
+  <div class="card p-6 text-center text-sm text-muted">
+    <%= t(".empty") %>
+  </div>
+<% end %>

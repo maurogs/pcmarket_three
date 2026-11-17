@@ -122,6 +122,39 @@ Rails.application.routes.draw do
       resource :dispute, only: :create
       resource :review, only: %i[new create]
     end
+
+    # Admin area (Phase 6a). Non-admins 404 on every route (see
+    # Admin::BaseController — a 403 would confirm the panel exists).
+    # Moderation steps are nested singular resources on listings (POST
+    # creates the transition), matching the project convention; the
+    # impersonation `destroy` is reachable while impersonating because its
+    # controller skips the admin guard for that one verb.
+    namespace :admin do
+      root to: "dashboards#show"
+
+      resource :dashboard, only: :show
+      resource :search, only: :show
+
+      # Moderation queue (oldest pending first).
+      resources :moderations, only: %i[index show]
+
+      resources :listings, only: %i[index show edit update destroy] do
+        resource :approval, only: :create
+        resource :rejection, only: %i[new create]
+        resource :unpublication, only: :create
+      end
+      resource :bulk_moderation, only: :create
+
+      resources :users, only: %i[index show edit update] do
+        resource :ban, only: %i[new create destroy]
+        resource :impersonation, only: %i[create destroy]
+      end
+
+      resources :stores, only: %i[index show edit update] do
+        resource :verification, only: %i[create destroy]
+        resource :hiding, only: %i[create destroy]
+      end
+    end
   end
 
   # Stripe webhook endpoint: no locale segment, no session, CSRF-skipped

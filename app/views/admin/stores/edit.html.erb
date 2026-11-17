@@ -1,0 +1,57 @@
+<% content_for :title, t(".title", name: @store.name) %>
+
+<div class="mx-auto max-w-2xl">
+  <%= link_to t(".back"), admin_store_path(@store), class: "text-sm font-medium text-muted hover:text-primary hover:underline" %>
+  <h1 class="mt-2 text-xl font-bold"><%= t(".title", name: @store.name) %></h1>
+  <p class="mb-4 mt-1 text-sm text-muted"><%= t(".subtitle") %></p>
+
+  <%= form_with model: @store, url: admin_store_path(@store), method: :patch do |form| %>
+    <% if @store.errors.any? %>
+      <div class="mb-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300" role="alert">
+        <ul class="list-inside list-disc">
+          <% @store.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="card space-y-4 p-4">
+      <div>
+        <%= form.label :name, class: "block text-sm font-medium" %>
+        <%= form.text_field :name, class: "input mt-1 w-full", required: true %>
+      </div>
+
+      <div>
+        <%= form.label :description, class: "block text-sm font-medium" %>
+        <%= form.text_area :description, rows: 4, maxlength: 2000, class: "input mt-1 w-full" %>
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div>
+          <%= form.label :city, class: "block text-sm font-medium" %>
+          <%= form.text_field :city, class: "input mt-1 w-full" %>
+        </div>
+        <div>
+          <%= form.label :region, class: "block text-sm font-medium" %>
+          <%= form.text_field :region, class: "input mt-1 w-full" %>
+        </div>
+      </div>
+
+      <div>
+        <%= form.label :returns_policy, class: "block text-sm font-medium" %>
+        <%= form.text_area :returns_policy, rows: 3, class: "input mt-1 w-full" %>
+      </div>
+
+      <div>
+        <%= form.label :shipping_policy, class: "block text-sm font-medium" %>
+        <%= form.text_area :shipping_policy, rows: 3, class: "input mt-1 w-full" %>
+      </div>
+    </div>
+
+    <div class="mt-4 flex items-center gap-2">
+      <%= form.submit t(".submit"), class: "btn-primary" %>
+      <%= link_to t(".cancel"), admin_store_path(@store), class: "btn-secondary" %>
+    </div>
+  <% end %>
+</div>

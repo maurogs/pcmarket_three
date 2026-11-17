@@ -79,11 +79,11 @@ class ListingsHelperTest < ActionView::TestCase
 
   test "condition_label humanises the enum key through the locale" do
     I18n.with_locale(:en) do
-      assert_equal "Used like new", condition_label(listings(:as_new))
+      assert_equal "Used – like new", condition_label(listings(:as_new))
     end
     I18n.with_locale(:es) do
-      assert_equal condition_label(listings(:as_new)),
-                   Listing.human_attribute_name("condition.used_like_new", locale: :es)
+      assert_equal Listing.human_attribute_name("condition/used_like_new", locale: :es),
+                   condition_label(listings(:as_new))
     end
   end
 end

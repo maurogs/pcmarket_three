@@ -1,0 +1,75 @@
+<% content_for :title, t(".title") %>
+
+<h1 class="text-xl font-bold"><%= t(".title") %></h1>
+<p class="mb-4 mt-1 text-sm text-muted"><%= t(".subtitle", count: @pagy.count) %></p>
+
+<form action="<%= admin_stores_path %>" method="get" class="card mb-4 flex flex-wrap items-end gap-3 p-3">
+  <%= search_field_tag :q, params[:q], placeholder: t(".filters.q"), class: "input text-sm" %>
+
+  <%= select_tag :verified,
+        options_for_select([ [ t(".filters.verified_yes"), "yes" ] ], params[:verified]),
+        include_blank: t(".filters.verified_any"), class: "input text-sm", aria: { label: t(".filters.verified") } %>
+
+  <%= select_tag :hidden,
+        options_for_select([ [ t(".filters.hidden_yes"), "yes" ], [ t(".filters.visible_yes"), "visible" ] ], params[:hidden]),
+        include_blank: t(".filters.hidden_any"), class: "input text-sm", aria: { label: t(".filters.hidden") } %>
+
+  <div class="flex items-center gap-2">
+    <button type="submit" class="btn-primary"><%= t(".filters.apply") %></button>
+    <%= link_to t(".filters.clear"), admin_stores_path, class: "btn-secondary" %>
+  </div>
+</form>
+
+<% if @stores.any? %>
+  <div class="card overflow-x-auto">
+    <table class="admin-table w-full min-w-[760px] text-sm">
+      <thead>
+        <tr>
+          <th scope="col"><%= t(".columns.store") %></th>
+          <th scope="col"><%= t(".columns.owner") %></th>
+          <th scope="col"><%= t(".columns.listings") %></th>
+          <th scope="col"><%= t(".columns.rating") %></th>
+          <th scope="col"><%= t(".columns.badges") %></th>
+          <th scope="col"><%= t(".columns.created") %></th>
+          <th scope="col"><span class="sr-only"><%= t(".columns.actions") %></span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @stores.each do |store| %>
+          <tr>
+            <td class="max-w-[16rem]">
+              <%= link_to store.name, admin_store_path(store), class: "font-medium hover:text-primary hover:underline" %>
+              <span class="block truncate text-xs text-muted"><%= store.slug %></span>
+            </td>
+            <td><%= store.user&.username %></td>
+            <td class="text-muted"><%= number_with_delimiter(store.listings_count) %></td>
+            <td class="text-muted">
+              <% if store.rating_average %>
+                ★ <%= "%.1f" % store.rating_average %> <span class="text-xs">(<%= store.reviews_count %>)</span>
+              <% else %>
+                —
+              <% end %>
+            </td>
+            <td class="space-x-1">
+              <% if store.verified %>
+                <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"><%= t(".badges.verified") %></span>
+              <% end %>
+              <% if store.hidden %>
+                <span class="rounded-full bg-rose-100 px-2 py-0.5 text-xs font-medium text-rose-800 dark:bg-rose-950 dark:text-rose-300"><%= t(".badges.hidden") %></span>
+              <% end %>
+            </td>
+            <td class="whitespace-nowrap text-muted"><%= l(store.created_at.to_date, format: :delivery) %></td>
+            <td class="whitespace-nowrap text-right">
+              <%= link_to t(".actions.view"), admin_store_path(store), class: "btn-secondary" %>
+              <%= link_to t(".actions.edit"), edit_admin_store_path(store), class: "btn-secondary" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-4"><%= results_pagination(@pagy) %></div>
+<% else %>
+  <div class="card p-6 text-center text-sm text-muted"><%= t(".empty") %></div>
+<% end %>

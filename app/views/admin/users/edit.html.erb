@@ -1,0 +1,64 @@
+<% content_for :title, t(".title", name: @user.display_name) %>
+
+<div class="mx-auto max-w-2xl">
+  <%= link_to t(".back"), admin_user_path(@user), class: "text-sm font-medium text-muted hover:text-primary hover:underline" %>
+  <h1 class="mt-2 text-xl font-bold"><%= t(".title", name: @user.display_name) %></h1>
+  <p class="mb-4 mt-1 text-sm text-muted"><%= t(".subtitle") %></p>
+
+  <%= form_with model: @user, url: admin_user_path(@user), method: :patch do |form| %>
+    <% if @user.errors.any? %>
+      <div class="mb-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300" role="alert">
+        <ul class="list-inside list-disc">
+          <% @user.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="card space-y-4 p-4">
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div>
+          <%= form.label :first_name, class: "block text-sm font-medium" %>
+          <%= form.text_field :first_name, class: "input mt-1 w-full" %>
+        </div>
+        <div>
+          <%= form.label :last_name, class: "block text-sm font-medium" %>
+          <%= form.text_field :last_name, class: "input mt-1 w-full" %>
+        </div>
+        <div>
+          <%= form.label :username, class: "block text-sm font-medium" %>
+          <%= form.text_field :username, class: "input mt-1 w-full", required: true %>
+        </div>
+        <div>
+          <%= form.label :email_address, class: "block text-sm font-medium" %>
+          <%= form.email_field :email_address, class: "input mt-1 w-full", required: true %>
+        </div>
+        <div>
+          <%= form.label :country_code, class: "block text-sm font-medium" %>
+          <%= form.select :country_code,
+                Country.enabled.order(:code).map { |c| [ t("countries.#{c.code.downcase}"), c.code ] },
+                {}, class: "input mt-1 w-full" %>
+        </div>
+        <div>
+          <%= form.label :locale, class: "block text-sm font-medium" %>
+          <%= form.select :locale,
+                I18n.available_locales.map { |code| [ t("locales.#{code}"), code ] },
+                {}, class: "input mt-1 w-full" %>
+        </div>
+        <div>
+          <%= form.label :role, class: "block text-sm font-medium" %>
+          <%= form.select :role,
+                User.roles.keys.map { |r| [ t(".roles.#{r}"), r ] },
+                {}, class: "input mt-1 w-full" %>
+          <p class="mt-1 text-xs text-muted"><%= t(".role_hint") %></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-4 flex items-center gap-2">
+      <%= form.submit t(".submit"), class: "btn-primary" %>
+      <%= link_to t(".cancel"), admin_user_path(@user), class: "btn-secondary" %>
+    </div>
+  <% end %>
+</div>

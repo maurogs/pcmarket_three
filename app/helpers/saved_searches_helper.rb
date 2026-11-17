@@ -7,7 +7,7 @@ module SavedSearchesHelper
     parts << t("saved_searches.summary.quoted_query", query: saved_search.query) if saved_search.query.present?
     parts << saved_search.category.name if saved_search.category
     if filters["condition"].present?
-      parts << Listing.human_attribute_name("condition.#{filters['condition']}")
+      parts << Listing.human_attribute_name("condition/#{filters['condition']}")
     end
     parts << saved_search_price_range(filters)
     parts << Label.where(slug: filters["labels"]).pluck(:name).join(", ") if filters["labels"].present?

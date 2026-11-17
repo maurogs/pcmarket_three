@@ -4,5 +4,7 @@ class ModerationEvent < ApplicationRecord
   belongs_to :listing
   belongs_to :admin, class_name: "User"
 
+  scope :recent, -> { order(created_at: :desc, id: :desc) }
+
   validates :action, presence: true
 end

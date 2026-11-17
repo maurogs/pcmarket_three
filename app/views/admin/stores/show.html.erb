@@ -1,0 +1,109 @@
+<% content_for :title, t(".title", name: @store.name) %>
+
+<div class="mb-4 flex flex-wrap items-center gap-3">
+  <%= link_to t(".back_to_stores"), admin_stores_path, class: "text-sm font-medium text-muted hover:text-primary hover:underline" %>
+  <% unless @store.hidden %>
+    <%= link_to t(".view_public"), store_path(@store), class: "text-sm font-medium text-primary hover:underline" %>
+  <% end %>
+</div>
+
+<div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
+  <div class="min-w-0 space-y-4">
+    <article class="card p-4">
+      <div class="flex flex-wrap items-start justify-between gap-3">
+        <h1 class="text-lg font-bold"><%= @store.name %></h1>
+        <div class="flex gap-2">
+          <% if @store.verified %>
+            <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"><%= t(".badges.verified") %></span>
+          <% end %>
+          <% if @store.hidden %>
+            <span class="rounded-full bg-rose-100 px-2 py-0.5 text-xs font-medium text-rose-800 dark:bg-rose-950 dark:text-rose-300"><%= t(".badges.hidden") %></span>
+          <% end %>
+          <% if @store.vacation_mode %>
+            <span class="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800"><%= t(".badges.vacation") %></span>
+          <% end %>
+        </div>
+      </div>
+      <p class="mt-1 text-xs text-muted">/<%= @store.slug %> · <%= t(".owner", owner: @store.user&.username) %></p>
+
+      <% if @store.description.present? %>
+        <h2 class="mt-4 text-sm font-semibold"><%= Store.human_attribute_name("description") %></h2>
+        <div class="mt-1 whitespace-pre-line text-sm"><%= @store.description %></div>
+      <% end %>
+
+      <dl class="mt-4 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
+        <div>
+          <dt class="text-xs text-muted"><%= t(".location") %></dt>
+          <dd><%= [ @store.city, @store.region ].compact_blank.join(", ").presence || "—" %></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted"><%= Store.human_attribute_name("vat_number") %></dt>
+          <dd><%= @store.vat_number.presence || "—" %></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted"><%= Store.human_attribute_name("returns_policy") %></dt>
+          <dd class="whitespace-pre-line"><%= @store.returns_policy.presence || "—" %></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted"><%= Store.human_attribute_name("shipping_policy") %></dt>
+          <dd class="whitespace-pre-line"><%= @store.shipping_policy.presence || "—" %></dd>
+        </div>
+      </dl>
+
+      <dl class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <% [ [ t(".counters.listings"), @store.listings_count ],
+             [ t(".counters.sales"), @store.sales_count ],
+             [ t(".counters.followers"), @store.followers_count ],
+             [ t(".counters.rating"), @store.rating_average ? "★ %.1f (%d)" % [ @store.rating_average, @store.reviews_count ] : "—" ] ].each do |label, value| %>
+          <div class="rounded-md bg-surface-muted px-3 py-2">
+            <dt class="text-xs text-muted"><%= label %></dt>
+            <dd class="text-lg font-bold"><%= value %></dd>
+          </div>
+        <% end %>
+      </dl>
+    </article>
+
+    <section class="card p-4">
+      <h2 class="mb-3 text-sm font-semibold text-muted"><%= t(".recent_listings") %></h2>
+      <% if @listings.any? %>
+        <ul class="space-y-2 text-sm">
+          <% @listings.each do |listing| %>
+            <li class="flex items-center justify-between gap-2">
+              <span class="min-w-0 truncate">
+                <%= link_to listing.title, admin_listing_path(listing), class: "font-medium hover:text-primary hover:underline" %>
+              </span>
+              <span class="shrink-0 rounded-full px-2 py-0.5 text-xs font-medium <%= status_badge_class(listing.status) %>">
+                <%= Listing.human_attribute_name("status/#{listing.status}") %>
+              </span>
+              <span class="shrink-0 text-xs text-muted"><%= money(listing.price_cents, listing.currency) %></span>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="text-sm text-muted"><%= t(".recent_listings_empty") %></p>
+      <% end %>
+    </section>
+  </div>
+
+  <div class="space-y-4 lg:sticky lg:top-4 lg:self-start">
+    <section class="card p-4">
+      <h2 class="mb-3 text-sm font-semibold"><%= t(".actions.title") %></h2>
+      <div class="grid gap-2">
+        <%= link_to t(".actions.edit"), edit_admin_store_path(@store), class: "btn-secondary w-full" %>
+
+        <% if @store.verified %>
+          <%= button_to t(".actions.unverify"), admin_store_verification_path(@store), method: :delete, class: "btn-secondary w-full" %>
+        <% else %>
+          <%= button_to t(".actions.verify"), admin_store_verification_path(@store), method: :post, class: "btn-primary w-full" %>
+        <% end %>
+
+        <% if @store.hidden %>
+          <%= button_to t(".actions.reveal"), admin_store_hiding_path(@store), method: :delete, class: "btn-primary w-full" %>
+        <% else %>
+          <%= button_to t(".actions.hide"), admin_store_hiding_path(@store), method: :post,
+                class: "btn-secondary w-full", form: { data: { turbo_confirm: t(".confirm_hide") } } %>
+        <% end %>
+      </div>
+    </section>
+  </div>
+</div>

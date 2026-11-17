@@ -24,12 +24,19 @@ module Users
     def call
       raise OpenOrderError if self.class.open_orders_count(user) > 0
 
+      # Collected BEFORE the transaction so a rollback keeps every attachment;
+      # purge_later runs after the commit (never inside the transaction —
+      # see the Listings photo-purge regression in the sell tests).
+      attachments = [ user.avatar, user.export ].select(&:attached?)
+
       ActiveRecord::Base.transaction do
-        user.avatar.purge
         anonymize_columns
         destroy_related_records
         archive_listings
       end
+
+      # Avatar AND the GDPR export artifact both hold personal data.
+      attachments.each(&:purge_later)
       user
     end
 

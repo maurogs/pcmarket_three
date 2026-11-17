@@ -107,6 +107,16 @@ class ApplicationController < ActionController::Base
       @current_country_code ||= Country.enabled.order(:code).first&.code || "ES"
     end
 
+    # Impersonation (Phase 6a admin support): while an admin "logs in as" a
+    # user, the cookie session carries the impersonator's id and the current
+    # user is the target. Drives the sticky red banner everywhere.
+    def impersonation_target
+      return unless session[:impersonated_user_id]
+
+      @impersonation_target ||= User.find_by(id: session[:impersonated_user_id])
+    end
+    helper_method :impersonation_target
+
     BOT_USER_AGENT = /bot|crawl|spider|slurp|headless|preview|facebookexternalhit|curl|wget|python|monitor/i
 
     def bot_request?

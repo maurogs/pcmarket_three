@@ -1,0 +1,3 @@
+<p><%= t(".greeting", name: @recipient.display_name) %></p>
+<p><%= t(".body", title: @listing.title) %></p>
+<p><%= link_to t(".view_listing"), listing_url(@listing) %></p>

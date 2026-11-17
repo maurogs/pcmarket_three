@@ -1,0 +1,109 @@
+<% content_for :title, t(".title") %>
+
+<div class="mb-4 flex flex-wrap items-end justify-between gap-3">
+  <div>
+    <h1 class="text-xl font-bold"><%= t(".title") %></h1>
+    <p class="mt-1 text-sm text-muted"><%= t(".subtitle", count: @pagy.count) %></p>
+  </div>
+  <%# Same filter set as the page; export streams the whole filtered set. %>
+  <%= link_to t(".export_csv"), admin_listings_path(request.query_parameters.merge(format: "csv")),
+        class: "btn-secondary" %>
+</div>
+
+<%# --- filters ------------------------------------------------------------%>
+<form action="<%= admin_listings_path %>" method="get" class="card mb-4 grid gap-3 p-3 sm:grid-cols-2 lg:grid-cols-4">
+  <% status_options = Listing.statuses.keys.map { |s| [ Listing.human_attribute_name("status/#{s}"), s ] } %>
+  <%= select_tag :status, options_for_select(status_options, @filter[:status]),
+        include_blank: t(".filters.all_statuses"), class: "input text-sm",
+        aria: { label: t(".filters.status") } %>
+
+  <%= select_tag :category,
+        options_for_select(Category.roots.active.ordered.map { |r| [ r.name, r.slug ] }, @filter[:category]),
+        include_blank: t(".filters.all_categories"), class: "input text-sm",
+        aria: { label: t(".filters.category") } %>
+
+  <%= select_tag :country,
+        options_for_select(Country.enabled.order(:code).map { |c| [ t("countries.#{c.code.downcase}"), c.code ] },
+                           @filter[:country]),
+        include_blank: t(".filters.all_countries"), class: "input text-sm",
+        aria: { label: t(".filters.country") } %>
+
+  <%= text_field_tag :seller, @filter[:seller], placeholder: t(".filters.seller"), class: "input text-sm" %>
+
+  <%= number_field_tag :min_price, @filter[:min_price], placeholder: t(".filters.min_price"), step: 0.01, min: 0, class: "input text-sm" %>
+  <%= number_field_tag :max_price, @filter[:max_price], placeholder: t(".filters.max_price"), step: 0.01, min: 0, class: "input text-sm" %>
+
+  <%= date_field_tag :created_from, @filter[:created_from], "aria-label": t(".filters.created_from"), class: "input text-sm" %>
+  <%= date_field_tag :created_to, @filter[:created_to], "aria-label": t(".filters.created_to"), class: "input text-sm" %>
+
+  <%= check_box_tag :has_photos, "1", @filter[:has_photos] == "1", class: "size-4 accent-indigo-600", id: "filter-photos" %>
+  <label for="filter-photos" class="text-sm"><%= t(".filters.has_photos") %></label>
+
+  <%= select_tag :featured,
+        options_for_select([ [ t(".filters.featured_active"), "active" ],
+                             [ t(".filters.featured_none"), "none" ] ], @filter[:featured]),
+        include_blank: t(".filters.featured_all"), class: "input text-sm",
+        aria: { label: t(".filters.featured") } %>
+
+  <%= search_field_tag :q, @filter[:q], placeholder: t(".filters.q"), class: "input text-sm" %>
+
+  <div class="flex items-center gap-2">
+    <button type="submit" class="btn-primary"><%= t(".filters.apply") %></button>
+    <%= link_to t(".filters.clear"), admin_listings_path, class: "btn-secondary" %>
+  </div>
+</form>
+
+<% if @listings.any? %>
+  <div class="card overflow-x-auto">
+    <table class="admin-table w-full min-w-[820px] text-sm">
+      <thead>
+        <tr>
+          <th scope="col"><%= t(".columns.listing") %></th>
+          <th scope="col"><%= t(".columns.price") %></th>
+          <th scope="col"><%= t(".columns.status") %></th>
+          <th scope="col"><%= t(".columns.category") %></th>
+          <th scope="col"><%= t(".columns.seller") %></th>
+          <th scope="col"><%= t(".columns.created") %></th>
+          <th scope="col"><span class="sr-only"><%= t(".columns.actions") %></span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @listings.each do |listing| %>
+          <tr>
+            <td class="max-w-[18rem]">
+              <div class="flex items-center gap-2">
+                <% if listing.photos.attached? %>
+                  <%= photo_variant_tag listing.photos.first, variant: :card, alt: "",
+                        class: "h-10 w-10 shrink-0 rounded object-cover" %>
+                <% end %>
+                <span class="min-w-0">
+                  <%= link_to listing.title, admin_listing_path(listing), class: "font-medium hover:text-primary hover:underline" %>
+                  <% if listing.featured_until.present? && listing.featured_until.future? %>
+                    <span class="ml-1 rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-semibold text-accent"><%= t(".featured") %></span>
+                  <% end %>
+                </span>
+              </div>
+            </td>
+            <td class="whitespace-nowrap"><%= money(listing.price_cents, listing.currency) %></td>
+            <td>
+              <span class="rounded-full px-2 py-0.5 text-xs font-medium <%= status_badge_class(listing.status) %>">
+                <%= Listing.human_attribute_name("status/#{listing.status}") %>
+              </span>
+            </td>
+            <td class="text-muted"><%= listing.category&.name %></td>
+            <td><%= listing.user&.username %></td>
+            <td class="whitespace-nowrap text-muted"><%= l(listing.created_at.to_date, format: :delivery) %></td>
+            <td class="whitespace-nowrap text-right">
+              <%= link_to t(".actions.view"), admin_listing_path(listing), class: "btn-secondary" %>
+              <%= link_to t(".actions.edit"), edit_admin_listing_path(listing), class: "btn-secondary" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-4"><%= results_pagination(@pagy) %></div>
+<% else %>
+  <div class="card p-6 text-center text-sm text-muted"><%= t(".empty") %></div>
+<% end %>

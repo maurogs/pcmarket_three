@@ -1,0 +1,88 @@
+<% content_for :title, t(".title") %>
+
+<h1 class="text-xl font-bold"><%= t(".title") %></h1>
+<p class="mb-4 mt-1 text-sm text-muted"><%= t(".subtitle", count: @pagy.count) %></p>
+
+<%# --- filters ------------------------------------------------------------%>
+<form action="<%= admin_users_path %>" method="get" class="card mb-4 grid gap-3 p-3 sm:grid-cols-2 lg:grid-cols-4">
+  <%= search_field_tag :q, params[:q], placeholder: t(".filters.q"), class: "input text-sm" %>
+
+  <%= select_tag :role,
+        options_for_select(User.roles.keys.map { |r| [ t(".roles.#{r}"), r ] }, params[:role]),
+        include_blank: t(".filters.all_roles"), class: "input text-sm", aria: { label: t(".filters.role") } %>
+
+  <%= select_tag :banned,
+        options_for_select([ [ t(".filters.banned_yes"), "yes" ], [ t(".filters.banned_no"), "no" ] ], params[:banned]),
+        include_blank: t(".filters.banned_any"), class: "input text-sm", aria: { label: t(".filters.banned") } %>
+
+  <%= select_tag :country,
+        options_for_select(Country.enabled.order(:code).map { |c| [ t("countries.#{c.code.downcase}"), c.code ] },
+                           params[:country]),
+        include_blank: t(".filters.all_countries"), class: "input text-sm", aria: { label: t(".filters.country") } %>
+
+  <%= select_tag :has_store,
+        options_for_select([ [ t(".filters.has_store_yes"), "yes" ], [ t(".filters.has_store_no"), "no" ] ], params[:has_store]),
+        include_blank: t(".filters.has_store_any"), class: "input text-sm", aria: { label: t(".filters.has_store") } %>
+
+  <%= date_field_tag :signup_from, params[:signup_from], "aria-label": t(".filters.signup_from"), class: "input text-sm" %>
+  <%= date_field_tag :signup_to, params[:signup_to], "aria-label": t(".filters.signup_to"), class: "input text-sm" %>
+
+  <div class="flex items-center gap-2">
+    <button type="submit" class="btn-primary"><%= t(".filters.apply") %></button>
+    <%= link_to t(".filters.clear"), admin_users_path, class: "btn-secondary" %>
+  </div>
+</form>
+
+<% if @users.any? %>
+  <div class="card overflow-x-auto">
+    <table class="admin-table w-full min-w-[760px] text-sm">
+      <thead>
+        <tr>
+          <th scope="col"><%= t(".columns.user") %></th>
+          <th scope="col"><%= t(".columns.email") %></th>
+          <th scope="col"><%= t(".columns.role") %></th>
+          <th scope="col"><%= t(".columns.status") %></th>
+          <th scope="col"><%= t(".columns.country") %></th>
+          <th scope="col"><%= t(".columns.store") %></th>
+          <th scope="col"><%= t(".columns.created") %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @users.each do |user| %>
+          <tr>
+            <td class="max-w-[16rem]">
+              <span class="min-w-0">
+                <%= link_to user.display_name, admin_user_path(user), class: "font-medium hover:text-primary hover:underline" %>
+                <span class="block truncate text-xs text-muted">@<%= user.username %></span>
+              </span>
+            </td>
+            <td class="text-muted"><%= user.email_address %></td>
+            <td>
+              <% if user.admin? %>
+                <span class="rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300"><%= t(".roles.admin") %></span>
+              <% else %>
+                <span class="rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium"><%= t(".roles.user") %></span>
+              <% end %>
+            </td>
+            <td>
+              <% if user.banned? %>
+                <span class="rounded-full bg-rose-100 px-2 py-0.5 text-xs font-medium text-rose-800 dark:bg-rose-950 dark:text-rose-300"><%= t(".badges.banned") %></span>
+              <% elsif user.deleted? %>
+                <span class="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600"><%= t(".badges.anonymized") %></span>
+              <% else %>
+                <span class="text-xs text-muted"><%= t(".badges.active") %></span>
+              <% end %>
+            </td>
+            <td class="text-muted"><%= user.country_code %></td>
+            <td class="text-muted"><%= user.store ? user.store.name : "—" %></td>
+            <td class="whitespace-nowrap text-muted"><%= l(user.created_at.to_date, format: :delivery) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-4"><%= results_pagination(@pagy) %></div>
+<% else %>
+  <div class="card p-6 text-center text-sm text-muted"><%= t(".empty") %></div>
+<% end %>

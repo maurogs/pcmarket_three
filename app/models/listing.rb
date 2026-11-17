@@ -103,6 +103,11 @@ class Listing < ApplicationRecord
     where(user_id: user.id, status: :rejected).order(updated_at: :desc, id: :desc)
   }
 
+  # Has at least one photo attachment (admin index filter).
+  scope :with_photos, -> {
+    where(id: ActiveStorage::Attachment.where(record_type: "Listing", name: "photos").select(:record_id))
+  }
+
   # Everything a card needs in one round trip: photo attachments plus the
   # store/user/labels/category rendered on the card. Use on every relation that
   # renders cards.
@@ -140,6 +145,40 @@ class Listing < ApplicationRecord
       .where.not(id: listing.id)
       .order(published_at: :desc, id: :desc)
       .limit(limit)
+  end
+
+  # --- Admin moderation aids (Phase 6a) -------------------------------------
+
+  # pg_trgm powers the queue's duplicate-title warning; the extension is
+  # added by migration 20261118010001, but the check keeps the query safe
+  # on databases where it is missing.
+  def self.trgm_available?
+    return @trgm_available if defined?(@trgm_available)
+
+    @trgm_available = connection.select_value(
+      "SELECT 1 FROM pg_extension WHERE extname = 'pg_trgm'"
+    ) == 1
+  end
+
+  # The seller's other listings with trigram-similar titles (duplicate
+  # warning on the moderation page); empty when pg_trgm is unavailable.
+  def self.potential_duplicates_of(listing, threshold: 0.6, limit: 5)
+    return none unless trgm_available? && listing.title.present?
+
+    where(user_id: listing.user_id)
+      .where.not(id: listing.id)
+      .where("similarity(title, ?) >= ?", listing.title, threshold)
+      .order(Arel.sql(sanitize_sql_array([ "similarity(title, ?) DESC", listing.title ])))
+      .limit(limit)
+  end
+
+  # Median approved price in the listing's category (other listings only),
+  # integer cents; nil when the category has no comparables.
+  def self.category_median_price_cents(listing)
+    where(category_id: listing.category_id, status: :approved)
+      .where.not(id: listing.id)
+      .pick(Arel.sql("percentile_cont(0.5) WITHIN GROUP (ORDER BY price_cents)"))
+      &.round
   end
 
   # Recompute every listing's search vector. Rails' fixture inserts go through
@@ -282,8 +321,8 @@ class Listing < ApplicationRecord
     return if from.map(&:to_s).include?(status.to_s)
 
     raise InvalidTransition,
-          I18n.t("listings.transition.invalid", from: self.class.human_attribute_name("status.#{status}"),
-                                                 to: self.class.human_attribute_name("status.#{to}"))
+          I18n.t("listings.transition.invalid", from: self.class.human_attribute_name("status/#{status}"),
+                                                 to: self.class.human_attribute_name("status/#{to}"))
   end
 
   def slug_candidates

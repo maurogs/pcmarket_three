@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title><%= content_for?(:title) ? yield(:title) : t(".title") %></title>
+    <meta name="robots" content="noindex">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="bg-surface text-text antialiased" data-controller="rail theme">
+    <div class="flex min-h-dvh">
+      <aside class="admin-rail" data-rail-target="rail">
+        <div class="flex items-center gap-2 px-3 py-4">
+          <%= link_to admin_dashboard_path, class: "flex min-w-0 items-center gap-2" do %>
+            <span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary text-white font-bold">P</span>
+            <span class="admin-rail__label truncate text-lg font-bold tracking-tight">PCMarket</span>
+          <% end %>
+          <button type="button" class="admin-rail__toggle ml-auto" data-action="rail#toggle"
+                  aria-label="<%= t(".toggle_nav") %>">
+            <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+            </svg>
+          </button>
+        </div>
+
+        <nav aria-label="<%= t(".nav_label") %>" class="mt-2 flex-1 px-2">
+          <ul class="space-y-1">
+            <% pending = admin_pending_count %>
+            <% Admin::SidebarHelper::ADMIN_NAV.each do |section, label_key, icon_key| %>
+              <%= admin_nav_item section, label_key, icon_key,
+                    badge: (pending.positive? && section == "admin/moderations" ? pending : nil) %>
+            <% end %>
+          </ul>
+        </nav>
+
+        <div class="border-t border-border p-3">
+          <%= link_to root_path, class: "admin-rail__link" do %>
+            <svg class="size-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+            <span class="admin-rail__label text-sm"><%= t(".back_to_site") %></span>
+          <% end %>
+        </div>
+      </aside>
+
+      <div class="flex min-w-0 flex-1 flex-col">
+        <header class="sticky top-0 z-30 border-b border-border bg-surface/90 backdrop-blur">
+          <div class="flex flex-wrap items-center gap-3 px-4 py-3 sm:px-6">
+            <form action="<%= admin_search_path %>" method="get" role="search"
+                  class="flex w-full max-w-md items-center gap-2 sm:w-auto sm:flex-1">
+              <label class="sr-only" for="admin-q"><%= t(".search_label") %></label>
+              <input id="admin-q" type="search" name="q" value="<%= params[:q] %>"
+                     placeholder="<%= t(".search_placeholder") %>" maxlength="100"
+                     class="input h-10 flex-1 text-sm" autocomplete="off">
+              <button type="submit" class="btn-secondary"><%= t(".search") %></button>
+            </form>
+            <div class="ml-auto flex items-center gap-3">
+              <span class="hidden text-sm text-muted sm:block"><%= current_user.display_name %></span>
+              <button type="button" data-action="theme#toggle" class="icon-button" aria-label="<%= t("nav.toggle_theme") %>">
+                <svg class="hidden size-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v2m0 14v2M5.6 5.6l1.4 1.4m9.9 9.9 1.4 1.4M3 12h2m14 0h2M5.6 18.4l1.4-1.4m9.9-9.9 1.4-1.4"/><circle cx="12" cy="12" r="4"/></svg>
+                <svg class="block size-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <%= render "shared/impersonation_banner" %>
+
+        <main class="flex-1 px-4 py-6 sm:px-6">
+          <div class="mx-auto max-w-6xl">
+            <%= render "layouts/flashes" %>
+            <%= yield %>
+          </div>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

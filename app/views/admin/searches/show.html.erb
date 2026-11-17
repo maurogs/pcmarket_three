@@ -1,0 +1,67 @@
+<% content_for :title, t(".title", query: @query) %>
+
+<h1 class="text-xl font-bold"><%= t(".title", query: @query) %></h1>
+
+<% if @result.nil? %>
+  <p class="mt-2 text-sm text-muted"><%= t(".too_short") %></p>
+<% else %>
+  <div class="mt-4 space-y-4">
+    <section class="card p-4">
+      <h2 class="mb-3 text-sm font-semibold text-muted"><%= t(".users.title", count: @result.users.size) %></h2>
+      <% if @result.users.any? %>
+        <ul class="space-y-2 text-sm">
+          <% @result.users.each do |user| %>
+            <li class="flex flex-wrap items-center gap-2">
+              <%= link_to user.display_name, admin_user_path(user), class: "font-medium hover:text-primary hover:underline" %>
+              <span class="text-xs text-muted">@<%= user.username %> · <%= user.email_address %></span>
+              <% if user.banned? %>
+                <span class="rounded-full bg-rose-100 px-2 py-0.5 text-xs font-medium text-rose-800 dark:bg-rose-950 dark:text-rose-300"><%= t(".badges.banned") %></span>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="text-sm text-muted"><%= t(".users.empty") %></p>
+      <% end %>
+    </section>
+
+    <section class="card p-4">
+      <h2 class="mb-3 text-sm font-semibold text-muted"><%= t(".listings.title", count: @result.listings.size) %></h2>
+      <% if @result.listings.any? %>
+        <ul class="space-y-2 text-sm">
+          <% @result.listings.each do |listing| %>
+            <li class="flex flex-wrap items-center gap-2">
+              <%= link_to listing.title, admin_listing_path(listing), class: "font-medium hover:text-primary hover:underline" %>
+              <span class="rounded-full px-2 py-0.5 text-xs font-medium <%= status_badge_class(listing.status) %>">
+                <%= Listing.human_attribute_name("status/#{listing.status}") %>
+              </span>
+              <span class="text-xs text-muted"><%= money(listing.price_cents, listing.currency) %></span>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="text-sm text-muted"><%= t(".listings.empty") %></p>
+      <% end %>
+    </section>
+
+    <section class="card p-4">
+      <h2 class="mb-3 text-sm font-semibold text-muted"><%= t(".orders.title", count: @result.orders.size) %></h2>
+      <% if @result.orders.any? %>
+        <ul class="space-y-2 text-sm">
+          <% @result.orders.each do |order| %>
+            <li class="flex flex-wrap items-center gap-2">
+              <span class="font-medium"><%= order.number %></span>
+              <span class="rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium">
+                <%= Order.human_attribute_name("status/#{order.status}") %>
+              </span>
+              <span class="text-xs text-muted"><%= money(order.total_cents, order.currency) %></span>
+              <span class="text-xs text-muted"><%= l(order.created_at.to_date, format: :delivery) %></span>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="text-sm text-muted"><%= t(".orders.empty") %></p>
+      <% end %>
+    </section>
+  </div>
+<% end %>

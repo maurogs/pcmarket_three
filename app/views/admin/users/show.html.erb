@@ -1,0 +1,170 @@
+<% content_for :title, t(".title", name: @user.display_name) %>
+
+<div class="mb-4 flex flex-wrap items-center gap-3">
+  <%= link_to t(".back_to_users"), admin_users_path, class: "text-sm font-medium text-muted hover:text-primary hover:underline" %>
+  <% if @store && !@user.deleted? %>
+    <%= link_to t(".view_public_store"), store_path(@store), class: "text-sm font-medium text-primary hover:underline" %>
+  <% end %>
+</div>
+
+<div class="grid gap-4 lg:grid-cols-[22rem_minmax(0,1fr)]">
+  <%# --- identity + admin actions ------------------------------------------ %>
+  <div class="space-y-4">
+    <section class="card p-4">
+      <div class="flex flex-wrap items-center gap-2">
+        <h1 class="text-lg font-bold"><%= @user.display_name %></h1>
+        <% if @user.admin? %>
+          <span class="rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300"><%= t(".roles.admin") %></span>
+        <% end %>
+        <% if @user.banned? %>
+          <span class="rounded-full bg-rose-100 px-2 py-0.5 text-xs font-medium text-rose-800 dark:bg-rose-950 dark:text-rose-300"><%= t(".badges.banned") %></span>
+        <% end %>
+        <% if @user.deleted? %>
+          <span class="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600"><%= t(".badges.anonymized") %></span>
+        <% end %>
+      </div>
+      <p class="mt-1 text-sm text-muted">@<%= @user.username %> · <%= @user.email_address %></p>
+      <p class="mt-0.5 text-xs text-muted">
+        <%= t(".member_since", date: l(@user.created_at.to_date, format: :delivery)) %>
+        · <%= t("countries.#{@user.country_code.downcase}") %>
+        · <%= t("locales.#{@user.locale}") %>
+      </p>
+
+      <% if @user.banned? %>
+        <div class="mt-3 rounded-md border border-rose-200 bg-rose-50 p-3 text-xs text-rose-900 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-300">
+          <p class="font-semibold"><%= t(".ban.banned_on", date: l(@user.banned_at.to_date, format: :delivery)) %></p>
+          <% if @user.ban_reason.present? %>
+            <p class="mt-1"><%= @user.ban_reason %></p>
+          <% end %>
+        </div>
+      <% end %>
+
+      <div class="mt-4 grid gap-2">
+        <%= link_to t(".actions.edit"), edit_admin_user_path(@user), class: "btn-secondary w-full" %>
+        <% if @user.banned? %>
+          <%= button_to t(".ban.unban"), admin_user_ban_path(@user), method: :delete, class: "btn-secondary w-full" %>
+        <% elsif @user.id != Current.user.id %>
+          <%= link_to t(".ban.ban"), new_admin_user_ban_path(@user), class: "btn-danger w-full" %>
+        <% end %>
+        <% if @user.id != Current.user.id && !@user.admin? && !@user.deleted? %>
+          <%= button_to t(".actions.impersonate"), admin_user_impersonation_path(@user), method: :post,
+                class: "btn-secondary w-full", form: { data: { turbo_confirm: t(".confirm_impersonate") } } %>
+        <% end %>
+      </div>
+    </section>
+
+    <% if @store %>
+      <section class="card p-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-semibold text-muted"><%= t(".store.title") %></h2>
+          <%= link_to t(".store.manage"), admin_store_path(@store), class: "text-xs font-medium text-primary hover:underline" %>
+        </div>
+        <p class="mt-2 font-medium"><%= @store.name %></p>
+        <p class="mt-1 flex flex-wrap gap-2 text-xs">
+          <% if @store.verified %>
+            <span class="rounded-full bg-emerald-100 px-2 py-0.5 font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"><%= t(".store.verified") %></span>
+          <% end %>
+          <% if @store.hidden %>
+            <span class="rounded-full bg-rose-100 px-2 py-0.5 font-medium text-rose-800 dark:bg-rose-950 dark:text-rose-300"><%= t(".store.hidden") %></span>
+          <% end %>
+        </p>
+      </section>
+    <% end %>
+
+    <section class="card p-4">
+      <h2 class="mb-3 text-sm font-semibold text-muted"><%= t(".sessions.title") %></h2>
+      <% if @recent_sessions.any? %>
+        <ul class="space-y-2 text-xs text-muted">
+          <% @recent_sessions.each do |session| %>
+            <li class="flex justify-between gap-2">
+              <span class="min-w-0 truncate"><%= session.ip_address %></span>
+              <span class="shrink-0"><%= l(session.created_at.to_date, format: :delivery) %></span>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="text-sm text-muted"><%= t(".sessions.empty") %></p>
+      <% end %>
+    </section>
+  </div>
+
+  <div class="min-w-0 space-y-4">
+    <%# --- listings by status ------------------------------------------------ %>
+    <section class="card p-4">
+      <h2 class="mb-3 text-sm font-semibold text-muted"><%= t(".listings.title") %></h2>
+      <dl class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <% Listing.statuses.keys.each do |status| %>
+          <div class="rounded-md bg-surface-muted px-3 py-2">
+            <dt class="text-xs text-muted"><%= Listing.human_attribute_name("status/#{status}") %></dt>
+            <dd class="text-lg font-bold"><%= @listing_counts.fetch(status, 0) %></dd>
+          </div>
+        <% end %>
+      </dl>
+      <% if @archived_listings.any? %>
+        <ul class="mt-3 space-y-1 text-sm">
+          <% @archived_listings.each do |listing| %>
+            <li class="flex items-center justify-between gap-2">
+              <%= link_to listing.title, admin_listing_path(listing), class: "min-w-0 truncate hover:text-primary hover:underline" %>
+              <span class="shrink-0 text-xs text-muted"><%= money(listing.price_cents, listing.currency) %></span>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+    </section>
+
+    <%# --- orders both sides -------------------------------------------------- %>
+    <div class="grid gap-4 sm:grid-cols-2">
+      <% [ [ t(".orders.buyer"), @buyer_orders ], [ t(".orders.seller"), @seller_orders ] ].each do |heading, orders| %>
+        <section class="card p-4">
+          <h2 class="mb-3 text-sm font-semibold text-muted"><%= heading %></h2>
+          <% if orders.any? %>
+            <ul class="space-y-2 text-sm">
+              <% orders.each do |order| %>
+                <li class="flex items-center justify-between gap-2">
+                  <span class="min-w-0 truncate font-medium"><%= order.number %></span>
+                  <span class="shrink-0 rounded-full bg-surface-muted px-2 py-0.5 text-xs">
+                    <%= Order.human_attribute_name("status/#{order.status}") %>
+                  </span>
+                  <span class="shrink-0 text-xs text-muted"><%= money(order.total_cents, order.currency) %></span>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <p class="text-sm text-muted"><%= t(".orders.empty") %></p>
+          <% end %>
+        </section>
+      <% end %>
+    </div>
+
+    <%# --- audit trail for this user ------------------------------------------ %>
+    <section class="card p-4">
+      <h2 class="mb-3 text-sm font-semibold text-muted"><%= t(".audit.title") %></h2>
+      <% if @audit_logs.any? %>
+        <div class="overflow-x-auto">
+          <table class="admin-table w-full min-w-[520px] text-sm">
+            <thead>
+              <tr>
+                <th scope="col"><%= t(".audit.columns.action") %></th>
+                <th scope="col"><%= t(".audit.columns.admin") %></th>
+                <th scope="col"><%= t(".audit.columns.changes") %></th>
+                <th scope="col"><%= t(".audit.columns.time") %></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @audit_logs.each do |log| %>
+                <tr>
+                  <td class="font-medium"><%= t("admin.audit.actions.#{log.action}") %></td>
+                  <td class="text-muted"><%= log.admin&.display_name || t(".audit.deleted_admin") %></td>
+                  <td class="max-w-[16rem] truncate text-xs text-muted"><%= log.details.presence || "—" %></td>
+                  <td class="whitespace-nowrap text-xs text-muted"><%= l(log.created_at.to_date, format: :delivery) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="text-sm text-muted"><%= t(".audit.empty") %></p>
+      <% end %>
+    </section>
+  </div>
+</div>

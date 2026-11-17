@@ -60,7 +60,7 @@ module ListingsHelper
       chips << [ category.name, url_without_category(category) ]
     end
     filters[:conditions].each do |value|
-      chips << [ Listing.human_attribute_name("condition.#{value}"),
+      chips << [ Listing.human_attribute_name("condition/#{value}"),
                  url_without_filter(type: :condition, value: value) ]
     end
     filters[:specs].each do |key, values|
@@ -116,7 +116,7 @@ module ListingsHelper
   end
 
   def condition_label(listing)
-    Listing.human_attribute_name("condition.#{listing.condition}")
+    Listing.human_attribute_name("condition/#{listing.condition}")
   end
 
   # Translated display name for a spec attribute ("gpu_chipset" -> "Chipset").

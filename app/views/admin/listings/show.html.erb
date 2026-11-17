@@ -1,0 +1,135 @@
+<% content_for :title, @listing.title %>
+
+<div class="mb-4 flex flex-wrap items-center gap-3">
+  <%= link_to t(".back_to_listings"), admin_listings_path, class: "text-sm font-medium text-muted hover:text-primary hover:underline" %>
+  <% if @listing.approved? %>
+    <%= link_to t(".view_public"), listing_path(@listing), class: "text-sm font-medium text-primary hover:underline" %>
+  <% end %>
+</div>
+
+<div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
+  <div class="min-w-0 space-y-4">
+    <article class="card p-4">
+      <div class="flex flex-wrap items-start justify-between gap-3">
+        <h1 class="min-w-0 text-lg font-bold"><%= @listing.title %></h1>
+        <span class="shrink-0 rounded-full px-2 py-0.5 text-xs font-medium <%= status_badge_class(@listing.status) %>">
+          <%= Listing.human_attribute_name("status/#{@listing.status}") %>
+        </span>
+      </div>
+
+      <% if @listing.photos.any? %>
+        <div class="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <% @listing.photos.each do |photo| %>
+            <%= photo_variant_tag photo, variant: :card, alt: @listing.title,
+                  class: "h-28 w-full rounded-md border border-border object-cover" %>
+          <% end %>
+        </div>
+      <% end %>
+
+      <dl class="mt-4 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
+        <div>
+          <dt class="text-xs text-muted"><%= Listing.human_attribute_name("price_cents") %></dt>
+          <dd class="font-semibold"><%= money(@listing.price_cents, @listing.currency) %></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted"><%= Listing.human_attribute_name("original_price_cents") %></dt>
+          <dd><%= @listing.original_price_cents.to_i.positive? ? money(@listing.original_price_cents, @listing.currency) : "—" %></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted"><%= Listing.human_attribute_name("shipping_price_cents") %></dt>
+          <dd><%= @listing.shipping_price_cents.to_i.positive? ? money(@listing.shipping_price_cents, @listing.currency) : t(".free") %></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted"><%= Listing.human_attribute_name("condition") %></dt>
+          <dd><%= Listing.human_attribute_name("condition/#{@listing.condition}") %></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted"><%= Listing.human_attribute_name("quantity") %></dt>
+          <dd><%= @listing.quantity %></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted"><%= Listing.human_attribute_name("category") %></dt>
+          <dd><%= @listing.category&.name %></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted"><%= t(".location") %></dt>
+          <dd><%= [ @listing.city, @listing.region, @listing.postal_code ].compact_blank.join(", ").presence || "—" %></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted"><%= t(".seller_location") %></dt>
+          <dd><%= t("countries.#{@listing.user.country_code.downcase}") %></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted"><%= Listing.human_attribute_name("views_count") %></dt>
+          <dd><%= number_with_delimiter(@listing.views_count) %></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted"><%= Listing.human_attribute_name("favorites_count") %></dt>
+          <dd><%= number_with_delimiter(@listing.favorites_count) %></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted"><%= Listing.human_attribute_name("featured_until") %></dt>
+          <dd><%= @listing.featured_until ? l(@listing.featured_until.to_date, format: :delivery) : "—" %></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted"><%= Listing.human_attribute_name("published_at") %></dt>
+          <dd><%= @listing.published_at ? l(@listing.published_at.to_date, format: :delivery) : "—" %></dd>
+        </div>
+      </dl>
+
+      <% if @listing.labels.any? %>
+        <div class="mt-4 flex flex-wrap gap-2">
+          <% @listing.labels.each do |label| %>
+            <span class="rounded-full bg-surface-muted px-3 py-1 text-xs font-medium"><%= label.names.values.first %></span>
+          <% end %>
+        </div>
+      <% end %>
+
+      <h2 class="mt-4 text-sm font-semibold"><%= t(".description") %></h2>
+      <div class="mt-1 whitespace-pre-line text-sm"><%= @listing.description %></div>
+
+      <% if @listing.specs.present? %>
+        <h2 class="mt-4 text-sm font-semibold"><%= Listing.human_attribute_name("specs") %></h2>
+        <dl class="mt-1 grid gap-x-6 gap-y-1 text-sm sm:grid-cols-2">
+          <% @listing.specs.each do |key, value| %>
+            <div class="flex justify-between gap-3 border-b border-border py-1">
+              <dt class="text-muted"><%= key %></dt>
+              <dd class="text-right font-medium"><%= value %></dd>
+            </div>
+          <% end %>
+        </dl>
+      <% end %>
+
+      <% if @listing.rejection_reason.present? %>
+        <div class="mt-4 rounded-md border border-rose-200 bg-rose-50 p-3 text-sm text-rose-900 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-200">
+          <p class="font-semibold"><%= Listing.human_attribute_name("rejection_reason") %></p>
+          <p class="mt-1"><%= @listing.rejection_reason %></p>
+        </div>
+      <% end %>
+    </article>
+
+    <%= render "admin/shared/events", events: @events %>
+  </div>
+
+  <div class="space-y-4 lg:sticky lg:top-4 lg:self-start">
+    <section class="card p-4">
+      <h2 class="mb-3 text-sm font-semibold"><%= t(".actions.title") %></h2>
+      <div class="grid gap-2">
+        <%= link_to t(".actions.edit"), edit_admin_listing_path(@listing), class: "btn-secondary w-full" %>
+        <% if %w[approved sold reserved].include?(@listing.status) %>
+          <%= button_to t(".actions.unpublish"), admin_listing_unpublication_path(@listing),
+                method: :post, class: "btn-secondary w-full" %>
+        <% end %>
+        <% unless %w[approved sold reserved pending_review].include?(@listing.status) %>
+          <%= link_to t(".moderate"), admin_moderation_path(@listing), class: "btn-secondary w-full" %>
+        <% end %>
+        <% if @listing.destroyable? %>
+          <%= button_to t(".actions.delete"), admin_listing_path(@listing), method: :delete,
+                class: "btn-danger w-full", form: { data: { turbo_confirm: t(".confirm_delete") } } %>
+        <% end %>
+      </div>
+    </section>
+
+    <%= render "admin/shared/seller_card", user: @listing.user, counts: @seller_counts %>
+  </div>
+</div>

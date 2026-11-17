@@ -1,0 +1,36 @@
+<% content_for :title, t(".title", title: @listing.title) %>
+
+<div class="mx-auto max-w-lg">
+  <%= link_to t(".back"), admin_moderation_path(@listing), class: "text-sm font-medium text-muted hover:text-primary hover:underline" %>
+
+  <h1 class="mt-2 text-xl font-bold"><%= t(".title", title: @listing.title) %></h1>
+  <p class="mb-4 mt-1 text-sm text-muted"><%= t(".subtitle") %></p>
+
+  <%= form_with url: admin_listing_rejection_path(@listing), method: :post do |form| %>
+    <div class="card space-y-4 p-4">
+      <fieldset>
+        <legend class="text-sm font-semibold"><%= t(".reason_label") %></legend>
+        <div class="mt-2 space-y-2">
+          <% Moderations::Reject::REASONS.each do |reason| %>
+            <label class="flex min-h-11 cursor-pointer items-center gap-3 rounded-md border border-border px-3 text-sm hover:border-primary">
+              <%= radio_button_tag :reason, reason, false, required: true %>
+              <span><%= t("admin.rejections.reasons.#{reason}") %></span>
+            </label>
+          <% end %>
+        </div>
+      </fieldset>
+
+      <div>
+        <%= form.label :note, t(".note_label"), class: "block text-sm font-semibold" %>
+        <%= form.text_area :note, rows: 4, maxlength: 500, class: "input mt-1 w-full",
+              placeholder: t(".note_placeholder") %>
+        <p class="mt-1 text-xs text-muted"><%= t(".note_hint") %></p>
+      </div>
+    </div>
+
+    <div class="mt-4 flex items-center gap-2">
+      <%= form.submit t(".submit"), class: "btn-danger" %>
+      <%= link_to t(".cancel"), admin_moderation_path(@listing), class: "btn-secondary" %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,167 @@
+<% content_for :title, t(".title", title: @listing.title) %>
+
+<div class="mb-4 flex flex-wrap items-center gap-3">
+  <%= link_to t(".back_to_queue"), admin_moderations_path, class: "text-sm font-medium text-muted hover:text-primary hover:underline" %>
+  <span class="ml-auto hidden text-xs text-muted lg:block">
+    <%= t(".shortcuts_hint") %>
+    <kbd class="kbd">A</kbd> <%= t(".shortcut.approve") %> ·
+    <kbd class="kbd">R</kbd> <%= t(".shortcut.reject") %> ·
+    <kbd class="kbd">J</kbd> <%= t(".shortcut.prev") %> ·
+    <kbd class="kbd">K</kbd> <%= t(".shortcut.next") %>
+  </span>
+</div>
+
+<div data-controller="moderation"
+     data-moderation-prev-url-value="<%= @prev_pending ? admin_moderation_path(@prev_pending) : "" %>"
+     data-moderation-next-url-value="<%= @next_pending ? admin_moderation_path(@next_pending) : "" %>">
+
+  <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
+    <%# --- listing content -------------------------------------------------%>
+    <div class="min-w-0 space-y-4">
+      <article class="card p-4">
+        <div class="flex flex-wrap items-start justify-between gap-3">
+          <h1 class="min-w-0 text-lg font-bold"><%= @listing.title %></h1>
+          <span class="shrink-0 rounded-full px-2 py-0.5 text-xs font-medium <%= status_badge_class(@listing.status) %>">
+            <%= Listing.human_attribute_name("status/#{@listing.status}") %>
+          </span>
+        </div>
+        <p class="mt-1 text-xs text-muted">
+          <%= t(".submitted", time: time_ago_in_words(@listing.created_at)) %>
+          · <%= @listing.category&.name %>
+          · <%= @listing.city.presence || "—" %>
+          · <%= t("countries.#{@listing.user.country_code.downcase}") rescue @listing.user.country_code %>
+        </p>
+
+        <% if @listing.photos.any? %>
+          <div class="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <% @listing.photos.each do |photo| %>
+              <%= photo_variant_tag photo, variant: :card, alt: @listing.title,
+                    class: "h-28 w-full rounded-md border border-border object-cover" %>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="mt-4 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-200">
+            <%= t(".no_photos") %>
+          </p>
+        <% end %>
+
+        <h2 class="mt-4 text-sm font-semibold"><%= t(".description") %></h2>
+        <div class="mt-1 whitespace-pre-line text-sm"><%= @listing.description %></div>
+
+        <% if @listing.specs.present? %>
+          <h2 class="mt-4 text-sm font-semibold"><%= t(".specs") %></h2>
+          <dl class="mt-1 grid gap-x-6 gap-y-1 text-sm sm:grid-cols-2">
+            <% @listing.specs.each do |key, value| %>
+              <div class="flex justify-between gap-3 border-b border-border py-1">
+                <dt class="text-muted"><%= key %></dt>
+                <dd class="text-right font-medium"><%= value %></dd>
+              </div>
+            <% end %>
+          </dl>
+        <% end %>
+      </article>
+
+      <%# --- price context --------------------------------------------------%>
+      <section class="card p-4">
+        <h2 class="mb-3 text-sm font-semibold text-muted"><%= t(".price_context") %></h2>
+        <p class="text-sm">
+          <span class="text-xl font-bold"><%= money(@listing.price_cents, @listing.currency) %></span>
+          <% if @listing.original_price_cents.to_i.positive? %>
+            <span class="ml-2 text-xs text-muted line-through"><%= money(@listing.original_price_cents, @listing.currency) %></span>
+          <% end %>
+        </p>
+        <p class="mt-1 text-sm text-muted">
+          <% if (compare = admin_price_vs_median(@listing, @median_cents)) %>
+            <%= t(".median_comparison.#{compare[0]}",
+                  median: money(@median_cents, @listing.currency),
+                  percent: number_to_percentage(compare[1], precision: 0)) %>
+          <% else %>
+            <%= t(".median_unavailable") %>
+          <% end %>
+        </p>
+      </section>
+
+      <%# --- duplicate detection --------------------------------------------%>
+      <section class="card p-4">
+        <h2 class="mb-3 text-sm font-semibold text-muted">
+          <%= t(".duplicates.title") %>
+          <% if @duplicates.any? %>
+            <span class="ml-1 rounded-full bg-rose-100 px-2 py-0.5 text-xs font-semibold text-rose-800"><%= @duplicates.size %></span>
+          <% end %>
+        </h2>
+        <% if @duplicates.any? %>
+          <ul class="space-y-2 text-sm">
+            <% @duplicates.each do |dupe| %>
+              <li class="flex items-center gap-3">
+                <span class="min-w-0 flex-1 truncate">
+                  <%= link_to dupe.title, admin_listing_path(dupe), class: "font-medium hover:text-primary hover:underline" %>
+                </span>
+                <span class="shrink-0 text-xs text-muted"><%= money(dupe.price_cents, dupe.currency) %></span>
+                <span class="shrink-0 text-xs text-muted"><%= l(dupe.created_at.to_date, format: :delivery) %></span>
+              </li>
+            <% end %>
+          </ul>
+        <% elsif Listing.trgm_available? %>
+          <p class="text-sm text-muted"><%= t(".duplicates.none") %></p>
+        <% else %>
+          <p class="text-sm text-muted"><%= t(".duplicates.unavailable") %></p>
+        <% end %>
+      </section>
+
+      <%# --- risky words ----------------------------------------------------%>
+      <section class="card p-4">
+        <h2 class="mb-3 text-sm font-semibold text-muted">
+          <%= t(".risky_words.title") %>
+          <% if (risky = admin_risky_word_matches(@listing)).any? %>
+            <span class="ml-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800"><%= risky.size %></span>
+          <% end %>
+        </h2>
+        <% if risky.any? %>
+          <ul class="flex flex-wrap gap-2">
+            <% risky.each do |word| %>
+              <li class="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900 dark:bg-amber-950 dark:text-amber-200"><%= word %></li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="text-sm text-muted"><%= t(".risky_words.none") %></p>
+        <% end %>
+      </section>
+
+      <%= render "admin/shared/events", events: @events %>
+    </div>
+
+    <%# --- decision rail ----------------------------------------------------%>
+    <div class="space-y-4 lg:sticky lg:top-4 lg:self-start">
+      <section class="card p-4">
+        <h2 class="mb-3 text-sm font-semibold"><%= t(".decision.title") %></h2>
+
+        <%= form_with url: admin_listing_approval_path(@listing), method: :post,
+              data: { moderation_target: "approveForm" } do |form| %>
+          <%= form.submit t(".decision.approve"), class: "btn-primary w-full" %>
+        <% end %>
+
+        <div class="mt-2 grid gap-2">
+          <%= link_to t(".decision.reject"), new_admin_listing_rejection_path(@listing),
+                class: "btn-danger w-full", data: { moderation_target: "rejectLink" } %>
+          <%= link_to t(".decision.edit"), edit_admin_listing_path(@listing), class: "btn-secondary w-full" %>
+          <% if %w[approved sold reserved].include?(@listing.status) %>
+            <%= button_to t(".decision.unpublish"), admin_listing_unpublication_path(@listing),
+                  method: :post, class: "btn-secondary w-full" %>
+          <% end %>
+        </div>
+
+        <p class="mt-3 text-xs text-muted">
+          <%= t(".decision.prev_next_hint") %>
+        </p>
+      </section>
+
+      <% if @listing.status != "pending_review" %>
+        <p class="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-200">
+          <%= t(".already_reviewed", status: Listing.human_attribute_name("status/#{@listing.status}")) %>
+        </p>
+      <% end %>
+
+      <%= render "admin/shared/seller_card", user: @seller, counts: @seller_counts %>
+    </div>
+  </div>
+</div>
