@@ -1,0 +1,29 @@
+<% content_for :title, t(".title", number: @order.number) %>
+
+<div class="mx-auto max-w-2xl">
+  <h1 class="text-xl font-bold tracking-tight sm:text-2xl">
+    <%= t(".title", number: @order.number) %>
+  </h1>
+  <p class="mt-1 text-sm text-muted"><%= t(".subtitle") %></p>
+
+  <%= render "shared/error_summary", resource: @review %>
+
+  <%= form_with model: @review, url: order_review_path(@order), class: "card mt-6 space-y-4 px-4 py-4" do |form| %>
+    <div>
+      <%= form.label :rating, class: "block text-sm font-medium text-text" %>
+      <%= form.select :rating, (1..5).to_a.reverse.map { |n| [ t(".stars", count: n), n ] },
+            {}, class: "input mt-1 w-auto" %>
+    </div>
+
+    <div>
+      <%= form.label :body, class: "block text-sm font-medium text-text" %>
+      <%= form.text_area :body, rows: 5, class: "input mt-1", maxlength: 2000,
+            placeholder: t(".body_placeholder") %>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      <%= form.submit t(".submit"), class: "btn-primary cursor-pointer" %>
+      <%= link_to t(".cancel"), order_path(@order), class: "inline-flex min-h-11 items-center rounded-md border border-border px-4 text-sm font-medium hover:border-primary hover:text-primary" %>
+    </div>
+  <% end %>
+</div>

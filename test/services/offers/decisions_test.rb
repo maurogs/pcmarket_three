@@ -42,6 +42,20 @@ module Offers
       assert_equal :stale, Offers::Accept.call(offer: @offer).error
     end
 
+    test "the second accept on the same listing comes back stale (row locks re-check state)" do
+      assert_nil Offers::Accept.call(offer: @offer).error
+
+      # @other was auto-declined by the first accept; under the listing +
+      # offer row locks its state is re-read before transitioning, so the
+      # second accept is refused instead of double-reserving.
+      result = Offers::Accept.call(offer: @other)
+      assert_equal :stale, result.error
+      assert_predicate @other.reload, :declined?
+      @listing.reload
+      assert_predicate @listing, :reserved?
+      assert_equal users(:two), @listing.reserved_for
+    end
+
     test "decline only works on pending offers" do
       assert_nil Offers::Decline.call(offer: @other).error
       assert_predicate @other.reload, :declined?

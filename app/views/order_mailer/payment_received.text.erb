@@ -1,0 +1,7 @@
+<%= t(".greeting", name: @recipient.display_name) %>
+
+<%= t(".intro", number: @order.number) %>
+
+<%= t(".view_sale") %>: <%= sell_sale_url(@order, locale: @recipient.locale) %>
+
+<%= t(".safety") %>

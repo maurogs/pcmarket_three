@@ -28,8 +28,12 @@
       <%= link_to "#", class: "icon-button", aria: { label: t("nav.notifications") } do %>
         <%= inline_icon :bell %>
       <% end %>
-      <%= link_to "#", class: "icon-button", aria: { label: t("nav.cart") } do %>
+      <% cart_count = header_cart_count %>
+      <%= link_to cart_path, class: "icon-button relative", aria: { label: t("nav.cart") } do %>
         <%= inline_icon :cart %>
+        <% if cart_count.positive? %>
+          <span class="absolute -right-0.5 -top-0.5 flex min-w-4.5 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-white"><%= cart_count %></span>
+        <% end %>
       <% end %>
       <%= render "shared/unread_conversations_badge", user: Current.user if authenticated? %>
 
@@ -189,7 +193,7 @@
       <%= link_to t("nav.list_item"), new_sell_listing_path, class: "flex min-h-11 items-center rounded-md bg-accent px-3 py-2.5 text-center font-medium text-white hover:bg-accent/90" %>
       <%= link_to t("nav.wishlist"), "#", class: "rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
       <%= link_to t("nav.notifications"), "#", class: "rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
-      <%= link_to t("nav.cart"), "#", class: "rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
+      <%= link_to cart_path, class: "rounded-md px-3 py-2.5 hover:bg-surface-muted" %><%= " (#{header_cart_count})" if header_cart_count.positive? %>
       <hr class="my-2 border-border">
       <% if authenticated? %>
         <p class="px-3 pt-1 text-xs font-semibold uppercase tracking-wide text-muted"><%= t("nav.my_store") %></p>

@@ -2,7 +2,7 @@ require "test_helper"
 
 class MessagingTest < ActionDispatch::IntegrationTest
   setup do
-    MessagesController::RATE_LIMIT_STORE.clear
+    Rails.cache.clear
     @conversation = Conversation.create!(
       listing: listings(:gigabyte), buyer: users(:two), seller: users(:one)
     )

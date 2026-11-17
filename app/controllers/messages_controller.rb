@@ -1,14 +1,13 @@
 # POST /conversations/:conversation_id/messages — the only write path into a
 # thread (business rules live in Messages::Send). Outsiders 404: the thread
-# is looked up through Conversation.for_user before anything else. A
-# separate rate-limit store keeps spammy senders to 30 messages/minute per
-# user without touching the fragment-cache store (tests clear this store in
-# setup).
+# is looked up through Conversation.for_user before anything else. The
+# default Rails.cache store (solid_cache in production, so the counter is
+# shared across Puma workers) keeps spammy senders to 30 messages/minute
+# per user (tests clear Rails.cache in setup where needed; in the test env
+# the null store means the throttle never fires).
 class MessagesController < ApplicationController
-  RATE_LIMIT_STORE = ActiveSupport::Cache::MemoryStore.new
-
   rate_limit to: 30, within: 1.minute, only: :create,
-             by: -> { Current.user.id }, store: RATE_LIMIT_STORE
+             by: -> { Current.user.id }
 
   before_action :set_conversation
 

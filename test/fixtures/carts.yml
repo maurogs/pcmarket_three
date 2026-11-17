@@ -1,0 +1,2 @@
+# Intentionally empty: guest carts are created by the CartsController and
+# user carts by Carts::.for_user. Tests build their own carts.

@@ -40,15 +40,15 @@ class Sell::DashboardTest < ActionDispatch::IntegrationTest
     sign_in_as users(:two)
     get sell_sales_path
     assert_response :success
-    assert_match "PCM-2026-000001", response.body  # seller: two
-    assert_no_match "PCM-2026-000002", response.body # seller: one
+    assert_match "PCM-2025-000001", response.body  # seller: two
+    assert_no_match "PCM-2025-000002", response.body # seller: one
   end
 
   test "sale show is scoped to the seller and read-only" do
     sign_in_as users(:two)
     get sell_sale_path(orders(:one))
     assert_response :success
-    assert_match "PCM-2026-000001", response.body
+    assert_match "PCM-2025-000001", response.body
     assert_match I18n.t("sell.sales.show.net_revenue"), response.body
 
     get sell_sale_path(orders(:two))

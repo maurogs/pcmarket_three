@@ -1,0 +1,128 @@
+<% set_meta_tags(title: t(".title")) %>
+
+<div class="mx-auto max-w-3xl">
+  <h1 class="text-xl font-bold tracking-tight sm:text-2xl"><%= t(".title") %></h1>
+
+  <% if @summary.empty? %>
+    <div class="card mt-6 px-6 py-10 text-center">
+      <span class="text-muted"><%= inline_icon :cart, classes: "mx-auto size-10" %></span>
+      <p class="mt-3 text-sm font-medium text-text"><%= t(".empty") %></p>
+      <p class="mt-1 text-xs text-muted"><%= t(".empty_hint") %></p>
+      <%= link_to t(".empty_cta"), listings_path, class: "btn-primary mt-5" %>
+    </div>
+  <% else %>
+    <%# One card per seller group — each group becomes one order at checkout. %>
+    <div class="mt-6 space-y-4">
+      <% @summary.groups.each do |group| %>
+        <section class="card">
+          <header class="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3">
+            <h2 class="min-w-0 truncate text-sm font-semibold text-text">
+              <% if group.store %>
+                <%= link_to group.store.name, store_path(group.store), class: "hover:text-primary hover:underline" %>
+              <% else %>
+                <%= group.seller.display_name %>
+              <% end %>
+            </h2>
+            <% if group.pickup_available? %>
+              <span class="chip"><%= inline_icon :map_pin, classes: "size-3.5" %> <%= t(".pickup_available") %></span>
+            <% end %>
+          </header>
+
+          <ul class="divide-y divide-border">
+            <% group.items.each do |item| %>
+              <li class="flex flex-wrap items-center gap-3 px-4 py-3 <%= "opacity-50" if item.stale %>">
+                <div class="min-w-0 flex-1">
+                  <%= link_to item.listing.title, listing_path(item.listing),
+                        class: "text-sm font-medium text-text hover:text-primary hover:underline" %>
+                  <p class="mt-0.5 text-xs text-muted"><%= money(item.listing.price_cents, item.listing.currency) %></p>
+                  <% if item.stale %>
+                    <p class="mt-1 text-xs font-medium text-red-600 dark:text-red-400"><%= t(".item_unavailable") %></p>
+                  <% end %>
+                </div>
+
+                <% unless item.stale %>
+                  <%= form_with url: cart_item_path(item.cart_item), method: :patch, class: "flex items-center gap-1.5" do %>
+                    <%= number_field_tag "cart_item[quantity]", item.quantity, min: 1, max: item.listing.quantity,
+                          class: "input w-16 text-center", aria: { label: t(".quantity_label") } %>
+                    <%= submit_tag t(".update"), class: "chip cursor-pointer" %>
+                  <% end %>
+                <% end %>
+
+                <p class="w-20 text-right text-sm font-semibold text-text">
+                  <%= money(item.line_total_cents, item.listing.currency) %>
+                </p>
+
+                <div class="flex items-center gap-1">
+                  <% if authenticated? %>
+                    <%= button_to t(".save_wishlist"), cart_item_path(item.cart_item), method: :patch,
+                          params: { intent: "wishlist" }, class: "chip" %>
+                  <% end %>
+                  <%= button_to t(".remove"), cart_item_path(item.cart_item), method: :delete, class: "chip" %>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+
+          <% if group.any_live? %>
+            <dl class="space-y-1.5 border-t border-border px-4 py-3 text-sm">
+              <div class="flex justify-between">
+                <dt class="text-muted"><%= t(".subtotal") %></dt>
+                <dd class="text-text"><%= money(group.subtotal_cents, group.items.first.listing.currency) %></dd>
+              </div>
+              <div class="flex justify-between">
+                <dt class="text-muted"><%= t(".shipping") %></dt>
+                <dd class="text-text">
+                  <%= group.shipping_cents.zero? ? t(".shipping_free") : money(group.shipping_cents, group.items.first.listing.currency) %>
+                </dd>
+              </div>
+              <div class="flex justify-between font-semibold text-text">
+                <dt><%= t(".seller_total") %></dt>
+                <dd><%= money(group.total_cents, group.items.first.listing.currency) %></dd>
+              </div>
+              <% if !group.free_shipping? && group.store&.free_shipping_threshold_cents.present? %>
+                <p class="pt-1 text-xs text-muted">
+                  <%= t(".free_shipping_hint", threshold: money(group.store.free_shipping_threshold_cents, group.items.first.listing.currency)) %>
+                </p>
+              <% end %>
+            </dl>
+          <% end %>
+        </section>
+      <% end %>
+    </div>
+
+    <section class="card mt-4 px-4 py-3">
+      <dl class="space-y-1.5 text-sm">
+        <div class="flex justify-between">
+          <dt class="text-muted"><%= t(".items_count", count: @summary.total_quantity) %></dt>
+          <dd class="text-text"><%= money(@summary.subtotal_cents, "EUR") %></dd>
+        </div>
+        <div class="flex justify-between font-semibold text-text">
+          <dt><%= t(".estimated_total") %></dt>
+          <dd><%= money(@summary.total_cents, "EUR") %></dd>
+        </div>
+        <p class="pt-1 text-xs text-muted"><%= t(".total_hint") %></p>
+      </dl>
+
+      <div class="mt-4 flex flex-wrap gap-2">
+        <% if @summary.orderable? %>
+          <%= link_to t(".checkout_cta"), checkout_path, class: "btn-primary flex-1 sm:flex-none" %>
+        <% else %>
+          <button type="button" disabled class="btn-primary cursor-not-allowed"><%= t(".checkout_cta") %></button>
+        <% end %>
+        <%= link_to t(".continue_shopping"), listings_path,
+              class: "inline-flex min-h-11 items-center rounded-md border border-border px-4 text-sm font-medium hover:border-primary hover:text-primary" %>
+      </div>
+    </section>
+  <% end %>
+
+  <% if @recommended.any? %>
+    <section class="mt-10">
+      <h2 class="text-base font-semibold text-text"><%= t(".recommended_title") %></h2>
+      <div class="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        <% @recommended.first(4).each do |listing| %>
+          <%= render "shared/listing_card", listing: listing %>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+</div>

@@ -69,5 +69,53 @@
     </div>
   </dl>
 
-  <p class="mt-4 text-xs text-muted"><%= t(".shipping_actions_hint") %></p>
+  <%# --- fulfilment actions (sellers only, guarded by order state) -------- %>
+  <% sale_conversation = @sale.conversation %>
+  <% if @sale.pending_payment? || @sale.paid? || sale_conversation %>
+    <div class="card mt-6 px-4 py-3">
+      <h2 class="text-sm font-semibold text-text"><%= t(".actions_title") %></h2>
+
+      <% if @sale.pending_payment? %>
+        <p class="mt-2 text-xs text-muted">
+          <%= @sale.payment_provider == "stripe" ? t(".stripe_pending_hint") : t(".direct_pending_hint") %>
+        </p>
+        <% if @sale.payment_provider != "stripe" %>
+          <%= button_to t(".confirm_payment_button"), sell_sale_payment_confirmation_path(@sale), method: :post,
+                class: "btn-primary mt-3 cursor-pointer" %>
+        <% end %>
+      <% end %>
+
+      <% if @sale.paid? %>
+        <%= form_with url: sell_sale_shipment_path(@sale), method: :post, class: "mt-3 space-y-3" do |form| %>
+          <div class="grid gap-3 sm:grid-cols-2">
+            <div>
+              <%= form.label :carrier, t(".carrier_label"), class: "block text-sm font-medium text-text" %>
+              <%= form.select :carrier, carrier_options_for_select,
+                    { selected: Order::CARRIERS.first }, class: "input mt-1" %>
+            </div>
+            <div>
+              <%= form.label :tracking_number, t(".tracking_label"), class: "block text-sm font-medium text-text" %>
+              <%= form.text_field :tracking_number, class: "input mt-1" %>
+            </div>
+          </div>
+          <%= form.submit t(".ship_button"), class: "btn-primary cursor-pointer" %>
+        <% end %>
+      <% end %>
+
+      <div class="mt-3 flex flex-wrap gap-2">
+        <% if sale_conversation %>
+          <%= link_to t(".contact_buyer"), conversation_path(sale_conversation), class: "chip" %>
+        <% end %>
+        <%= button_to t(".cancel_order_button"), sell_sale_cancellation_path(@sale), method: :post, class: "chip",
+              form: { data: { turbo_confirm: t(".cancel_confirm") } } %>
+      </div>
+      <p class="mt-2 text-xs text-muted"><%= t(".cancel_note") %></p>
+    </div>
+  <% end %>
+
+  <%# --- progress ---------------------------------------------------------- %>
+  <div class="card mt-6 px-4 py-3">
+    <h2 class="mb-3 text-sm font-semibold text-text"><%= t(".progress") %></h2>
+    <%= render "orders/timeline", order: @sale %>
+  </div>
 </div>

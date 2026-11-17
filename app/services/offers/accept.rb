@@ -16,7 +16,16 @@ module Offers
 
     def call
       ActiveRecord::Base.transaction do
+        # Serialise concurrent accepts on the same listing: the listing row
+        # lock (SELECT ... FOR UPDATE) makes the second transaction wait, and
+        # the re-read under the lock sees the winner's changes — so both the
+        # offer state and the listing state are re-checked atomically.
+        offer.listing.lock!
+        offer.lock!
+        offer.reload
+
         offer.accept!
+        offer.listing.reload
         offer.listing.reserve_for!(offer.buyer)
         Offer.active.where(listing_id: offer.listing_id).where.not(id: offer.id)
              .find_each(&:decline!)

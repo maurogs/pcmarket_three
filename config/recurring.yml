@@ -16,3 +16,6 @@ production:
   expire_offers:
     class: ExpireOffersJob
     schedule: every 15 minutes
+  auto_complete_orders:
+    class: AutoCompleteOrdersJob
+    schedule: hourly

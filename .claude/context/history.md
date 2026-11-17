@@ -1,5 +1,114 @@
 # History
 
+## 2026-11-17 — Phase 4b: cart, checkout & order lifecycle (guest carts, per-seller orders, Stripe/direct payment, state machine) + Phase 4a review fixes
+
+**What changed**
+
+- Phase 4a review fixes first: `Offers::Accept` now re-checks offer staleness
+  INSIDE the transaction after locking (second concurrent accept → `:stale`,
+  regression test added); `MessagesController` rate-limits via
+  `rate_limit to: 30, within: 1.minute, by: -> { Current.user.id }` on the
+  default `Rails.cache` store (test env `config.cache_store` changed
+  `:null_store` → `:memory_store` so the 429 path is testable; integration
+  tests clear the store in setup).
+- Migration `20261117223000`: orders gain `paid_at/completed_at/cancelled_at`
+  datetimes + `checkout_token` string, indexes on `checkout_token` and
+  `status` (`shipped_at`/`delivered_at` existed since Phase 1). structure.sql
+  dumped; applied to dev + test.
+- Cart: `Cart.for_user/for_token/token`; guest carts keyed by a signed
+  permanent `:cart_token` cookie, `Carts::Merge` folds the guest cart into the
+  user's cart at login (hooked into `authentication.rb#start_new_session_for`:
+  quantities stack capped at stock, non-purchasable items are discarded, guest
+  cart destroyed, cookie cleared). `Carts::AddItem` is the single rule
+  enforcer (approved, not own listing, not reserved-for-another, seller not on
+  vacation, quantity ≤ stock); `CartItem` itself deliberately does NOT
+  validate approval so stale items survive and are shown greyed by
+  `Carts::Summary`.
+- Checkout: `Carts::Summary` groups items per seller, marks `stale` items, and
+  computes per-seller shipping (0 for pickup when the seller allows it, 0 when
+  subtotal ≥ `Store#free_shipping_threshold_cents`, else max of the items'
+  `listing.shipping_price_cents`). `Checkout::PlaceOrders` runs in one
+  transaction: `SELECT ... FOR UPDATE` locks on the listings, re-validates
+  `purchasable_by?` + stock against the LOCKED rows (a listing sold
+  mid-checkout fails the whole call — zero orders), creates one `Order` per
+  seller with recomputed totals, applies commission when Flipper `:commissions`
+  is on, stamps `checkout_token` for idempotent replay, empties the cart,
+  marks listings sold, notifies + e-mails both parties. `CheckoutsController`
+  mints `session[:checkout_token]` per `show`; `create` checks the replay
+  branch BEFORE the empty-cart guard so a double submit lands on the existing
+  orders. Payment mode: Stripe Checkout session when
+  `Flipper :stripe_checkout && ENV["STRIPE_SECRET_KEY"]`, otherwise
+  `Checkout::DirectPayment` posts a system Message into the seeded
+  Conversation and redirects there. `StripeWebhooksController` verifies the
+  `Stripe-Signature` header with `Stripe::SignatureVerifier` (secret
+  `STRIPE_WEBHOOK_SECRET`) and marks linked orders paid on
+  `checkout.session.completed` (order ids read from
+  `stripe_session["metadata"]["order_ids"]` — stripe-ruby 21 StripeObject has
+  no `dig`).
+- Order lifecycle: state machine on `Order` (`pending_payment → paid →
+  shipped → delivered → completed`, + `cancelled`/`disputed`; guards raise
+  `Order::InvalidTransition`; delivery sets `buyer_protection_until =
+  now + Order::BUYER_PROTECTION_WINDOW` (2 days); cancel calls
+  `restore_listings!` → `reinstate!`/`add_back_quantity!`).
+  `Orders::Transition` service wraps model transition + Notification +
+  `OrderMailer`. Routes: buyer actions under `resources :orders` (nested
+  `delivery_confirmations#create`, `completion/cancellation/dispute` singular
+  resources) scoped to `current_user.orders`; seller fulfilment under
+  `sell/sales/:sale_id/{payment_confirmation,shipment,cancellation}` scoped
+  to `current_user.sales` — role guards are 404s by scoping (buyer can't ship,
+  seller can't confirm delivery/cancel-after-delivery, outsiders 404).
+  `AutoCompleteOrdersJob` (recurring `auto_complete_orders` in
+  config/recurring.yml): completes delivered orders past buyer protection and
+  auto-cancels `pending_payment` older than 72h. Reviews: `ReviewsController`
+  new/create gated to `completed` orders, `Review` uniq `order_id` = one
+  review per order.
+- Views: `carts/show` (per-seller groups, stale rows greyed, shipping rows,
+  free-shipping progress hint), `checkouts/show` (address picker, per-seller
+  pickup checkboxes, hidden `checkout_token`, Stripe vs direct notice),
+  `addresses/{index,new}`, `orders/{index,show,_timeline}`,
+  `sell/sales/show` fulfilment actions, `reviews/new`; `OrderMailer` 4 actions
+  in recipient locale (`ApplicationMailer` now includes `helper ListingsHelper`
+  for `money()`). All strings in the 6 locales (linter: 963 shared keys).
+- Tests: 373 runs / 1960 assertions green. New: `test/models/{cart,order}_test.rb`;
+  services `carts_{add_item,merge,summary}`, `checkout_{place_orders,direct_payment}`,
+  `payments_stripe_checkout` (Stripe stubbed by swapping
+  `Stripe::Checkout::Session.create` on the singleton class — minitest 6 has
+  no `minitest/mock` — asserting line_items/total/metadata params; PlaceOrders
+  concurrency test injects a mid-transaction sold via
+  `Listing.singleton_class.define_method(:find)`); `test/jobs/auto_complete_orders_job_test.rb`;
+  controllers `carts`, `checkouts` (replay + token refusal + Stripe redirect),
+  `orders` (role guards + cancellation restores listings), `stripe_webhooks`
+  (hand-built valid HMAC signature accepted, bad/missing rejected),
+  `sell/sales_controller_test.rb` (seller transitions + 404 guards);
+  fixtures `carts/cart_items/addresses.yml`.
+- Fixture churn: `orders.yml` numbers renamed `PCM-2026-*` → `PCM-2025-*`
+  (fresh `order_number_seq` nextvals 1,2 collide with same-year PCM-2026
+  numbers once tests create their own orders); `sell_dashboard_test.rb`
+  assertions follow.
+
+**Why**
+
+Phase 4b spec: cart (guest + user), checkout with one order per seller, both
+payment modes behind the Stripe flag, and the full order lifecycle with
+role-guarded transitions — while keeping logic out of controllers (models +
+service objects) and every string in I18n. Idempotent checkout (token replay)
+and the mid-checkout-sold race were spec'd explicitly: row locks + re-check
+inside the transaction mirror the Phase 4a accept-race fix pattern.
+
+**Files touched**: db/migrate/20261117223000*.rb, db/structure.sql;
+config/{routes.rb,recurring.yml,environments/test.rb}; config/locales/{es,en,fr,de,it,pt}.yml;
+app/models/{order,cart,cart_item,address,order_item}.rb;
+app/services/carts/{add_item,merge,summary}.rb, app/services/checkout/{place_orders,direct_payment}.rb,
+app/services/orders/transition.rb, app/services/payments/{stripe_checkout,handle_webhook}.rb;
+app/jobs/auto_complete_orders_job.rb; app/mailers/{application_mailer,order_mailer}.rb;
+app/controllers/{carts,cart_items,checkouts,addresses,orders,delivery_confirmations,completions,cancellations,disputes,stripe_webhooks,reviews}_controller.rb,
+app/controllers/sell/{sales,payment_confirmations,shipments,cancellations}_controller.rb,
+app/controllers/concerns/authentication.rb (login merge), app/controllers/messages_controller.rb (rate limit),
+app/services/offers/accept.rb (race fix); app/views/{carts,checkouts,addresses,orders,sell/sales,reviews,order_mailer}/*;
+test/{models,services,jobs,controllers,controllers/sell,fixtures}/* (new files above),
+test/integration/sell_dashboard_test.rb + sell_vacation_test.rb (fixture-number rename / buy-button label),
+test/integration/messaging_test.rb (429 via Rails.cache).
+
 ## 2026-11-17 — Phase 4a: internal chat & offers (threads, Turbo real-time, blocks, offer decisions, expiry job)
 
 **What changed**

@@ -268,6 +268,9 @@ fr:
       reserved_banner: 'Réservée jusqu''au %{until_time} : un acheteur est sur le
         point de l''acheter.'
       reserved_cta: Cette annonce est actuellement réservée.
+      add_to_cart: Ajouter au panier
+      own_listing_cta: C'est votre propre annonce
+      quantity_label: Quantité
   activerecord:
     errors:
       messages:
@@ -861,14 +864,36 @@ fr:
         commission: Commission plateforme
         total: Total
         net_revenue: Votre revenu
-        shipping_actions_hint: Les actions d'expédition seront disponibles dans la
-          prochaine phase.
+        actions_title: Actions
+        cancel_confirm: Annuler cette vente ?
+        cancel_note: Annulez si vous ne pouvez pas livrer l'article.
+        cancel_order_button: Annuler la vente
+        carrier_label: Transporteur
+        confirm_payment_button: Confirmer le paiement reçu
+        contact_buyer: Contacter l'acheteur
+        direct_pending_hint: L'acheteur va convenir du paiement. Confirmez-le une
+          fois reçu.
+        progress: Avancement
+        ship_button: Marquer comme expédié
+        stripe_pending_hint: L'acheteur paie en toute sécurité par carte. Une fois
+          payé, expédiez l'article.
+        tracking_label: Numéro de suivi (facultatif)
     vacations:
       create:
         enabled: Mode vacances activé. Vos annonces restent visibles, mais les achats
           sont en pause.
       destroy:
         disabled: Mode vacances désactivé — vous êtes de nouveau actif.
+    cancellations:
+      create:
+        cancelled: Vente annulée
+    payment_confirmations:
+      create:
+        confirmed: Paiement confirmé. Expédiez l'article quand vous êtes prêt.
+    shipments:
+      create:
+        shipped: Article marqué comme expédié
+        unknown_carrier: Choisissez un transporteur valide
   time:
     formats:
       chat_day: "%d/%m %H:%M"
@@ -990,3 +1015,255 @@ fr:
       safety: Ne payez pas et ne partagez pas vos coordonnées bancaires en dehors
         de PCMarket.
       subject: "%{sender} vous a écrit sur PCMarket"
+  addresses:
+    create:
+      created: Adresse enregistrée
+    destroy:
+      destroyed: Adresse supprimée
+    edit:
+      title: Modifier l'adresse
+    form:
+      cancel: Annuler
+      postal_code_hint: Code postal à 5 chiffres.
+      region_hint: Indiquez votre département ou région.
+      save: Enregistrer l'adresse
+    index:
+      confirm_delete: Supprimer cette adresse ?
+      default_badge: Par défaut
+      delete: Supprimer
+      edit: Modifier
+      empty: Aucune adresse pour le moment
+      empty_hint: Enregistrez une adresse pour accélérer vos prochains paiements.
+      make_default: Définir par défaut
+      new_address: Nouvelle adresse
+      title: Vos adresses
+    new:
+      title: Nouvelle adresse
+    update:
+      updated: Adresse mise à jour
+  cancellations:
+    create:
+      cancelled: Commande annulée
+  cart_items:
+    create:
+      added: "%{title} ajouté à votre panier"
+    destroy:
+      removed: Article retiré de votre panier
+    update:
+      errors:
+        invalid_quantity: Choisissez une quantité valide
+        quantity_exceeded: Seules %{count} unités sont disponibles
+      updated: Quantité mise à jour
+      wishlist_saved: "%{title} déplacé vers votre liste d'envies"
+  carts:
+    add_errors:
+      invalid: L'article n'a pas pu être ajouté à votre panier
+      invalid_quantity: Choisissez une quantité valide
+      not_found: Cette annonce est introuvable
+      not_purchasable: Cette annonce n'est pas disponible pour le moment
+      own_listing: Vous ne pouvez pas acheter votre propre annonce
+      quantity_exceeded: Seules %{count} unités sont disponibles
+      vacation: Cette boutique est en mode vacances
+    show:
+      checkout_cta: Passer au paiement
+      continue_shopping: Continuer vos achats
+      empty: Votre panier est vide
+      empty_cta: Parcourir les annonces
+      empty_hint: Parcourez les annonces et ajoutez des articles à votre panier.
+      estimated_total: Total estimé
+      free_shipping_hint: Livraison gratuite à partir de %{threshold}
+      item_unavailable: N'est plus disponible
+      items_count:
+        one: "%{count} article"
+        other: "%{count} articles"
+      pickup_available: Retrait disponible
+      quantity_label: Quantité
+      recommended_title: Recommandé pour vous
+      remove: Retirer
+      save_wishlist: Enregistrer dans la liste d'envies
+      seller_total: Total vendeur
+      shipping: Livraison
+      shipping_free: Gratuite
+      subtotal: Sous-total
+      title: Votre panier
+      total_hint: Les commandes sont créées par vendeur ; les totaux sont confirmés
+        au paiement.
+      update: Mettre à jour
+      wishlist_login_required: Connectez-vous pour enregistrer des articles dans votre
+        liste d'envies
+  checkouts:
+    create:
+      direct:
+        multiple: Vos commandes sont confirmées. Convenez du paiement et de la livraison
+          avec chaque vendeur.
+        placed: La commande %{number} est confirmée. Convenez du paiement et de la
+          livraison avec le vendeur.
+      empty_cart: Votre panier est vide
+      errors:
+        empty_cart: Votre panier ne contient aucun article commandable.
+        invalid_address: L'adresse sélectionnée n'est pas valide.
+        invalid_token: Votre session de paiement a expiré. Veuillez réessayer.
+        no_address: Choisissez une adresse de livraison pour les articles expédiés.
+        not_purchasable: L'un des articles n'est plus disponible.
+        own_listing: Vous ne pouvez pas acheter votre propre annonce.
+        quantity_exceeded: Le stock est insuffisant pour l'un des articles.
+        vacation: L'une des boutiques est en mode vacances.
+      replayed:
+        one: Votre commande a déjà été passée
+        other: "%{count} commandes ont déjà été passées"
+    direct:
+      system_message: Commande %{number} créée. Convenez ici du paiement et de la
+        livraison avec le vendeur.
+    show:
+      add_address: Ajouter une adresse
+      address_section: Adresse de livraison
+      back_to_cart: Retour au panier
+      card_hint: Payez en toute sécurité par carte. Nous versons l'argent au vendeur
+        après réception de l'article.
+      commission: Commission de la plateforme
+      default_badge: Par défaut
+      delivery_section: Mode de livraison
+      direct_hint: Convenez du paiement et de la livraison directement avec le vendeur.
+      empty_cart: Votre panier est vide
+      manage_addresses: Gérer les adresses
+      no_address: Vous n'avez pas encore d'adresse enregistrée.
+      option_pickup: Retrait
+      option_ship: Livraison
+      pay_card: Payer par carte
+      pay_direct: Convenir du paiement avec le vendeur
+      payment_section: Paiement
+      secure_note: Vos coordonnées bancaires ne sont jamais partagées avec le vendeur.
+      shipping: Livraison
+      shipping_free: Gratuite
+      subtotal: Sous-total
+      summary_section: Récapitulatif de la commande
+      title: Paiement
+      total: Total
+  completions:
+    create:
+      completed: Commande marquée comme terminée
+  delivery_confirmations:
+    create:
+      confirmed: Livraison confirmée. Profitez de votre article !
+  disputes:
+    create:
+      opened: Litige ouvert. Notre équipe vous contactera.
+  errors:
+    messages:
+      invalid_postal_code: n'est pas un code postal valide (5 chiffres)
+      province_unknown: n'est pas une province reconnue
+  order_mailer:
+    confirmation:
+      greeting: Bonjour %{name},
+      intro: Votre commande %{number} est confirmée et le vendeur a été informé.
+      item_line: "%{title} x %{quantity} - %{amount}"
+      safety: Pour votre protection, le paiement n'est versé qu'après confirmation
+        de la réception.
+      subject: Commande %{number} confirmée
+      total: 'Total : %{amount}'
+      view_order: Voir la commande
+    new_sale:
+      greeting: Bonjour %{name},
+      intro: Vous avez une nouvelle commande. Confirmez le paiement ou expédiez votre
+        article.
+      item_line: "%{title} x %{quantity} - %{amount}"
+      safety: Ne partagez jamais vos coordonnées bancaires en dehors des accords de
+        la plateforme.
+      subject: 'Nouvelle vente : commande %{number}'
+      total: 'Total : %{amount}'
+      view_sale: Voir la vente
+    order_shipped:
+      greeting: Bonjour %{name},
+      intro: Le vendeur a marqué la commande %{number} comme expédiée.
+      safety: Confirmez la réception uniquement après avoir reçu l'article.
+      subject: Votre commande %{number} a été expédiée
+      tracking: 'Transporteur : %{carrier}. Numéro de suivi : %{number}'
+      view_order: Voir la commande
+    payment_received:
+      greeting: Bonjour %{name},
+      intro: L'acheteur confirme le paiement de la commande %{number}. Expédiez l'article
+        quand vous êtes prêt.
+      safety: Expédiez avec un numéro de suivi pour protéger votre vente.
+      subject: 'Paiement confirmé : commande %{number}'
+      view_sale: Voir la vente
+  orders:
+    carrier:
+      Correos: Correos
+      DHL: DHL
+      GLS: GLS
+      MRW: MRW
+      Other: Autre
+      SEUR: SEUR
+      UPS: UPS
+    index:
+      empty: Aucune commande pour le moment
+      empty_cta: Parcourir les annonces
+      empty_hint: Les commandes que vous passerez apparaîtront ici.
+      items_count:
+        one: "%{count} article"
+        other: "%{count} articles"
+      placed_on: Passée le %{date}
+      title: Vos commandes
+    show:
+      auto_complete_note: La commande se terminera automatiquement.
+      back: Retour à mes commandes
+      cancel_button: Annuler la commande
+      commission: Commission de la plateforme
+      complete_button: Marquer comme terminée
+      confirm_delivery_button: Confirmer la réception
+      contact_seller: Contacter le vendeur
+      direct_pending_note: Convenez du paiement directement avec le vendeur, qui le
+        confirmera.
+      dispute_button: Ouvrir un litige
+      dispute_confirm: Ouvrir un litige pour cette commande ?
+      free_shipping: Gratuite
+      items: Articles
+      placed_on: Passée le %{date}
+      progress: Avancement
+      protection_note: Vous êtes protégé jusqu'au %{until_time}. Ensuite, la commande
+        se termine automatiquement.
+      quantity:
+        one: "%{count} unité"
+        other: "%{count} unités"
+      review_button: Laisser un avis
+      review_stars: "%{rating} étoiles sur 5"
+      seller: Vendeur
+      shipping: Livraison
+      shipping_address: Adresse de livraison
+      stripe_pending_note: Payez en toute sécurité par carte pour libérer votre commande
+        au vendeur.
+      subtotal: Sous-total
+      title: Commande %{number}
+      total: Total
+      totals: Totaux
+      tracking: Suivi
+      view_tracking: Suivre le colis
+      your_review: Votre avis
+    timeline:
+      cancelled: Annulée
+      completed: Terminée
+      delivered: Livrée
+      paid: Paiement confirmé
+      shipped: Expédiée
+    transition:
+      invalid: Impossible de passer une commande de %{from} à %{to}
+      protection_closed: La période de protection de l'acheteur est déjà terminée.
+      stale: La commande a changé. Veuillez réessayer.
+  payments:
+    stripe:
+      commission_line: Commission de la plateforme
+      shipping_line: Livraison
+  reviews:
+    create:
+      created: Merci pour votre avis !
+      not_reviewable: Cette commande ne peut pas être évaluée.
+    new:
+      body_placeholder: Comment cela s'est-il passé ? (facultatif)
+      cancel: Annuler
+      not_reviewable: Cette commande ne peut pas être évaluée.
+      stars:
+        one: "%{count} étoile"
+        other: "%{count} étoiles"
+      submit: Publier l'avis
+      subtitle: Racontez aux autres utilisateurs votre expérience de cette commande.
+      title: Avis sur la commande %{number}

@@ -28,7 +28,7 @@ class Sell::VacationModeTest < ActionDispatch::IntegrationTest
 
     doc = Nokogiri::HTML(response.body)
     disabled = doc.css("button[disabled]").map(&:text)
-    assert_includes disabled.map(&:strip), I18n.t("listings.show.buy_now")
+    assert_includes disabled.map(&:strip), I18n.t("listings.show.add_to_cart")
     assert_includes disabled.map(&:strip), I18n.t("listings.show.make_offer")
   end
 

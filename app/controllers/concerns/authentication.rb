@@ -46,6 +46,10 @@ module Authentication
       user.sessions.create!(user_agent: request.user_agent, ip_address: request.remote_ip).tap do |session|
         Current.session = session
         cookies.signed.permanent[:session_id] = { value: session.id, httponly: true, same_site: :lax }
+        # Carry the guest cart over: merge it into the user's cart and drop
+        # the cookie cart (see Carts::Merge for the rules).
+        Carts::Merge.call(from: Cart.for_token(cookies.signed[:cart_token]), to: Cart.for_user(user))
+        cookies.delete(:cart_token)
       end
     end
 

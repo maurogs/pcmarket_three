@@ -264,6 +264,9 @@ pt:
       offers_disabled: Este anúncio não aceita propostas.
       reserved_banner: 'Reservado até %{until_time}: um comprador está prestes a comprá-lo.'
       reserved_cta: Este anúncio está reservado neste momento.
+      add_to_cart: Adicionar ao carrinho
+      own_listing_cta: Este é o seu próprio anúncio
+      quantity_label: Quantidade
   activerecord:
     errors:
       messages:
@@ -855,13 +858,36 @@ pt:
         commission: Comissão da plataforma
         total: Total
         net_revenue: Sua receita
-        shipping_actions_hint: As ações de envio estarão disponíveis na próxima fase.
+        actions_title: Ações
+        cancel_confirm: Cancelar esta venda?
+        cancel_note: Cancele se não conseguir entregar o artigo.
+        cancel_order_button: Cancelar venda
+        carrier_label: Transportadora
+        confirm_payment_button: Confirmar pagamento recebido
+        contact_buyer: Contactar o comprador
+        direct_pending_hint: O comprador vai combinar o pagamento. Confirme-o quando
+          o receber.
+        progress: Progresso
+        ship_button: Marcar como enviado
+        stripe_pending_hint: O comprador paga com cartão em segurança. Depois de pago,
+          envie o artigo.
+        tracking_label: Número de rastreio (opcional)
     vacations:
       create:
         enabled: Modo férias ativado. Seus anúncios continuam visíveis, mas as compras
           estão pausadas.
       destroy:
         disabled: 'Modo férias desativado: você voltou.'
+    cancellations:
+      create:
+        cancelled: Venda cancelada
+    payment_confirmations:
+      create:
+        confirmed: Pagamento confirmado. Envie o artigo quando estiver pronto.
+    shipments:
+      create:
+        shipped: Artigo marcado como enviado
+        unknown_carrier: Escolha uma transportadora válida
   time:
     formats:
       chat_day: "%d/%m %H:%M"
@@ -981,3 +1007,250 @@ pt:
       read_reply: Ler e responder
       safety: Não pague nem partilhe dados bancários fora do PCMarket.
       subject: "%{sender} escreveu-lhe no PCMarket"
+  addresses:
+    create:
+      created: Morada guardada
+    destroy:
+      destroyed: Morada removida
+    edit:
+      title: Editar morada
+    form:
+      cancel: Cancelar
+      postal_code_hint: Código postal de 5 dígitos.
+      region_hint: Indique a sua província ou região.
+      save: Guardar morada
+    index:
+      confirm_delete: Eliminar esta morada?
+      default_badge: Predefinida
+      delete: Eliminar
+      edit: Editar
+      empty: Ainda não há moradas
+      empty_hint: Guarde uma morada para pagar mais depressa da próxima vez.
+      make_default: Tornar predefinida
+      new_address: Nova morada
+      title: As suas moradas
+    new:
+      title: Nova morada
+    update:
+      updated: Morada atualizada
+  cancellations:
+    create:
+      cancelled: Encomenda cancelada
+  cart_items:
+    create:
+      added: "%{title} adicionado ao seu carrinho"
+    destroy:
+      removed: Artigo removido do carrinho
+    update:
+      errors:
+        invalid_quantity: Escolha uma quantidade válida
+        quantity_exceeded: Apenas %{count} unidades disponíveis
+      updated: Quantidade atualizada
+      wishlist_saved: "%{title} movido para a lista de desejos"
+  carts:
+    add_errors:
+      invalid: O artigo não pôde ser adicionado ao carrinho
+      invalid_quantity: Escolha uma quantidade válida
+      not_found: Este anúncio não foi encontrado
+      not_purchasable: Este anúncio não está disponível de momento
+      own_listing: Não pode comprar o seu próprio anúncio
+      quantity_exceeded: Apenas %{count} unidades disponíveis
+      vacation: Esta loja está em modo de férias
+    show:
+      checkout_cta: Ir para o pagamento
+      continue_shopping: Continuar a comprar
+      empty: O seu carrinho está vazio
+      empty_cta: Explorar anúncios
+      empty_hint: Explore os anúncios e adicione artigos ao carrinho.
+      estimated_total: Total estimado
+      free_shipping_hint: Envio grátis a partir de %{threshold}
+      item_unavailable: Já não está disponível
+      items_count:
+        one: "%{count} artigo"
+        other: "%{count} artigos"
+      pickup_available: Levantamento disponível
+      quantity_label: Quantidade
+      recommended_title: Recomendado para si
+      remove: Remover
+      save_wishlist: Guardar na lista de desejos
+      seller_total: Total do vendedor
+      shipping: Envio
+      shipping_free: Grátis
+      subtotal: Subtotal
+      title: O seu carrinho
+      total_hint: As encomendas são criadas por vendedor; os totais são confirmados
+        no pagamento.
+      update: Atualizar
+      wishlist_login_required: Inicie sessão para guardar artigos na lista de desejos
+  checkouts:
+    create:
+      direct:
+        multiple: As suas encomendas estão confirmadas. Combine o pagamento e a entrega
+          com cada vendedor.
+        placed: A encomenda %{number} está confirmada. Combine o pagamento e a entrega
+          com o vendedor.
+      empty_cart: O seu carrinho está vazio
+      errors:
+        empty_cart: O seu carrinho não tem artigos encomendáveis.
+        invalid_address: A morada selecionada não é válida.
+        invalid_token: A sua sessão de pagamento expirou. Tente novamente.
+        no_address: Escolha uma morada de entrega para os artigos enviados.
+        not_purchasable: Um dos artigos já não está disponível.
+        own_listing: Não pode comprar o seu próprio anúncio.
+        quantity_exceeded: Não há stock suficiente para um dos artigos.
+        vacation: Uma das lojas está em modo de férias.
+      replayed:
+        one: A sua encomenda já tinha sido feita
+        other: "%{count} encomendas já tinham sido feitas"
+    direct:
+      system_message: Encomenda %{number} criada. Combine aqui o pagamento e a entrega
+        com o vendedor.
+    show:
+      add_address: Adicionar uma morada
+      address_section: Morada de entrega
+      back_to_cart: Voltar ao carrinho
+      card_hint: Pague com cartão em total segurança. Liberamos o dinheiro ao vendedor
+        depois de receber o artigo.
+      commission: Comissão do mercado
+      default_badge: Predefinida
+      delivery_section: Método de entrega
+      direct_hint: Combine o pagamento e a entrega diretamente com o vendedor.
+      empty_cart: O seu carrinho está vazio
+      manage_addresses: Gerir moradas
+      no_address: Ainda não tem moradas guardadas.
+      option_pickup: Levantamento
+      option_ship: Envio
+      pay_card: Pagar com cartão
+      pay_direct: Combinar pagamento com o vendedor
+      payment_section: Pagamento
+      secure_note: Os seus dados de pagamento nunca são partilhados com o vendedor.
+      shipping: Envio
+      shipping_free: Grátis
+      subtotal: Subtotal
+      summary_section: Resumo da encomenda
+      title: Pagamento
+      total: Total
+  completions:
+    create:
+      completed: Encomenda marcada como concluída
+  delivery_confirmations:
+    create:
+      confirmed: Entrega confirmada. Aproveite o seu artigo!
+  disputes:
+    create:
+      opened: Disputa aberta. A nossa equipa contactá-lo-á.
+  errors:
+    messages:
+      invalid_postal_code: não é um código postal válido (5 dígitos)
+      province_unknown: não é uma província reconhecida
+  order_mailer:
+    confirmation:
+      greeting: Olá %{name},
+      intro: A sua encomenda %{number} está confirmada e o vendedor foi notificado.
+      item_line: "%{title} x %{quantity} - %{amount}"
+      safety: Para sua proteção, o pagamento só é liberado depois de confirmar a entrega.
+      subject: Encomenda %{number} confirmada
+      total: 'Total: %{amount}'
+      view_order: Ver encomenda
+    new_sale:
+      greeting: Olá %{name},
+      intro: Tem uma nova encomenda. Confirme o pagamento ou envie o artigo.
+      item_line: "%{title} x %{quantity} - %{amount}"
+      safety: Nunca partilhe os seus dados de pagamento fora dos acordos da plataforma.
+      subject: 'Nova venda: encomenda %{number}'
+      total: 'Total: %{amount}'
+      view_sale: Ver venda
+    order_shipped:
+      greeting: Olá %{name},
+      intro: O vendedor marcou a encomenda %{number} como enviada.
+      safety: Confirme a entrega apenas depois de receber o artigo.
+      subject: A sua encomenda %{number} foi enviada
+      tracking: 'Transportadora: %{carrier}. Número de rastreio: %{number}'
+      view_order: Ver encomenda
+    payment_received:
+      greeting: Olá %{name},
+      intro: O comprador confirma o pagamento da encomenda %{number}. Envie o artigo
+        quando estiver pronto.
+      safety: Envie com número de rastreio para manter a sua venda protegida.
+      subject: 'Pagamento confirmado: encomenda %{number}'
+      view_sale: Ver venda
+  orders:
+    carrier:
+      Correos: Correos
+      DHL: DHL
+      GLS: GLS
+      MRW: MRW
+      Other: Outra
+      SEUR: SEUR
+      UPS: UPS
+    index:
+      empty: Ainda não há encomendas
+      empty_cta: Explorar anúncios
+      empty_hint: As encomendas que fizer aparecerão aqui.
+      items_count:
+        one: "%{count} artigo"
+        other: "%{count} artigos"
+      placed_on: Efetuada em %{date}
+      title: As suas encomendas
+    show:
+      auto_complete_note: A encomenda será concluída automaticamente.
+      back: Voltar às minhas encomendas
+      cancel_button: Cancelar encomenda
+      commission: Comissão do mercado
+      complete_button: Marcar como concluída
+      confirm_delivery_button: Confirmar entrega
+      contact_seller: Contactar o vendedor
+      direct_pending_note: Combine o pagamento diretamente com o vendedor, que o confirmará.
+      dispute_button: Abrir uma disputa
+      dispute_confirm: Abrir uma disputa para esta encomenda?
+      free_shipping: Grátis
+      items: Artigos
+      placed_on: Efetuada em %{date}
+      progress: Progresso
+      protection_note: Está protegido até %{until_time}. Depois disso, a encomenda
+        conclui-se automaticamente.
+      quantity:
+        one: "%{count} unidade"
+        other: "%{count} unidades"
+      review_button: Deixar uma avaliação
+      review_stars: "%{rating} em 5 estrelas"
+      seller: Vendedor
+      shipping: Envio
+      shipping_address: Morada de entrega
+      stripe_pending_note: Pague com cartão em segurança para liberar a sua encomenda
+        ao vendedor.
+      subtotal: Subtotal
+      title: Encomenda %{number}
+      total: Total
+      totals: Totais
+      tracking: Rastreio
+      view_tracking: Rastrear a encomenda
+      your_review: A sua avaliação
+    timeline:
+      cancelled: Cancelado
+      completed: Concluído
+      delivered: Entregue
+      paid: Pagamento confirmado
+      shipped: Enviado
+    transition:
+      invalid: Não é possível mover uma encomenda de %{from} para %{to}
+      protection_closed: O período de proteção ao comprador já terminou.
+      stale: A encomenda mudou. Tente novamente.
+  payments:
+    stripe:
+      commission_line: Comissão do mercado
+      shipping_line: Envio
+  reviews:
+    create:
+      created: Obrigado pela sua avaliação!
+      not_reviewable: Esta encomenda não pode ser avaliada.
+    new:
+      body_placeholder: Como correu? (opcional)
+      cancel: Cancelar
+      not_reviewable: Esta encomenda não pode ser avaliada.
+      stars:
+        one: "%{count} estrela"
+        other: "%{count} estrelas"
+      submit: Publicar avaliação
+      subtitle: Conte aos outros utilizadores a sua experiência com esta encomenda.
+      title: Avaliar a encomenda %{number}

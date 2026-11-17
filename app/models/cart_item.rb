@@ -5,11 +5,12 @@ class CartItem < ApplicationRecord
   validates :quantity, numericality: { only_integer: true, greater_than: 0 }
   validates :listing_id, uniqueness: { scope: :cart_id }
 
-  validate :listing_is_purchasable
-
-  private
-
-  def listing_is_purchasable
-    errors.add(:listing, :not_purchasable) unless listing&.approved?
+  # NOTE: there is deliberately no "listing must be approved" validation:
+  # items stay in the cart when a listing is sold/archived/rejected after
+  # being added, so the cart page can grey them out with a notice instead
+  # of silently dropping them (Carts::Summary flags them stale). Purchase
+  # rules live in Carts::AddItem and Checkout::PlaceOrders.
+  def stale?(for_user: nil)
+    !listing.purchasable_by?(for_user)
   end
 end

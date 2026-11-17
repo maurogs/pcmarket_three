@@ -1,0 +1,46 @@
+<% content_for :title, t(".title") %>
+
+<div class="mx-auto max-w-2xl">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h1 class="text-xl font-bold tracking-tight sm:text-2xl"><%= t(".title") %></h1>
+    <%= link_to t(".new_address"), new_address_path, class: "btn-primary" %>
+  </div>
+
+  <% if @addresses.any? %>
+    <ul class="mt-6 space-y-3">
+      <% @addresses.each do |address| %>
+        <li class="card flex flex-wrap items-start justify-between gap-3 px-4 py-3">
+          <div class="min-w-0">
+            <p class="text-sm font-semibold text-text">
+              <%= address.full_name %>
+              <% if address.default? %>
+                <span class="ml-1 rounded bg-primary/10 px-1.5 py-0.5 text-xs font-medium text-primary"><%= t(".default_badge") %></span>
+              <% end %>
+            </p>
+            <p class="mt-1 text-xs leading-5 text-muted">
+              <%= [ address.line1, address.line2 ].compact_blank.join(", ") %><br>
+              <%= [ address.postal_code, address.city ].compact_blank.join(" – ") %><br>
+              <%= [ address.region, t("countries.#{address.country_code.downcase}") ].compact_blank.join(", ") %>
+              <% if address.phone.present? %><br><%= address.phone %><% end %>
+            </p>
+          </div>
+          <div class="flex shrink-0 items-center gap-2">
+            <% unless address.default? %>
+              <%= button_to t(".make_default"), address_path(address), method: :patch,
+                    params: { address: { default: true } }, class: "chip" %>
+            <% end %>
+            <%= link_to t(".edit"), edit_address_path(address), class: "chip" %>
+            <%= button_to t(".delete"), address_path(address), method: :delete, class: "chip",
+                  form: { data: { turbo_confirm: t(".confirm_delete") } } %>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <div class="card mt-6 px-6 py-10 text-center">
+      <span class="text-muted"><%= inline_icon :map_pin, classes: "mx-auto size-10" %></span>
+      <p class="mt-3 text-sm font-medium text-text"><%= t(".empty") %></p>
+      <p class="mt-1 text-xs text-muted"><%= t(".empty_hint") %></p>
+    </div>
+  <% end %>
+</div>

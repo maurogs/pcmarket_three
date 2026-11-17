@@ -20,7 +20,11 @@ Rails.application.configure do
 
   # Show full error reports.
   config.consider_all_requests_local = true
-  config.cache_store = :null_store
+  # A real (in-process) cache store: the message rate limiter (see
+  # MessagesController) and Setting lookups go through Rails.cache, so a
+  # null store would make those features untestable here. Each parallel
+  # test worker gets its own memory store.
+  config.cache_store = :memory_store
 
   # Render exception templates for rescuable exceptions and raise for other exceptions.
   config.action_dispatch.show_exceptions = :rescuable

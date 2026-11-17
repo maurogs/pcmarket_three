@@ -1,0 +1,11 @@
+<%= t(".greeting", name: @recipient.display_name) %>
+
+<%= t(".intro", number: @order.number) %>
+
+<% @order.order_items.each do |item| %><%= t(".item_line", title: item.title, quantity: item.quantity, amount: money(item.line_total_cents, @order.currency)) %>
+<% end %>
+<%= t(".total", amount: money(@order.total_cents, @order.currency)) %>
+
+<%= t(".view_sale") %>: <%= sell_sale_url(@order, locale: @recipient.locale) %>
+
+<%= t(".safety") %>

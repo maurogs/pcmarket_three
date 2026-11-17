@@ -132,14 +132,23 @@
       <% elsif listing.reserved? %>
         <p class="rounded-md bg-surface-muted px-4 py-3 text-sm font-medium text-muted"><%= t(".reserved_cta") %></p>
       <% else %>
-        <% if Flipper.enabled?(:stripe_checkout) %>
-          <%= link_to t(".buy_now"), "#", class: "inline-flex min-h-11 items-center rounded-md bg-primary px-6 text-sm font-semibold text-white hover:bg-primary-hover" %>
-        <% else %>
-          <%# Checkout opens with the payments phase; keep the affordance visible. %>
-          <button type="button" disabled title="<%= t(".checkout_soon") %>"
+        <%# Cart works for guests too (cookie cart, merged on sign-in), so
+            the add-to-cart form is the entry point to checkout. Carts::AddItem
+            enforces the purchase rules; the affordance is still disabled for
+            cases we know up front (own listing, vacation stores). %>
+        <% own_listing = listing.user_id == Current.user&.id %>
+        <% if on_vacation || own_listing %>
+          <button type="button" disabled title="<%= own_listing ? t(".own_listing_cta") : t(".vacation_cta") %>"
                   class="inline-flex min-h-11 cursor-not-allowed items-center rounded-md bg-primary/40 px-6 text-sm font-semibold text-white">
-            <%= t(".buy_now") %>
+            <%= t(".add_to_cart") %>
           </button>
+        <% else %>
+          <%= form_with url: cart_items_path, method: :post, class: "inline-flex items-center gap-2" do %>
+            <%= hidden_field_tag :listing_id, listing.to_param %>
+            <%= number_field_tag :quantity, 1, min: 1, max: listing.quantity,
+                  class: "input w-16 text-center", aria: { label: t(".quantity_label") } %>
+            <%= submit_tag t(".add_to_cart"), class: "btn-primary cursor-pointer" %>
+          <% end %>
         <% end %>
 
         <%# Offers are live (Phase 4a): real form unless the seller's store

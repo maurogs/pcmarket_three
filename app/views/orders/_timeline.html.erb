@@ -1,0 +1,35 @@
+<%# Vertical lifecycle steps, shared by the buyer order page and the
+    seller sale page (render "orders/timeline", order: @order). %>
+<% steps = [ [ :placed, order.created_at ], [ :paid, order.paid_at ], [ :shipped, order.shipped_at ],
+             [ :delivered, order.delivered_at ], [ :completed, order.completed_at ] ] %>
+<ol class="space-y-3">
+  <% steps.each do |step, time| %>
+    <li class="flex items-start gap-3">
+      <% if time %>
+        <span class="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+          <%= inline_icon :check, classes: "size-3.5" %>
+        </span>
+      <% else %>
+        <span class="mt-0.5 size-5 shrink-0 rounded-full border border-border"></span>
+      <% end %>
+      <div class="min-w-0 text-sm">
+        <p class="<%= time ? "font-medium text-text" : "text-muted" %>"><%= t(".#{step}") %></p>
+        <% if time %>
+          <p class="text-xs text-muted"><%= l(time, format: :long) %></p>
+        <% end %>
+      </div>
+    </li>
+  <% end %>
+
+  <% if order.cancelled? && order.cancelled_at %>
+    <li class="flex items-start gap-3">
+      <span class="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+        <%= inline_icon :close, classes: "size-3.5" %>
+      </span>
+      <div class="min-w-0 text-sm">
+        <p class="font-medium text-text"><%= t(".cancelled") %></p>
+        <p class="text-xs text-muted"><%= l(order.cancelled_at, format: :long) %></p>
+      </div>
+    </li>
+  <% end %>
+</ol>

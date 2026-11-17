@@ -16,6 +16,7 @@ class User < ApplicationRecord
   has_many :sales, class_name: "Order", foreign_key: "seller_id",
                    inverse_of: :seller, dependent: :destroy
   has_many :notifications, dependent: :destroy
+  has_many :carts, dependent: :destroy
   has_many :addresses, dependent: :destroy
   has_many :api_tokens, dependent: :destroy
   has_many :reviews, foreign_key: "reviewer_id", inverse_of: :reviewer, dependent: :destroy

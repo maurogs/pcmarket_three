@@ -1,0 +1,21 @@
+one:
+  user: one
+  full_name: Mauro Fernández
+  line1: Calle de Serrano 21
+  line2: 4ºB
+  city: Madrid
+  region: Madrid
+  postal_code: "28001"
+  country_code: ES
+  phone: "+34 600 111 222"
+  default: true
+
+two:
+  user: two
+  full_name: Two User
+  line1: Avenida de Andalucía 15
+  city: Sevilla
+  region: Sevilla
+  postal_code: "41001"
+  country_code: ES
+  default: true

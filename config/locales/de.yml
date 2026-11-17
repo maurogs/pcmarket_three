@@ -266,6 +266,9 @@ de:
       reserved_banner: 'Reserviert bis %{until_time}: ein Käufer steht kurz vor dem
         Kauf.'
       reserved_cta: Dieses Angebot ist gerade reserviert.
+      add_to_cart: In den Warenkorb
+      own_listing_cta: Dies ist deine eigene Anzeige
+      quantity_label: Menge
   activerecord:
     errors:
       messages:
@@ -858,12 +861,35 @@ de:
         commission: Plattformgebühr
         total: Gesamt
         net_revenue: Dein Umsatz
-        shipping_actions_hint: Versandaktionen folgen in der nächsten Phase.
+        actions_title: Aktionen
+        cancel_confirm: Diesen Verkauf stornieren?
+        cancel_note: Storniere, wenn du den Artikel nicht liefern kannst.
+        cancel_order_button: Verkauf stornieren
+        carrier_label: Versanddienstleister
+        confirm_payment_button: Zahlungseingang bestätigen
+        contact_buyer: Käufer kontaktieren
+        direct_pending_hint: Der Käufer vereinbart die Zahlung. Bestätige sie, sobald
+          du sie erhalten hast.
+        progress: Fortschritt
+        ship_button: Als versandt markieren
+        stripe_pending_hint: Der Käufer zahlt sicher mit Karte. Nach der Zahlung versende
+          den Artikel.
+        tracking_label: Sendungsnummer (optional)
     vacations:
       create:
         enabled: Urlaubsmodus aktiv. Deine Angebote bleiben sichtbar, Käufe sind pausiert.
       destroy:
         disabled: Urlaubsmodus beendet — du bist wieder verfügbar.
+    cancellations:
+      create:
+        cancelled: Verkauf storniert
+    payment_confirmations:
+      create:
+        confirmed: Zahlung bestätigt. Versende den Artikel, sobald du bereit bist.
+    shipments:
+      create:
+        shipped: Artikel als versandt markiert
+        unknown_carrier: Wähle einen gültigen Versanddienstleister
   time:
     formats:
       chat_day: "%d.%m. %H:%M"
@@ -985,3 +1011,254 @@ de:
       read_reply: Lesen und antworten
       safety: Zahlen Sie nicht und teilen Sie keine Bankdaten außerhalb von PCMarket.
       subject: "%{sender} hat Ihnen auf PCMarket geschrieben"
+  addresses:
+    create:
+      created: Adresse gespeichert
+    destroy:
+      destroyed: Adresse entfernt
+    edit:
+      title: Adresse bearbeiten
+    form:
+      cancel: Abbrechen
+      postal_code_hint: Postleitzahl mit 5 Ziffern.
+      region_hint: Gib deine Provinz oder Region ein.
+      save: Adresse speichern
+    index:
+      confirm_delete: Diese Adresse löschen?
+      default_badge: Standard
+      delete: Löschen
+      edit: Bearbeiten
+      empty: Noch keine Adressen
+      empty_hint: Speichere eine Adresse, um künftig schneller zu bestellen.
+      make_default: Als Standard festlegen
+      new_address: Neue Adresse
+      title: Deine Adressen
+    new:
+      title: Neue Adresse
+    update:
+      updated: Adresse aktualisiert
+  cancellations:
+    create:
+      cancelled: Bestellung storniert
+  cart_items:
+    create:
+      added: "%{title} in den Warenkorb gelegt"
+    destroy:
+      removed: Artikel aus dem Warenkorb entfernt
+    update:
+      errors:
+        invalid_quantity: Wähle eine gültige Menge
+        quantity_exceeded: Nur %{count} Stück verfügbar
+      updated: Menge aktualisiert
+      wishlist_saved: "%{title} auf die Merkliste verschoben"
+  carts:
+    add_errors:
+      invalid: Der Artikel konnte nicht in den Warenkorb gelegt werden
+      invalid_quantity: Wähle eine gültige Menge
+      not_found: Diese Anzeige wurde nicht gefunden
+      not_purchasable: Diese Anzeige ist derzeit nicht verfügbar
+      own_listing: Du kannst deine eigene Anzeige nicht kaufen
+      quantity_exceeded: Nur %{count} Stück verfügbar
+      vacation: Dieser Shop ist im Urlaubsmodus
+    show:
+      checkout_cta: Zur Kasse
+      continue_shopping: Weiter einkaufen
+      empty: Dein Warenkorb ist leer
+      empty_cta: Anzeigen durchsuchen
+      empty_hint: Stöbere in Anzeigen und lege Artikel in den Warenkorb.
+      estimated_total: Geschätzte Gesamtsumme
+      free_shipping_hint: Gratis Versand ab %{threshold}
+      item_unavailable: Nicht mehr verfügbar
+      items_count:
+        one: "%{count} Artikel"
+        other: "%{count} Artikel"
+      pickup_available: Abholung möglich
+      quantity_label: Menge
+      recommended_title: Für dich empfohlen
+      remove: Entfernen
+      save_wishlist: Zur Merkliste speichern
+      seller_total: Verkäufer gesamt
+      shipping: Versand
+      shipping_free: Gratis
+      subtotal: Zwischensumme
+      title: Dein Warenkorb
+      total_hint: Bestellungen werden pro Verkäufer aufgegeben; die Summen werden
+        an der Kasse bestätigt.
+      update: Aktualisieren
+      wishlist_login_required: Melde dich an, um Artikel auf die Merkliste zu setzen
+  checkouts:
+    create:
+      direct:
+        multiple: Deine Bestellungen sind bestätigt. Stimme Zahlung und Lieferung
+          mit jedem Verkäufer ab.
+        placed: Bestellung %{number} ist bestätigt. Stimme Zahlung und Lieferung mit
+          dem Verkäufer ab.
+      empty_cart: Dein Warenkorb ist leer
+      errors:
+        empty_cart: Dein Warenkorb enthält keine bestellbaren Artikel.
+        invalid_address: Die gewählte Adresse ist nicht gültig.
+        invalid_token: Deine Kasse-Sitzung ist abgelaufen. Bitte versuche es erneut.
+        no_address: Wähle eine Lieferadresse für die versendeten Artikel.
+        not_purchasable: Einer der Artikel ist nicht mehr verfügbar.
+        own_listing: Du kannst deine eigene Anzeige nicht kaufen.
+        quantity_exceeded: Für einen der Artikel ist nicht genug Bestand vorhanden.
+        vacation: Einer der Shops ist im Urlaubsmodus.
+      replayed:
+        one: Deine Bestellung wurde bereits aufgegeben
+        other: "%{count} Bestellungen wurden bereits aufgegeben"
+    direct:
+      system_message: Bestellung %{number} erstellt. Stimme hier Zahlung und Lieferung
+        mit dem Verkäufer ab.
+    show:
+      add_address: Adresse hinzufügen
+      address_section: Lieferadresse
+      back_to_cart: Zurück zum Warenkorb
+      card_hint: Sicher mit Karte zahlen. Wir zahlen das Geld an den Verkäufer aus,
+        nachdem du den Artikel erhalten hast.
+      commission: Marktplatzgebühr
+      default_badge: Standard
+      delivery_section: Liefermethode
+      direct_hint: Stimme Zahlung und Lieferung direkt mit dem Verkäufer ab.
+      empty_cart: Dein Warenkorb ist leer
+      manage_addresses: Adressen verwalten
+      no_address: Du hast noch keine gespeicherten Adressen.
+      option_pickup: Abholung
+      option_ship: Versand
+      pay_card: Mit Karte zahlen
+      pay_direct: Zahlung mit dem Verkäufer vereinbaren
+      payment_section: Zahlung
+      secure_note: Deine Zahlungsdaten werden nie mit dem Verkäufer geteilt.
+      shipping: Versand
+      shipping_free: Gratis
+      subtotal: Zwischensumme
+      summary_section: Bestellübersicht
+      title: Kasse
+      total: Gesamt
+  completions:
+    create:
+      completed: Bestellung als abgeschlossen markiert
+  delivery_confirmations:
+    create:
+      confirmed: Lieferung bestätigt. Viel Spaß mit deinem Artikel!
+  disputes:
+    create:
+      opened: Streitfall eröffnet. Unser Team kontaktiert dich.
+  errors:
+    messages:
+      invalid_postal_code: ist keine gültige Postleitzahl (5 Ziffern)
+      province_unknown: ist keine anerkannte Provinz
+  order_mailer:
+    confirmation:
+      greeting: Hallo %{name},
+      intro: Deine Bestellung %{number} ist bestätigt und der Verkäufer wurde informiert.
+      item_line: "%{title} x %{quantity} - %{amount}"
+      safety: Zu deinem Schutz wird die Zahlung erst nach Bestätigung des Erhalts
+        an den Verkäufer ausgezahlt.
+      subject: Bestellung %{number} bestätigt
+      total: 'Gesamt: %{amount}'
+      view_order: Bestellung ansehen
+    new_sale:
+      greeting: Hallo %{name},
+      intro: Du hast eine neue Bestellung. Bestätige die Zahlung oder versende deinen
+        Artikel.
+      item_line: "%{title} x %{quantity} - %{amount}"
+      safety: Teile deine Zahlungsdaten niemals außerhalb der Vereinbarungen auf der
+        Plattform.
+      subject: 'Neuer Verkauf: Bestellung %{number}'
+      total: 'Gesamt: %{amount}'
+      view_sale: Verkauf ansehen
+    order_shipped:
+      greeting: Hallo %{name},
+      intro: Der Verkäufer hat Bestellung %{number} als versandt markiert.
+      safety: Bestätige den Erhalt erst, nachdem du den Artikel erhalten hast.
+      subject: Deine Bestellung %{number} wurde versandt
+      tracking: 'Versanddienstleister: %{carrier}. Sendungsnummer: %{number}'
+      view_order: Bestellung ansehen
+    payment_received:
+      greeting: Hallo %{name},
+      intro: Der Käufer bestätigt die Zahlung für Bestellung %{number}. Versende den
+        Artikel, sobald du bereit bist.
+      safety: Versende mit Sendungsnummer, um deinen Verkauf zu schützen.
+      subject: 'Zahlung bestätigt: Bestellung %{number}'
+      view_sale: Verkauf ansehen
+  orders:
+    carrier:
+      Correos: Correos
+      DHL: DHL
+      GLS: GLS
+      MRW: MRW
+      Other: Sonstige
+      SEUR: SEUR
+      UPS: UPS
+    index:
+      empty: Noch keine Bestellungen
+      empty_cta: Anzeigen durchsuchen
+      empty_hint: Bestellungen, die du aufgibst, erscheinen hier.
+      items_count:
+        one: "%{count} Artikel"
+        other: "%{count} Artikel"
+      placed_on: Aufgegeben am %{date}
+      title: Deine Bestellungen
+    show:
+      auto_complete_note: Die Bestellung wird automatisch abgeschlossen.
+      back: Zurück zu meinen Bestellungen
+      cancel_button: Bestellung stornieren
+      commission: Marktplatzgebühr
+      complete_button: Als abgeschlossen markieren
+      confirm_delivery_button: Erhalt bestätigen
+      contact_seller: Verkäufer kontaktieren
+      direct_pending_note: Vereinbare die Zahlung direkt mit dem Verkäufer, der sie
+        bestätigt.
+      dispute_button: Streitfall eröffnen
+      dispute_confirm: Streitfall für diese Bestellung eröffnen?
+      free_shipping: Gratis
+      items: Artikel
+      placed_on: Aufgegeben am %{date}
+      progress: Fortschritt
+      protection_note: Du bist bis %{until_time} geschützt. Danach wird die Bestellung
+        automatisch abgeschlossen.
+      quantity:
+        one: "%{count} Stück"
+        other: "%{count} Stück"
+      review_button: Bewertung hinterlassen
+      review_stars: "%{rating} von 5 Sternen"
+      seller: Verkäufer
+      shipping: Versand
+      shipping_address: Lieferadresse
+      stripe_pending_note: Zahle sicher mit Karte, um deine Bestellung an den Verkäufer
+        freizugeben.
+      subtotal: Zwischensumme
+      title: Bestellung %{number}
+      total: Gesamt
+      totals: Summen
+      tracking: Sendungsverfolgung
+      view_tracking: Paket verfolgen
+      your_review: Deine Bewertung
+    timeline:
+      cancelled: Storniert
+      completed: Abgeschlossen
+      delivered: Zugestellt
+      paid: Zahlung bestätigt
+      shipped: Versandt
+    transition:
+      invalid: Eine Bestellung kann nicht von %{from} nach %{to} geändert werden
+      protection_closed: Der Käuferschutzzeitraum ist bereits abgelaufen.
+      stale: Die Bestellung hat sich geändert. Bitte versuche es erneut.
+  payments:
+    stripe:
+      commission_line: Marktplatzgebühr
+      shipping_line: Versand
+  reviews:
+    create:
+      created: Danke für deine Bewertung!
+      not_reviewable: Diese Bestellung kann nicht bewertet werden.
+    new:
+      body_placeholder: Wie lief es? (optional)
+      cancel: Abbrechen
+      not_reviewable: Diese Bestellung kann nicht bewertet werden.
+      stars:
+        one: "%{count} Stern"
+        other: "%{count} Sterne"
+      submit: Bewertung veröffentlichen
+      subtitle: Erzähle anderen Nutzern von deiner Erfahrung mit dieser Bestellung.
+      title: Bestellung %{number} bewerten

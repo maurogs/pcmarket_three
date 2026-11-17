@@ -1,0 +1,9 @@
+<%= t(".greeting", name: @recipient.display_name) %>
+
+<%= t(".intro", number: @order.number) %>
+
+<% if @order.carrier.present? %><%= t(".tracking", carrier: t("orders.carrier.#{@order.carrier}"), number: @order.tracking_number) %>
+<% end %>
+<%= t(".view_order") %>: <%= order_url(@order, locale: @recipient.locale) %>
+
+<%= t(".safety") %>

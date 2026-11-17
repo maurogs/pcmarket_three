@@ -1,5 +1,5 @@
 one:
-  number: PCM-2026-000001
+  number: PCM-2025-000001
   buyer: one
   seller: two
   status: completed
@@ -7,7 +7,7 @@ one:
   total_cents: 50000
 
 two:
-  number: PCM-2026-000002
+  number: PCM-2025-000002
   buyer: two
   seller: one
   status: completed

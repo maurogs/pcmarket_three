@@ -209,6 +209,25 @@ class Listing < ApplicationRecord
     update!(status: :approved, reserved_for: nil, reserved_until: nil)
   end
 
+  # Can this (possibly anonymous) buyer buy the listing right now? A
+  # reserved listing is purchasable only by the buyer it is reserved for.
+  def purchasable_by?(user)
+    approved? || (reserved? && user.present? && reserved_for_id == user.id)
+  end
+
+  # Checkout cancelled: put the reserved units back on sale. The quantity
+  # goes up, so the > 0 validation can never be violated by this move.
+  def add_back_quantity!(units)
+    update!(quantity: quantity + units)
+  end
+
+  # Sold listing revived after the order that sold it was cancelled: back
+  # into the public pool.
+  def reinstate!
+    ensure_transition!(from: [ :sold ], to: :approved)
+    update!(status: :approved, sold_at: nil)
+  end
+
   # Tri-state allow_offers column: nil falls back to the store default.
   def offers_allowed?
     return allow_offers unless allow_offers.nil?

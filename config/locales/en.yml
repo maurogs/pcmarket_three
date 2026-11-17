@@ -260,6 +260,9 @@ en:
       offers_disabled: This listing does not accept offers.
       reserved_banner: 'Reserved until %{until_time}: a buyer is about to buy it.'
       reserved_cta: This listing is currently reserved.
+      add_to_cart: Add to cart
+      own_listing_cta: This is your own listing
+      quantity_label: Quantity
   activerecord:
     errors:
       messages:
@@ -847,13 +850,34 @@ en:
         commission: Platform commission
         total: Total
         net_revenue: Your revenue
-        shipping_actions_hint: Shipping and fulfilment actions will be available with
-          the next phase.
+        actions_title: Actions
+        cancel_confirm: Cancel this sale?
+        cancel_note: Cancel if you cannot deliver the item.
+        cancel_order_button: Cancel sale
+        carrier_label: Carrier
+        confirm_payment_button: Confirm payment received
+        contact_buyer: Contact buyer
+        direct_pending_hint: The buyer will arrange payment. Confirm it once received.
+        progress: Progress
+        ship_button: Mark as shipped
+        stripe_pending_hint: The buyer pays securely by card. Once paid, ship the
+          item.
+        tracking_label: Tracking number (optional)
     vacations:
       create:
         enabled: Vacation mode is on. Your listings stay visible, but buying is paused.
       destroy:
         disabled: Vacation mode is off — you are back open.
+    cancellations:
+      create:
+        cancelled: Sale cancelled
+    payment_confirmations:
+      create:
+        confirmed: Payment confirmed. Ship the item when you are ready.
+    shipments:
+      create:
+        shipped: Item marked as shipped
+        unknown_carrier: Choose a valid carrier
   time:
     formats:
       chat_day: "%b %d %H:%M"
@@ -971,3 +995,249 @@ en:
       read_reply: Read and reply
       safety: Do not pay or share bank details outside PCMarket.
       subject: "%{sender} wrote to you on PCMarket"
+  addresses:
+    create:
+      created: Address saved
+    destroy:
+      destroyed: Address removed
+    edit:
+      title: Edit address
+    form:
+      cancel: Cancel
+      postal_code_hint: 5-digit postcode.
+      region_hint: Enter your province or region.
+      save: Save address
+    index:
+      confirm_delete: Delete this address?
+      default_badge: Default
+      delete: Delete
+      edit: Edit
+      empty: No addresses yet
+      empty_hint: Save an address to speed up future checkouts.
+      make_default: Make default
+      new_address: New address
+      title: Your addresses
+    new:
+      title: New address
+    update:
+      updated: Address updated
+  cancellations:
+    create:
+      cancelled: Order cancelled
+  cart_items:
+    create:
+      added: "%{title} added to your cart"
+    destroy:
+      removed: Item removed from your cart
+    update:
+      errors:
+        invalid_quantity: Choose a valid quantity
+        quantity_exceeded: Only %{count} units are available
+      updated: Quantity updated
+      wishlist_saved: "%{title} moved to your wishlist"
+  carts:
+    add_errors:
+      invalid: The item could not be added to your cart
+      invalid_quantity: Choose a valid quantity
+      not_found: This listing could not be found
+      not_purchasable: This listing is not available right now
+      own_listing: You cannot buy your own listing
+      quantity_exceeded: Only %{count} units are available
+      vacation: This store is on vacation
+    show:
+      checkout_cta: Go to checkout
+      continue_shopping: Continue shopping
+      empty: Your cart is empty
+      empty_cta: Browse listings
+      empty_hint: Browse listings and add items to your cart.
+      estimated_total: Estimated total
+      free_shipping_hint: Free shipping over %{threshold}
+      item_unavailable: No longer available
+      items_count:
+        one: "%{count} item"
+        other: "%{count} items"
+      pickup_available: Pickup available
+      quantity_label: Quantity
+      recommended_title: Recommended for you
+      remove: Remove
+      save_wishlist: Save to wishlist
+      seller_total: Seller total
+      shipping: Shipping
+      shipping_free: Free
+      subtotal: Subtotal
+      title: Your cart
+      total_hint: Orders are placed per seller; totals are confirmed at checkout.
+      update: Update
+      wishlist_login_required: Sign in to save items to your wishlist
+  checkouts:
+    create:
+      direct:
+        multiple: Your orders are confirmed. Arrange payment and delivery with each
+          seller.
+        placed: Order %{number} is confirmed. Arrange payment and delivery with the
+          seller.
+      empty_cart: Your cart is empty
+      errors:
+        empty_cart: Your cart has no orderable items.
+        invalid_address: The selected address is not valid.
+        invalid_token: Your checkout session expired. Please try again.
+        no_address: Choose a delivery address for the shipped items.
+        not_purchasable: One of the items is no longer available.
+        own_listing: You cannot buy your own listing.
+        quantity_exceeded: There is not enough stock left for one of the items.
+        vacation: One of the stores is on vacation.
+      replayed:
+        one: Your order was already placed
+        other: "%{count} orders were already placed"
+    direct:
+      system_message: Order %{number} created. Arrange payment and delivery with the
+        seller here.
+    show:
+      add_address: Add an address
+      address_section: Delivery address
+      back_to_cart: Back to cart
+      card_hint: Pay securely by card. We release the money to the seller after you
+        receive the item.
+      commission: Marketplace commission
+      default_badge: Default
+      delivery_section: Delivery method
+      direct_hint: Agree on payment and delivery directly with the seller.
+      empty_cart: Your cart is empty
+      manage_addresses: Manage addresses
+      no_address: You have no saved addresses yet.
+      option_pickup: Pickup
+      option_ship: Shipping
+      pay_card: Pay by card
+      pay_direct: Arrange payment with the seller
+      payment_section: Payment
+      secure_note: Your payment details are never shared with the seller.
+      shipping: Shipping
+      shipping_free: Free
+      subtotal: Subtotal
+      summary_section: Order summary
+      title: Checkout
+      total: Total
+  completions:
+    create:
+      completed: Order marked as completed
+  delivery_confirmations:
+    create:
+      confirmed: Delivery confirmed. Enjoy your item!
+  disputes:
+    create:
+      opened: Dispute opened. Our team will contact you.
+  errors:
+    messages:
+      invalid_postal_code: is not a valid postcode (5 digits)
+      province_unknown: is not a recognised province
+  order_mailer:
+    confirmation:
+      greeting: Hi %{name},
+      intro: Your order %{number} is confirmed and the seller has been notified.
+      item_line: "%{title} x %{quantity} - %{amount}"
+      safety: For your protection, payment is only released after you confirm delivery.
+      subject: Order %{number} confirmed
+      total: 'Total: %{amount}'
+      view_order: View order
+    new_sale:
+      greeting: Hi %{name},
+      intro: You have a new order. Confirm the payment or ship your item.
+      item_line: "%{title} x %{quantity} - %{amount}"
+      safety: Never share your payment details outside the platform agreements.
+      subject: 'New sale: order %{number}'
+      total: 'Total: %{amount}'
+      view_sale: View sale
+    order_shipped:
+      greeting: Hi %{name},
+      intro: The seller marked order %{number} as shipped.
+      safety: Confirm delivery only after you receive the item.
+      subject: Your order %{number} has shipped
+      tracking: 'Carrier: %{carrier}. Tracking number: %{number}'
+      view_order: View order
+    payment_received:
+      greeting: Hi %{name},
+      intro: The buyer confirms payment for order %{number}. Ship the item when you
+        are ready.
+      safety: Ship with a tracking number to keep your sale protected.
+      subject: 'Payment confirmed: order %{number}'
+      view_sale: View sale
+  orders:
+    carrier:
+      Correos: Correos
+      DHL: DHL
+      GLS: GLS
+      MRW: MRW
+      Other: Other
+      SEUR: SEUR
+      UPS: UPS
+    index:
+      empty: No orders yet
+      empty_cta: Browse listings
+      empty_hint: Orders you place will appear here.
+      items_count:
+        one: "%{count} item"
+        other: "%{count} items"
+      placed_on: Placed on %{date}
+      title: Your orders
+    show:
+      auto_complete_note: The order will complete automatically.
+      back: Back to orders
+      cancel_button: Cancel order
+      commission: Marketplace commission
+      complete_button: Mark as completed
+      confirm_delivery_button: Confirm delivery
+      contact_seller: Contact seller
+      direct_pending_note: Arrange payment directly with the seller, who will confirm
+        it.
+      dispute_button: Open a dispute
+      dispute_confirm: Open a dispute for this order?
+      free_shipping: Free
+      items: Items
+      placed_on: Placed on %{date}
+      progress: Progress
+      protection_note: You are protected until %{until_time}. After that, the order
+        completes automatically.
+      quantity:
+        one: "%{count} unit"
+        other: "%{count} units"
+      review_button: Leave a review
+      review_stars: "%{rating} out of 5 stars"
+      seller: Seller
+      shipping: Shipping
+      shipping_address: Shipping address
+      stripe_pending_note: Pay securely by card to release your order to the seller.
+      subtotal: Subtotal
+      title: Order %{number}
+      total: Total
+      totals: Totals
+      tracking: Tracking
+      view_tracking: Track shipment
+      your_review: Your review
+    timeline:
+      cancelled: Cancelled
+      completed: Completed
+      delivered: Delivered
+      paid: Payment confirmed
+      shipped: Shipped
+    transition:
+      invalid: Cannot move an order from %{from} to %{to}
+      protection_closed: The buyer protection period has already ended.
+      stale: The order changed. Please try again.
+  payments:
+    stripe:
+      commission_line: Marketplace commission
+      shipping_line: Shipping
+  reviews:
+    create:
+      created: Thanks for your review!
+      not_reviewable: This order cannot be reviewed.
+    new:
+      body_placeholder: How did it go? (optional)
+      cancel: Cancel
+      not_reviewable: This order cannot be reviewed.
+      stars:
+        one: "%{count} star"
+        other: "%{count} stars"
+      submit: Publish review
+      subtitle: Tell other users about your experience with this order.
+      title: Review order %{number}

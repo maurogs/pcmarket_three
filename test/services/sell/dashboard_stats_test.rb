@@ -7,7 +7,7 @@ class Sell::DashboardStatsTest < ActiveSupport::TestCase
     @listing.update_column(:views_count, 200)
   end
 
-  # Explicit numbers: the fixture orders hand-pick PCM-2026-000001/2, so the
+  # Explicit numbers: the fixture orders hand-pick PCM-2025-000001/2, so the
   # order_number sequence would collide on first use inside tests.
   def create_order(status:, days_ago:, subtotal:, commission: 0)
     order = Order.create!(number: "PCM-TEST-#{SecureRandom.hex(8).upcase}",

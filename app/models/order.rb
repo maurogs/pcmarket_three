@@ -1,4 +1,18 @@
 class Order < ApplicationRecord
+  class InvalidTransition < StandardError; end
+
+  # Buyer protection: while the window is open the buyer can still open a
+  # dispute after confirming delivery. AutoCompleteOrdersJob completes
+  # delivered orders once it lapses.
+  BUYER_PROTECTION_WINDOW = 2.days
+  # pending_payment orders older than this are auto-cancelled by
+  # AutoCompleteOrdersJob (listings restored).
+  AUTO_CANCEL_AFTER = 72.hours
+
+  # Courier options for the seller shipment form (labels in the locale
+  # files, tracking links built per carrier in OrdersHelper).
+  CARRIERS = %w[Correos SEUR MRW GLS DHL UPS Other].freeze
+
   enum :status, {
     pending_payment: 0, paid: 1, shipped: 2, delivered: 3,
     completed: 4, cancelled: 5, refunded: 6, disputed: 7
@@ -10,6 +24,7 @@ class Order < ApplicationRecord
   has_one :review, dependent: :nullify
 
   validates :number, presence: true, uniqueness: true
+  validates :carrier, inclusion: { in: CARRIERS }, allow_nil: true
   validates :subtotal_cents, :shipping_cents, :commission_cents, :total_cents,
             numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :currency, presence: true
@@ -18,6 +33,17 @@ class Order < ApplicationRecord
   before_validation :recalculate_total
 
   scope :recent, -> { order(created_at: :desc, id: :desc) }
+
+  # Delivered orders whose buyer-protection window has lapsed: the
+  # auto-completion target of AutoCompleteOrdersJob.
+  scope :awaiting_auto_completion, -> {
+    delivered.where(buyer_protection_until: ..Time.current)
+  }
+
+  # Abandoned checkouts: still pending_payment after the payment window.
+  scope :auto_cancellable, -> {
+    pending_payment.where(created_at: ...AUTO_CANCEL_AFTER.ago)
+  }
 
   # What the seller keeps: the platform commission is charged on top of the
   # total, so it is not part of the seller's revenue.
@@ -32,7 +58,97 @@ class Order < ApplicationRecord
     recalculate_total
   end
 
+  # --- State machine (guards raise Order::InvalidTransition) --------------
+
+  def pay!
+    ensure_transition!(from: [ :pending_payment ], to: :paid)
+    update!(status: :paid, paid_at: Time.current)
+  end
+
+  def ship!(carrier:, tracking_number: nil)
+    ensure_transition!(from: [ :paid ], to: :shipped)
+    update!(status: :shipped, carrier: carrier, tracking_number: tracking_number,
+            shipped_at: Time.current)
+  end
+
+  # Buyer confirms delivery: the protection window starts here (nil until
+  # delivered — see the checkout phase notes).
+  def mark_delivered!
+    ensure_transition!(from: [ :shipped ], to: :delivered)
+    update!(status: :delivered, delivered_at: Time.current,
+            buyer_protection_until: Time.current + BUYER_PROTECTION_WINDOW)
+  end
+
+  def complete!
+    ensure_transition!(from: [ :delivered ], to: :completed)
+    update!(status: :completed, completed_at: Time.current)
+  end
+
+  # Buyer cancels while pending_payment, seller while not yet shipped; the
+  # role split lives in the controllers, the model accepts both open
+  # states. Cancelling puts every listing back on sale (see restore).
+  def cancel!
+    ensure_transition!(from: [ :pending_payment, :paid ], to: :cancelled)
+    update!(status: :cancelled, cancelled_at: Time.current)
+    restore_listings!
+  end
+
+  # Buyer opens a dispute after delivery, inside the protection window.
+  def open_dispute!
+    ensure_transition!(from: [ :delivered ], to: :disputed)
+    raise InvalidTransition, I18n.t("orders.transition.protection_closed") unless protection_open?
+
+    update!(status: :disputed)
+  end
+
+  def protection_open?
+    buyer_protection_until.nil? || buyer_protection_until > Time.current
+  end
+
+  # Timeline anchors for the order pages (nil before the step is reached).
+  def step_times
+    {
+      placed: created_at,
+      paid: paid_at,
+      shipped: shipped_at,
+      delivered: delivered_at,
+      completed: completed_at
+    }
+  end
+
+  # The thread to talk to the other party in: the conversation seeded by
+  # the checkout for this order's listing, if any.
+  def conversation
+    Conversation.find_by(listing_id: order_items.where.not(listing_id: nil).select(:listing_id),
+                         buyer_id: buyer_id, seller_id: seller_id)
+  end
+
   private
+
+  # Puts every still-linked listing back on sale: quantity is topped back
+  # up, listings sold or reserved for this buyer by this order go live
+  # again. Listings an admin sold/archived elsewhere are left alone.
+  def restore_listings!
+    order_items.includes(:listing).find_each do |item|
+      listing = item.listing
+      next if listing.nil?
+
+      listing.add_back_quantity!(item.quantity)
+      if listing.reserved_for_id == buyer_id
+        listing.release_reservation!
+      elsif listing.sold?
+        listing.reinstate!
+      end
+    end
+  end
+
+  def ensure_transition!(from:, to:)
+    return if from.map(&:to_s).include?(status.to_s)
+
+    raise InvalidTransition,
+          I18n.t("orders.transition.invalid", from: self.class.human_attribute_name("status.#{status}"),
+                                              to: self.class.human_attribute_name("status.#{to}"))
+  end
 
   def assign_number
     return if number.present?

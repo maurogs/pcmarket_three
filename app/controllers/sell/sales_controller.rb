@@ -1,7 +1,7 @@
 module Sell
-  # Orders where the signed-in user is the seller. Read-only for now:
-  # shipping/fulfilment actions land with the checkout phase. Lookups go
-  # through current_user.sales, so another seller's order 404s.
+  # Updates (3b) were read-only for the seller; fulfilment actions
+  # (payment confirmation, shipment, cancellation) landed with the
+  # checkout phase — see the nested resources in config/routes.rb.
   class SalesController < BaseController
     PER_PAGE = 20
 
@@ -10,7 +10,7 @@ module Sell
     end
 
     def show
-      @sale = current_user.sales.find(params[:id])
+      @sale = current_user.sales.includes(order_items: :listing).find(params[:id])
     end
   end
 end

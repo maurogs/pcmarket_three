@@ -1,0 +1,151 @@
+<% content_for :title, t(".title", number: @order.number) %>
+
+<div class="mx-auto max-w-2xl">
+  <div class="mb-4 flex flex-wrap items-center gap-3">
+    <h1 class="min-w-0 flex-1 text-xl font-bold tracking-tight sm:text-2xl">
+      <%= t(".title", number: @order.number) %>
+    </h1>
+    <%= order_status_badge(@order) %>
+  </div>
+  <p class="mb-4"><%= link_to t(".back"), orders_path, class: "text-sm font-medium text-primary hover:underline" %></p>
+
+  <%# --- actions (only offered when the transition is currently valid) --- %>
+  <% conversation = @order.conversation %>
+  <% if @order.pending_payment? || @order.shipped? || @order.delivered? ||
+       (@order.completed? && @order.review.nil?) || conversation %>
+    <div class="card mb-4 flex flex-wrap items-center gap-2 px-4 py-3">
+      <% if @order.pending_payment? %>
+        <p class="w-full text-xs text-muted">
+          <%= @order.payment_provider == "stripe" ? t(".stripe_pending_note") : t(".direct_pending_note") %>
+        </p>
+        <%= button_to t(".cancel_button"), order_cancellation_path(@order), method: :post, class: "chip" %>
+        <% if conversation %>
+          <%= link_to t(".contact_seller"), conversation_path(conversation), class: "chip" %>
+        <% end %>
+      <% end %>
+
+      <% if @order.shipped? %>
+        <%= button_to t(".confirm_delivery_button"), order_delivery_confirmation_path(@order), method: :post,
+              class: "btn-primary cursor-pointer" %>
+        <% if conversation %>
+          <%= link_to t(".contact_seller"), conversation_path(conversation), class: "chip" %>
+        <% end %>
+      <% end %>
+
+      <% if @order.delivered? %>
+        <p class="w-full text-xs text-muted">
+          <% if @order.buyer_protection_until && @order.buyer_protection_until > Time.current %>
+            <%= t(".protection_note", until_time: l(@order.buyer_protection_until, format: :long)) %>
+          <% else %>
+            <%= t(".auto_complete_note") %>
+          <% end %>
+        </p>
+        <%= button_to t(".complete_button"), order_completion_path(@order), method: :post, class: "btn-primary cursor-pointer" %>
+        <% if @order.protection_open? %>
+          <%= button_to t(".dispute_button"), order_dispute_path(@order), method: :post, class: "chip",
+                form: { data: { turbo_confirm: t(".dispute_confirm") } } %>
+        <% end %>
+        <% if conversation %>
+          <%= link_to t(".contact_seller"), conversation_path(conversation), class: "chip" %>
+        <% end %>
+      <% end %>
+
+      <% if @order.completed? && @order.review.nil? %>
+        <%= link_to t(".review_button"), new_order_review_path(@order), class: "btn-primary" %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if @order.review %>
+    <div class="card mb-4 px-4 py-3">
+      <h2 class="text-sm font-semibold text-text"><%= t(".your_review") %></h2>
+      <p class="mt-1 text-xs text-muted"><%= t(".review_stars", rating: @order.review.rating) %></p>
+      <% if @order.review.body.present? %>
+        <p class="mt-2 whitespace-pre-line text-sm text-text"><%= @order.review.body %></p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%# --- progress ------------------------------------------------------- %>
+  <div class="card px-4 py-3">
+    <h2 class="mb-3 text-sm font-semibold text-text"><%= t(".progress") %></h2>
+    <%= render "orders/timeline", order: @order %>
+  </div>
+
+  <%# --- tracking -------------------------------------------------------- %>
+  <% if @order.carrier.present? || @order.tracking_number.present? %>
+    <div class="card mt-4 px-4 py-3">
+      <h2 class="text-sm font-semibold text-text"><%= t(".tracking") %></h2>
+      <p class="mt-1 text-sm text-muted">
+        <%= t("orders.carrier.#{@order.carrier}") if @order.carrier.present? %>
+        <% if @order.tracking_number.present? %>
+          <span class="font-mono text-text"><%= @order.tracking_number %></span>
+          <% if (url = tracking_url(@order)) %>
+            · <%= link_to t(".view_tracking"), url, target: "_blank", rel: "noopener",
+                  class: "font-medium text-primary hover:underline" %>
+          <% end %>
+        <% end %>
+      </p>
+    </div>
+  <% end %>
+
+  <%# --- items ----------------------------------------------------------- %>
+  <h2 class="mt-6 text-lg font-semibold text-text"><%= t(".items") %></h2>
+  <ul class="card mt-2 divide-y divide-border">
+    <% @order.order_items.each do |item| %>
+      <li class="flex items-center gap-3 px-4 py-3">
+        <div class="min-w-0 flex-1">
+          <% if item.listing %>
+            <%= link_to item.title, listing_path(item.listing), class: "text-sm font-medium text-text hover:text-primary hover:underline" %>
+          <% else %>
+            <span class="text-sm font-medium text-text"><%= item.title %></span>
+          <% end %>
+          <p class="mt-0.5 text-xs text-muted"><%= t(".quantity", count: item.quantity) %></p>
+        </div>
+        <p class="text-sm font-semibold text-text"><%= money(item.line_total_cents, @order.currency) %></p>
+      </li>
+    <% end %>
+  </ul>
+
+  <%# --- totals ----------------------------------------------------------- %>
+  <h2 class="mt-6 text-lg font-semibold text-text"><%= t(".totals") %></h2>
+  <dl class="card mt-2 divide-y divide-border text-sm">
+    <div class="flex justify-between px-4 py-2.5">
+      <dt class="text-muted"><%= t(".subtotal") %></dt>
+      <dd class="text-text"><%= money(@order.subtotal_cents, @order.currency) %></dd>
+    </div>
+    <div class="flex justify-between px-4 py-2.5">
+      <dt class="text-muted"><%= t(".shipping") %></dt>
+      <dd class="text-text"><%= @order.shipping_cents.zero? ? t(".free_shipping") : money(@order.shipping_cents, @order.currency) %></dd>
+    </div>
+    <div class="flex justify-between px-4 py-2.5">
+      <dt class="text-muted"><%= t(".commission") %></dt>
+      <dd class="text-text"><%= money(@order.commission_cents, @order.currency) %></dd>
+    </div>
+    <div class="flex justify-between bg-surface-muted px-4 py-2.5 font-semibold text-text">
+      <dt><%= t(".total") %></dt>
+      <dd><%= money(@order.total_cents, @order.currency) %></dd>
+    </div>
+  </dl>
+
+  <%# --- address + seller -------------------------------------------------- %>
+  <div class="mt-6 grid gap-4 sm:grid-cols-2">
+    <div class="card px-4 py-3">
+      <h2 class="text-sm font-semibold text-text"><%= t(".shipping_address") %></h2>
+      <p class="mt-1 text-xs leading-5 text-muted">
+        <% shipping_address_lines(@order).each do |line| %><%= line %><br><% end %>
+      </p>
+    </div>
+    <div class="card px-4 py-3">
+      <h2 class="text-sm font-semibold text-text"><%= t(".seller") %></h2>
+      <p class="mt-1 text-sm text-text">
+        <% if @order.seller.store %>
+          <%= link_to @order.seller.store.name, store_path(@order.seller.store), class: "font-medium hover:text-primary hover:underline" %>
+        <% else %>
+          <%= @order.seller.display_name %>
+        <% end %>
+      </p>
+      <p class="mt-1 text-xs text-muted"><%= t(".placed_on", date: l(@order.created_at, format: :long)) %></p>
+    </div>
+  </div>
+</div>

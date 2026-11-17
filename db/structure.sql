@@ -1053,7 +1053,11 @@ CREATE TABLE public.orders (
     delivered_at timestamp(6) without time zone,
     buyer_protection_until timestamp(6) without time zone,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    paid_at timestamp(6) without time zone,
+    completed_at timestamp(6) without time zone,
+    cancelled_at timestamp(6) without time zone,
+    checkout_token character varying
 );
 
 
@@ -2517,6 +2521,13 @@ CREATE INDEX index_orders_on_buyer_id_and_status ON public.orders USING btree (b
 
 
 --
+-- Name: index_orders_on_checkout_token; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_orders_on_checkout_token ON public.orders USING btree (checkout_token);
+
+
+--
 -- Name: index_orders_on_number; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2535,6 +2546,13 @@ CREATE INDEX index_orders_on_seller_id ON public.orders USING btree (seller_id);
 --
 
 CREATE INDEX index_orders_on_seller_id_and_status ON public.orders USING btree (seller_id, status);
+
+
+--
+-- Name: index_orders_on_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_orders_on_status ON public.orders USING btree (status);
 
 
 --
@@ -3047,6 +3065,7 @@ ALTER TABLE ONLY public.moderation_events
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261117223000'),
 ('20261117210002'),
 ('20261117210001'),
 ('20261117200003'),

@@ -1,0 +1,62 @@
+<%= render "shared/error_summary", resource: @address %>
+
+<%= form_with model: @address, url: @address.persisted? ? address_path(@address) : addresses_path, class: "card mt-6 space-y-4 px-4 py-4" do |form| %>
+  <% if params[:from] == "checkout" %>
+    <%= hidden_field_tag :from, "checkout" %>
+  <% end %>
+
+  <div>
+    <%= form.label :full_name, class: "block text-sm font-medium text-text" %>
+    <%= form.text_field :full_name, class: "input mt-1", autocomplete: "name", required: true %>
+  </div>
+
+  <div class="grid gap-4 sm:grid-cols-2">
+    <div>
+      <%= form.label :line1, class: "block text-sm font-medium text-text" %>
+      <%= form.text_field :line1, class: "input mt-1", autocomplete: "address-line1", required: true %>
+    </div>
+    <div>
+      <%= form.label :line2, class: "block text-sm font-medium text-text" %>
+      <%= form.text_field :line2, class: "input mt-1", autocomplete: "address-line2" %>
+    </div>
+  </div>
+
+  <div class="grid gap-4 sm:grid-cols-3">
+    <div>
+      <%= form.label :postal_code, class: "block text-sm font-medium text-text" %>
+      <%= form.text_field :postal_code, class: "input mt-1", autocomplete: "postal-code", required: true %>
+      <p class="mt-1 text-xs text-muted"><%= t(".postal_code_hint") %></p>
+    </div>
+    <div>
+      <%= form.label :city, class: "block text-sm font-medium text-text" %>
+      <%= form.text_field :city, class: "input mt-1", autocomplete: "address-level2", required: true %>
+    </div>
+    <div>
+      <%= form.label :region, class: "block text-sm font-medium text-text" %>
+      <%= form.text_field :region, class: "input mt-1", autocomplete: "address-level1" %>
+      <p class="mt-1 text-xs text-muted"><%= t(".region_hint") %></p>
+    </div>
+  </div>
+
+  <div class="grid gap-4 sm:grid-cols-2">
+    <div>
+      <%= form.label :country_code, class: "block text-sm font-medium text-text" %>
+      <%= form.select :country_code, Country.enabled.order(:code).map { |country| [ t("countries.#{country.code.downcase}"), country.code ] }, {},
+            class: "input mt-1", autocomplete: "country" %>
+    </div>
+    <div>
+      <%= form.label :phone, class: "block text-sm font-medium text-text" %>
+      <%= form.telephone_field :phone, class: "input mt-1", autocomplete: "tel" %>
+    </div>
+  </div>
+
+  <label class="flex cursor-pointer items-center gap-2 text-sm text-text">
+    <%= form.check_box :default %>
+    <%= form.label :default, class: "cursor-pointer" %>
+  </label>
+
+  <div class="flex flex-wrap gap-2 pt-1">
+    <%= form.submit t(".save"), class: "btn-primary cursor-pointer" %>
+    <%= link_to t(".cancel"), addresses_path, class: "inline-flex min-h-11 items-center rounded-md border border-border px-4 text-sm font-medium hover:border-primary hover:text-primary" %>
+  </div>
+<% end %>

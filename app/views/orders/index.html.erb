@@ -1,0 +1,40 @@
+<% content_for :title, t(".title") %>
+
+<div class="mx-auto max-w-3xl">
+  <h1 class="text-xl font-bold tracking-tight sm:text-2xl"><%= t(".title") %></h1>
+
+  <% if @orders.any? %>
+    <ul class="mt-6 space-y-3">
+      <% @orders.each do |order| %>
+        <li>
+          <%= link_to order_path(order), class: "card flex flex-wrap items-center gap-3 px-4 py-3 hover:border-primary/60" do %>
+            <div class="min-w-0 flex-1">
+              <p class="flex flex-wrap items-center gap-2 text-sm font-semibold text-text">
+                <%= order.number %>
+                <%= order_status_badge(order) %>
+              </p>
+              <p class="mt-1 text-xs text-muted">
+                <%= t(".placed_on", date: l(order.created_at.to_date, format: :long)) %>
+                · <%= t(".items_count", count: order.order_items.sum(&:quantity)) %>
+                <% if order.seller.store %> · <%= order.seller.store.name %><% end %>
+              </p>
+            </div>
+            <p class="text-sm font-semibold text-text"><%= money(order.total_cents, order.currency) %></p>
+            <%= inline_icon :chevron_right, classes: "size-4 text-muted" %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+
+    <% if @pagy.pages > 1 %>
+      <div class="mt-4"><%= results_pagination @pagy %></div>
+    <% end %>
+  <% else %>
+    <div class="card mt-6 px-6 py-10 text-center">
+      <span class="text-muted"><%= inline_icon :box, classes: "mx-auto size-10" %></span>
+      <p class="mt-3 text-sm font-medium text-text"><%= t(".empty") %></p>
+      <p class="mt-1 text-xs text-muted"><%= t(".empty_hint") %></p>
+      <%= link_to t(".empty_cta"), listings_path, class: "btn-primary mt-5" %>
+    </div>
+  <% end %>
+</div>

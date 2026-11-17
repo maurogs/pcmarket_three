@@ -42,6 +42,37 @@ class ApplicationController < ActionController::Base
                    :labels, :tags, :seller, :sort, :page)
     end
 
+    # The cart of the current visitor: the user's own cart when signed in,
+    # otherwise the guest cart keyed by a signed cookie token. `create:
+    # false` (the header badge) never creates a row — guests only get a
+    # cart when they add their first item.
+    def current_cart(create: true)
+      @current_cart ||=
+        if Current.user
+          Cart.for_user(Current.user)
+        else
+          cart = Cart.for_token(cookies.signed[:cart_token])
+          if cart.nil? && create
+            cart = Cart.create!
+            cookies.signed.permanent[:cart_token] =
+              { value: cart.token, httponly: true, same_site: :lax }
+          end
+          cart
+        end
+    end
+    helper_method :current_cart
+
+    # Item count for the header cart badge (one SUM query, and — unlike
+    # current_cart — never creates a cart on a plain page view).
+    def header_cart_count
+      if Current.user
+        CartItem.joins(:cart).where(carts: { user_id: Current.user.id }).sum(:quantity)
+      else
+        current_cart(create: false)&.total_quantity.to_i
+      end
+    end
+    helper_method :header_cart_count
+
     # Single-country launch (Spain); the enabled Country row is the source of truth.
     def current_country_code
       @current_country_code ||= Country.enabled.order(:code).first&.code || "ES"

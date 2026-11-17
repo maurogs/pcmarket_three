@@ -38,7 +38,15 @@ Rails.application.routes.draw do
 
       resource :store, only: %i[edit update]
       resource :vacation, only: %i[create destroy]
-      resources :sales, only: %i[index show]
+
+      # Seller order fulfilment (Phase 4b): confirm a direct payment,
+      # record the shipment, cancel before shipping. Scoped through
+      # current_user.sales — foreign sellers 404.
+      resources :sales, only: %i[index show] do
+        resource :payment_confirmation, only: :create
+        resource :shipment, only: :create
+        resource :cancellation, only: :create
+      end
     end
 
     # Messaging & offers (Phase 4a). Status changes on offers are modelled
@@ -59,5 +67,33 @@ Rails.application.routes.draw do
       resource :decline, only: :create
       resource :withdrawal, only: :create
     end
+
+    # Cart & checkout (Phase 4b). The cart works for guests too: their
+    # cart is keyed by a signed cookie token and merged into the user's
+    # cart on login. Cart item edits/teardowns are the standard plural
+    # resource verbs ("Save to wishlist" is a PATCH with an intent).
+    resource :cart, only: :show
+    resources :cart_items, only: %i[create update destroy]
+
+    resource :checkout, only: %i[show create] # auth required
+
+    # Account area: shipping addresses (checkout selects one of these).
+    resources :addresses, only: %i[index new create edit update destroy]
+
+    # Buyer order pages. Lifecycle steps are nested singular resources
+    # (POST creates the transition), matching the sell-area convention;
+    # role guards live in the controllers (all lookups are scoped through
+    # current_user.orders, so anyone else 404s).
+    resources :orders, only: %i[index show] do
+      resource :delivery_confirmation, only: :create
+      resource :completion, only: :create
+      resource :cancellation, only: :create
+      resource :dispute, only: :create
+      resource :review, only: %i[new create]
+    end
   end
+
+  # Stripe webhook endpoint: no locale segment, no session, CSRF-skipped
+  # (Stripe authenticates via the signed payload — see the controller).
+  resources :stripe_webhooks, only: :create
 end
