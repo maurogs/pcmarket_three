@@ -80,6 +80,37 @@ Rails.application.routes.draw do
     # Account area: shipping addresses (checkout selects one of these).
     resources :addresses, only: %i[index new create edit update destroy]
 
+    # Favourites / wishlist (Phase 5). create/destroy are Turbo Stream calls
+    # from listing cards and the listing page; index is the wishlist itself.
+    resources :favorites, only: %i[index create destroy]
+
+    # Saved searches (max 25 per user, enforced in the model; update
+    # toggles email_alerts).
+    resources :saved_searches, only: %i[index create update destroy]
+
+    # Notification centre. Mark-all-read is a singular resource (POST
+    # creates the "read everything" action), matching the project's
+    # state-transition convention.
+    resources :notifications, only: :index
+    resource :notifications_read, only: :create
+
+    # Account settings (Phase 5): profile, security, notification
+    # preferences, GDPR export and deletion. Singular resources because
+    # each one is "the current user's" thing.
+    namespace :account do
+      resource :profile, only: %i[show update]
+      resource :security, only: %i[show update]
+      resource :notification_preferences, only: %i[show update]
+      resource :data_export, only: :create
+      resource :deletion, only: %i[show destroy]
+    end
+
+    # Following a store (Phase 5): POST/DELETE on a nested singular
+    # resource, matching the state-transition convention.
+    resources :stores, only: [] do
+      resource :follow, only: %i[create destroy]
+    end
+
     # Buyer order pages. Lifecycle steps are nested singular resources
     # (POST creates the transition), matching the sell-area convention;
     # role guards live in the controllers (all lookups are scoped through

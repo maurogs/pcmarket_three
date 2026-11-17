@@ -1,0 +1,41 @@
+<% content_for :title, t(".title") %>
+
+<h1 class="text-2xl font-bold text-red-600 dark:text-red-400"><%= t(".title") %></h1>
+<p class="mt-1 text-sm text-muted"><%= t(".description") %></p>
+
+<div class="card mt-6 space-y-3 px-4 py-4">
+  <h2 class="text-sm font-semibold"><%= t(".what_happens_title") %></h2>
+  <ul class="list-disc space-y-1.5 pl-5 text-sm text-muted">
+    <li><%= t(".what_happens_1") %></li>
+    <li><%= t(".what_happens_2") %></li>
+    <li><%= t(".what_happens_3") %></li>
+    <li><%= t(".what_happens_4") %></li>
+  </ul>
+  <h2 class="text-sm font-semibold"><%= t(".kept_title") %></h2>
+  <p class="text-sm text-muted"><%= t(".kept_hint") %></p>
+  <ul class="list-disc space-y-1.5 pl-5 text-sm text-muted">
+    <li><%= t(".kept_orders") %></li>
+    <li><%= t(".kept_messages") %></li>
+    <li><%= t(".kept_disputes") %></li>
+    <li><%= t(".kept_analytics") %></li>
+  </ul>
+</div>
+
+<% if @open_orders_count.positive? %>
+  <div class="mt-6 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm dark:border-amber-700 dark:bg-amber-950/40">
+    <p class="font-semibold text-amber-800 dark:text-amber-300"><%= t(".blocked_title", count: @open_orders_count) %></p>
+    <p class="mt-1 text-amber-800/80 dark:text-amber-300/80"><%= t(".blocked_hint") %></p>
+    <%= link_to t(".orders_link"), orders_path, class: "btn-secondary mt-3 inline-flex" %>
+  </div>
+<% else %>
+  <div class="mt-6 rounded-xl border border-red-300 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950/40">
+    <p class="text-sm font-semibold text-red-700 dark:text-red-300"><%= t(".warning") %></p>
+    <%= button_to t(".confirm_button"), account_deletion_path, method: :delete,
+          form: { data: { turbo_confirm: t(".confirm_confirmation") } },
+          class: "mt-3 cursor-pointer rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700" %>
+  </div>
+<% end %>
+
+<div class="mt-6">
+  <%= link_to t(".back"), account_profile_path, class: "text-sm font-medium text-muted hover:text-text hover:underline" %>
+</div>

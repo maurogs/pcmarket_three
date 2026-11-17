@@ -12,8 +12,12 @@ store settings** (`/sell` dashboard with KPIs and a 12-week chart, store setting
 Spanish tax-ID validation and FriendlyId slug history, vacation mode, read-only sales
 list), and Phase 4a **internal chat & offers** (buyer↔seller threads with Turbo
 real-time, read receipts, blocks, offer negotiation with 48h expiry and
-accept-to-reserve, all I18n'd). Cart/checkout and the admin/moderation
-UI come in later phases.
+accept-to-reserve, all I18n'd), Phase 4b cart/checkout/orders, and Phase 5
+**engagement & account** — wishlist/favorites with price-drop alerts, store
+follows, saved searches with new-matching-listing alerts + hourly digest, a
+notification centre with unread badge, and the `/account` area (profile,
+security, notification preferences, GDPR export & deletion). The
+admin/moderation UI comes in a later phase.
 
 ## Stack
 
@@ -207,7 +211,7 @@ UI come in later phases.
     with no `signed_id` — `store_logo_url`/`store_banner_url` require
     `attached? && persisted?`; also `store&.logo.attached?` only guards
     `logo` — chain `&.attached?` too.
-- **i18n**: the 6 locale files currently share an identical tree of **759 keys**. Plurals
+- **i18n**: the 6 locale files currently share an identical tree of **1130 keys**. Plurals
   must be nested (`count: { one:, other: }`) — i18n 1.15.2 does not resolve flat
   `*_one`/`*_other` keys. Locale files are machine-merged (`YAML.dump` → alphabetical
   keys); regenerate rather than hand-splicing.
@@ -249,6 +253,94 @@ UI come in later phases.
   - **Currency in tests**: services/controllers format with
     `Money#formatted` — under `:en` that's `€300.00` (unit prefix), under
     `:es` `300,00 €`. Tests run `:en`.
+- **Engagement & account (Phase 5)** — authenticated; account area uses
+  `Account::BaseController` (`require_authentication`, `layout "account"`
+  with `layouts/_account_nav`):
+  - **Favorites**: `FavoritesController` (`GET /favorites` wishlist +
+    create/destroy, Turbo Stream swaps `shared/_favorite_button` in place;
+    create looks up `Listing.visible.find(params[:listing_id])`, destroy by
+    favorite id via `current_user.favorites`). `Favorite#price_cents_at_save`
+    records the price when saved → `#price_dropped?` powers the wishlist's
+    "price dropped since you saved it" badge.
+  - **Price-drop alerts**: Listing `after_update_commit :alert_price_drop`
+    (when `saved_change_to_price_cents?`) runs `Listings::PriceDropNotifier`
+    **synchronously** — only on a price CUT and only while `approved?`.
+    Service: **24h per-listing cooldown** (`recently_notified?` re-queries the
+    `price_drop` Notification rows via `payload->>'listing_id'`), notifies
+    only favorites whose `price_cents_at_save` is above the new price;
+    Notification always created, `PriceDropMailer` only when
+    `user.wants_email?("price_drop")`.
+  - **Follows**: nested `resource :follow` under stores
+    (`store_follow_path(store)` POST/DELETE), `FollowsController` looks up
+    `Store.visible.friendly.find` (hidden/anonymised stores 404) and swaps
+    `shared/_follow_button` over turbo_stream; model rejects self-follows.
+  - **Saved searches**: filters stored as-is in JSONB `filters` (the same
+    params the browse form posts: `q, category, min_price, max_price,
+    condition[], f{}, labels[], tags[], seller`);
+    `SavedSearch.new_from_search(user:, name:, search_filters:)` takes the
+    **permitted Parameters** (max 25/user → base error). `email_alerts`
+    defaults to **false at the attribute level** (DB column default true).
+    Routes are `index/create/update/destroy` — update is PATCH and just
+    toggles `email_alerts` (turbo_stream replaces the row partial).
+  - **Matching pipeline**: Listing `after_commit on: :update` when status
+    transitions **into approved** → `SavedSearchMatchJob(listing_id)` →
+    `SavedSearches::MatchNewListing` (class, `self.call`). Matching is
+    SQL prefilter (saved search's `category_id` ∈ listing's ancestor ids,
+    Ruby price-band check) then the authoritative answer from
+    **`ListingSearch.new(search_params, only_id: listing.id).match?`** — one
+    code path, so keyword/spec/condition/label rules can never drift from
+    the results page. Each match = one `saved_search_match` Notification
+    (payload carries `saved_search_name` for the mail). Instant e-mail
+    (`SavedSearchMailer#match_found`) goes at most once per user when a
+    matching search has `email_alerts` AND `wants_email?("saved_search")`,
+    then `touch(:last_notified_at)` on those searches as the watermark.
+  - **Digest**: `SavedSearchDigestJob` runs from `config/recurring.yml`
+    (`saved_search_digest`, hourly, production block) → `SavedSearchDigest`
+    (plain class, `MAX_LISTINGS_PER_EMAIL` 10): one e-mail per user for
+    matches their instant alerts skipped, via
+    `Notification.unsent_saved_search_matches(search)` (created after
+    `last_notified_at`), stamps `last_notified_at` after sending; opted-out
+    users' matches stay pending until they opt back in.
+  - **Notification centre**: `NotificationsController#index` (paginated,
+    `Notification.recent`, clears the per-user unread-count cache) +
+    `NotificationsReadsController` (POST `notifications_read` = mark ALL
+    read; NOTE `resource :notifications_read` infers the PLURAL constant).
+    Kind text/icon/link mapping lives in `NotificationsHelper`
+    (`notification_text`/`notification_icon`/`notification_link`,
+    payload-driven); header bell badge is
+    `shared/_notifications_badge` (`Notification.unread_count_for`,
+    live via `turbo_stream_from Current.user, :notifications`;
+    cache-busted by `after_create_commit` + the read paths).
+    `Notification::KINDS` lists the ten kinds the centre renders.
+  - **E-mail preferences**: sparse JSONB `users.notification_preferences` —
+    `EMAIL_PREFERENCE_KEYS` (`email_new_message`, `email_offers`,
+    `email_orders`, `email_price_drop`, `email_saved_search`,
+    `email_newsletter`), all default ON except the newsletter; missing keys
+    fall back to defaults in `wants_email?`. The form posts all six keys
+    (hidden blanks + checked values) and
+    `User#update_notification_preferences` writes the full matrix.
+    `data_export` e-mails are transactional — no preference gates them.
+  - **GDPR**: `Users::Anonymize.call(user)` raises
+    `Users::Anonymize::OpenOrderError` when open orders exist
+    (`open_orders_count`, also shown on the confirm page), then anonymises
+    the user row via `update_columns` and archives non-archived/non-sold
+    listings (drafts too, `where.not(status: %w[archived sold])`).
+    Export: `account/data_exports#create` → `Users::DataExportJob` builds
+    `Users::DataExport` JSON, **attaches it to the user** (`user.export`
+    ActiveStorage) and mails the signed link via `DataExportMailer#ready`
+    (7 days).
+  - **Password change**: `User#current_password` is a virtual
+    `attr_accessor` — `Account::SecuritiesController#update` assigns it
+    before `authenticate` so `shared/_error_summary` renders
+    `current_password` errors on the 422 re-render.
+  - **Rails 8.1 / test gotchas**: mailer methods return lazy
+    `MessageDelivery`s — `NullMail` assertions need `…action.message`, and
+    `…deliver_now` must be called on the delivery; multipart
+    `mail.body.to_s` is EMPTY — assert on `text_part.body.decoded`; long
+    URLs are quoted-printable soft-broken — match short fragments, not
+    `href="…"`; plain `ActiveSupport::TestCase` does NOT clear
+    `ActionMailer::Base.deliveries` — clear it in setup when counting
+    absolute deliveries.
 
 
 
@@ -257,7 +349,7 @@ UI come in later phases.
 
 | Area | Files |
 | --- | --- |
-| Routes (locale-scoped) | `config/routes.rb` — root `pages#home`, `resources :listings, only: %i[index show]` (nests `resources :offers, only: %i[new create]`), `resources :categories, only: :show, path: "c"`, `resources :stores, only: :show`, `get "search" → listings#index`, `namespace :sell { root "dashboards#show"; resources :listings + resource :submission/:archival/:sale_mark + resources :category_fields, only: :show; resource :dashboard; resource :store, only: %i[edit update]; resource :vacation, only: %i[create destroy]; resources :sales, only: %i[index show] }`, `resource :session`, `resources :passwords`, `resource :registration`, `resources :conversations, only: %i[index show create]` (nested `resources :messages, only: :create` + `resource :read_receipt, only: :create`), `resources :blocks, only: %i[index create destroy]`, `resources :offers, only: :index` + `resource :acceptance/:decline/:withdrawal` nested under offers; 4b: `resource :cart` + `resources :cart_items, only: %i[create update destroy]`, `resource :checkout, only: %i[show create]`, `resources :addresses`, `resources :orders, only: %i[index show]` (nested `resource :completion/:cancellation/:dispute` + `resources :delivery_confirmations, only: :create`), `namespace :sell { resources :sales { resource :payment_confirmation; resource :shipment; resource :cancellation } }`, `resource :stripe_webhook, only: :create`, `resources :reviews, only: %i[new create]` |
+| Routes (locale-scoped) | `config/routes.rb` — root `pages#home`, `resources :listings, only: %i[index show]` (nests `resources :offers, only: %i[new create]`), `resources :categories, only: :show, path: "c"`, `resources :stores, only: :show`, `get "search" → listings#index`, `namespace :sell { root "dashboards#show"; resources :listings + resource :submission/:archival/:sale_mark + resources :category_fields, only: :show; resource :dashboard; resource :store, only: %i[edit update]; resource :vacation, only: %i[create destroy]; resources :sales, only: %i[index show] }`, `resource :session`, `resources :passwords`, `resource :registration`, `resources :conversations, only: %i[index show create]` (nested `resources :messages, only: :create` + `resource :read_receipt, only: :create`), `resources :blocks, only: %i[index create destroy]`, `resources :offers, only: :index` + `resource :acceptance/:decline/:withdrawal` nested under offers; 4b: `resource :cart` + `resources :cart_items, only: %i[create update destroy]`, `resource :checkout, only: %i[show create]`, `resources :addresses`, `resources :orders, only: %i[index show]` (nested `resource :completion/:cancellation/:dispute` + `resources :delivery_confirmations, only: :create`), `namespace :sell { resources :sales { resource :payment_confirmation; resource :shipment; resource :cancellation } }`, `resource :stripe_webhook, only: :create`, `resources :reviews, only: %i[new create]`; 5: `resources :favorites, only: %i[index create destroy]`, `resources :stores, only: [] { resource :follow, only: %i[create destroy] }` (helper `store_follow_path(store)`), `resources :saved_searches, only: %i[index create update destroy]` (PATCH update toggles `email_alerts`), `resources :notifications, only: :index` + `resource :notifications_read, only: :create` (marks ALL read; controller is the plural-inferred `NotificationsReadsController`), `namespace :account { resource :profile/:security/:notification_preferences, only: %i[show update]; resource :data_export, only: :create; resource :deletion, only: %i[show destroy] }` |
 | Auth | `app/controllers/concerns/authentication.rb` (cookie resume, `Current.session`), `sessions_controller.rb`, `passwords_controller.rb`, `passwords_mailer.rb` |
 | Sign-up | `registrations_controller.rb` + `views/registrations/new` |
 | User model | `app/models/user.rb` — `email_address` (normalized downcase, uniq index), `username` (uniq index, `/\A[a-zA-Z0-9_\-]{3,30}\z/`), `first_name`, `last_name`, `phone`, `role` enum (user:0 admin:1), `locale` (default "es"), `country_code` (default "ES"), `confirmed_at`, `banned_at` (`banned?/ban!/unban!`), `display_name`; has_many: store, listings, sales/orders, favorites, follows, seller_follows, saved_searches, conversations, offers, carts, reviews, sent_messages, api_tokens |
@@ -278,19 +370,24 @@ UI come in later phases.
 | Cart & checkout (4b) | `app/controllers/{carts,cart_items,checkouts,addresses}_controller.rb` — guest cart = `Cart.token` in a signed permanent cookie (`:cart_token`), user cart = `Cart.for_user`; `CheckoutsController#show` mints `session[:checkout_token]`, `#create` checks the **replay branch BEFORE the empty-cart guard** (first submit empties the cart, so a double click must replay, not bounce) then `Checkout::PlaceOrders`; `Carts::Merge` is called from `authentication.rb#start_new_session_for` (login folds the guest cart in, drops non-purchasable items, destroys the guest cart, clears the cookie). Services `app/services/carts/{add_item,merge,summary}.rb` (AddItem = the ONLY add-path purchase-rule enforcer: approved + not own listing + not reserved + seller not on vacation + quantity ≤ stock; Summary = groups by seller, marks `stale` items, per-seller shipping = 0 when pickup allowed and chosen, 0 over `Store#free_shipping_threshold_cents`, else max of item `listing.shipping_price_cents`), `app/services/checkout/{place_orders,direct_payment}.rb` (PlaceOrders: one order per seller, locks listings with `SELECT ... FOR UPDATE` + re-validates inside the transaction — a listing sold mid-checkout fails the whole call with `:not_purchasable`, applies commission when `:commissions` is on, sets `checkout_token`, empties the cart, notifies + e-mails both parties; `Result#success?`), `app/services/payments/{stripe_checkout,handle_webhook}.rb` (Stripe only when `Flipper :stripe_checkout` AND `ENV["STRIPE_SECRET_KEY"]`; webhook verifies `Stripe::SignatureVerifier` against `STRIPE_WEBHOOK_SECRET`, marks linked orders paid — order ids come from `stripe_session["metadata"]["order_ids"]`, stripe-ruby 21 StripeObject has NO `dig`). Views `app/views/carts/show.html.erb` (stale items greyed, per-seller shipping rows), `app/views/checkouts/show.html.erb` (address picker + per-seller pickup checkboxes + hidden `checkout_token`), `app/views/addresses/{index,new,_form}.html.erb` |
 | Order lifecycle (4b) | buyer transitions under `resources :orders` (`orders/{delivery_confirmations,completions,cancellations,disputes}_controller.rb`, scoped to `current_user.orders` → outsiders/buyers-vs-sellers all 404), seller fulfilment nested under `sell/sales/:sale_id/*` (`sell/{sales,payment_confirmations,shipments,cancellations}_controller.rb`, scoped to `current_user.sales` — the buyer 404s on seller routes and vice versa); `app/services/orders/transition.rb` wraps the model transition + Notification + mailer; `app/jobs/auto_complete_orders_job.rb` (recurring `auto_complete_orders` in `config/recurring.yml`: completes `delivered` past `buyer_protection_until`, auto-cancels `pending_payment` older than `Order::AUTO_CANCEL_AFTER`); `app/mailers/order_mailer.rb` (`new_sale`/`confirmation`/`payment_received`/`order_shipped`, recipient locale; `ApplicationMailer` now `helper ListingsHelper` for `money()`); views `app/views/orders/{index,show,_timeline}.html.erb`, `app/views/sell/sales/{index,show}.html.erb` (fulfilment actions), `app/views/reviews/{new,create}` (one review per completed order, `Review` uniq `order_id`); listings sold via checkout use `Listing#mark_sold!`, cancellation restores with `reinstate!`/`add_back_quantity!` |
 | 4a review fixes | `Offers::Accept` now locks offer+listing+all sibling offers and re-checks staleness INSIDE the transaction (second concurrent accept → `:stale`); `MessagesController` rate-limits via `rate_limit to: 30, within: 1.minute, by: -> { Current.user.id }` on the default `Rails.cache` (test env `config.cache_store` switched `:null_store` → `:memory_store` so this is testable) |
+| Wishlist & follows (5) | `app/controllers/{favorites,follows}_controller.rb` (Turbo Stream swaps `app/views/shared/{_favorite_button,_follow_button}.html.erb` in place), `favorite.rb` (`price_cents_at_save`, `#price_dropped?`/`#saved_price`, `with_listing_data` eager scope, counter cache), `follow.rb` (`follower`/`followed` on `follows`, self-follow rejected), wishlist page `app/views/favorites/index.html.erb` (dropped-since-saved badge) |
+| Price drops & saved-search matching (5) | `app/services/listings/price_drop_notifier.rb` (`COOLDOWN` 24h via Notification-row re-query, only price CUTs on approved listings, mail gated by `wants_email?("price_drop")`), `app/services/saved_searches/match_new_listing.rb` (ancestor-category SQL prefilter + price-band check + `ListingSearch.new(params, only_id:).match?` — one code path with the results page), `app/jobs/saved_search_match_job.rb` (instant `SavedSearchMailer#match_found` ≤ once/user, `touch(:last_notified_at)` watermark), `app/jobs/saved_search_digest_job.rb` + `app/services/saved_search_digest.rb` (hourly via `config/recurring.yml` `saved_search_digest`, ≤10 listings, only matches past `last_notified_at`), `saved_search.rb` (`MAX_PER_USER` 25, JSONB `filters` + `search_params`, `attribute :email_alerts, default: false`, `with_alerts`); listing hooks in `listing.rb` (`after_update_commit :alert_price_drop`, `after_commit :match_saved_searches` on →approved transition) |
+| Notification centre (5) | `app/controllers/{notifications,notifications_reads}_controller.rb`, `app/views/notifications/index.html.erb`, `app/views/shared/_unread_notifications_badge.html.erb` (header bell, `Notification.unread_count_for` cached per user), `app/helpers/notifications_helper.rb` (`notification_text`/`_icon`/`_link` from `KINDS` + payload), `notification.rb` (`KINDS`, `unsent_saved_search_matches`, `recent_unread_message_for?`, `unread_count_for`/`clear_unread_cache`/`mark_all_as_read_for`, `after_create_commit :bust_unread_cache_and_broadcast`) |
+| Account area & GDPR (5) | `app/controllers/account/{base,profiles,securities,notification_preferences,data_exports,deletions}_controller.rb` (`layout "account"` = `app/views/layouts/account.html.erb` + `layouts/_account_nav.html.erb`; views `app/views/account/{profiles,securities,notification_preferences,deletions}/show.html.erb`), `user.rb` (`EMAIL_PREFERENCE_KEYS`/`DEFAULT_EMAIL_PREFERENCES` sparse-JSONB `wants_email?`, `update_notification_preferences`, virtual `current_password` for the security form), `app/services/users/anonymize.rb` (`OpenOrderError` + `open_orders_count` guard, `update_columns` anonymisation to `deleted-<id>@invalid`/`deleted-<id>` + hides the store, archives non-sold/non-archived listings incl. drafts), `app/services/users/data_export.rb` (account JSON) + `app/services/users/data_export_job.rb` (`Users::DataExportJob`, attaches `user.export` blob, 7-day signed link); mailers `price_drop_mailer.rb`/`saved_search_mailer.rb` (`match_found` + `digest`)/`data_export_mailer.rb` + `app/views/{price_drop_mailer,saved_search_mailer,data_export_mailer}/*` (recipient locale) |
 | Platform | `country.rb` (JSONB-free locale rows via `name_key` i18n keys, `Country.seed_defaults!` ES-only), `setting.rb` (`get/set` + Rails.cache key `settings/<key>`, `seed_defaults!`), `api_token.rb` (`issue_for` → SHA-256 `token_digest`, `authenticate` active-only), `legal_page.rb`, `newsletter_subscription.rb`, `notification.rb`, `saved_search.rb`, `money.rb` (value object: `cents`/`amount`/`to_s`) |
 | Seeds (Phase 2a) | `db/seeds.rb` (loads `db/seeds/support/seed_loader.rb` + one loader per concern, idempotent upserts), raw data `db/seeds/data/{categories,spec_attributes,category_spec_attributes,labels,seller_tags}.yml` — counts: 61 categories, 34 spec attributes, 293 options, 88 category attachments, 13 labels, 21 seller tags, 6 countries, 5 settings (4 core + `min_offer_percent` since Phase 4a) |
 | Seeds (Phase 2b, dev-only) | `db/seeds/sample_listings.rb` early-returns unless `Rails.env.development?`; seeds 5 sample sellers (store + user each), 41 listings across the taxonomy (labels, seller tags, JSONB specs, favorites/views counters, `status: sold` on a few indexes, `featured_until = 7.days.from_now` on the featured ones), 13 reviews through delivered orders, then attaches 80 generated 1200×900 placeholder photos (ImageMagick gradients cached in `tmp/sample_photos/` — no fonts on this box, so no text overlay). Idempotent: re-running creates 0 records. Dev DB after seeding: 42 listings (39 approved, 3 sold), 80 attachments, 13 reviews, 5 sample stores |
-| Migrations | Phase 0: `20261116205301…205400`. Phase 1 domain: `db/migrate/20261117090001`–`20261117090033` (countries, settings, stores, categories, spec_*, listings + tsv trigger/GIN, labels/tags/moderation, favorites/follows, saved_searches, conversations/messages/blocks, offers, carts/cart_items, addresses/orders/order_items, reviews, notifications, newsletter, legal_pages, api_tokens, user ban fields, active_storage). Phase 3b: `20261117200001` (stores: returns/shipping policies, shipping-default cents), `20261117200002` (friendly_id_slugs), `20261117200003` (stores.city/region). Phase 4a: `20261117210001` (messages: `kind` enum + `offer_id` FK), `20261117210002` (listings: `reserved_for_id` FK + `reserved_until`). Phase 4b: `20261117223000` (orders: `paid_at/completed_at/cancelled_at` datetimes + `checkout_token` string + indexes on `checkout_token`/`status`; `shipped_at`/`delivered_at` already existed since Phase 1). Schema dump: `db/structure.sql` (schema_format: sql in `config/database.yml`) |
-| Tests | `test/models/user_test.rb`, `test/models/{listing,category,setting,country,api_token,review,favorite}_test.rb`, `test/models/store_test.rb` (3b: name/description/VAT/business/region/logo/banner validations, slug history — create via model, not fixtures), `test/validators/spanish_tax_id_validator_test.rb` (NIF/NIE/CIF vectors incl. G02377372, P0200000H), `test/services/{commission_calculator,listing_search,sell/dashboard_stats}_test.rb` (dashboard: windowed revenue nets commission, zero-filled ISO weeks, unanswered/pending scopes; fixture order `one` is a completed in-window order for seller two and orders' `created_at` defaults to now), `test/controllers/{pages,listings,categories,stores,sessions,passwords}_controller_test.rb`, `test/integration/sell_listings_test.rb` (3a + photo purge-after-commit regression: failed update keeps photos attached), `test/integration/sell_dashboard_test.rb` (auth, KPI render, attention), `test/integration/sell_store_settings_test.rb` (euro fields, business VAT, oversized logo 422, rename → 301 via seeded `slugs` row), `test/integration/sell_vacation_test.rb` (toggle, listing notice/disabled buy, store banner), `test/helpers/listings_helper_test.rb`, `test/test_helpers/session_test_helper.rb` (`sign_in_as`); fixtures for users (incl. `banned`)/countries/categories/spec_*/labels/seller_tags/stores/listings/orders/order_items/files. `test_helper.rb`: `I18n.default_locale = :en`, `routes.default_url_options[:locale] = :en`, and a **global** `setup { Listing.reindex_search_vectors! }` (fixture INSERTs do not fire `trg_listings_tsv`, which only fires on UPDATE of title/description). GOTCHA: fixture orders use `number:` `PCM-2025-000001/2` (deliberately NOT `PCM-2026-*`: fresh `order_number_seq` nextvals are 1,2 and would collide with same-year fixture numbers when tests create orders); create extra orders in tests with an explicit unique `number:` or let `assign_number` pick from the sequence. `listings_controller_test.rb` also guards against N+1 by counting `sql.active_record` notifications. Phase 4a: `test/models/{conversation,message,offer}_test.rb`, `test/services/{conversations/start,messages/send}_test.rb`, `test/services/offers/{create,decisions}_test.rb`, `test/jobs/expire_offers_job_test.rb`, `test/mailers/message_notification_mailer_test.rb` (mailer renders in the RECIPIENT's locale — fixture user `one` is `es`), `test/integration/messaging_test.rb` (scoping, start refusals, read receipts, blocks incl. `cannot_block_self`/`taken`, 30/min → 429 via `MessagesController::RATE_LIMIT_STORE.clear` in setup), `test/integration/offers_test.rb` (form hints in `:en` money format `€300.00`, decision flows, reserved 422 + banner, tab scoping), `test/integration/turbo_broadcasts_test.rb` (`capture_turbo_stream_broadcasts` returns Nokogiri elements — assert `el["action"]`/`el["target"]`/`to_html`; commit callbacks DO fire in transactional tests on this Rails). Phase 4b: `test/models/{cart,order}_test.rb`, `test/services/{carts_add_item,carts_merge,carts_summary,checkout_place_orders,checkout_direct_payment,payments_stripe_checkout}_test.rb` (PlaceOrders covers per-seller split + recomputed totals, commission flag off/on, free-shipping threshold, pickup, the concurrency guard — a `Listing.singleton_class.define_method(:find)` swap sells the listing mid-transaction → `:not_purchasable` + zero orders — and token replay), `test/jobs/auto_complete_orders_job_test.rb`, `test/controllers/{carts,checkouts,orders,stripe_webhooks}_controller_test.rb` + `test/controllers/sell/sales_controller_test.rb` (role guards: buyer hitting seller routes 404, outsider 404, seller can't confirm delivery). Fixtures add `carts.yml`, `cart_items.yml`, `addresses.yml` (address columns: `full_name/line1/line2/city/region/postal_code/country_code/phone/default`). **Minitest 6 has no `minitest/mock`** — no `stub`; swap class methods via `Klass.singleton_class.define_method(...)` + `remove_method` in `ensure` (see Stripe stubs). Integration tests can't read signed cookies — guest carts via `Cart.where(user: nil).order(:id).last`, assert `cookies[:cart_token].blank?` after login. `perform_enqueued_jobs` needs `include ActiveJob::TestHelper`. Test env uses `config.cache_store = :memory_store` (message rate limiter needs a real store) |
+| Migrations | Phase 0: `20261116205301…205400`. Phase 1 domain: `db/migrate/20261117090001`–`20261117090033` (countries, settings, stores, categories, spec_*, listings + tsv trigger/GIN, labels/tags/moderation, favorites/follows, saved_searches, conversations/messages/blocks, offers, carts/cart_items, addresses/orders/order_items, reviews, notifications, newsletter, legal_pages, api_tokens, user ban fields, active_storage). Phase 3b: `20261117200001` (stores: returns/shipping policies, shipping-default cents), `20261117200002` (friendly_id_slugs), `20261117200003` (stores.city/region). Phase 4a: `20261117210001` (messages: `kind` enum + `offer_id` FK), `20261117210002` (listings: `reserved_for_id` FK + `reserved_until`). Phase 4b: `20261117223000` (orders: `paid_at/completed_at/cancelled_at` datetimes + `checkout_token` string + indexes on `checkout_token`/`status`; `shipped_at`/`delivered_at` already existed since Phase 1). Phase 5: `20261117230001` (favorites: `price_cents_at_save` integer), `20261117230002` (users: `notification_preferences` jsonb NOT NULL default `{}`), `20261117230003` (stores: `hidden` boolean NOT NULL default false — set on GDPR anonymisation; `Store.visible` excludes them). `saved_searches.email_alerts`/`last_notified_at` already existed since Phase 1 migration `20261117090017`. Schema dump: `db/structure.sql` (schema_format: sql in `config/database.yml`) |
+| Tests | `test/models/user_test.rb`, `test/models/{listing,category,setting,country,api_token,review,favorite}_test.rb`, `test/models/store_test.rb` (3b: name/description/VAT/business/region/logo/banner validations, slug history — create via model, not fixtures), `test/validators/spanish_tax_id_validator_test.rb` (NIF/NIE/CIF vectors incl. G02377372, P0200000H), `test/services/{commission_calculator,listing_search,sell/dashboard_stats}_test.rb` (dashboard: windowed revenue nets commission, zero-filled ISO weeks, unanswered/pending scopes; fixture order `one` is a completed in-window order for seller two and orders' `created_at` defaults to now), `test/controllers/{pages,listings,categories,stores,sessions,passwords}_controller_test.rb`, `test/integration/sell_listings_test.rb` (3a + photo purge-after-commit regression: failed update keeps photos attached), `test/integration/sell_dashboard_test.rb` (auth, KPI render, attention), `test/integration/sell_store_settings_test.rb` (euro fields, business VAT, oversized logo 422, rename → 301 via seeded `slugs` row), `test/integration/sell_vacation_test.rb` (toggle, listing notice/disabled buy, store banner), `test/helpers/listings_helper_test.rb`, `test/test_helpers/session_test_helper.rb` (`sign_in_as`); fixtures for users (incl. `banned`)/countries/categories/spec_*/labels/seller_tags/stores/listings/orders/order_items/files. `test_helper.rb`: `I18n.default_locale = :en`, `routes.default_url_options[:locale] = :en`, and a **global** `setup { Listing.reindex_search_vectors! }` (fixture INSERTs do not fire `trg_listings_tsv`, which only fires on UPDATE of title/description). GOTCHA: fixture orders use `number:` `PCM-2025-000001/2` (deliberately NOT `PCM-2026-*`: fresh `order_number_seq` nextvals are 1,2 and would collide with same-year fixture numbers when tests create orders); create extra orders in tests with an explicit unique `number:` or let `assign_number` pick from the sequence. `listings_controller_test.rb` also guards against N+1 by counting `sql.active_record` notifications. Phase 4a: `test/models/{conversation,message,offer}_test.rb`, `test/services/{conversations/start,messages/send}_test.rb`, `test/services/offers/{create,decisions}_test.rb`, `test/jobs/expire_offers_job_test.rb`, `test/mailers/message_notification_mailer_test.rb` (mailer renders in the RECIPIENT's locale — fixture user `one` is `es`), `test/integration/messaging_test.rb` (scoping, start refusals, read receipts, blocks incl. `cannot_block_self`/`taken`, 30/min → 429 via `MessagesController::RATE_LIMIT_STORE.clear` in setup), `test/integration/offers_test.rb` (form hints in `:en` money format `€300.00`, decision flows, reserved 422 + banner, tab scoping), `test/integration/turbo_broadcasts_test.rb` (`capture_turbo_stream_broadcasts` returns Nokogiri elements — assert `el["action"]`/`el["target"]`/`to_html`; commit callbacks DO fire in transactional tests on this Rails). Phase 4b: `test/models/{cart,order}_test.rb`, `test/services/{carts_add_item,carts_merge,carts_summary,checkout_place_orders,checkout_direct_payment,payments_stripe_checkout}_test.rb` (PlaceOrders covers per-seller split + recomputed totals, commission flag off/on, free-shipping threshold, pickup, the concurrency guard — a `Listing.singleton_class.define_method(:find)` swap sells the listing mid-transaction → `:not_purchasable` + zero orders — and token replay), `test/jobs/auto_complete_orders_job_test.rb`, `test/controllers/{carts,checkouts,orders,stripe_webhooks}_controller_test.rb` + `test/controllers/sell/sales_controller_test.rb` (role guards: buyer hitting seller routes 404, outsider 404, seller can't confirm delivery). Fixtures add `carts.yml`, `cart_items.yml`, `addresses.yml` (address columns: `full_name/line1/line2/city/region/postal_code/country_code/phone/default`). **Minitest 6 has no `minitest/mock`** — no `stub`; swap class methods via `Klass.singleton_class.define_method(...)` + `remove_method` in `ensure` (see Stripe stubs). Integration tests can't read signed cookies — guest carts via `Cart.where(user: nil).order(:id).last`, assert `cookies[:cart_token].blank?` after login. `perform_enqueued_jobs` needs `include ActiveJob::TestHelper`. Test env uses `config.cache_store = :memory_store` (message rate limiter needs a real store). Phase 5: `test/integration/{favorites,follows,saved_searches,notifications,account_settings}_test.rb`, `test/services/listings/price_drop_notifier_test.rb`, `test/services/saved_searches/match_new_listing_test.rb`, `test/services/users/{anonymize,data_export}_test.rb`, `test/mailers/phase5_mailers_test.rb` (no favorites/follows/notifications/saved_searches FIXTURE files — those tests create records in setup). Phase 5 mail-test gotchas: NullMail must assert on `…action.message` (lazy `MessageDelivery`), multipart body assertions use `text_part.body.decoded`, absolute delivery counts need `ActionMailer::Base.deliveries.clear` in setup |
 
 ## Open items (next phases)
 
-- Seller follow-ups: favourites/wishlist persistence, per-listing edit of
-  labels. (Listing create/edit, publish flow, photo upload, mark-sold and
-  archiving shipped in Phase 3a; store settings, dashboard, vacation mode
-  and a read-only sales list shipped in Phase 3b — fulfilment actions and
-  payments shipped with Phase 4b checkout; payout UI still open.)
+- Seller follow-ups: per-listing edit of labels. (Listing create/edit,
+  publish flow, photo upload, mark-sold and archiving shipped in Phase 3a;
+  store settings, dashboard, vacation mode and a read-only sales list shipped
+  in Phase 3b — fulfilment actions and payments shipped with Phase 4b
+  checkout; payout UI still open. Wishlist/favourites, store follows, saved
+  searches + alerts and the notification centre shipped in Phase 5.)
 - Cart + checkout + order lifecycle shipped in Phase 4b (guest carts + login
   merge, per-seller orders, direct payment + Stripe behind flag `stripe_checkout`,
   full state machine with role-guarded transitions, auto-complete/auto-cancel job,
@@ -303,9 +400,10 @@ UI come in later phases.
 - Seed data: reference data done (Phase 2a) and dev demo catalogue done (Phase 2b,
   dev-only). Photo placeholders are generated gradients — replace with real assets if
   screenshots/design reviews matter. pg_search typo tolerance (dmetaphone) if needed.
-- Saved searches and reviews UI (models exist; Phase 2b shows
-  read-only reviews on the store page). Chat/offers UI shipped in Phase 4a —
-  follow-ups there: message edit/delete, typing indicators, photo-in-chat,
-  notification inbox page (the `Notification` records exist and e-mails go
-  out; only the unread badge is surfaced in the header).
+- Saved searches UI, notification inbox, wishlist, follows and account area
+  (profile/security/e-mail prefs/GDPR) shipped in Phase 5; store-page review
+  display (Phase 2b) + write-a-review (Phase 4b). Chat follow-ups: message
+  edit/delete, typing indicators, photo-in-chat. Notification follow-ups:
+  per-item read state (only mark-all-read exists today), in-app e-mail
+  preference nudges.
 - Add `script/lint_locale_keys.rb` to CI.

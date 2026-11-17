@@ -1,21 +1,23 @@
 <%# One GET form drives both the sidebar and the results frame: every change is
     a frame-only Turbo visit, so the page shell and the sidebar stay put.
     Used by the listings index, category pages and the store listings tab. %>
-<%= form_with url: request.path, method: :get,
-      data: { controller: "filters", turbo_frame: "results" } do %>
-  <% %i[q category seller].each do |key| %>
-    <% value = @result.filters[key] %>
-    <% value = value.slug if value.respond_to?(:slug) %>
-    <%= hidden_field_tag key, value if value.present? %>
+<div class="flex flex-col gap-6 lg:flex-row lg:items-start">
+  <%# The sidebar form targets the results frame below by id; keeping it wrapped
+      around only the sidebar leaves the frame free to host its own forms. %>
+  <%= form_with url: request.path, method: :get,
+        data: { controller: "filters", turbo_frame: "results" } do %>
+    <% %i[q category seller].each do |key| %>
+      <% value = @result.filters[key] %>
+      <% value = value.slug if value.respond_to?(:slug) %>
+      <%= hidden_field_tag key, value if value.present? %>
+    <% end %>
+
+    <%= render "listings/filters", result: @result %>
   <% end %>
 
-  <div class="flex flex-col gap-6 lg:flex-row lg:items-start">
-    <%= render "listings/filters", result: @result %>
-
-    <div class="min-w-0 flex-1">
-      <turbo-frame id="results" data-turbo-action="advance" class="block">
-        <%= render "listings/results", result: @result %>
-      </turbo-frame>
-    </div>
+  <div class="min-w-0 flex-1">
+    <turbo-frame id="results" data-turbo-action="advance" class="block">
+      <%= render "listings/results", result: @result %>
+    </turbo-frame>
   </div>
-<% end %>
+</div>

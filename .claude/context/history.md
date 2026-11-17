@@ -1,5 +1,103 @@
 # History
 
+## 2026-11-17 — Phase 5: wishlists + price-drop alerts, store follows, saved searches & digest, notification centre, account settings (profile/security/GDPR)
+
+**What changed**
+
+- Migrations `20261117230001–230003`: `favorites.price_cents_at_save`,
+  `users.notification_preferences` (jsonb), `stores.hidden` (GDPR marker);
+  structure.sql dumped, dev + test applied.
+- **Wishlist**: `FavoritesController` (create/destroy turbo streams, idempotent
+  `find_or_initialize_by`, price stamped at save), `shared/_favorite_button`,
+  header heart badge (`header_favorite_count` in `ApplicationController`),
+  `favorites/index` shows the drop % since saving (`Favorite#price_dropped?`).
+- **Price-drop alerts**: `Listings::PriceDropNotifier` (24 h cooldown per
+  listing, only alerts savers whose `price_cents_at_save` is above the new
+  price; Notification always created, e-mail only when the user
+  `wants_email?("price_drop")`). Runs **synchronously** from the Listing
+  `after_update_commit :alert_price_drop` hook (the
+  `Listings::PriceDropNotifierJob` was deleted — the notification must exist
+  right after the update and the mail is the only async part).
+  `PriceDropMailer` re-checks the preference inside the action (guards
+  preference flips between enqueue and send; `@previous_cents` nil-safe in
+  both templates).
+- **Follows**: `FollowsController` (turbo-stream swap of
+  `shared/_follow_button` + `stores/_follower_count`; `Store.visible.friendly.find`
+  — hidden stores 404), `Follow` model rejects self-follow; Store page shows
+  button + count.
+- **Saved searches**: `SavedSearchesController` (save from results page,
+  toggle alerts, delete — turbo streams; 25-per-user cap in the model,
+  on create). `SavedSearch#new_from_search(user:, name:, search_filters:)`
+  accepts permitted Parameters (`to_h.with_indifferent_access`); `attribute
+  :email_alerts, default: false` at the model (DB column defaults true for
+  legacy rows). `SavedSearches::MatchNewListing` (SQL prefilter on category
+  ancestry + price band, then authoritative `ListingSearch.new(..., only_id:)`
+  — service **class**, `self.call` → `new(listing).call`) writes one
+  `saved_search_match` Notification per matching search; `SavedSearchMatchJob`
+  (fired by Listing `after_commit` on approve) e-mails once per user when any
+  of their matching searches has `email_alerts` + the user wants the channel,
+  then touches `last_notified_at` (watermark). `SavedSearchDigest` +
+  `saved_search_digest_job` (recurring `saved_search_digest` hourly in
+  `config/recurring.yml`) batch unsent matches per user
+  (`Notification.unsent_saved_search_matches` = created after the watermark).
+- **Notification centre**: `NotificationsController#index` + `NotificationsReadsController`
+  (route is `resource :notifications_read` → Rails infers the PLURALised
+  controller name, so the class is `NotificationsReadsController`),
+  `NotificationsHelper` renders kind → text/link/icon from the jsonb payload
+  (`saved_search_match` payload now carries `saved_search_name`; `new_message`
+  uses the counterparty's display name; links resolve listing ids through
+  `Listing.find_by` so paths render slugs). Header bell `shared/_notifications_badge`
+  (`div#notifications-badge`, count from `Notification.unread_count_for`
+  cached per user; live via `turbo_stream_from Current.user, :notifications`
+  + broadcast in `Notification#bust_unread_cache_and_broadcast`).
+  `Notification` gained `unread?`, `unsent_saved_search_matches` scope,
+  cache helpers.
+- **Account namespace** (`/account/*`, `Account::BaseController` with
+  `layout "account"` + `_account_nav`): `profiles` (name/email/phone/locale —
+  redirect honours the new locale), `securities` (current-password confirm;
+  `User#current_password` is a virtual attr so the error summary can render
+  it), `notification_preferences` (6-channel checkbox matrix →
+  `User#update_notification_preferences` writes the FULL matrix, missing
+  keys → explicit false; `EMAIL_PREFERENCE_KEYS`/`DEFAULT_EMAIL_PREFERENCES`/
+  `wants_email?` — everything defaults ON except newsletter), `data_exports`
+  (`Users::DataExportJob` builds the GDPR JSON, attaches it to
+  `user.export`, `DataExportMailer#ready` mails a 7-day signed blob link —
+  deliberately NOT gated on a channel preference, it's the user's own
+  transactional request), `deletions` (`Users::Anonymize`: refuses while any
+  order is not completed/cancelled (`OpenOrderError`), renames to
+  `deleted-<id>@invalid`/`deleted-<id>`, purges avatar, destroys
+  addresses/favorites/saved searches/tokens/sessions/blocks, archives ALL
+  non-sold listings incl. drafts, hides the store; `User#deleted?` =
+  email ends `@invalid`, `wants_email?` returns false for deleted users).
+- **Test gotchas learned**: Rails 8.1 `ActionMailer::MessageDelivery` is a
+  lazy delegator — assert `NullMail` on `...action.message`, deliver with
+  `.deliver_now`; multipart `mail.body.to_s` is empty — use
+  `text_part.body.decoded`; quoted-printable splits long URLs, so never
+  assert on `body.encoded` substrings; plain `ActiveSupport::TestCase`
+  does NOT clear `ActionMailer::Base.deliveries` between tests — classes
+  that count absolute deliveries `setup { ActionMailer::Base.deliveries.clear }`;
+  `pluck("payload->>'x'")` needs `Arel.sql(...)` on Rails 8.1. Phase 5 tests
+  create records in setup instead of adding new fixture files (no
+  favorites/follows/notifications/saved_searches fixtures).
+- **Gates**: 428 runs / 2224 assertions / 0F 0E; rubocop clean; locale linter
+  6 files × 1130 keys; tailwind build OK. Not committed (per instruction).
+
+**Why** — Phase 5 of the plan: engagement features (wishlist + price-drop
+notifier, store follows, saved searches with match fan-out and hourly digest)
+plus the notification centre and the account area required before launch
+(profile, password change, e-mail channel prefs, GDPR export & erasure).
+
+**Files** — see the Phase 5 rows in `project.md` code map; touched:
+`app/controllers/{favorites,follows,saved_searches,notifications,notifications_reads,application}_controller.rb`,
+`app/controllers/account/*`, `app/models/{user,listing,store,favorite,follow,saved_search,notification}.rb`,
+`app/services/{listings/price_drop_notifier,saved_search_digest,saved_searches/match_new_listing,users/{data_export,data_export_job,anonymize}}.rb`,
+`app/jobs/{saved_search_match_job,saved_search_digest_job}.rb`,
+`app/mailers/{price_drop,saved_search,data_export}_mailer.rb`,
+`app/helpers/{notifications,saved_searches}_helper.rb`, views under
+`app/views/{account,favorites,notifications,saved_searches,price_drop_mailer,saved_search_mailer,data_export_mailer,shared}/`,
+`config/routes.rb`, `config/recurring.yml`, all 6 locale files, and the
+phase 5 test files under `test/{models,services,mailers,integration}/`.
+
 ## 2026-11-17 — Phase 4b: cart, checkout & order lifecycle (guest carts, per-seller orders, Stripe/direct payment, state machine) + Phase 4a review fixes
 
 **What changed**

@@ -51,6 +51,13 @@ class Listing < ApplicationRecord
 
   has_many_attached :photos
 
+  # A price CUT on a live listing alerts the users who saved it (at most once
+  # per listing per 24h — see Listings::PriceDropNotifier) and a listing
+  # that just became APPROVED fans out to saved-search matches.
+  after_update_commit :alert_price_drop, if: -> { saved_change_to_price_cents? }
+  after_commit :match_saved_searches, on: :update,
+               if: -> { saved_change_to_status? && approved? }
+
   validates :title, presence: true, length: { in: 5..120 }
   validates :description, length: { maximum: 20_000 }, allow_nil: true
   validates :price_cents, presence: true,
@@ -260,6 +267,16 @@ class Listing < ApplicationRecord
   end
 
   private
+
+  def alert_price_drop
+    return unless price_cents_before_last_save && price_cents < price_cents_before_last_save
+
+    Listings::PriceDropNotifier.call(self)
+  end
+
+  def match_saved_searches
+    SavedSearchMatchJob.perform_later(id)
+  end
 
   def ensure_transition!(from:, to:)
     return if from.map(&:to_s).include?(status.to_s)

@@ -42,6 +42,42 @@
     <% end %>
     <li><%= link_to t(".clear_all"), request.path, class: "inline-flex min-h-9 items-center px-1 text-xs font-semibold text-primary hover:underline" %></li>
   </ul>
+
+  <%# Save the current filter set as an email-alert-ready saved search. Sits
+      inside the results frame (re-rendered on every filter change), outside
+      the sidebar GET form, so it can be its own POST form. %>
+  <% if authenticated? && @result.applied_filters? %>
+    <%= form_with url: saved_searches_path, method: :post,
+          data: { turbo_frame: "_top" },
+          class: "mb-4 flex flex-wrap items-center gap-2 rounded-lg border border-border bg-surface-muted px-3 py-2" do |form| %>
+      <% %i[q min_price max_price condition].each do |key| %>
+        <%= hidden_field_tag key, @result.filters[key] if @result.filters[key].present? %>
+      <% end %>
+      <% if @result.filters[:category].present? %>
+        <% cat = @result.filters[:category] %>
+        <%= hidden_field_tag :category, cat.respond_to?(:slug) ? cat.slug : cat %>
+      <% end %>
+      <% if @result.filters[:seller].present? %>
+        <% seller = @result.filters[:seller] %>
+        <%= hidden_field_tag :seller, seller.respond_to?(:slug) ? seller.slug : seller %>
+      <% end %>
+      <% Array(@result.filters[:f]).each do |value| %>
+        <%= hidden_field_tag "f[]", value %>
+      <% end %>
+      <% Array(@result.filters[:labels]).each do |value| %>
+        <%= hidden_field_tag "labels[]", value %>
+      <% end %>
+
+      <span class="flex items-center gap-1.5 text-sm font-medium">
+        <%= inline_icon :bookmark, classes: "size-4 text-primary" %>
+        <%= t(".save_search.label") %>
+      </span>
+      <%= form.text_field :name, required: true, maxlength: 120,
+            placeholder: t(".save_search.name_placeholder"), aria: { label: t(".save_search.name_placeholder") },
+            class: "h-9 min-w-0 flex-1 basis-40 rounded-md border border-border bg-surface px-2.5 text-sm focus:border-primary focus:outline-none" %>
+      <%= form.submit t(".save_search.submit"), class: "min-h-9 cursor-pointer rounded-md bg-primary px-3 text-sm font-semibold text-white hover:bg-primary-hover" %>
+    <% end %>
+  <% end %>
 <% end %>
 
 <% if @result.empty? %>

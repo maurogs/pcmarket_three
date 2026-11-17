@@ -53,11 +53,14 @@ class ListingSearch
     end
   end
 
-  def initialize(params, country_code: "ES", request: nil, limit: PER_PAGE)
+  def initialize(params, country_code: "ES", request: nil, limit: PER_PAGE, only_id: nil)
     @params = (params.respond_to?(:to_unsafe_h) ? params.to_unsafe_h : params).with_indifferent_access
     @country_code = country_code
     @request = request
     @limit = limit
+    # Internal hook (saved-search matching): restrict the scope to one listing
+    # so we can ask "does THIS listing satisfy these criteria?" for free.
+    @only_id = only_id
   end
 
   def call
@@ -76,12 +79,19 @@ class ListingSearch
     )
   end
 
+  # Existence check without facets/pagination — used by saved-search matching
+  # (ListingSearch.new(criteria, only_id: listing.id).match?).
+  def match?
+    filtered_scope.exists?
+  end
+
   private
 
   # --- filtering -------------------------------------------------------------
 
   def filtered_scope
     scope = Listing.published.in_country(@country_code)
+    scope = scope.where(id: @only_id) if @only_id
     # A category param that resolves to nothing must match nothing, not
     # silently drop the filter and show the whole catalogue.
     return scope.none if @params[:category].present? && category.nil?

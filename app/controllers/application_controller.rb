@@ -73,6 +73,35 @@ class ApplicationController < ActionController::Base
     end
     helper_method :header_cart_count
 
+    # Favourite state of the signed-in user: listing_id => favorite_id, one
+    # pluck per request, reused by every listing card on the page — cards
+    # include the flag in their cache key so hearts render correctly without
+    # N+1 queries.
+    def favorites_by_listing_id
+      @favorites_by_listing_id ||= Current.user ? Current.user.favorites.pluck(:listing_id, :id).to_h : {}
+    end
+
+    def favorite?(listing)
+      favorites_by_listing_id.key?(listing.id)
+    end
+    helper_method :favorite?
+
+    def favorite_id(listing)
+      favorites_by_listing_id[listing.id]
+    end
+    helper_method :favorite_id
+
+    # Wishlist mutations invalidate the memo so a re-render in the same
+    # request sees fresh state.
+    def forget_favorite(listing_id)
+      favorites_by_listing_id.delete(listing_id) if defined?(@favorites_by_listing_id)
+    end
+
+    def header_favorite_count
+      favorites_by_listing_id.size
+    end
+    helper_method :header_favorite_count
+
     # Single-country launch (Spain); the enabled Country row is the source of truth.
     def current_country_code
       @current_country_code ||= Country.enabled.order(:code).first&.code || "ES"

@@ -17,4 +17,14 @@ class FavoriteTest < ActiveSupport::TestCase
     other = Favorite.new(user: users(:two), listing: listings(:gigabyte))
     assert_not other.valid?
   end
+
+  test "price_dropped? compares against the price captured on save" do
+    favorite = Favorite.create!(user: users(:two), listing: listings(:gigabyte),
+                                price_cents_at_save: listings(:gigabyte).price_cents)
+    assert_not favorite.price_dropped?
+
+    favorite.price_cents_at_save = favorite.listing.price_cents + 1_000
+    assert favorite.price_dropped?
+    assert_equal favorite.price_cents_at_save, favorite.saved_price.cents
+  end
 end

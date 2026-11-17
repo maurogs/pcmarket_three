@@ -1,0 +1,12 @@
+<% content_for :title, t(".subject", count: @listings.size) %>
+<p><%= t(".greeting", name: @user.display_name) %></p>
+<p><%= t(".intro", count: @listings.size) %></p>
+<ul>
+  <% @listings.each do |listing| %>
+    <li style="margin-bottom:0.5rem;">
+      <%= link_to listing.title, listing_url(listing, locale: @user.locale) %>
+      — <%= money(listing.price_cents, listing.currency) %>
+    </li>
+  <% end %>
+</ul>
+<p><%= t(".manage", link: link_to(t(".manage_link"), saved_searches_url(locale: @user.locale))) %></p>

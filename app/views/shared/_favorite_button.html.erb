@@ -1,0 +1,26 @@
+<%# Favourite (wishlist) heart button. The wrapper id is the target of the
+    Turbo Stream replace from FavoritesController. Local: listing %>
+<%= tag.div id: "favorite_button_#{listing.id}" do %>
+  <% if authenticated? %>
+    <% if favorite?(listing) %>
+      <%= button_to favorite_path(favorite_id(listing)), method: :delete,
+            class: "flex size-9 cursor-pointer items-center justify-center rounded-full bg-surface/90 text-accent hover:text-red-700 dark:bg-slate-900/90",
+            title: t(".remove"), aria: { label: t(".remove") } do %>
+        <svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path d="M21 8.25c0-2.485-2.099-4.5-4.685-4.5C14.24 3.75 12 6 12 6s-2.24-2.25-4.315-2.25C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
+        </svg>
+      <% end %>
+    <% else %>
+      <%= button_to favorites_path(listing_id: listing.id), method: :post,
+            class: "flex size-9 cursor-pointer items-center justify-center rounded-full bg-surface/90 text-muted hover:text-accent dark:bg-slate-900/90",
+            title: t(".save"), aria: { label: t(".save") } do %>
+        <%= inline_icon :heart, classes: "size-5" %>
+      <% end %>
+    <% end %>
+  <% else %>
+    <%= link_to new_session_path, class: "flex size-9 items-center justify-center rounded-full bg-surface/90 text-muted hover:text-accent dark:bg-slate-900/90",
+          title: t(".save_login"), aria: { label: t(".save_login") } do %>
+      <%= inline_icon :heart, classes: "size-5" %>
+    <% end %>
+  <% end %>
+<% end %>

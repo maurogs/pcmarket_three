@@ -1,0 +1,22 @@
+<%# Follow/unfollow a store. The wrapper id is the target of the Turbo
+    Stream replace from FollowsController. Local: store %>
+<%= tag.div id: "follow_button_#{store.id}" do %>
+  <% if authenticated? && current_user != store.user %>
+    <% if store.followed_by?(current_user) %>
+      <%= button_to store_follow_path(store), method: :delete,
+            class: "min-h-11 cursor-pointer rounded-md border border-border bg-surface px-4 py-2 text-sm font-medium text-text hover:border-accent hover:text-accent" do %>
+        <%= t(".following") %>
+      <% end %>
+    <% else %>
+      <%= button_to store_follow_path(store), method: :post,
+            class: "min-h-11 cursor-pointer rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90" do %>
+        <%= t(".follow") %>
+      <% end %>
+    <% end %>
+  <% elsif !authenticated? %>
+    <%= link_to new_session_path, class: "inline-flex min-h-11 items-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90" do %>
+      <%= t(".follow_login") %>
+    <% end %>
+  <% end %>
+  <p id="follow_error_<%= store.id %>" class="mt-1 text-xs text-red-600 dark:text-red-400"></p>
+<% end %>

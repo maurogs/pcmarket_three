@@ -1,0 +1,50 @@
+<% content_for :title, t(".title") %>
+
+<div class="mx-auto max-w-3xl">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h1 class="text-2xl font-bold"><%= t(".title") %></h1>
+    <% if @notifications.any?(&:unread?) %>
+      <%= button_to t(".mark_all_read"), notifications_read_path,
+            class: "cursor-pointer rounded-md border border-border px-3 py-1.5 text-sm font-medium hover:border-primary hover:text-primary" %>
+    <% end %>
+  </div>
+  <p class="mt-1 text-sm text-muted"><%= t(".description") %></p>
+
+  <% if @notifications.empty? %>
+    <div class="mt-8 rounded-xl border border-dashed border-border p-10 text-center">
+      <p class="text-sm"><%= t(".empty") %></p>
+      <p class="mt-1 text-sm text-muted"><%= t(".empty_hint") %></p>
+      <%= link_to t(".browse_listings"), listings_path, class: "btn-secondary mt-4 inline-flex" %>
+    </div>
+  <% else %>
+    <ul class="mt-6 flex flex-col gap-2">
+      <% @notifications.each do |notification| %>
+        <li id="<%= dom_id(notification) %>"
+            class=["flex items-start gap-3 rounded-xl border p-4 shadow-sm",
+                   notification.read? ? "border-border bg-surface" : "border-primary/40 bg-primary/5"].join(" ") %>
+          <span class="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-surface-muted text-primary">
+            <%= notification_icon(notification, classes: "size-4") %>
+          </span>
+
+          <div class="min-w-0 flex-1">
+            <% text = notification_text(notification) %>
+            <% if (href = notification_link(notification)) %>
+              <%= link_to text, href, class: ["block text-sm", notification.read? ? "text-text" : "font-semibold text-text hover:text-primary"].join(" ") %>
+            <% else %>
+              <p class=["block text-sm", notification.read? ? "text-text" : "font-semibold text-text"].join(" ")><%= text %></p>
+            <% end %>
+            <p class="mt-0.5 text-xs text-muted"><%= t("time.ago", time: time_ago_in_words(notification.created_at)) %></p>
+          </div>
+
+          <% unless notification.read? %>
+            <span class="mt-1 size-2 shrink-0 rounded-full bg-primary" aria-label="<%= t(".unread") %>"></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+
+    <% if @pagy.pages > 1 %>
+      <div class="mt-6"><%= results_pagination(@pagy) %></div>
+    <% end %>
+  <% end %>
+</div>

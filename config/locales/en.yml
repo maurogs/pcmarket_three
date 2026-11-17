@@ -4,6 +4,13 @@ en:
     name: PCMarket
   layouts:
     announcement: 'New in Spain: buy and sell new and second-hand PC hardware on PCMarket.'
+    account_nav:
+      title: Account settings
+      profile: Profile
+      security: Security
+      notification_preferences: Notifications
+      addresses: Addresses
+      deletion: Delete account
   nav:
     search_placeholder: Search graphics cards, processors, laptops…
     search_submit: Search
@@ -33,6 +40,12 @@ en:
     my_store_sales: My sales
     my_store_settings: Store settings
     messages: Messages
+    my_orders: My orders
+    inbox: Inbox
+    offers: My offers
+    saved_searches: Saved searches
+    addresses: Addresses
+    account_settings: Account settings
   footer:
     newsletter_title: Subscribe to our newsletter
     newsletter_placeholder: Your email address
@@ -204,6 +217,10 @@ en:
       count:
         one: "%{count} result"
         other: "%{count} results"
+      save_search:
+        label: Save this search
+        name_placeholder: Name this search
+        submit: Save
     show:
       breadcrumb: Breadcrumb
       breadcrumb_home: Home
@@ -285,6 +302,15 @@ en:
         logo_too_large: must be %{max} MB or smaller
         banner_content_type_invalid: must be a JPEG, PNG or WebP image
         banner_too_large: must be %{max} MB or smaller
+      models:
+        follow:
+          attributes:
+            store_id:
+              cannot_follow_own_store: You can't follow your own store
+        saved_search:
+          attributes:
+            base:
+              saved_search_limit: You can save at most %{count} searches
     models:
       address: Address
       api_token: API token
@@ -590,6 +616,14 @@ en:
       save_login: Log in to save this item
     card_rail:
       view_all: View all
+    favorite_button:
+      save: Save listing
+      remove: Remove from wishlist
+      save_login: Log in to save listings
+    follow_button:
+      follow: Follow store
+      following: Following
+      follow_login: Log in to follow stores
   stores:
     verified: Verified seller
     types:
@@ -882,6 +916,7 @@ en:
     formats:
       chat_day: "%b %d %H:%M"
       chat_time: "%H:%M"
+    ago: "%{time} ago"
   conversations:
     composer:
       blocked_notice: You cannot send messages in this conversation.
@@ -1241,3 +1276,197 @@ en:
       submit: Publish review
       subtitle: Tell other users about your experience with this order.
       title: Review order %{number}
+  users:
+    deleted_display_name: Former user
+  favorites:
+    index:
+      title: Wishlist
+      description: Listings you saved, with price-drop alerts.
+      count:
+        one: "%{count} saved listing"
+        other: "%{count} saved listings"
+      empty: Your wishlist is empty
+      empty_hint: Tap the heart on any listing to save it here.
+      browse_listings: Browse listings
+      saved_ago: Saved %{time}
+      price_dropped: Price dropped %{percent}
+      remove: Remove
+      sold_badge: Sold
+  saved_searches:
+    index:
+      title: Saved searches
+      description: Get an email whenever a listing matches a search you saved. You
+        can save up to %{limit} searches.
+      empty: You have no saved searches
+      empty_hint: Search the marketplace and tap Save this search to get email alerts.
+      browse_listings: Browse listings
+    saved_search:
+      alerts_on: Email alerts on
+      alerts_off: Email alerts off
+      delete: Delete
+      alerts_enable: Turn on alerts
+      alerts_disable: Turn off alerts
+    create:
+      created: Search saved. We'll email you when something matches.
+    summary:
+      quoted_query: '"%{query}"'
+      more_filters:
+        one: "%{count} filter"
+        other: "%{count} filters"
+      price_between: "%{min} - %{max}"
+      price_min: from %{min}
+      price_max: up to %{max}
+  notifications:
+    index:
+      title: Notifications
+      description: Activity on your offers, messages and saved searches.
+      empty: No notifications yet
+      empty_hint: Offers, messages and saved-search alerts show up here.
+      browse_listings: Browse listings
+      mark_all_read: Mark all as read
+      unread: Unread
+    kinds:
+      new_message: New message from %{name}
+      new_offer: New offer on %{title}
+      offer_accepted: Offer accepted on %{title}
+      price_drop: 'Price drop on %{title}: now %{price}'
+      saved_search_match: 'New listing for "%{name}": %{title}'
+      listing_submitted: Your listing "%{title}" is live
+      order_placed: Order %{number} placed
+      order_confirmed: Order %{number} confirmed
+      order_paid: Order %{number} paid
+      order_shipped: Order %{number} shipped
+      order_delivered: Order %{number} delivered
+      order_completed: Order %{number} completed
+      order_cancelled: Order %{number} cancelled
+      order_disputed: Order %{number} disputed
+      unknown: "%{kind}"
+  account:
+    profiles:
+      show:
+        title: Profile
+        description: How you appear to other members.
+        email: Email
+        phone: Phone
+        phone_hint: Used by our support team if there is a problem with an order.
+        language: Language
+        save: Save profile
+        first_name: First name
+        last_name: Last name
+        email_hint: You will need to re-verify if you change this.
+        locale_hint: Used for emails and the language of the site.
+        export_title: Download your data
+        export_description: We email you a file with your profile, listings, orders,
+          messages and reviews.
+        export_button: Request export
+      update:
+        updated: Profile updated
+    securities:
+      show:
+        title: Security
+        description: Manage your password and API tokens.
+        password: Password
+        current_password: Current password
+        new_password: New password
+        password_hint: At least 10 characters.
+        password_confirmation: Confirm new password
+        save: Change password
+      update:
+        updated: Password updated
+    notification_preferences:
+      show:
+        title: Notifications
+        description: Choose which emails you receive from PCMarket.
+        in_app_note: Offers, messages and order updates always appear in your notification
+          list.
+        topics:
+          email_offers:
+            label: Offers
+            hint: New offers on your listings and offers you make.
+          email_new_message:
+            label: Messages
+            hint: New messages in your conversations.
+          email_saved_search:
+            label: Saved searches
+            hint: A summary email when new listings match your saved searches.
+          email_price_drop:
+            label: Price drops
+            hint: When a listing on your wishlist gets cheaper.
+          email_orders:
+            label: Orders
+            hint: Order updates from booking to collection.
+          email_newsletter:
+            label: Product news
+            hint: Occasional news about PCMarket features.
+        save: Save preferences
+      update:
+        updated: Notification preferences saved
+    data_exports:
+      create:
+        queued: We're building your export. You'll get an email when it's ready.
+    deletions:
+      show:
+        title: Delete account
+        description: Close your PCMarket account and remove your personal data.
+        what_happens_1: Your name, bio, email address and phone number are removed.
+        what_happens_2: Your listings are closed and your reviews are removed.
+        what_happens_3: You can no longer sign in, post, message or trade.
+        what_happens_4: You keep access to your orders until the legal retention period
+          ends.
+        kept_title: What we keep
+        kept_hint: We only keep what the law requires.
+        kept_orders: Order records, invoices and payment references
+        kept_messages: Messages, offers and moderation records on orders
+        kept_disputes: Records of disputes and refunds
+        kept_analytics: Anonymous usage data that cannot be traced back to you
+        blocked_title:
+          one: You have %{count} open order
+          other: You have %{count} open orders
+        blocked_hint: Finish or cancel these orders before you delete your account.
+        orders_link: Go to my orders
+        warning: This cannot be undone.
+        confirm_button: Delete my account
+        confirm_confirmation: Permanently delete your account and all of your personal
+          data?
+        back: Keep my account
+        what_happens_title: What happens
+      destroy:
+        done: Your account has been deleted and your personal data removed.
+  price_drop_mailer:
+    price_drop:
+      subject: 'Price drop on a listing you saved: %{title}'
+      greeting: Hi %{name},
+      intro: A listing on your wishlist is now cheaper.
+      view_listing: View listing
+      manage: Manage your wishlist at %{link}
+      manage_link: PCMarket
+  saved_search_mailer:
+    match_found:
+      subject:
+        one: New listing matches "%{name}"
+        other: '%{count} new listings match "%{name}"'
+      greeting: Hi %{name},
+      intro: A new listing matches a search you saved.
+      matches_intro: 'New listings matching "%{name}":'
+      view_listing: View listing
+      view_results: View all results
+      manage: Manage your saved searches at %{link}
+      manage_link: PCMarket
+    digest:
+      subject:
+        one: "%{count} new listing matches your saved searches"
+        other: "%{count} new listings match your saved searches"
+      greeting: Hi %{name},
+      intro:
+        one: One new listing matches a search you saved.
+        other: "%{count} new listings match searches you saved."
+      view_results: View all results
+      manage: Manage your saved searches at %{link}
+      manage_link: PCMarket
+  data_export_mailer:
+    ready:
+      subject: Your PCMarket data export is ready
+      greeting: Hi %{name},
+      intro: Your copy of the data we hold about you is ready to download.
+      download: Download my data
+      expires: The download link stays available for %{days} days.

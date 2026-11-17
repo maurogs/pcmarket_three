@@ -1,0 +1,67 @@
+<% content_for :title, t(".title") %>
+
+<div class="mx-auto max-w-3xl">
+  <div class="flex items-baseline justify-between gap-4">
+    <h1 class="text-2xl font-bold"><%= t(".title") %></h1>
+    <span class="text-sm text-muted"><%= t(".count", count: @favorites.size) %></span>
+  </div>
+  <p class="mt-1 text-sm text-muted"><%= t(".description") %></p>
+
+  <% if @favorites.empty? %>
+    <div class="mt-8 rounded-xl border border-dashed border-border p-10 text-center">
+      <p class="text-sm text-text"><%= t(".empty") %></p>
+      <p class="mt-1 text-sm text-muted"><%= t(".empty_hint") %></p>
+      <%= link_to t(".browse_listings"), listings_path, class: "btn-secondary mt-4 inline-flex" %>
+    </div>
+  <% else %>
+    <div class="mt-6 flex flex-col gap-3">
+      <% @favorites.each do |favorite| %>
+        <% listing = favorite.listing %>
+        <div id="favorite_<%= listing.id %>" class="flex gap-4 rounded-xl border border-border bg-surface p-4 shadow-sm">
+          <% if (photo = listing.photos.first) %>
+            <%= image_tag photo.variant(resize_to_fill: [ 160, 160 ]),
+                  alt: listing.title, class: "size-20 shrink-0 rounded-lg bg-surface-muted object-cover" %>
+          <% else %>
+            <div class="size-20 shrink-0 rounded-lg bg-surface-muted" aria-hidden="true"></div>
+          <% end %>
+
+          <div class="min-w-0 flex-1">
+            <% if listing.sold? %>
+              <div class="mb-1 inline-flex items-center gap-1 rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium text-muted">
+                <%= inline_icon :check, classes: "size-3.5" %>
+                <%= t(".sold_badge") %>
+              </div>
+            <% end %>
+            <%= link_to listing.title, listing_path(listing),
+                  class: ["block truncate text-sm font-semibold hover:text-primary hover:underline", listing.sold? && "text-muted line-through"].compact.join(" ") %>
+            <p class="mt-0.5 truncate text-xs text-muted">
+              <%= link_to listing.store.name, store_path(listing.store), class: "hover:text-text hover:underline" %>
+              &middot; <%= t(".saved_ago", time: time_ago_in_words(favorite.created_at)) %>
+            </p>
+          </div>
+
+          <div class="flex shrink-0 flex-col items-end gap-2">
+            <div class="text-right">
+              <% if favorite.price_cents_at_save && favorite.price_cents_at_save > listing.price_cents %>
+                <% drop_percent = ((favorite.price_cents_at_save - listing.price_cents).fdiv(favorite.price_cents_at_save) * 100).round %>
+                <div class="text-xs line-through text-muted"><%= money(favorite.price_cents_at_save) %></div>
+                <div class="text-sm font-bold text-emerald-600 dark:text-emerald-400"><%= money(listing.price_cents) %></div>
+                <div class="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                  <%= t(".price_dropped", percent: "#{drop_percent}%") %>
+                </div>
+              <% else %>
+                <div class="text-sm font-bold"><%= money(listing.price_cents) %></div>
+              <% end %>
+            </div>
+            <%= button_to favorite_path(favorite), method: :delete,
+                  form: { data: { turbo: true } },
+                  class: "inline-flex cursor-pointer items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950" do %>
+              <%= inline_icon :close, classes: "size-3.5" %>
+              <%= t(".remove") %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

@@ -19,3 +19,7 @@ production:
   auto_complete_orders:
     class: AutoCompleteOrdersJob
     schedule: hourly
+  saved_search_digest:
+    class: SavedSearchDigestJob
+    schedule: hourly
+

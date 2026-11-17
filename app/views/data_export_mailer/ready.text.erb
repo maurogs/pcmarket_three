@@ -1,0 +1,7 @@
+<%= t(".greeting", name: @user.display_name) %>
+
+<%= t(".intro") %>
+
+<%= t(".download") %>: <%= @export_url %>
+
+<%= t(".expires", days: DataExportMailer::EXPORT_LINK_TTL.to_i / 1.day) %>

@@ -1,0 +1,22 @@
+<%# Account-area sidebar. Shared across the account settings pages. %>
+<aside class="lg:sticky lg:top-20">
+  <nav aria-label="<%= t(".title") %>" class="flex gap-1 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible lg:pb-0">
+    <% items = [
+         [ t(".profile"), account_profile_path ],
+         [ t(".security"), account_security_path ],
+         [ t(".notification_preferences"), account_notification_preferences_path ],
+         [ t(".addresses"), addresses_path ],
+         [ t(".deletion"), account_deletion_path ]
+       ] %>
+    <% items.each do |label, path| %>
+      <% current = request.path == path %>
+      <%= link_to label, path,
+            aria: { current: current ? "page" : nil },
+            class: [
+              "min-h-11 shrink-0 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium lg:whitespace-normal",
+              current ? "bg-primary/10 text-primary" : "text-muted hover:bg-surface-muted hover:text-text",
+              path == account_deletion_path && !current && "text-red-600 hover:text-red-700 dark:text-red-400"
+            ].compact.join(" ") %>
+    <% end %>
+  </nav>
+</aside>

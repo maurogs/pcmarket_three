@@ -41,7 +41,7 @@ class TurboBroadcastsTest < ActionDispatch::IntegrationTest
 
     get conversation_path(@conversation)
     assert_response :success
-    assert_select "turbo-cable-stream-source[channel=?]", "Turbo::StreamsChannel", count: 2 # thread + inbox rail
+    assert_select "turbo-cable-stream-source[channel=?]", "Turbo::StreamsChannel", count: 3 # thread + inbox rail + notification bell
 
     get conversations_path
     assert_select "turbo-cable-stream-source[channel=?]", "Turbo::StreamsChannel", minimum: 1

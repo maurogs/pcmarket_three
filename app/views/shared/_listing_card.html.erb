@@ -1,10 +1,12 @@
 <%# ListingCard: photo, label chips, discount badge, price (EUR per locale),
     title (2-line clamp), store + verified badge, condition, favourite heart.
+    The heart sits OUTSIDE the cache fragment (its form carries a CSRF
+    token and its state is per-user); the square overlay matches the photo
+    aspect, so it lands on the photo's bottom-right corner.
     locals: listing, compact (carousel variant) %>
 <% compact = local_assigns.fetch(:compact, false) %>
-<% sold = listing.sold? %>
-<%= cache [ I18n.locale, "listing_card", compact, authenticated?, listing ] do %>
-  <article class="relative flex flex-col overflow-hidden rounded-lg border border-border bg-surface transition hover:border-primary/50 hover:shadow-md">
+<article class="relative flex flex-col overflow-hidden rounded-lg border border-border bg-surface transition hover:border-primary/50 hover:shadow-md">
+  <% cache [ I18n.locale, "listing_card", compact, authenticated?, listing ] do %>
     <div class="relative aspect-square overflow-hidden bg-surface-muted">
       <%= listing_photo_tag(listing, alt: listing.title) %>
 
@@ -24,26 +26,13 @@
         </span>
       <% end %>
 
-      <% if sold %>
+      <% if listing.sold? %>
         <div class="absolute inset-0 z-[5] flex items-center justify-center bg-black/45">
           <span class="rounded bg-white px-2 py-1 text-xs font-bold uppercase tracking-wider text-slate-900 dark:bg-slate-100">
             <%= t(".sold_out") %>
           </span>
         </div>
       <% end %>
-
-      <%# Placeholder favourite control (forms arrive with the favourites phase). %>
-      <div class="absolute bottom-1.5 right-1.5 z-10">
-        <% if authenticated? %>
-          <button type="button" disabled class="flex size-9 cursor-default items-center justify-center rounded-full bg-surface/90 text-muted hover:text-accent dark:bg-slate-900/90" title="<%= t(".save_soon") %>">
-            <%= inline_icon :heart, classes: "size-5" %>
-          </button>
-        <% else %>
-          <%= link_to new_session_path, class: "flex size-9 items-center justify-center rounded-full bg-surface/90 text-muted hover:text-accent dark:bg-slate-900/90", title: t(".save_login"), aria: { label: t(".save_login") } do %>
-            <%= inline_icon :heart, classes: "size-5" %>
-          <% end %>
-        <% end %>
-      </div>
     </div>
 
     <div class="flex flex-1 flex-col gap-1 p-2.5">
@@ -75,5 +64,11 @@
         </div>
       <% end %>
     </div>
-  </article>
-<% end %>
+  <% end %>
+
+  <div class="pointer-events-none absolute inset-x-0 top-0 z-10 aspect-square">
+    <div class="absolute bottom-1.5 right-1.5 pointer-events-auto">
+      <%= render "shared/favorite_button", listing: listing %>
+    </div>
+  </div>
+</article>

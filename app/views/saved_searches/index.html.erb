@@ -1,0 +1,20 @@
+<% content_for :title, t(".title") %>
+
+<div class="mx-auto max-w-3xl">
+  <h1 class="text-2xl font-bold"><%= t(".title") %></h1>
+  <p class="mt-1 text-sm text-muted"><%= t(".description", limit: SavedSearch::MAX_PER_USER) %></p>
+
+  <% if @saved_searches.empty? %>
+    <div class="mt-8 rounded-xl border border-dashed border-border p-10 text-center">
+      <p class="text-sm"><%= t(".empty") %></p>
+      <p class="mt-1 text-sm text-muted"><%= t(".empty_hint") %></p>
+      <%= link_to t(".browse_listings"), listings_path, class: "btn-secondary mt-4 inline-flex" %>
+    </div>
+  <% else %>
+    <ul class="mt-6 flex flex-col gap-3" id="saved_searches_list">
+      <% @saved_searches.each do |saved_search| %>
+        <%= render "saved_searches/saved_search", saved_search: saved_search %>
+      <% end %>
+    </ul>
+  <% end %>
+</div>

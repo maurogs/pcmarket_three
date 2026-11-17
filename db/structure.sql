@@ -463,7 +463,8 @@ CREATE TABLE public.favorites (
     user_id bigint NOT NULL,
     listing_id bigint NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    price_cents_at_save integer
 );
 
 
@@ -1358,7 +1359,8 @@ CREATE TABLE public.stores (
     default_shipping_cents integer DEFAULT 0 NOT NULL,
     free_shipping_threshold_cents integer,
     city character varying,
-    region character varying
+    region character varying,
+    hidden boolean DEFAULT false NOT NULL
 );
 
 
@@ -1400,7 +1402,8 @@ CREATE TABLE public.users (
     country_code character varying DEFAULT 'ES'::character varying NOT NULL,
     confirmed_at timestamp(6) without time zone,
     banned_at timestamp(6) without time zone,
-    ban_reason text
+    ban_reason text,
+    notification_preferences jsonb DEFAULT '{}'::jsonb NOT NULL
 );
 
 
@@ -3065,6 +3068,9 @@ ALTER TABLE ONLY public.moderation_events
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261117230003'),
+('20261117230002'),
+('20261117230001'),
 ('20261117223000'),
 ('20261117210002'),
 ('20261117210001'),

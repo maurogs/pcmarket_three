@@ -1,0 +1,9 @@
+<%= t(".greeting", name: @user.display_name) %>
+
+<%= t(".intro", count: @listings.size) %>
+
+<% @listings.each do |listing| %><%= listing.title %> — <%= money(listing.price_cents, listing.currency) %>
+<%= listing_url(listing, locale: @user.locale) %>
+<% end %>
+
+<%= t(".manage", link: saved_searches_url(locale: @user.locale)) %>

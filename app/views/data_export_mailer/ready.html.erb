@@ -1,0 +1,8 @@
+<% content_for :title, t(".subject") %>
+<p><%= t(".greeting", name: @user.display_name) %></p>
+<p><%= t(".intro") %></p>
+<p>
+  <%= link_to t(".download"), @export_url,
+        style: "display:inline-block;background:#4f46e5;color:#fff;padding:0.6rem 1rem;border-radius:6px;" %>
+</p>
+<p><%= t(".expires", days: DataExportMailer::EXPORT_LINK_TTL.to_i / 1.day) %></p>

@@ -22,11 +22,20 @@
         <%= t("nav.list_item") %>
       <% end %>
 
-      <%= link_to "#", class: "icon-button", aria: { label: t("nav.wishlist") } do %>
+      <%= link_to favorites_path, class: "icon-button relative", aria: { label: t("nav.wishlist") } do %>
         <%= inline_icon :heart %>
+        <% wishlist_count = header_favorite_count %>
+        <% if wishlist_count.positive? %>
+          <span class="absolute -right-0.5 -top-0.5 flex min-w-4.5 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-white"><%= wishlist_count %></span>
+        <% end %>
       <% end %>
-      <%= link_to "#", class: "icon-button", aria: { label: t("nav.notifications") } do %>
-        <%= inline_icon :bell %>
+      <% if authenticated? %>
+        <%= turbo_stream_from Current.user, :notifications %>
+        <%= render "shared/notifications_badge", user: Current.user %>
+      <% else %>
+        <%= link_to new_session_path, class: "icon-button", aria: { label: t("nav.notifications") } do %>
+          <%= inline_icon :bell %>
+        <% end %>
       <% end %>
       <% cart_count = header_cart_count %>
       <%= link_to cart_path, class: "icon-button relative", aria: { label: t("nav.cart") } do %>
@@ -47,11 +56,21 @@
               <%= Current.user.email_address %>
             </div>
             <hr class="my-2 border-border">
+            <%= link_to t("nav.my_orders"), orders_path, class: "block rounded-md px-2 py-1.5 text-sm text-text hover:bg-surface-muted" %>
+            <%= link_to t("nav.inbox"), conversations_path, class: "block rounded-md px-2 py-1.5 text-sm text-text hover:bg-surface-muted" %>
+            <%= link_to t("nav.offers"), offers_path, class: "block rounded-md px-2 py-1.5 text-sm text-text hover:bg-surface-muted" %>
+            <%= link_to t("nav.wishlist"), favorites_path, class: "block rounded-md px-2 py-1.5 text-sm text-text hover:bg-surface-muted" %>
+            <%= link_to t("nav.saved_searches"), saved_searches_path, class: "block rounded-md px-2 py-1.5 text-sm text-text hover:bg-surface-muted" %>
+            <%= link_to t("nav.notifications"), notifications_path, class: "block rounded-md px-2 py-1.5 text-sm text-text hover:bg-surface-muted" %>
+            <hr class="my-2 border-border">
             <p class="px-2 pb-1 text-xs font-semibold uppercase tracking-wide text-muted"><%= t("nav.my_store") %></p>
             <%= link_to t("nav.my_store_dashboard"), sell_dashboard_path, class: "block rounded-md px-2 py-1.5 text-sm text-text hover:bg-surface-muted" %>
             <%= link_to t("nav.my_store_listings"), sell_listings_path, class: "block rounded-md px-2 py-1.5 text-sm text-text hover:bg-surface-muted" %>
             <%= link_to t("nav.my_store_sales"), sell_sales_path, class: "block rounded-md px-2 py-1.5 text-sm text-text hover:bg-surface-muted" %>
             <%= link_to t("nav.my_store_settings"), edit_sell_store_path, class: "block rounded-md px-2 py-1.5 text-sm text-text hover:bg-surface-muted" %>
+            <hr class="my-2 border-border">
+            <%= link_to t("nav.addresses"), addresses_path, class: "block rounded-md px-2 py-1.5 text-sm text-text hover:bg-surface-muted" %>
+            <%= link_to t("nav.account_settings"), account_profile_path, class: "block rounded-md px-2 py-1.5 text-sm text-text hover:bg-surface-muted" %>
             <hr class="my-2 border-border">
             <%= button_to t("nav.log_out"), session_path, method: :delete, class: "mt-1 w-full rounded-md px-2 py-1.5 text-left text-sm text-text hover:bg-surface-muted" %>
           </div>
@@ -191,16 +210,24 @@
       <% end %>
       <hr class="my-2 border-border">
       <%= link_to t("nav.list_item"), new_sell_listing_path, class: "flex min-h-11 items-center rounded-md bg-accent px-3 py-2.5 text-center font-medium text-white hover:bg-accent/90" %>
-      <%= link_to t("nav.wishlist"), "#", class: "rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
-      <%= link_to t("nav.notifications"), "#", class: "rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
+      <%= link_to t("nav.wishlist"), favorites_path, class: "rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
+      <% if authenticated? %>
+        <%= link_to t("nav.notifications"), notifications_path, class: "rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
+        <%= link_to t("nav.saved_searches"), saved_searches_path, class: "rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
+      <% end %>
       <%= link_to cart_path, class: "rounded-md px-3 py-2.5 hover:bg-surface-muted" %><%= " (#{header_cart_count})" if header_cart_count.positive? %>
       <hr class="my-2 border-border">
       <% if authenticated? %>
+        <%= link_to t("nav.my_orders"), orders_path, class: "block rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
+        <%= link_to t("nav.inbox"), conversations_path, class: "block rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
         <p class="px-3 pt-1 text-xs font-semibold uppercase tracking-wide text-muted"><%= t("nav.my_store") %></p>
         <%= link_to t("nav.my_store_dashboard"), sell_dashboard_path, class: "block rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
         <%= link_to t("nav.my_store_listings"), sell_listings_path, class: "block rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
         <%= link_to t("nav.my_store_sales"), sell_sales_path, class: "block rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
         <%= link_to t("nav.my_store_settings"), edit_sell_store_path, class: "block rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
+        <hr class="my-2 border-border">
+        <%= link_to t("nav.addresses"), addresses_path, class: "block rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
+        <%= link_to t("nav.account_settings"), account_profile_path, class: "block rounded-md px-3 py-2.5 hover:bg-surface-muted" %>
         <hr class="my-2 border-border">
         <%= button_to t("nav.log_out"), session_path, method: :delete, class: "w-full min-h-11 rounded-md px-3 py-2.5 text-left text-sm text-text hover:bg-surface-muted" %>
       <% else %>

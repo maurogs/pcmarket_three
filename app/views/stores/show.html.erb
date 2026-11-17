@@ -39,12 +39,7 @@
     </div>
 
     <div class="flex gap-2">
-      <%# Follow and messaging land with the social/messaging phases. %>
-      <button type="button" disabled title="<%= t(".follow_soon") %>"
-              class="inline-flex min-h-11 cursor-not-allowed items-center gap-1.5 rounded-md bg-primary/40 px-4 text-sm font-semibold text-white">
-        <%= inline_icon :plus, classes: "size-4" %>
-        <%= t(".follow") %>
-      </button>
+      <%= render "shared/follow_button", store: store %>
       <button type="button" disabled title="<%= t(".message_soon") %>"
               class="inline-flex min-h-11 cursor-not-allowed items-center rounded-md border border-border px-4 text-sm font-semibold text-muted">
         <%= t(".message") %>
@@ -55,7 +50,7 @@
   <dl class="grid grid-cols-3 divide-x divide-border border-t border-border text-center">
     <div class="px-2 py-3">
       <dt class="text-xs text-muted"><%= t(".stats_followers") %></dt>
-      <dd class="text-sm font-bold tabular-nums"><%= number_with_delimiter(store.followers_count) %></dd>
+      <dd class="text-sm font-bold tabular-nums"><%= render "follower_count", store: store %></dd>
     </div>
     <div class="px-2 py-3">
       <dt class="text-xs text-muted"><%= t(".stats_for_sale") %></dt>

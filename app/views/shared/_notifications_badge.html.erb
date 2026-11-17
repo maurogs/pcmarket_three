@@ -1,0 +1,15 @@
+<%# Header bell with unread count. Cached per user (busted by Notification
+    after_create_commit and the read paths) and live-updated through the
+    user's [user, :notifications] Turbo stream. Local: user %>
+<% count = Notification.unread_count_for(user) %>
+<%= tag.div id: "notifications-badge", class: "relative" do %>
+  <%= link_to notifications_path, class: "icon-button", title: t("nav.notifications"),
+        aria: { label: t("nav.notifications") } do %>
+    <%= inline_icon :bell, classes: "size-5" %>
+    <% if count > 0 %>
+      <span class="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-white">
+        <%= count > 99 ? "99+" : count %>
+      </span>
+    <% end %>
+  <% end %>
+<% end %>

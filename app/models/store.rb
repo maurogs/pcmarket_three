@@ -50,11 +50,18 @@ class Store < ApplicationRecord
 
   scope :active, -> { where(vacation_mode: false) }
   scope :verified, -> { where(verified: true) }
+  scope :visible, -> { where(hidden: false) }
 
   # FriendlyId regenerates the slug when the name changes; the previous slug
   # lands in friendly_id_slugs and keeps resolving (with a 301).
   def should_generate_new_friendly_id?
     name_changed? || super
+  end
+
+  def followed_by?(user)
+    return false if user.nil?
+
+    follows.exists?(follower_id: user.id)
   end
 
   # Money-like decimal values for the shipping-defaults form fields.

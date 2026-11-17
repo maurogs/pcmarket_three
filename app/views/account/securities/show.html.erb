@@ -1,0 +1,26 @@
+<% content_for :title, t(".title") %>
+
+<h1 class="text-2xl font-bold"><%= t(".title") %></h1>
+<p class="mt-1 text-sm text-muted"><%= t(".description") %></p>
+
+<%= render "shared/error_summary", resource: current_user %>
+
+<%= form_with scope: :user, url: account_security_path, method: :patch, class: "card mt-6 max-w-md space-y-4 px-4 py-4" do |form| %>
+  <div>
+    <%= form.label :current_password, t(".current_password"), class: "block text-sm font-medium text-text" %>
+    <%= form.password_field :current_password, class: "input mt-1", autocomplete: "current-password", required: true %>
+  </div>
+
+  <div>
+    <%= form.label :password, t(".password"), class: "block text-sm font-medium text-text" %>
+    <%= form.password_field :password, class: "input mt-1", autocomplete: "new-password", required: true %>
+    <p class="mt-1 text-xs text-muted"><%= t(".password_hint") %></p>
+  </div>
+
+  <div>
+    <%= form.label :password_confirmation, t(".password_confirmation"), class: "block text-sm font-medium text-text" %>
+    <%= form.password_field :password_confirmation, class: "input mt-1", autocomplete: "new-password", required: true %>
+  </div>
+
+  <%= form.submit t(".save"), class: "btn-primary cursor-pointer" %>
+<% end %>

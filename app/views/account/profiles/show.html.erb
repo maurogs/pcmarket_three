@@ -1,0 +1,47 @@
+<% content_for :title, t(".title") %>
+
+<h1 class="text-2xl font-bold"><%= t(".title") %></h1>
+<p class="mt-1 text-sm text-muted"><%= t(".description") %></p>
+
+<%= render "shared/error_summary", resource: current_user %>
+
+<%= form_with model: current_user, url: account_profile_path, method: :patch, class: "card mt-6 space-y-4 px-4 py-4" do |form| %>
+  <div class="grid gap-4 sm:grid-cols-2">
+    <div>
+      <%= form.label :first_name, t(".first_name"), class: "block text-sm font-medium text-text" %>
+      <%= form.text_field :first_name, class: "input mt-1", autocomplete: "given-name" %>
+    </div>
+    <div>
+      <%= form.label :last_name, t(".last_name"), class: "block text-sm font-medium text-text" %>
+      <%= form.text_field :last_name, class: "input mt-1", autocomplete: "family-name" %>
+    </div>
+  </div>
+
+  <div>
+    <%= form.label :email_address, t(".email"), class: "block text-sm font-medium text-text" %>
+    <%= form.email_field :email_address, class: "input mt-1", autocomplete: "email", required: true %>
+    <p class="mt-1 text-xs text-muted"><%= t(".email_hint") %></p>
+  </div>
+
+  <div>
+    <%= form.label :phone, t(".phone"), class: "block text-sm font-medium text-text" %>
+    <%= form.telephone_field :phone, class: "input mt-1", autocomplete: "tel" %>
+    <p class="mt-1 text-xs text-muted"><%= t(".phone_hint") %></p>
+  </div>
+
+  <div>
+    <%= form.label :locale, t(".language"), class: "block text-sm font-medium text-text" %>
+    <%= form.select :locale, I18n.available_locales.map { |code| [ t("locales.#{code}"), code ] },
+          {}, class: "input mt-1" %>
+    <p class="mt-1 text-xs text-muted"><%= t(".locale_hint") %></p>
+  </div>
+
+  <%= form.submit t(".save"), class: "btn-primary cursor-pointer" %>
+<% end %>
+
+<div class="card mt-6 px-4 py-4">
+  <h2 class="text-sm font-semibold"><%= t(".export_title") %></h2>
+  <p class="mt-1 text-sm text-muted"><%= t(".export_description") %></p>
+  <%= button_to t(".export_button"), account_data_export_path,
+        class: "btn-secondary mt-3 cursor-pointer" %>
+</div>

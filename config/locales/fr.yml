@@ -5,6 +5,13 @@ fr:
   layouts:
     announcement: 'Nouveau : PCMarket est désormais disponible en Espagne. Achetez
       et vendez du matériel informatique neuf et d''occasion.'
+    account_nav:
+      title: Paramètres du compte
+      profile: Profil
+      security: Sécurité
+      notification_preferences: Notifications
+      addresses: Adresses
+      deletion: Supprimer le compte
   nav:
     search_placeholder: Recherchez cartes graphiques, processeurs, ordinateurs portables…
     search_submit: Rechercher
@@ -34,6 +41,12 @@ fr:
     my_store_sales: Mes ventes
     my_store_settings: Paramètres de la boutique
     messages: Messages
+    my_orders: Mes commandes
+    inbox: Messages
+    offers: Mes offres
+    saved_searches: Recherches enregistrées
+    addresses: Adresses
+    account_settings: Paramètres du compte
   footer:
     newsletter_title: Abonnez-vous à notre newsletter
     newsletter_placeholder: Votre adresse e-mail
@@ -209,6 +222,10 @@ fr:
       count:
         one: "%{count} résultat"
         other: "%{count} résultats"
+      save_search:
+        label: Enregistrer cette recherche
+        name_placeholder: Nommez cette recherche
+        submit: Enregistrer
     show:
       breadcrumb: Fil d'Ariane
       breadcrumb_home: Accueil
@@ -293,6 +310,15 @@ fr:
         logo_too_large: doit faire %{max} Mo ou moins
         banner_content_type_invalid: doit être une image JPEG, PNG ou WebP
         banner_too_large: doit faire %{max} Mo ou moins
+      models:
+        follow:
+          attributes:
+            store_id:
+              cannot_follow_own_store: Vous ne pouvez pas suivre votre propre boutique
+        saved_search:
+          attributes:
+            base:
+              saved_search_limit: Vous pouvez enregistrer au maximum %{count} recherches
     models:
       address: Adresse
       api_token: Jeton d'API
@@ -598,6 +624,14 @@ fr:
       save_login: Connectez-vous pour sauvegarder cette annonce
     card_rail:
       view_all: Tout voir
+    favorite_button:
+      save: Enregistrer l'annonce
+      remove: Retirer de la liste de souhaits
+      save_login: Connectez-vous pour enregistrer des annonces
+    follow_button:
+      follow: Suivre la boutique
+      following: Abonné
+      follow_login: Connectez-vous pour suivre des boutiques
   stores:
     verified: Vendeur vérifié
     types:
@@ -898,6 +932,7 @@ fr:
     formats:
       chat_day: "%d/%m %H:%M"
       chat_time: "%H:%M"
+    ago: il y a %{time}
   conversations:
     composer:
       blocked_notice: Vous ne pouvez pas envoyer de messages dans cette conversation.
@@ -1267,3 +1302,203 @@ fr:
       submit: Publier l'avis
       subtitle: Racontez aux autres utilisateurs votre expérience de cette commande.
       title: Avis sur la commande %{number}
+  users:
+    deleted_display_name: Ancien utilisateur
+  favorites:
+    index:
+      title: Liste de souhaits
+      description: Vos annonces enregistrées, avec les alertes de baisse de prix.
+      count:
+        one: "%{count} annonce enregistrée"
+        other: "%{count} annonces enregistrées"
+      empty: Votre liste de souhaits est vide
+      empty_hint: Cliquez sur le cœur d'une annonce pour l'enregistrer ici.
+      browse_listings: Parcourir les annonces
+      saved_ago: Enregistrée il y a %{time}
+      price_dropped: Baisse de prix de %{percent}
+      remove: Retirer
+      sold_badge: Vendu
+  saved_searches:
+    index:
+      title: Recherches enregistrées
+      description: Recevez un e-mail quand une annonce correspond à une recherche
+        enregistrée. Vous pouvez enregistrer jusqu'à %{limit} recherches.
+      empty: Vous n'avez aucune recherche enregistrée
+      empty_hint: Lancez une recherche puis cliquez sur Enregistrer cette recherche
+        pour recevoir des alertes.
+      browse_listings: Parcourir les annonces
+    saved_search:
+      alerts_on: Alertes e-mail activées
+      alerts_off: Alertes e-mail désactivées
+      delete: Supprimer
+      alerts_enable: Activer les alertes
+      alerts_disable: Désactiver les alertes
+    create:
+      created: Recherche enregistrée. Nous vous enverrons un e-mail en cas de correspondance.
+    summary:
+      quoted_query: "« %{query} »"
+      more_filters:
+        one: "%{count} filtre"
+        other: "%{count} filtres"
+      price_between: "%{min} - %{max}"
+      price_min: à partir de %{min}
+      price_max: jusqu'à %{max}
+  notifications:
+    index:
+      title: Notifications
+      description: Activité de vos offres, messages et recherches enregistrées.
+      empty: Aucune notification pour le moment
+      empty_hint: Les offres, messages et alertes de recherches apparaissent ici.
+      browse_listings: Parcourir les annonces
+      mark_all_read: Tout marquer comme lu
+      unread: Non lue
+    kinds:
+      new_message: Nouveau message de %{name}
+      new_offer: Nouvelle offre sur %{title}
+      offer_accepted: Offre acceptée sur %{title}
+      price_drop: 'Baisse de prix sur %{title} : désormais %{price}'
+      saved_search_match: 'Nouvelle annonce pour « %{name} » : %{title}'
+      listing_submitted: Votre annonce « %{title} » est en ligne
+      order_placed: Commande %{number} passée
+      order_confirmed: Commande %{number} confirmée
+      order_paid: Commande %{number} payée
+      order_shipped: Commande %{number} expédiée
+      order_delivered: Commande %{number} livrée
+      order_completed: Commande %{number} terminée
+      order_cancelled: Commande %{number} annulée
+      order_disputed: Commande %{number} en litige
+      unknown: "%{kind}"
+  account:
+    profiles:
+      show:
+        title: Profil
+        description: Voici comment les autres membres vous voient.
+        email: E-mail
+        phone: Téléphone
+        phone_hint: Utilisé par notre service client en cas de problème avec une commande.
+        language: Langue
+        save: Enregistrer le profil
+        first_name: Prénom
+        last_name: Nom
+        email_hint: Vous devrez le re-vérifier si vous le modifiez.
+        locale_hint: Utilisé pour les e-mails et la langue du site.
+        export_title: Télécharger vos données
+        export_description: Nous vous envoyons un fichier avec votre profil, vos annonces,
+          commandes, messages et avis.
+        export_button: Demander un export
+      update:
+        updated: Profil mis à jour
+    securities:
+      show:
+        title: Sécurité
+        description: Gérez votre mot de passe et vos jetons d'API.
+        password: Mot de passe
+        current_password: Mot de passe actuel
+        new_password: Nouveau mot de passe
+        password_hint: 10 caractères minimum.
+        password_confirmation: Confirmer le nouveau mot de passe
+        save: Changer le mot de passe
+      update:
+        updated: Mot de passe mis à jour
+    notification_preferences:
+      show:
+        title: Notifications
+        description: Choisissez les e-mails que vous souhaitez recevoir de PCMarket.
+        in_app_note: Les offres, messages et suivi des commandes apparaissent toujours
+          dans votre liste de notifications.
+        topics:
+          email_offers:
+            label: Offres
+            hint: Nouvelles offres sur vos annonces et offres que vous faites.
+          email_new_message:
+            label: Messages
+            hint: Nouveaux messages dans vos conversations.
+          email_saved_search:
+            label: Recherches enregistrées
+            hint: Un e-mail récapitulatif quand de nouvelles annonces correspondent.
+          email_price_drop:
+            label: Baisses de prix
+            hint: Quand une annonce de votre liste de souhaits baisse de prix.
+          email_orders:
+            label: Commandes
+            hint: Suivi des commandes, de la réservation au retrait.
+          email_newsletter:
+            label: Nouveautés du produit
+            hint: Actualités occasionnelles sur les fonctions de PCMarket.
+        save: Enregistrer les préférences
+      update:
+        updated: Préférences de notification enregistrées
+    data_exports:
+      create:
+        queued: Nous préparons votre export. Vous recevrez un e-mail quand il sera
+          prêt.
+    deletions:
+      show:
+        title: Supprimer le compte
+        description: Fermez votre compte PCMarket et supprimez vos données personnelles.
+        what_happens_1: Votre nom, votre bio, votre e-mail et votre téléphone sont
+          supprimés.
+        what_happens_2: Vos annonces sont fermées et vos avis sont supprimés.
+        what_happens_3: Vous ne pouvez plus vous connecter, publier, envoyer des messages
+          ou échanger.
+        what_happens_4: Vous conservez l'accès à vos commandes jusqu'à la fin de la
+          durée de conservation légale.
+        kept_title: Ce que nous conservons
+        kept_hint: Nous ne conservons que ce que la loi exige.
+        kept_orders: Commandes, factures et références de paiement
+        kept_messages: Messages, offres et dossiers de modération des commandes
+        kept_disputes: Dossiers de litiges et de remboursements
+        kept_analytics: Données d'utilisation anonymes qui ne peuvent pas être reliées
+          à vous
+        blocked_title:
+          one: Vous avez %{count} commande en cours
+          other: Vous avez %{count} commandes en cours
+        blocked_hint: Terminez ou annulez ces commandes avant de supprimer votre compte.
+        orders_link: Accéder à mes commandes
+        warning: Cette action est irréversible.
+        confirm_button: Supprimer mon compte
+        confirm_confirmation: Supprimer définitivement votre compte et toutes vos
+          données personnelles ?
+        back: Garder mon compte
+        what_happens_title: Ce qui se passe
+      destroy:
+        done: Votre compte a été supprimé et vos données personnelles effacées.
+  price_drop_mailer:
+    price_drop:
+      subject: 'Baisse de prix sur une annonce enregistrée : %{title}'
+      greeting: Bonjour %{name},
+      intro: Une annonce de votre liste de souhaits est maintenant moins chère.
+      view_listing: Voir l'annonce
+      manage: Gérez votre liste de souhaits sur %{link}
+      manage_link: PCMarket
+  saved_search_mailer:
+    match_found:
+      subject:
+        one: Une nouvelle annonce correspond à « %{name} »
+        other: "%{count} nouvelles annonces correspondent à « %{name} »"
+      greeting: Bonjour %{name},
+      intro: Une nouvelle annonce correspond à une recherche enregistrée.
+      matches_intro: 'Nouvelles annonces correspondant à « %{name} » :'
+      view_listing: Voir l'annonce
+      view_results: Voir tous les résultats
+      manage: Gérez vos recherches enregistrées sur %{link}
+      manage_link: PCMarket
+    digest:
+      subject:
+        one: "%{count} nouvelle annonce correspond à vos recherches enregistrées"
+        other: "%{count} nouvelles annonces correspondent à vos recherches enregistrées"
+      greeting: Bonjour %{name},
+      intro:
+        one: Une nouvelle annonce correspond à une recherche enregistrée.
+        other: "%{count} nouvelles annonces correspondent à vos recherches enregistrées."
+      view_results: Voir tous les résultats
+      manage: Gérez vos recherches enregistrées sur %{link}
+      manage_link: PCMarket
+  data_export_mailer:
+    ready:
+      subject: Votre export de données PCMarket est prêt
+      greeting: Bonjour %{name},
+      intro: Votre copie des données que nous détenons à votre sujet est prête à être
+        téléchargée.
+      download: Télécharger mes données
+      expires: Le lien de téléchargement reste disponible pendant %{days} jours.

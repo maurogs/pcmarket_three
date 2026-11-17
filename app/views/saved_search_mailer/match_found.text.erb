@@ -1,0 +1,9 @@
+<%= t(".greeting", name: @user.display_name) %>
+
+<%= t(".intro") %>
+
+<%= @listing.title %> — <%= money(@listing.price_cents, @listing.currency) %>
+
+<%= t(".view_listing") %>: <%= listing_url(@listing, locale: @user.locale) %>
+
+<%= t(".manage", link: saved_searches_url(locale: @user.locale)) %>

@@ -1,0 +1,15 @@
+<% content_for :title, t(".subject", title: @listing.title.truncate(60)) %>
+<p><%= t(".greeting", name: @user.display_name) %></p>
+<p><%= t(".intro", title: @listing.title) %></p>
+<p>
+  <% if @previous_cents %>
+    <span style="text-decoration:line-through;color:#6b7280;"><%= money(@previous_cents, @listing.currency) %></span>
+    &rarr;
+  <% end %>
+  <strong><%= money(@listing.price_cents, @listing.currency) %></strong>
+</p>
+<p>
+  <%= link_to t(".view_listing"), listing_url(@listing, locale: @user.locale),
+        style: "display:inline-block;background:#4f46e5;color:#fff;padding:0.6rem 1rem;border-radius:6px;" %>
+</p>
+<p class="text-sm text-muted"><%= t(".manage", link: link_to(t(".manage_link"), favorites_url(locale: @user.locale))) %></p>

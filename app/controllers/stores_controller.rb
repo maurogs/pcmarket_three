@@ -8,6 +8,12 @@ class StoresController < ApplicationController
   def show
     @store = Store.friendly.find(params[:id])
 
+    # GDPR-anonymized stores (hidden) disappear from the public catalogue;
+    # the owner and admins can still open the page.
+    if @store.hidden? && current_user != @store.user && !current_user&.admin?
+      raise ActiveRecord::RecordNotFound
+    end
+
     # Renamed stores: FriendlyId :history resolves the old slug, then we 301
     # to the canonical URL so backlinks and SEO value survive the rename.
     if @store.slug != params[:id]
