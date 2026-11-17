@@ -147,8 +147,10 @@ class Listing < ApplicationRecord
   # renders cards. Explicit preload chain (instead of with_attached_photos) so
   # the blob's preview_image attachments are not dragged in too — cards only
   # ever read the card variants, whose VariantRecords come preloaded here.
+  # user: :store because cards without a store fall back to
+  # User#display_name, which reads the user's (often nil) store.
   scope :with_card_data, -> {
-    includes(:store, :user, :labels, :category, :seller_tags, photos_attachments: { blob: :variant_records })
+    includes(:store, :labels, :category, :seller_tags, user: :store, photos_attachments: { blob: :variant_records })
   }
 
   # Listings favorited within the window, most saved first.

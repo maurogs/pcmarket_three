@@ -6,7 +6,7 @@ module Admin
     def index
       scope = OrderFilter.call(filter_params)
       scope = scope.disputed unless params[:status].presence_in(Order.statuses.keys)
-      @pagy, @orders = pagy(scope, limit: 25)
+      @pagy, @orders = pagy(scope.includes(:buyer, :seller), limit: 25)
     end
 
     def show

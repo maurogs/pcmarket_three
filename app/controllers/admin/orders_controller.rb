@@ -9,7 +9,9 @@ module Admin
     before_action :set_order, only: %i[show update]
 
     def index
-      @pagy, @orders = pagy(OrderFilter.call(filter_params), limit: 25)
+      # :buyer/:seller render the username columns; without them each row
+      # costs its own user query (Prosopite N+1).
+      @pagy, @orders = pagy(OrderFilter.call(filter_params).includes(:buyer, :seller), limit: 25)
     end
 
     def show

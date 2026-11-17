@@ -42,7 +42,14 @@ module Api
       end
 
       def show
-        listing = Listing.friendly.find(params[:id])
+        # Same deep photo preload as ListingsController#set_listing: photo_json
+        # builds :card and :gallery variants per attachment, which without
+        # variant_records → image_attachment → blob fans out into per-photo
+        # blob + VariantRecord queries (Prosopite N+1).
+        listing = Listing
+          .includes(:store, :category, user: :store,
+                    photos_attachments: { blob: { variant_records: { image_attachment: :blob } } })
+          .friendly.find(params[:id])
         unless listing.approved? || listing.sold? || listing.reserved? || owner_or_admin?(listing)
           raise ActiveRecord::RecordNotFound
         end

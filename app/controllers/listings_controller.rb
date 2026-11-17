@@ -30,7 +30,14 @@ class ListingsController < ApplicationController
   private
 
   def set_listing
-    listing = Listing.friendly.find(params[:id])
+    # Deep ActiveStorage preload: the gallery (show.html.erb), JsonLdHelper
+    # and ListingsHelper#variant_url all read blob variants, and without
+    # variant_records → image_attachment → blob each photo costs its own
+    # blob + VariantRecord round trips (Prosopite N+1).
+    listing = Listing
+      .includes(:store, :category, user: :store,
+                photos_attachments: { blob: { variant_records: { image_attachment: :blob } } })
+      .friendly.find(params[:id])
     # draft / pending_review / rejected / archived stay invisible to everyone
     # but the owner and admins; sold and reserved listings stay public.
     raise ActiveRecord::RecordNotFound unless listing.approved? || listing.sold? ||

@@ -2572,7 +2572,7 @@ es:
         new: Nueva categoría
         edit: Editar
         position: Posición
-        listings_count: "%{count} anuncios"
+        listings_count: "%{count} anuncios en total"
         move_up: Subir
         move_down: Bajar
         specs: Especificaciones

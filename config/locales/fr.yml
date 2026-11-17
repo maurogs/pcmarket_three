@@ -2594,7 +2594,7 @@ fr:
         new: Nouvelle catégorie
         edit: Modifier
         position: Position
-        listings_count: "%{count} annonces"
+        listings_count: "%{count} annonces au total"
         move_up: Monter
         move_down: Descendre
         specs: Spécifications

@@ -2556,7 +2556,7 @@ en:
         new: New category
         edit: Edit
         position: Position
-        listings_count: "%{count} listings"
+        listings_count: "%{count} total listings"
         move_up: Move up
         move_down: Move down
         specs: Specifications

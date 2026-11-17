@@ -22,7 +22,8 @@
       <% end %>
     </span>
     <span class="text-xs text-muted"><%= t(".position", position: category.position) %></span>
-    <span class="text-xs text-muted"><%= t(".listings_count", count: category.listings.count) %></span>
+    <%# listings_count is the counter_cache column (Listing belongs_to :category) — a per-row listings.count would be an N+1. %>
+    <span class="text-xs text-muted"><%= t(".listings_count", count: category.listings_count) %></span>
 
     <span class="ml-auto flex items-center gap-1">
       <% %w[up down].each do |direction| %>

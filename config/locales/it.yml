@@ -2577,7 +2577,7 @@ it:
         new: Nuova categoria
         edit: Modifica
         position: Posizione
-        listings_count: "%{count} annunci"
+        listings_count: "%{count} annunci in totale"
         move_up: Sposta in alto
         move_down: Sposta in basso
         specs: Specifica

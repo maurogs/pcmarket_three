@@ -216,8 +216,10 @@ class ListingSearch
 
   # Eager loading for the listing cards (kills the N+1 on store/user/photos).
   # Same explicit preload chain as Listing.with_card_data — see its comment.
+  # user: :store for the same reason with_card_data has it — card fallback
+  # User#display_name loads the user's store.
   def with_card_includes(scope)
-    scope.includes(:store, :user, :category, :labels, photos_attachments: { blob: :variant_records })
+    scope.includes(:store, :category, :labels, user: :store, photos_attachments: { blob: :variant_records })
   end
 
   # --- facets ----------------------------------------------------------------

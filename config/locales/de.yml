@@ -2588,7 +2588,7 @@ de:
         new: Neue Kategorie
         edit: Bearbeiten
         position: Reihenfolge
-        listings_count: "%{count} Anzeigen"
+        listings_count: "%{count} Anzeigen gesamt"
         move_up: Nach oben
         move_down: Nach unten
         specs: Spezifikationen
