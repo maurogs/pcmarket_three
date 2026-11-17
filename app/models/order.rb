@@ -22,7 +22,9 @@ class Order < ApplicationRecord
   belongs_to :seller, class_name: "User"
   has_many :order_items, dependent: :destroy
   has_many :order_notes, dependent: :destroy
-  has_one :review, dependent: :nullify
+  # :destroy, not :nullify — order_id is NOT NULL, so nullifying would violate
+  # the constraint and make any reviewed order impossible to destroy.
+  has_one :review, dependent: :destroy
 
   validates :number, presence: true, uniqueness: true
   validates :carrier, inclusion: { in: CARRIERS }, allow_nil: true

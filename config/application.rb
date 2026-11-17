@@ -28,5 +28,10 @@ module AppTestThree
     config.i18n.available_locales = %i[es en fr de it pt]
     config.i18n.default_locale = :es
     config.i18n.fallbacks = [ :en ]
+
+    # Rails 8.1 defaults variants to libvips, which is not installed here:
+    # the transformer stays nil and every variant render raises. ImageMagick
+    # + mini_magick (both available) process the gallery variants instead.
+    config.active_storage.variant_processor = :mini_magick
   end
 end

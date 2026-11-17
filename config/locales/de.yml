@@ -536,6 +536,7 @@ de:
       previous_photo: Vorheriges Foto
       next_photo: Nächstes Foto
       photo_thumbnail: Foto %{number}
+      photo_credit: "Foto: %{creator} · %{license} über %{provider}"
       published_on: Einstellt am %{date}
       labels: Kennzeichnungen
       sold_cta: Dieser Artikel ist bereits verkauft

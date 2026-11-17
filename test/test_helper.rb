@@ -1,8 +1,13 @@
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
+require "webmock/minitest"
 require_relative "test_helpers/session_test_helper"
 require_relative "test_helpers/api_v1_test_helper"
+
+# No test may reach the real network (DemoImages providers are exercised with
+# stubbed HTTP; everything else should not be doing HTTP at all).
+WebMock.disable_net_connect!(allow_localhost: true)
 
 module ActiveSupport
   class TestCase

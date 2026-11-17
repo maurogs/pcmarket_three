@@ -228,6 +228,24 @@ module ListingsHelper
                 .merge(html_options))
   end
 
+  # "Photo: <creator> · <license> via <provider>" credit line for demo
+  # photos whose blob metadata carries attribution (see DemoImages::Fetcher
+  # and db/seeds/demo.rb). Nil for photos without attribution.
+  def photo_credit_tag(photo)
+    attribution = photo.blob&.metadata.is_a?(Hash) ? photo.blob.metadata["attribution"] : nil
+    return if attribution.blank?
+
+    credit = t("listings.show.photo_credit",
+               creator: attribution["creator"].to_s,
+               license: attribution["license"].to_s,
+               provider: attribution["provider"].to_s.capitalize)
+    if attribution["source_url"].present?
+      link_to credit, attribution["source_url"], target: "_blank", rel: "noopener nofollow"
+    else
+      credit
+    end
+  end
+
   def photo_placeholder_tag(alt)
     tag.svg(raw('<rect x="3" y="5" width="18" height="14" rx="1.5"/><circle cx="9" cy="10" r="1.6"/><path d="m5 17 4.5-4.5L12 15l3-3 4 4"/>'),
             viewBox: "0 0 24 24", fill: "none", stroke: "currentColor",

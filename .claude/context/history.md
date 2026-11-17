@@ -1,5 +1,93 @@
 # History
 
+## 2026-11-17 — Phase 9: demo seed with real photos (image APIs, attribution, Spanish catalog)
+
+**What changed**
+
+- **Image provider services** (`app/services/demo_images/`):
+  `Fetcher` (orchestrator: provider priority Pexels→Pixabay→Openverse,
+  per-query on-disk pool cache `tmp/demo_images/<query-slug>/manifest.json`,
+  magic-byte validation jpeg/png/webp, 8 MB download cap, content type
+  from sniffed bytes), `Placeholder` (ImageMagick gradient tiles with
+  category name, always succeeds), `Providers::Base` (shared Net::HTTP
+  get_json: 10 s timeouts, 8 MB stream cap, custom UA `PCMarketSeed/1.0`
+  — required by Openverse, Cloudflare 403s the Ruby default),
+  `Providers::Openverse` (no key; `license_type=commercial,modification`
+  server-side filter + client-side `ALLOWED_LICENSES` re-check (by,
+  by-sa, cc0, pdm, zero); 3 s inter-call throttle + class-level
+  `min_call_interval` test seam), `Providers::Pexels`/`Providers::Pixabay`
+  (activate only with `PEXELS_API_KEY`/`PIXABAY_API_KEY`). **Unsplash
+  deliberately NOT implemented**: its API requires clients to load the
+  source URL on every render for hotlink-protection counting, which is
+  incompatible with one-shot seed-time downloads — documented in
+  `providers/base.rb`.
+- **Attribution end-to-end**: provider metadata (creator, creator_url,
+  license, license_url, source_url, provider) stored in
+  `blob.metadata["attribution"]`; `ListingsHelper#photo_credit_tag`
+  renders "Foto: <creator> · <license> vía <provider>" (creator + source
+  linked) inside each gallery slide of `listings/show`
+  (`listing.photo_credit` key, all 6 locales).
+- **New seed** `db/seeds/demo.rb` (`module DemoSeed`, called from
+  `db/seeds.rb` in dev or with `SEED_DEMO=1`; refuses production unless
+  `ALLOW_DEMO_SEED=1`): `SEED_LISTINGS` (default 300), `SEED_RESET=1`,
+  `SEED_SEED=` reproducible randomness; **idempotent** via fixed
+  `*@demo.pcmarket.test` emails + top-up semantics (a second run creates
+  zero listings). Replaces `sample_listings.rb` (DELETED; a one-time
+  `cleanup_legacy_samples!` destroys the old `*@pcmarket.test` users +
+  their orphan slugs first).
+- **Data**: Faker `:es` locale, Spanish descriptions/questions/replies/
+  addresses; catalog `db/seeds/data/demo_catalog.yml` (52 leaves: model
+  names + realistic € ranges + sample spec presets); business stores
+  with valid **CIFs computed via `SpanishTaxIdValidator.cif_control`**,
+  ImageMagick logo/banner attachments, policy pages; specs filtered
+  against the leaf's real options (`valid_specs_for`); photo blobs
+  uploaded with `identify: false` + explicit width/height metadata
+  (analyzer jobs are skipped on this path and `vite_image_tag` needs
+  dimensions) + attribution. Status mix 70/10/5/10/5
+  (approved/sold/draft/pending/reserved), ~15% with strikethrough
+  `original_price_cents`, `featured_until` ~12%.
+- **Graph**: favorites (some auto-cleared through sold orders), follows,
+  saved searches, Spanish conversations with unread counts, offers in
+  every state (acceptances through `accept!` so counters stay true),
+  orders walked through the real state machine then backdated via
+  `update_columns` (disputes opened BEFORE backdating to respect the
+  15-day window; past-deadline ones resolved by the admin), refunds
+  after disputes (auto-resolve refunded), reviews for delivered/
+  completed orders, notifications, reports (≤3 per listing so flood
+  revalidation isn't triggered), contact messages, newsletter prefs,
+  moderation events, labels + seller tags.
+- **App bug fixed along the way**: `Order#has_one :review` was
+  `dependent: :nullify` while `reviews.order_id` is NOT NULL — destroying
+  any reviewed order raised a NotNullViolation (surfaced by seed
+  cleanup; regression test in `review_test.rb`). Now `dependent: :destroy`
+  (Review's destroy callback already refreshes store ratings).
+- **Tests**: webmock added to the test group
+  (`disable_net_connect!` in `test_helper`); new
+  `test/services/demo_images/{openverse,fetcher}_test.rb` (Openverse
+  parse + non-commercial filtering, pool cache reuse, placeholder
+  fallback, magic-byte rejection), `test/seeds/demo_seed_test.rb`
+  (idempotent 20-listing run + CIF validity),
+  `test/integration/listing_photo_credit_test.rb` (credit renders with
+  string-keyed blob metadata). Suite: **748 runs green**. rubocop 0
+  offenses (`test/services` + `test/seeds` excluded — intentionally
+  invalid payloads), locale lint 2657 keys aligned, eager_load clean.
+
+**Gotchas**
+
+- Blob `metadata` reads return STRING keys (`meta["attribution"]`, not
+  `meta[:attribution]`) — the helper and tests must match.
+- `vite_image_tag` raises "supports only images with width and height"
+  when blob metadata lacks dimensions; `identify: false` uploads skip
+  the analyzer, so the seed writes width/height itself (from `magick
+  identify`, default 800×600 — helpers clamp to that anyway).
+- `open_dispute!` requires the order <15 days past delivered_at — seed
+  opens disputes before backdating timestamps.
+- Order destruction cascades through the `has_one :review` fix;
+  `has_many :reviews` on Store stays `:nullify` (store_id IS nullable).
+- Seed wall time is dominated by cold pool fetches (~52 unique category
+  queries × 3 s throttle); re-runs with a warm `tmp/demo_images` are
+  fast. Placeholder fallback works fully offline.
+
 ## 2026-11-17 — Phase 8b: JSON API v1 (bearer auth, full REST surface, OpenAPI docs, devices)
 
 **What changed**

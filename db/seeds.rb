@@ -17,6 +17,9 @@ require seed_dir.join("support/seed_loader.rb").to_s
   legal_pages
 ].each { |name| load seed_dir.join("#{name}.rb") }
 
-# Development-only catalogue so the browse pages have something to show.
-# The loader itself is a no-op outside development and test.
-load seed_dir.join("sample_listings.rb")
+# Development-only realistic demo data (PHASE 9): stores, listings with real
+# photos, and a full social/commerce graph. DemoSeed.run! is gated inside
+# db/seeds/demo.rb too (never production, never test); the demo catalogue
+# lives in db/seeds/data/demo_catalog.yml. See README "Demo data".
+require seed_dir.join("demo.rb").to_s
+DemoSeed.run! if Rails.env.development? || ENV["SEED_DEMO"] == "1"

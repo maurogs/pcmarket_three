@@ -1,0 +1,587 @@
+# Demo catalogue for db/seeds/demo.rb (PHASE 9). One entry per LEAF category:
+#
+#   weight   sampling weight when choosing which leaf a listing goes in
+#   query    English search query for the photo providers
+#   icon     short label drawn on generated placeholder images
+#   new/used euro price ranges for [brand_new, open_box] and used conditions
+#   models   [name, new_lo, new_hi, used_lo, used_hi, specs?] tuples
+#
+# Specs use only option values valid for that leaf's spec attributes (see
+# db/seeds/spec_attributes.rb). Prices are euros; the seed stores cents.
+defaults:
+  new: [60, 320]
+  used: [40, 240]
+categories:
+  # --- Tarjetas gráficas ----------------------------------------------------
+  rtx:
+    weight: 8
+    query: nvidia geforce rtx graphics card
+    icon: Gráfica RTX
+    new: [290, 1180]
+    used: [230, 980]
+    models:
+      - [ASUS TUF GeForce RTX 4070 Super OCS 12GB, 565, 645, 465, 560, { gpu_chipset: nvidia, gpu_model: "RTX 4070 Super", gpu_memory: "12", rgb_lighting: static }]
+      - [MSI Ventus RTX 4060 Ti 8GB, 395, 455, 315, 390, { gpu_chipset: nvidia, gpu_model: "RTX 4060 Ti", gpu_memory: "8", rgb_lighting: none }]
+      - [Gigabyte RTX 4080 Super Aorus Master 16GB, 970, 1120, 830, 960, { gpu_chipset: nvidia, gpu_model: "RTX 4080 Super", gpu_memory: "16", rgb_lighting: addressable }]
+      - [Zotac RTX 3060 Twin Edge 12GB, 290, 340, 195, 250, { gpu_chipset: nvidia, gpu_model: "RTX 3060", gpu_memory: "12", rgb_lighting: none }]
+      - [Palit RTX 3070 JetStream 8GB, 340, 395, 230, 295, { gpu_chipset: nvidia, gpu_model: "RTX 3070", gpu_memory: "8", rgb_lighting: static }]
+      - [MSI Suprim X RTX 4090 24GB, 1750, 1960, 1520, 1720, { gpu_chipset: nvidia, gpu_model: "RTX 4090", gpu_memory: "24", rgb_lighting: addressable }]
+      - [ASUS Dual RTX 4060 8GB OC, 300, 345, 235, 290, { gpu_chipset: nvidia, gpu_model: "RTX 4060", gpu_memory: "8", rgb_lighting: none }]
+      - [Gainward Phantom RTX 3060 Ti 8GB, 330, 385, 220, 280, { gpu_chipset: nvidia, gpu_model: "RTX 3060 Ti", gpu_memory: "8", rgb_lighting: static }]
+  nvidia-gpus:
+    weight: 3
+    query: geforce gtx graphics card
+    icon: Gráfica GTX
+    new: [120, 420]
+    used: [80, 320]
+    models:
+      - [Gigabyte GTX 1660 Super OC 6GB, 190, 230, 120, 165, { gpu_chipset: nvidia, gpu_model: "GTX 1660 Super", gpu_memory: "6", rgb_lighting: none }]
+      - [MSI GTX 1070 Gaming X 8GB, 180, 220, 105, 150, { gpu_chipset: nvidia, gpu_model: "GTX 1070", gpu_memory: "8", rgb_lighting: static }]
+      - [ASUS ROG Strix GTX 1080 Ti 11GB, 320, 380, 200, 270, { gpu_chipset: nvidia, gpu_model: "GTX 1080 Ti", gpu_memory: "11", rgb_lighting: static }]
+      - [PNY GTX 1650 Mini 4GB, 130, 160, 75, 110, { gpu_chipset: nvidia, gpu_model: "GTX 1650", gpu_memory: "4", rgb_lighting: none }]
+  amd-gpus:
+    weight: 3
+    query: radeon rx graphics card
+    icon: Gráfica Radeon
+    new: [180, 620]
+    used: [140, 480]
+    models:
+      - [Sapphire Nitro RX 7800 XT 16GB, 495, 560, 410, 480, { gpu_chipset: amd, gpu_model: "RX 7800 XT", gpu_memory: "16", rgb_lighting: addressable }]
+      - [PowerColor Fighter RX 6600 8GB, 210, 250, 145, 190, { gpu_chipset: amd, gpu_model: "RX 6600", gpu_memory: "8", rgb_lighting: none }]
+      - [XFX Speedster RX 7600 8GB, 265, 305, 195, 245, { gpu_chipset: amd, gpu_model: "RX 7600", gpu_memory: "8", rgb_lighting: none }]
+      - [Sapphire Pulse RX 6700 XT 12GB, 320, 370, 215, 280, { gpu_chipset: amd, gpu_model: "RX 6700 XT", gpu_memory: "12", rgb_lighting: none }]
+  intel-gpus:
+    weight: 1
+    query: intel arc graphics card
+    icon: Gráfica Arc
+    new: [180, 380]
+    used: [130, 290]
+    models:
+      - [Intel Arc A770 Limited Edition 16GB, 285, 330, 200, 260, { gpu_chipset: intel, gpu_model: "Arc A770", gpu_memory: "16", rgb_lighting: none }]
+      - [Intel Arc A580 Limited Edition 8GB, 185, 225, 125, 170, { gpu_chipset: intel, gpu_model: "Arc A580", gpu_memory: "8", rgb_lighting: none }]
+      - [Retro 3dfs Voodoo 3 2000 PCI (colección), 95, 130, 70, 105, { gpu_chipset: other, gpu_model: "Voodoo 3 2000", gpu_memory: "16", rgb_lighting: none }]
+  workstation-gpus:
+    weight: 2
+    query: quadro pro graphics workstation card
+    icon: Gráfica pro
+    new: [320, 1250]
+    used: [220, 900]
+    models:
+      - [NVIDIA RTX A4000 16GB profesional, 980, 1140, 780, 920, { gpu_chipset: nvidia, gpu_model: "RTX A4000", gpu_memory: "16", rgb_lighting: none }]
+      - [NVIDIA Quadro P400 2GB, 320, 380, 200, 270, { gpu_chipset: nvidia, gpu_model: "Quadro P400", gpu_memory: "2", rgb_lighting: none }]
+      - [AMD Radeon Pro W5500 8GB, 520, 610, 360, 460, { gpu_chipset: amd, gpu_model: "Radeon Pro W5500", gpu_memory: "8", rgb_lighting: none }]
+      - [NVIDIA Quadro P2000 5GB, 430, 510, 290, 380, { gpu_chipset: nvidia, gpu_model: "Quadro P2000", gpu_memory: "5", rgb_lighting: none }]
+  # --- PCs gaming ------------------------------------------------------------
+  pro-gamer-pcs:
+    weight: 6
+    query: high end rgb gaming pc build
+    icon: PC gaming
+    new: [1450, 2700]
+    used: [1050, 2100]
+    models:
+      - [PC Gaming ASUS TUF RTX 4080 Super Ryzen 7 7800X3D 32GB DDR5, 2250, 2550, 1850, 2150, { cpu_brand: amd, cpu_model: "Ryzen 7 7800X3D", cpu_cores: "8", cpu_socket: am5, gpu_chipset: nvidia, gpu_model: "RTX 4080 Super", gpu_memory: "16", memory_capacity: "32", memory_type: ddr5, storage_capacity: 2tb, storage_interface: nvme_ssd, psu_wattage: "850", case_form_factor: mid_tower, case_color: black, rgb_lighting: addressable, cpu_cooler_type: aio, cpu_cooler_brand: corsair }]
+      - [PC Gaming MSI MEG RTX 4090 i7-14700K 64GB DDR5, 2550, 2900, 2100, 2450, { cpu_brand: intel, cpu_model: "Core i7-14700K", cpu_cores: "20", cpu_socket: lga1700, gpu_chipset: nvidia, gpu_model: "RTX 4090", gpu_memory: "24", memory_capacity: "64", memory_type: ddr5, storage_capacity: 2tb, storage_interface: nvme_ssd, psu_wattage: "1000", case_form_factor: full_tower, case_color: black, rgb_lighting: addressable, cpu_cooler_type: aio, cpu_cooler_brand: nzxt }]
+      - [PC Gaming Lian Li White RTX 4070 Ti Super Ryzen 7 7700X, 1750, 2000, 1400, 1700, { cpu_brand: amd, cpu_model: "Ryzen 7 7700X", cpu_cores: "8", cpu_socket: am5, gpu_chipset: nvidia, gpu_model: "RTX 4070 Ti Super", gpu_memory: "16", memory_capacity: "32", memory_type: ddr5, storage_capacity: 1tb, storage_interface: nvme_ssd, psu_wattage: "750", case_form_factor: mid_tower, case_color: white, rgb_lighting: addressable, cpu_cooler_type: aio, cpu_cooler_brand: lian-li }]
+      - [PC Gaming Custom 7800X3D + RX 7900 XTX Monarca RGB, 1900, 2200, 1550, 1850, { cpu_brand: amd, cpu_model: "Ryzen 7 7800X3D", cpu_cores: "8", cpu_socket: am5, gpu_chipset: amd, gpu_model: "RX 7900 XTX", gpu_memory: "24", memory_capacity: "32", memory_type: ddr5, storage_capacity: 2tb, storage_interface: nvme_ssd, psu_wattage: "850", case_form_factor: mid_tower, case_color: multicolor, rgb_lighting: addressable, cpu_cooler_type: custom_loop, motherboard_brand: asus }]
+      - [PC Gaming Noctua Silencioso i5-13600K RTX 4070, 1450, 1680, 1150, 1400, { cpu_brand: intel, cpu_model: "Core i5-13600K", cpu_cores: "14", cpu_socket: lga1700, gpu_chipset: nvidia, gpu_model: "RTX 4070", gpu_memory: "12", memory_capacity: "32", memory_type: ddr5, storage_capacity: 1tb, storage_interface: nvme_ssd, psu_wattage: "650", case_form_factor: mid_tower, case_color: black, rgb_lighting: none, cpu_cooler_type: air, cpu_cooler_brand: noctua }]
+  mid-range-pcs:
+    weight: 7
+    query: mid tower gaming computer desk
+    icon: PC gaming
+    new: [820, 1400]
+    used: [600, 1100]
+    models:
+      - [PC Gaming RTX 4060 Ti Ryzen 5 7600 16GB DDR5, 1020, 1180, 800, 980, { cpu_brand: amd, cpu_model: "Ryzen 5 7600", cpu_cores: "6", cpu_socket: am5, gpu_chipset: nvidia, gpu_model: "RTX 4060 Ti", gpu_memory: "8", memory_capacity: "16", memory_type: ddr5, storage_capacity: 1tb, storage_interface: nvme_ssd, psu_wattage: "600", case_form_factor: mid_tower, rgb_lighting: static, cpu_cooler_type: air }]
+      - [PC Gaming MSI RTX 4060 i5-13400F 16GB, 880, 1020, 680, 840, { cpu_brand: intel, cpu_model: "Core i5-13400F", cpu_cores: "10", cpu_socket: lga1700, gpu_chipset: nvidia, gpu_model: "RTX 4060", gpu_memory: "8", memory_capacity: "16", memory_type: ddr4, storage_capacity: 512gb, storage_interface: nvme_ssd, psu_wattage: "550", case_form_factor: mid_tower, rgb_lighting: none, cpu_cooler_type: air }]
+      - [PC Gaming RX 7600 Ryzen 5 5600 16GB DDR4, 750, 870, 560, 700, { cpu_brand: amd, cpu_model: "Ryzen 5 5600", cpu_cores: "6", cpu_socket: am4, gpu_chipset: amd, gpu_model: "RX 7600", gpu_memory: "8", memory_capacity: "16", memory_type: ddr4, storage_capacity: 512gb, storage_interface: nvme_ssd, psu_wattage: "550", case_form_factor: mini_tower, rgb_lighting: none, cpu_cooler_type: air }]
+      - [PC Compacto Fractal Design RTX 4060 i5-12400F, 830, 950, 640, 780, { cpu_brand: intel, cpu_model: "Core i5-12400F", cpu_cores: "6", cpu_socket: lga1700, gpu_chipset: nvidia, gpu_model: "RTX 4060", gpu_memory: "8", memory_capacity: "16", memory_type: ddr4, storage_capacity: 512gb, storage_interface: nvme_ssd, psu_wattage: "500", case_form_factor: sff, case_color: white, rgb_lighting: none, cpu_cooler_type: air }]
+      - [PC Gaming Cozy Sakura RX 6700 XT Ryzen 7 5800X, 720, 840, 540, 680, { cpu_brand: amd, cpu_model: "Ryzen 7 5800X", cpu_cores: "8", cpu_socket: am4, gpu_chipset: amd, gpu_model: "RX 6700 XT", gpu_memory: "12", memory_capacity: "32", memory_type: ddr4, storage_capacity: 1tb, storage_interface: nvme_ssd, psu_wattage: "650", case_form_factor: mid_tower, case_color: pink, rgb_lighting: static, cpu_cooler_type: aio }]
+  value-pcs:
+    weight: 6
+    query: budget gaming pc setup
+    icon: PC gaming
+    new: [430, 800]
+    used: [300, 620]
+    models:
+      - [PC Gaming barato GTX 1660 Super Ryzen 5 3600 16GB, 430, 520, 320, 420, { cpu_brand: amd, cpu_model: "Ryzen 5 3600", cpu_cores: "6", cpu_socket: am4, gpu_chipset: nvidia, gpu_model: "GTX 1660 Super", gpu_memory: "6", memory_capacity: "16", memory_type: ddr4, storage_capacity: 512gb, storage_interface: nvme_ssd, psu_wattage: "500", case_form_factor: mid_tower, rgb_lighting: none, cpu_cooler_type: air }]
+      - [PC Office + Gaming ligero RTX 3050 i3-12100F, 480, 560, 360, 460, { cpu_brand: intel, cpu_model: "Core i3-12100F", cpu_cores: "4", cpu_socket: lga1700, gpu_chipset: nvidia, gpu_model: "RTX 3050", gpu_memory: "8", memory_capacity: "16", memory_type: ddr4, storage_capacity: 512gb, storage_interface: nvme_ssd, psu_wattage: "450", case_form_factor: mid_tower, rgb_lighting: none, cpu_cooler_type: air }]
+      - [PC Gaming segunda mano RX 580 8GB Ryzen 5 2600, 340, 410, 240, 330, { cpu_brand: amd, cpu_model: "Ryzen 5 2600", cpu_cores: "6", cpu_socket: am4, gpu_chipset: amd, gpu_model: "RX 580", gpu_memory: "8", memory_capacity: "16", memory_type: ddr4, storage_capacity: 480gb, storage_interface: sata_ssd, psu_wattage: "500", case_form_factor: mid_tower, rgb_lighting: none }]
+      - [Mini PC Gaming N-case RTX 3060 i5-11400, 560, 650, 430, 540, { cpu_brand: intel, cpu_model: "Core i5-11400", cpu_cores: "6", cpu_socket: lga1200, gpu_chipset: nvidia, gpu_model: "RTX 3060", gpu_memory: "12", memory_capacity: "16", memory_type: ddr4, storage_capacity: 512gb, storage_interface: nvme_ssd, psu_wattage: "450", case_form_factor: sff, rgb_lighting: none }]
+  sim-rigs:
+    weight: 2
+    query: racing simulator wheel cockpit setup
+    icon: Sim rig
+    new: [750, 1900]
+    used: [520, 1400]
+    models:
+      - [Sim Rig completo Logitech G29 + PC RTX 4060, 1350, 1560, 1000, 1250, { cpu_brand: intel, cpu_model: "Core i5-13400F", cpu_cores: "10", cpu_socket: lga1700, gpu_chipset: nvidia, gpu_model: "RTX 4060", gpu_memory: "8", memory_capacity: "16", memory_type: ddr4, storage_capacity: 1tb, storage_interface: nvme_ssd, psu_wattage: "550", case_form_factor: mid_tower }]
+      - [Cockpit sim racing Aluminum + Volante Thrustmaster T300, 750, 900, 520, 700, {}]
+      - [Sim Rig Fanatec CSL DD + PC Ryzen 5 7600 RTX 4060 Ti, 1650, 1900, 1300, 1600, { cpu_brand: amd, cpu_model: "Ryzen 5 7600", cpu_cores: "6", cpu_socket: am5, gpu_chipset: nvidia, gpu_model: "RTX 4060 Ti", gpu_memory: "8", memory_capacity: "16", memory_type: ddr5, storage_capacity: 1tb, storage_interface: nvme_ssd, psu_wattage: "600", case_form_factor: mid_tower }]
+  # --- Estaciones de trabajo --------------------------------------------------
+  creator-rigs:
+    weight: 2
+    query: creative workstation studio computer
+    icon: PC creador
+    new: [1350, 2400]
+    used: [950, 1800]
+    models:
+      - [PC Creador i7-14700K + RTX 4070 Ti Super 16GB Premiere, 1850, 2100, 1500, 1780, { cpu_brand: intel, cpu_model: "Core i7-14700K", cpu_cores: "20", cpu_socket: lga1700, gpu_chipset: nvidia, gpu_model: "RTX 4070 Ti Super", gpu_memory: "16", memory_capacity: "64", memory_type: ddr5, storage_capacity: 2tb, storage_interface: nvme_ssd, psu_wattage: "750", case_form_factor: mid_tower, rgb_lighting: none }]
+      - [Workstation Ryzen 9 7900X + RX 7900 XT 24GB Blender, 1700, 1980, 1350, 1650, { cpu_brand: amd, cpu_model: "Ryzen 9 7900X", cpu_cores: "12", cpu_socket: am5, gpu_chipset: amd, gpu_model: "RX 7900 XT", gpu_memory: "24", memory_capacity: "64", memory_type: ddr5, storage_capacity: 2tb, storage_interface: nvme_ssd, psu_wattage: "850", case_form_factor: full_tower, rgb_lighting: none }]
+      - [PC Edición de vídeo i9-13900K + RTX A4000 silencioso, 2100, 2450, 1700, 2050, { cpu_brand: intel, cpu_model: "Core i9-13900K", cpu_cores: "24", cpu_socket: lga1700, gpu_chipset: nvidia, gpu_model: "RTX A4000", gpu_memory: "16", memory_capacity: "64", memory_type: ddr5, storage_capacity: 2tb, storage_interface: nvme_ssd, psu_wattage: "850", case_form_factor: full_tower, case_color: silver, rgb_lighting: none, cpu_cooler_brand: noctua }]
+  streaming-rigs:
+    weight: 1
+    query: streaming pc setup microphone lights
+    icon: PC streaming
+    new: [1150, 1850]
+    used: [820, 1400]
+    models:
+      - [PC Streaming Ryzen 7 7700X RTX 4070 + capture Elgato, 1500, 1720, 1180, 1420, { cpu_brand: amd, cpu_model: "Ryzen 7 7700X", cpu_cores: "8", cpu_socket: am5, gpu_chipset: nvidia, gpu_model: "RTX 4070", gpu_memory: "12", memory_capacity: "32", memory_type: ddr5, storage_capacity: 2tb, storage_interface: nvme_ssd, psu_wattage: "750", case_form_factor: mid_tower, rgb_lighting: addressable }]
+      - [PC Directo i7-13700 + RTX 4060 Ti OBS listo, 1150, 1330, 860, 1080, { cpu_brand: intel, cpu_model: "Core i7-13700", cpu_cores: "16", cpu_socket: lga1700, gpu_chipset: nvidia, gpu_model: "RTX 4060 Ti", gpu_memory: "8", memory_capacity: "32", memory_type: ddr5, storage_capacity: 1tb, storage_interface: nvme_ssd, psu_wattage: "650", case_form_factor: mid_tower, rgb_lighting: static }]
+  local-ai-rigs:
+    weight: 2
+    query: ai workstation gpu tower server
+    icon: PC IA local
+    new: [1600, 2900]
+    used: [1250, 2300]
+    models:
+      - [PC IA local RTX 3090 24GB (LLaMA listo) 64GB RAM, 1600, 1850, 1350, 1600, { cpu_brand: intel, cpu_model: "Core i7-12700", cpu_cores: "12", cpu_socket: lga1700, gpu_chipset: nvidia, gpu_model: "RTX 3090", gpu_memory: "24", memory_capacity: "64", memory_type: ddr5, storage_capacity: 2tb, storage_interface: nvme_ssd, psu_wattage: "850", case_form_factor: full_tower }]
+      - [PC IA dual GPU RTX 4060 Ti 16GB + eGPU ready, 2100, 2450, 1700, 2050, { cpu_brand: amd, cpu_model: "Ryzen 9 7900", cpu_cores: "12", cpu_socket: am5, gpu_chipset: nvidia, gpu_model: "RTX 4060 Ti 16GB", gpu_memory: "16", memory_capacity: "96", memory_type: ddr5, storage_capacity: 4tb, storage_interface: nvme_ssd, psu_wattage: "1000", case_form_factor: full_tower }]
+      - [Servidor compacto RTX A5000 24GB para IA local, 2500, 2950, 2000, 2450, { cpu_brand: amd, cpu_model: "Threadripper 3960X", cpu_cores: "24", cpu_socket: other, gpu_chipset: nvidia, gpu_model: "RTX A5000", gpu_memory: "24", memory_capacity: "128", memory_type: ddr4, storage_capacity: 4tb, storage_interface: nvme_ssd, psu_wattage: "1200", case_form_factor: full_tower }]
+  # --- Portátiles --------------------------------------------------------------
+  laptops-13:
+    weight: 2
+    query: ultrabook 13 inch laptop
+    icon: Portátil 13"
+    new: [520, 1350]
+    used: [350, 950]
+    models:
+      - [Lenovo ThinkPad X1 Carbon Gen 11 13" i7-1365U 16GB, 1150, 1320, 850, 1050, { cpu_brand: intel, cpu_model: "i7-1365U", gpu_chipset: intel, gpu_model: "Iris Xe", memory_capacity: "16", storage_capacity: 512gb }]
+      - [Apple MacBook Air M2 13" 16GB 512GB, 1050, 1220, 780, 980, { cpu_brand: apple, cpu_model: "Apple M2", gpu_chipset: apple, gpu_model: "M2 GPU", memory_capacity: "16", storage_capacity: 512gb }]
+      - [ASUS Zenbook 13 OLED Ryzen 7 7730U 16GB, 720, 840, 520, 690, { cpu_brand: amd, cpu_model: "Ryzen 7 7730U", gpu_chipset: amd, gpu_model: "Radeon Graphics", memory_capacity: "16", storage_capacity: 512gb }]
+  laptops-15:
+    weight: 5
+    query: gaming laptop 15 inch
+    icon: Portátil 15"
+    new: [640, 1850]
+    used: [420, 1350]
+    models:
+      - [Lenovo Legion 5 Pro 15" Ryzen 7 6800H RTX 3060 16GB, 980, 1140, 730, 920, { cpu_brand: amd, cpu_model: "Ryzen 7 6800H", gpu_chipset: nvidia, gpu_model: "RTX 3060 Laptop", memory_capacity: "16", storage_capacity: 512gb }]
+      - [ASUS TUF Gaming F15 i7-12700H RTX 4060 16GB, 1050, 1220, 800, 1010, { cpu_brand: intel, cpu_model: "i7-12700H", gpu_chipset: nvidia, gpu_model: "RTX 4060 Laptop", memory_capacity: "16", storage_capacity: 1tb }]
+      - [HP Pavilion 15 Ryzen 5 5500U 16GB ofimática, 540, 640, 380, 510, { cpu_brand: amd, cpu_model: "Ryzen 5 5500U", gpu_chipset: amd, gpu_model: "Radeon Graphics", memory_capacity: "16", storage_capacity: 512gb }]
+      - [MSI Katana 15" i7-13620H RTX 4070 32GB, 1550, 1780, 1250, 1500, { cpu_brand: intel, cpu_model: "i7-13620H", gpu_chipset: nvidia, gpu_model: "RTX 4070 Laptop", memory_capacity: "32", storage_capacity: 1tb }]
+      - [Apple MacBook Pro 14 M3 Pro 18GB 1TB seminuevo, 1650, 1880, 1380, 1620, { cpu_brand: apple, cpu_model: "Apple M3 Pro", gpu_chipset: apple, gpu_model: "M3 Pro GPU", memory_capacity: "18", storage_capacity: 1tb }]
+  laptops-17-plus:
+    weight: 3
+    query: big gaming laptop 17 inch
+    icon: Portátil 17"
+    new: [950, 2300]
+    used: [650, 1700]
+    models:
+      - [MSI Raider GE78 17" i9-13980HX RTX 4080 32GB, 2050, 2350, 1650, 1980, { cpu_brand: intel, cpu_model: "i9-13980HX", gpu_chipset: nvidia, gpu_model: "RTX 4080 Laptop", memory_capacity: "32", storage_capacity: 2tb }]
+      - [Lenovo Legion 7i 17" i7-13700HX RTX 4070 16GB, 1450, 1680, 1120, 1380, { cpu_brand: intel, cpu_model: "i7-13700HX", gpu_chipset: nvidia, gpu_model: "RTX 4070 Laptop", memory_capacity: "16", storage_capacity: 1tb }]
+      - [ASUS ROG Strix Scar 17 Ryzen 9 6900HX RTX 3070 Ti, 1200, 1400, 880, 1120, { cpu_brand: amd, cpu_model: "Ryzen 9 6900HX", gpu_chipset: nvidia, gpu_model: "RTX 3070 Ti Laptop", memory_capacity: "16", storage_capacity: 1tb }]
+  # --- Componentes -------------------------------------------------------------
+  cpus:
+    weight: 4
+    query: cpu processor box
+    icon: CPU
+    new: [90, 520]
+    used: [60, 400]
+    models:
+      - [AMD Ryzen 7 7800X3D AM5, 330, 380, 270, 330, { cpu_brand: amd, cpu_model: "Ryzen 7 7800X3D", cpu_cores: "8", cpu_socket: am5 }]
+      - [Intel Core i5-13400F LGA1700, 150, 180, 110, 145, { cpu_brand: intel, cpu_model: "Core i5-13400F", cpu_cores: "10", cpu_socket: lga1700 }]
+      - [AMD Ryzen 5 5600 AM4, 95, 120, 70, 100, { cpu_brand: amd, cpu_model: "Ryzen 5 5600", cpu_cores: "6", cpu_socket: am4 }]
+      - [Intel Core i7-14700K LGA1700, 340, 395, 280, 340, { cpu_brand: intel, cpu_model: "Core i7-14700K", cpu_cores: "20", cpu_socket: lga1700 }]
+      - [AMD Ryzen 9 5900X AM4, 210, 250, 150, 200, { cpu_brand: amd, cpu_model: "Ryzen 9 5900X", cpu_cores: "12", cpu_socket: am4 }]
+  motherboards:
+    weight: 3
+    query: motherboard atx board
+    icon: Placa base
+    new: [90, 420]
+    used: [65, 320]
+    models:
+      - [ASUS TUF Gaming B650-Plus WiFi AM5, 170, 200, 130, 165, { motherboard_brand: asus, cpu_socket: am5, memory_type: ddr5, motherboard_form_factor: atx, motherboard_networking: ethernet_wifi }]
+      - [MSI PRO B760M-A WiFi LGA1700, 120, 145, 90, 120, { motherboard_brand: msi, cpu_socket: lga1700, memory_type: ddr5, motherboard_form_factor: micro_atx, motherboard_networking: ethernet_wifi }]
+      - [Gigabyte B450M DS3H AM4, 90, 110, 55, 80, { motherboard_brand: gigabyte, cpu_socket: am4, memory_type: ddr4, motherboard_form_factor: micro_atx, motherboard_networking: ethernet_only }]
+      - [ASRock X670E Taichi AM5, 360, 420, 280, 350, { motherboard_brand: asrock, cpu_socket: am5, memory_type: ddr5, motherboard_form_factor: atx, motherboard_networking: ethernet_wifi }]
+  memory:
+    weight: 3
+    query: ddr5 ram memory kit
+    icon: Memoria RAM
+    new: [40, 220]
+    used: [28, 160]
+    models:
+      - [Kingston Fury Beast DDR5 32GB (2x16) 6000MHz, 95, 115, 72, 95, { memory_brand: kingston, memory_capacity: "32", memory_type: ddr5, memory_modules: "2", memory_form_factor: dimm }]
+      - [G.Skill Trident Z5 RGB DDR5 64GB (2x32), 185, 220, 145, 185, { memory_brand: g-skill, memory_capacity: "64", memory_type: ddr5, memory_modules: "2", memory_form_factor: dimm, rgb_lighting: addressable }]
+      - [Crucial DDR4 16GB (2x8) 3200MHz, 40, 52, 28, 42, { memory_brand: crucial, memory_capacity: "16", memory_type: ddr4, memory_modules: "2", memory_form_factor: dimm }]
+      - [Samsung DDR4 SO-DIMM 16GB portátil, 38, 48, 26, 38, { memory_brand: samsung, memory_capacity: "16", memory_type: ddr4, memory_modules: "1", memory_form_factor: so_dimm }]
+  storage:
+    weight: 4
+    query: nvme ssd m2 drive
+    icon: Almacenamiento
+    new: [35, 260]
+    used: [25, 190]
+    models:
+      - [Samsung 990 Pro 2TB NVMe M.2, 160, 190, 120, 155, { storage_brand: samsung, storage_capacity: 2tb, storage_interface: nvme_ssd, storage_form_factor: m2 }]
+      - [WD Black SN770 1TB NVMe, 72, 88, 52, 70, { storage_brand: western-digital, storage_capacity: 1tb, storage_interface: nvme_ssd, storage_form_factor: m2 }]
+      - [Crucial MX500 1TB SATA 2.5", 68, 82, 45, 64, { storage_brand: crucial, storage_capacity: 1tb, storage_interface: sata_ssd, storage_form_factor: 25 }]
+      - [Seagate Barracuda 4TB HDD SATA, 82, 98, 58, 78, { storage_brand: seagate, storage_capacity: 4tb, storage_interface: sata_hdd, storage_form_factor: 25 }]
+      - [Kingston NV2 500GB NVMe, 38, 48, 26, 38, { storage_brand: kingston, storage_capacity: 512gb, storage_interface: nvme_ssd, storage_form_factor: m2 }]
+  power-supplies:
+    weight: 3
+    query: power supply unit PSU
+    icon: Fuente
+    new: [50, 220]
+    used: [35, 160]
+    models:
+      - [Corsair RM850x 850W 80+ Gold modular, 118, 138, 88, 112, { psu_brand: corsair, psu_wattage: "850", psu_form_factor: atx }]
+      - [be quiet! Pure Power 11 550W 80+ Gold, 62, 75, 44, 60, { psu_brand: be-quiet, psu_wattage: "550", psu_form_factor: atx }]
+      - [Seasonic Focus GX-750 750W, 98, 118, 72, 95, { psu_brand: seasonic, psu_wattage: "750", psu_form_factor: atx }]
+      - [MSI MAG A650BN 650W 80+ Bronze, 52, 64, 36, 50, { psu_brand: msi, psu_wattage: "650", psu_form_factor: atx }]
+  cases:
+    weight: 3
+    query: pc case mid tower
+    icon: Caja
+    new: [45, 210]
+    used: [30, 150]
+    models:
+      - [Lian Li O11 Dynamic EVO blanca, 145, 170, 105, 138, { case_brand: lian-li, case_form_factor: mid_tower, case_color: white }]
+      - [Fractal Design North nogal, 118, 138, 88, 115, { case_brand: fractal-design, case_form_factor: mid_tower, case_color: black }]
+      - [NZXT H5 Flow negra, 88, 105, 60, 85, { case_brand: nzxt, case_form_factor: mid_tower, case_color: black }]
+      - [Nox Hummer MC RGB negra, 45, 58, 30, 45, { case_brand: nox, case_form_factor: mid_tower, case_color: black, rgb_lighting: static }]
+  cpu-coolers:
+    weight: 2
+    query: cpu air cooler heatsink fan
+    icon: Disipador
+    new: [25, 160]
+    used: [18, 115]
+    models:
+      - [Noctua NH-D15 chromax.black, 105, 125, 80, 105, { cpu_cooler_brand: noctua, cpu_cooler_type: air }]
+      - [Arctic Liquid Freezer II 280 AIO, 88, 105, 60, 85, { cpu_cooler_brand: arctic, cpu_cooler_type: aio }]
+      - [Thermalright Peerless Assassin 120 SE, 32, 42, 22, 34, { cpu_cooler_brand: thermalright, cpu_cooler_type: air }]
+      - [be quiet! Dark Rock Pro 5, 90, 108, 66, 90, { cpu_cooler_brand: be-quiet, cpu_cooler_type: air }]
+  motherboard-bundles:
+    weight: 1
+    query: motherboard cpu combo bundle
+    icon: Pack placa+CPU
+    new: [220, 700]
+    used: [160, 520]
+    models:
+      - [Pack ASUS TUF B650-Plus + Ryzen 5 7600, 320, 370, 250, 310, {}]
+      - [Pack MSI B760M + Intel i5-13400F, 250, 290, 190, 240, {}]
+      - [Pack Gigabyte A520M + Ryzen 5 4500, 220, 260, 160, 200, {}]
+  case-fans:
+    weight: 1
+    query: case fans rgb pack
+    icon: Ventiladores
+    new: [15, 90]
+    used: [10, 60]
+    models:
+      - [Pack 3x Lian Li Uni Fan SL-Infinity 120, 68, 82, 48, 66, { rgb_lighting: addressable }]
+      - [Noctua NF-A12x25 PWM (2 unidades), 48, 58, 34, 48, { rgb_lighting: none }]
+      - [Pack 4x Arctic P12 PWM, 28, 36, 18, 28, { rgb_lighting: none }]
+  expansion-cards:
+    weight: 1
+    query: pc expansion capture sound card
+    icon: Tarjeta exp.
+    new: [35, 240]
+    used: [25, 170]
+    models:
+      - [Elgato HD60 X capture card externa, 125, 148, 92, 118, {}]
+      - [Creative Sound Blaster Z sonido PCIe, 62, 75, 38, 55, {}]
+      - [Tarjeta de expansión USB 3.2 4 puertos, 35, 45, 22, 34, {}]
+  network-adapters:
+    weight: 1
+    query: wifi router network adapter
+    icon: Red
+    new: [18, 160]
+    used: [12, 110]
+    models:
+      - [TP-Link Archer TX50E WiFi 6 PCIe, 52, 64, 36, 50, {}]
+      - [Repetidor WiFi 6 TP-Link RE505X, 42, 52, 28, 40, {}]
+      - [Adaptador USB WiFi 6 AX900, 18, 25, 12, 19, {}]
+      - [Router ASUS RT-AX58U WiFi 6, 98, 120, 68, 92, {}]
+  other-components:
+    weight: 1
+    query: pc components cables riser
+    icon: Componentes
+    new: [12, 140]
+    used: [8, 100]
+    models:
+      - [Riser GPU PCIe 4.0 vertical, 32, 42, 22, 32, {}]
+      - [Cables de extensión RGB Corsair premium, 28, 38, 18, 28, {}]
+      - [Placa base LGA775 para piezas, 25, 35, 12, 22, {}]
+  # --- Periféricos -------------------------------------------------------------
+  monitors:
+    weight: 4
+    query: gaming monitor desk
+    icon: Monitor
+    new: [110, 700]
+    used: [75, 480]
+    models:
+      - [LG UltraGear 27GP850 27" 165Hz Nano IPS, 290, 340, 215, 275, { refresh_rate: "165", resolution: 1440p }]
+      - [Samsung Odyssey G7 32" 240Hz curvo, 420, 490, 310, 400, { refresh_rate: "240", resolution: 1440p }]
+      - [ASUS TUF VG27AQ 27" 144Hz 1440p, 210, 250, 150, 200, { refresh_rate: "144", resolution: 1440p }]
+      - [Xiaomi Mi 27" 1080p 75Hz office, 110, 135, 75, 105, { refresh_rate: "75", resolution: 1080p }]
+      - [Dell UltraSharp U3423WE 34" ultrawide productividad, 560, 650, 420, 540, { refresh_rate: "60", resolution: ultrawide }]
+  keyboards:
+    weight: 4
+    query: mechanical keyboard
+    icon: Teclado
+    new: [35, 220]
+    used: [24, 155]
+    models:
+      - [Keychron K2 V2 mecánico inalámbrico retro, 78, 95, 55, 75, {}]
+      - [Corsair K70 RGB MK.2 MX Red, 110, 132, 75, 100, {}]
+      - [Teclado retro IBM Model M (restaurado), 120, 160, 90, 130, {}]
+      - [Logitech G Pro X TKL Lightspeed, 130, 155, 95, 125, {}]
+      - [Redragon Kumara K552 mecánico económico, 35, 45, 24, 35, {}]
+  mice:
+    weight: 3
+    query: gaming mouse
+    icon: Ratón
+    new: [25, 140]
+    used: [17, 100]
+    models:
+      - [Logitech G Pro X Superlight 2, 120, 145, 88, 118, {}]
+      - [Razer DeathAdder V3, 62, 78, 44, 62, {}]
+      - [Zowie FK2 eSPORTS, 55, 68, 34, 50, {}]
+      - [Ratón ergonómico vertical Logitech MX Vertical, 65, 80, 42, 62, {}]
+  headphones:
+    weight: 4
+    query: gaming headphones headset
+    icon: Auriculares
+    new: [30, 300]
+    used: [20, 210]
+    models:
+      - [HyperX Cloud II 7.1, 72, 88, 48, 68, {}]
+      - [SteelSeries Arctis Nova Pro, 245, 290, 180, 235, {}]
+      - [Sony WH-1000XM5 inalámbricos ANC, 240, 285, 175, 230, {}]
+      - [Auriculares retro Sennheiser HD 25, 95, 115, 70, 95, {}]
+  speakers:
+    weight: 1
+    query: desktop speakers
+    icon: Altavoces
+    new: [30, 220]
+    used: [20, 150]
+    models:
+      - [Edifier R1280T estantería, 108, 130, 75, 100, {}]
+      - [Logitech Z333 2.1, 58, 72, 36, 54, {}]
+      - [Kanto YU4 monitores de escritorio, 185, 220, 130, 175, {}]
+  webcams:
+    weight: 2
+    query: webcam streaming camera
+    icon: Webcam
+    new: [30, 260]
+    used: [20, 180]
+    models:
+      - [Logitech Brio 4K Stream Edition, 145, 175, 100, 140, {}]
+      - [Elgato Facecam webcam 1080p60, 148, 175, 105, 140, {}]
+      - [Webcam 1080p con micro Logitech C920s, 52, 65, 30, 48, {}]
+  vr:
+    weight: 1
+    query: vr headset virtual reality
+    icon: VR
+    new: [220, 620]
+    used: [150, 420]
+    models:
+      - [Meta Quest 3 128GB, 440, 510, 330, 420, {}]
+      - [Valve Index kit completo, 560, 640, 420, 520, {}]
+      - [PlayStation VR2 + GT7, 380, 440, 290, 360, {}]
+  controllers:
+    weight: 2
+    query: game controller gamepad
+    icon: Mando
+    new: [25, 90]
+    used: [17, 65]
+    models:
+      - [Mando Xbox Series élite series 2, 135, 160, 100, 130, {}]
+      - [DualSense PS5 blanco, 58, 70, 42, 58, {}]
+      - [Scuf Reflex Pro PS5 personalizado, 195, 230, 140, 190, {}]
+      - [Mando Genesmaster retro USB, 25, 32, 15, 24, {}]
+  racing-simulators:
+    weight: 1
+    query: racing wheel simulator pedals
+    icon: Volante sim
+    new: [180, 900]
+    used: [130, 650]
+    models:
+      - [Volante Logitech G29 + pedales, 220, 265, 155, 205, {}]
+      - [Fanatec CSL DD base + pedal load cell, 420, 500, 310, 400, {}]
+      - [Thrustmaster T248 + volantes, 320, 385, 220, 300, {}]
+  retro-controllers:
+    weight: 1
+    query: retro game controller console
+    icon: Mando retro
+    new: [20, 120]
+    used: [14, 95]
+    models:
+      - [Mando Nintendo 64 original, 48, 62, 32, 50, {}]
+      - [8BitDo M301 mando retro Bluetooth, 38, 48, 26, 38, {}]
+      - [Mando Mega Drive original Sega, 30, 42, 18, 30, {}]
+  external-storage:
+    weight: 2
+    query: external hard drive ssd
+    icon: Disco externo
+    new: [45, 220]
+    used: [32, 160]
+    models:
+      - [Samsung T7 Shield 1TB SSD portátil, 108, 130, 80, 108, { storage_brand: samsung, storage_capacity: 1tb, storage_interface: other }]
+      - [WD My Passport 2TB HDD portátil, 78, 95, 55, 76, { storage_brand: western-digital, storage_capacity: 2tb, storage_interface: sata_hdd }]
+      - [SanDisk Ultra Dual Drive 256GB USB-C, 42, 52, 28, 40, { storage_brand: sandisk, storage_capacity: 256gb }]
+  other-peripherals:
+    weight: 1
+    query: desk gadgets peripherals mousepad
+    icon: Periférico
+    new: [10, 120]
+    used: [7, 85]
+    models:
+      - [Alfombrilla Artisan Hien XL, 48, 60, 32, 48, {}]
+      - [Soporte monitor gas spring, 68, 85, 45, 66, {}]
+      - [Hub USB-C 7 puertos Anker, 35, 45, 22, 34, {}]
+  # --- Móviles y tablets --------------------------------------------------------
+  phones:
+    weight: 5
+    query: smartphone phone
+    icon: Móvil
+    new: [110, 1150]
+    used: [70, 820]
+    models:
+      - [Apple iPhone 14 Pro 128GB morado, 780, 880, 590, 720, { device_brand: apple, storage_gb_mobile: "128" }]
+      - [Samsung Galaxy S23 128GB, 480, 550, 340, 440, { device_brand: samsung, storage_gb_mobile: "128" }]
+      - [Xiaomi Redmi Note 12 Pro 128GB, 175, 210, 120, 165, { device_brand: xiaomi, storage_gb_mobile: "128" }]
+      - [Google Pixel 7a 128GB seminuevo, 290, 340, 215, 280, { device_brand: google, storage_gb_mobile: "128" }]
+      - [OnePlus 11R 256GB, 330, 385, 240, 310, { device_brand: oneplus, storage_gb_mobile: "256" }]
+      - [Móvil de repuesto pantalla rota para piezas, 60, 90, 40, 70, { device_brand: samsung, storage_gb_mobile: "128" }]
+  tablets:
+    weight: 3
+    query: tablet device
+    icon: Tablet
+    new: [130, 950]
+    used: [90, 680]
+    models:
+      - [Apple iPad Air 5 64GB WiFi, 380, 440, 275, 360, { device_brand: apple, storage_gb_mobile: "64" }]
+      - [Samsung Galaxy Tab S9 FE 128GB, 320, 375, 230, 300, { device_brand: samsung, storage_gb_mobile: "128" }]
+      - [Xiaomi Pad 6 128GB, 210, 250, 150, 200, { device_brand: xiaomi, storage_gb_mobile: "128" }]
+      - [iPad mini 6 256GB WiFi (reacondicionado), 330, 385, 240, 310, { device_brand: apple, storage_gb_mobile: "256" }]
+  # --- Consolas -----------------------------------------------------------------
+  handhelds:
+    weight: 3
+    query: handheld game console
+    icon: Consola portátil
+    new: [280, 720]
+    used: [200, 520]
+    models:
+      - [Valve Steam Deck OLED 512GB, 510, 580, 400, 490, { device_brand: valve, platform: steam_deck, storage_gb_mobile: "512" }]
+      - [Nintendo Switch OLED blanca, 285, 330, 215, 275, { device_brand: nintendo, platform: switch, storage_gb_mobile: "64" }]
+      - [ASUS ROG Ally X 512GB, 650, 730, 500, 620, { device_brand: asus, platform: pc, storage_gb_mobile: "512" }]
+      - [Nintendo Switch Lite verde, 165, 195, 120, 160, { device_brand: nintendo, platform: switch, storage_gb_mobile: "32" }]
+  home-consoles:
+    weight: 3
+    query: home game console
+    icon: Consola
+    new: [240, 640]
+    used: [170, 450]
+    models:
+      - [PlayStation 5 Slim 1TB con DualSense, 440, 505, 350, 425, { device_brand: sony, platform: ps5, storage_gb_mobile: "1024" }]
+      - [Xbox Series X 1TB, 400, 465, 310, 390, { device_brand: microsoft, platform: xbox_series, storage_gb_mobile: "1024" }]
+      - [PlayStation 4 Pro 1TB con 2 mandos, 240, 285, 175, 235, { device_brand: sony, platform: ps4, storage_gb_mobile: "1024" }]
+      - [Xbox Series S 512GB, 245, 290, 185, 245, { device_brand: microsoft, platform: xbox_series, storage_gb_mobile: "512" }]
+  retro-consoles:
+    weight: 2
+    query: retro vintage game console
+    icon: Consola retro
+    new: [60, 340]
+    used: [40, 260]
+    models:
+      - [Nintendo GameCube original NGE-001, 120, 155, 80, 125, { device_brand: nintendo, platform: retro }]
+      - [Sega Mega Drive 2 + 2 mandos, 95, 120, 60, 95, { device_brand: other, platform: retro }]
+      - [PlayStation 1 PSX con 2 mandos, 70, 95, 45, 75, { device_brand: sony, platform: retro }]
+      - [Nintendo 64 + GoldenEye, 160, 205, 105, 165, { device_brand: nintendo, platform: retro }]
+  retro-handhelds:
+    weight: 1
+    query: retro handheld console
+    icon: Portátil retro
+    new: [40, 260]
+    used: [28, 190]
+    models:
+      - [Analogue Pocket negra impecable, 205, 245, 150, 200, { device_brand: other, platform: retro }]
+      - [Nintendo Game Boy Color morado, 68, 88, 42, 68, { device_brand: nintendo, platform: retro }]
+      - [Anbernic RG35XX Plus emuladora, 48, 60, 30, 46, { device_brand: other, platform: retro }]
+  # --- Accesorios ---------------------------------------------------------------
+  art-decor:
+    weight: 1
+    query: neon sign gaming room decor
+    icon: Decoración
+    new: [15, 140]
+    used: [10, 95]
+    models:
+      - [Rótulo neón PC Market personalizado, 58, 75, 38, 58, {}]
+      - [Cuadro lienzo setup gaming 60x90, 30, 42, 18, 30, {}]
+      - [Figura Funko Pop Master Chief, 15, 22, 10, 17, {}]
+  desk-accessories:
+    weight: 2
+    query: desk setup accessories organizer
+    icon: Escritorio
+    new: [10, 130]
+    used: [7, 90]
+    models:
+      - [Organizador de cables under-desk, 22, 30, 14, 22, {}]
+      - [ Alfombrilla de escritorio XL fieltro, 28, 38, 18, 28, {}]
+      - [Soporte auriculares + hub USB, 24, 32, 15, 24, {}]
+      - [Cabezal de cama riser para monitor, 62, 78, 42, 62, {}]
+  collectibles:
+    weight: 1
+    query: retro gaming collectible box
+    icon: Coleccionismo
+    new: [20, 260]
+    used: [14, 190]
+    models:
+      - [Caja original Dreamcast precintada (colección), 190, 245, 130, 190, {}]
+      - [Guía oficial Prima PS2 años 2000, 22, 32, 14, 24, {}]
+      - [Catálogo Sega Saturn España 1996, 40, 55, 26, 40, {}]
+  clothing-gear:
+    weight: 1
+    query: gaming hoodie apparel
+    icon: Ropa
+    new: [15, 80]
+    used: [10, 55]
+    models:
+      - [Sudadera retro arcade 8-bit, 32, 42, 18, 30, {}]
+      - [Camiseta PC Market vintage, 18, 25, 12, 18, {}]
+      - [Gorra gaming RGB LED, 15, 22, 10, 15, {}]
+  other-accessories:
+    weight: 1
+    query: pc accessories misc
+    icon: Accesorio
+    new: [8, 90]
+    used: [5, 60]
+    models:
+      - [Pasta térmica Noctua NT-H2 + kit limpieza, 18, 25, 12, 17, {}]
+      - [Set de destornilladores de precisión iFixit, 28, 38, 18, 28, {}]
+      - [Funda de transporte para Steam Deck, 22, 30, 14, 22, {}]
+  # --- Juegos y software --------------------------------------------------------
+  games:
+    weight: 4
+    query: video game box case
+    icon: Juego
+    new: [15, 90]
+    used: [8, 65]
+    models:
+      - [The Witcher 3 next-gen PS5 físico, 38, 48, 25, 38, { platform: ps5 }]
+      - [Elden Ring Xbox Series físico, 34, 44, 22, 34, { platform: xbox_series }]
+      - [Zelda Tears of the Kingdom Switch, 48, 58, 34, 48, { platform: switch }]
+      - [Silent Hill 2 PS1 original con caja, 28, 38, 16, 28, { platform: retro }]
+      - [Hollow Knight Switch Indie, 24, 32, 15, 24, { platform: switch }]
+      - [Juego PC año 2003 caja vieja, 15, 24, 8, 16, { platform: pc }]
+  software:
+    weight: 2
+    query: software box cd
+    icon: Software
+    new: [15, 210]
+    used: [10, 150]
+    models:
+      - [Windows 11 Pro clave digital OEM, 95, 120, 60, 95, {}]
+      - [Adobe Photoshop CS6 caja original, 85, 110, 55, 85, {}]
+      - [Office 2021 hogar clave multilenguaje, 72, 90, 45, 70, {}]
+      - [AutoCAD 2008 DVD coleccionismo, 22, 32, 12, 22, {}]

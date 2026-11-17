@@ -110,11 +110,20 @@ module SeoHelper
   end
 
   # public/ files (og images) are not pipeline assets: build the absolute
-  # URL by hand; pass-through for already-absolute URLs.
-  def seo_asset_url(path)
-    return path if path.match?(%r{\Ahttps?://})
+  # URL by hand; pass-through for already-absolute URLs. Active Storage
+  # blobs and variants (ListingsHelper#variant_url) are expanded to their
+  # redirect URL WITHOUT processing the image at render time.
+  def seo_asset_url(source)
+    source = url_for(source) if source.is_a?(ActiveStorage::Blob) || variant_object?(source)
+    return source if source.match?(%r{\Ahttps?://})
 
-    "#{request.protocol}#{request.host_with_port}#{path}"
+    "#{request.protocol}#{request.host_with_port}#{source}"
+  end
+
+  # ActiveStorage::Variant / VariantWithRecord (duck-typed: the hierarchy
+  # these sit in has moved across Rails versions).
+  def variant_object?(source)
+    source.respond_to?(:blob) && source.respond_to?(:processed)
   end
 
   def seo_query_string

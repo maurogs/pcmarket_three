@@ -66,6 +66,13 @@
               <% else %>
                 <%= photo_variant_tag(photo, variant: :gallery, alt: listing.title) %>
               <% end %>
+              <% if (credit = photo_credit_tag(photo)) %>
+                <div class="absolute bottom-2 left-2 z-10">
+                  <span class="block max-w-full truncate rounded bg-slate-900/70 px-2 py-1 text-[11px] font-medium text-white">
+                    <%= credit %>
+                  </span>
+                </div>
+              <% end %>
             </div>
           <% end %>
 

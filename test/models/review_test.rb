@@ -21,6 +21,14 @@ class ReviewTest < ActiveSupport::TestCase
     assert_equal 0, store.reviews_count
   end
 
+  test "destroying an order destroys its review" do
+    review = Review.create!(order: orders(:one), reviewer: users(:one), store: stores(:two), seller: users(:two), rating: 4)
+
+    orders(:one).destroy
+
+    assert_nil Review.find_by(id: review.id)
+  end
+
   test "one review per order" do
     Review.create!(order: orders(:one), reviewer: users(:one), store: stores(:two), rating: 4)
     other = Review.new(order: orders(:one), reviewer: users(:one), store: stores(:two), rating: 2)

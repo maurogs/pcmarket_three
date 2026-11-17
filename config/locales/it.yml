@@ -535,6 +535,7 @@ it:
       previous_photo: Foto precedente
       next_photo: Foto successiva
       photo_thumbnail: Foto %{number}
+      photo_credit: "Foto: %{creator} · %{license} tramite %{provider}"
       published_on: Pubblicato il %{date}
       labels: Etichette
       sold_cta: Spiacenti, questo articolo è già stato venduto
