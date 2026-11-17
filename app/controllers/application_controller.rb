@@ -79,13 +79,21 @@ class ApplicationController < ActionController::Base
     # Item count for the header cart badge (one SUM query, and — unlike
     # current_cart — never creates a cart on a plain page view).
     def header_cart_count
-      if Current.user
-        CartItem.joins(:cart).where(carts: { user_id: Current.user.id }).sum(:quantity)
-      else
-        current_cart(create: false)&.total_quantity.to_i
-      end
+      @header_cart_count ||=
+        if Current.user
+          CartItem.joins(:cart).where(carts: { user_id: Current.user.id }).sum(:quantity)
+        else
+          current_cart(create: false)&.total_quantity.to_i
+        end
     end
     helper_method :header_cart_count
+
+    # Cart state that changes the rendered header (guest cart cookie
+    # presence + the badge count). Page ETags set by `fresh_when` must
+    # include it, otherwise a 304 could keep a stale cart badge alive.
+    def cart_etag_part
+      [ cookies.signed[:cart_token].present?, header_cart_count ]
+    end
 
     # Favourite state of the signed-in user: listing_id => favorite_id, one
     # pluck per request, reused by every listing card on the page — cards

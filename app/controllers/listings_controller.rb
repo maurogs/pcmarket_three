@@ -1,5 +1,10 @@
 class ListingsController < ApplicationController
   allow_unauthenticated_access
+  include BrowserCaching
+
+  # The browser-only cache header (see BrowserCaching) applies to the
+  # results index; show has its own per-listing conditional-GET policy.
+  skip_after_action :cache_privately_for_revalidation, only: :show
 
   before_action :set_listing, only: :show
 
@@ -10,14 +15,13 @@ class ListingsController < ApplicationController
 
   def show
     # Conditional GET: revalidate cheaply; status changes bump updated_at.
-    # Shared caches (CDN, proxies) may only store what is identical for everyone:
-    # an anonymous hit on a listing the public can see. Signed-in responses carry
-    # a personalised header, and owners/admins also see draft/pending/rejected
-    # listings, so everything else stays private.
-    shared_cacheable = Current.user.nil? && (@listing.approved? || @listing.sold?)
+    # The page is never public, anonymous or not (see BrowserCaching): even
+    # the anonymous HTML embeds a per-session CSRF token and the guest cart
+    # badge, so shared caches (CDN, proxies) must not store it. Browsers
+    # still get cheap body-less 304s from the ETag.
     fresh_when(etag: show_etag, last_modified: @listing.updated_at,
-               public: shared_cacheable,
-               cache_control: { max_age: 0, must_revalidate: true, private: !shared_cacheable })
+               public: false,
+               cache_control: { max_age: 0, must_revalidate: true, private: true })
     return if performed?
 
     track_view if !owner_or_admin? && !bot_request?
@@ -45,8 +49,12 @@ class ListingsController < ApplicationController
     ListingSearch.new(params, country_code: current_country_code, request: request).call
   end
 
+  # The cart part matters as much as the signed-in flag: the header badge
+  # renders from the guest cart cookie / the user's cart, so without it a
+  # 304 could keep a stale badge alive after a cart change.
   def show_etag
-    [ I18n.locale.to_s, Current.user.present?.to_s, @listing.cache_key_with_version ]
+    [ I18n.locale.to_s, Current.user.present?.to_s, cart_etag_part,
+      @listing.cache_key_with_version ]
   end
 
   def owner_or_admin?(listing = @listing)

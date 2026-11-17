@@ -12,7 +12,9 @@ module Admin
       @filter_seller = params[:seller].presence
 
       scope = pending_scope
-      @pagy, @listings = pagy(scope.order(:created_at, :id), limit: PER_PAGE)
+      @pagy, @listings = pagy(scope.order(:created_at, :id)
+                                   .includes(:user, :category, photos_attachments: :blob),
+                              limit: PER_PAGE)
     end
 
     def show

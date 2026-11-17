@@ -34,13 +34,12 @@ class StoresController < ApplicationController
                                   request: request).call
     end
 
-    # Same cache rule as ListingsController#show: the storefront only ever lists
-    # approved listings, but a signed-in visitor gets their own header, so only
-    # anonymous responses may be stored by shared caches (CDN, proxies).
-    shared_cacheable = Current.user.nil?
+    # Same cache rule as ListingsController#show: never public, anonymous or
+    # not — the storefront HTML embeds a per-session CSRF token and the guest
+    # cart badge, so only the browser may store it and only with revalidation.
     fresh_when(etag: store_etag, last_modified: @store.updated_at,
-               public: shared_cacheable,
-               cache_control: { max_age: 0, must_revalidate: true, private: !shared_cacheable })
+               public: false,
+               cache_control: { max_age: 0, must_revalidate: true, private: true })
   end
 
   private
@@ -53,7 +52,8 @@ class StoresController < ApplicationController
   def store_etag
     [
       I18n.locale, @tab, @store.cache_key_with_version,
-      @store.listings_count, @store.reviews_count, params[:page], params[:tab]
+      @store.listings_count, @store.reviews_count, params[:page], params[:tab],
+      cart_etag_part # header badge state: a 304 must not keep a stale cart count
     ]
   end
 end

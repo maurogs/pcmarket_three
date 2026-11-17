@@ -35,7 +35,12 @@ JSON-LD, dynamic robots.txt, sitemaps, localized error pages) and Phase 8b
 the **JSON API v1** — a bearer-token REST surface at `/api/v1` mirroring the
 whole web app (catalog, engagement, chat/offers, cart/checkout/orders, sell
 area) with OpenAPI 3.1 docs at `/api/v1/docs`, direct uploads, bearer-authed
-Action Cable and a push-device registry.
+Action Cable and a push-device registry. Phase 8c is **performance**: Prosopite
+N+1 scanning in tests (step B), warm-path query fixes, anonymous HTTP caching
+(`public, max-age=60, stale-while-revalidate=300`), responsive card images
+(400/800w webp srcset), and production perf config — YJIT, WEB_CONCURRENCY
+(step C), measured by `script/perf_baseline.rb` (see `tmp/perf/` before/after
+tables).
 
 ## Stack
 

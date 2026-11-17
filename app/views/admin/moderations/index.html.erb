@@ -10,7 +10,7 @@
   <label class="text-xs font-medium text-muted">
     <span><%= t(".filters.category") %></span>
     <%= select_tag :category,
-          options_for_select(Category.roots.active.ordered.flat_map { |root|
+          options_for_select(Category.roots.active.ordered.includes(:children).flat_map { |root|
             [[ root.name, root.slug, { "data-depth" => 0 } ]].concat(
               root.children.map { |child| [ "&nbsp;&nbsp;&nbsp;#{child.name}", child.slug ] })
           }, @filter_category&.slug),

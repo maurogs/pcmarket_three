@@ -77,8 +77,9 @@ class Category < ApplicationRecord
   # Memoised: validate_specs and the spec pickers call it repeatedly per instance.
   def all_spec_attributes
     @all_spec_attributes ||=
-      spec_attribute_rows
-        .then { |rows| SpecAttribute.where(id: rows.keys).includes(:spec_options).order(position: :asc, id: :asc).to_a }
+      spec_attribute_rows.each_value
+                         .sort_by { |row| [ row.spec_attribute.position, row.spec_attribute.id ] }
+                         .map(&:spec_attribute)
   end
 
   # Batched #all_spec_attributes for an already-loaded set of categories:
@@ -155,13 +156,15 @@ class Category < ApplicationRecord
   end
 
   # Join rows for every spec attribute attached to this category or an
-  # ancestor; own-category attachments override inherited ones.
+  # ancestor; own-category attachments override inherited ones. The ORDER BY
+  # references spec_attributes, so includes is promoted to a single eager-load
+  # JOIN; the options ride in one extra preload.
   def spec_attribute_rows
     @spec_attribute_rows ||= begin
       rows = CategorySpecAttribute
         .where(category_id: self_and_ancestor_ids)
-        .left_joins(:spec_attribute)
-        .preload(:spec_attribute)
+        .eager_load(:spec_attribute)
+        .preload(spec_attribute: :spec_options)
         .order("spec_attributes.position ASC, category_spec_attributes.category_id ASC")
       unique_by_spec = {}
       rows.each do |row|

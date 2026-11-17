@@ -53,7 +53,7 @@ class ListingSearch
     end
   end
 
-  def initialize(params, country_code: "ES", request: nil, limit: PER_PAGE, only_id: nil)
+  def initialize(params, country_code: "ES", request: nil, limit: PER_PAGE, only_id: nil, category: nil)
     @params = (params.respond_to?(:to_unsafe_h) ? params.to_unsafe_h : params).with_indifferent_access
     @country_code = country_code
     @request = request
@@ -61,6 +61,10 @@ class ListingSearch
     # Internal hook (saved-search matching): restrict the scope to one listing
     # so we can ask "does THIS listing satisfy these criteria?" for free.
     @only_id = only_id
+    # Controllers that already resolved the category pass it in: one shared
+    # instance means the view and the search see the same preloaded
+    # associations (e.g. loaded children).
+    @category = category
   end
 
   def call
@@ -68,9 +72,12 @@ class ListingSearch
     total = scope.count
     pagy = build_pagy(total)
     facets = facet_counts(scope)
+    # Load the records here so Result#empty? (views) never fires an extra
+    # EXISTS query on an unloaded relation.
+    records = pagy.records(with_card_includes(apply_sort(scope))).load
 
     Result.new(
-      records: pagy.records(with_card_includes(apply_sort(scope))),
+      records: records,
       pagy: pagy,
       total_count: total,
       facets: facets,
@@ -205,9 +212,9 @@ class ListingSearch
   end
 
   # Eager loading for the listing cards (kills the N+1 on store/user/photos).
+  # Same explicit preload chain as Listing.with_card_data — see its comment.
   def with_card_includes(scope)
-    scope.with_attached_photos
-         .includes(:store, :user, :category, :labels, photos_attachments: :blob)
+    scope.includes(:store, :user, :category, :labels, photos_attachments: { blob: :variant_records })
   end
 
   # --- facets ----------------------------------------------------------------

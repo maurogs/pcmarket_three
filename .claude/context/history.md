@@ -1812,3 +1812,95 @@ app/services/admin/{dashboard_stats,settings}.rb; app/services/listings/csv_expo
 app/services/pc_finder/search.rb; app/controllers/{pc_finders,sell/listings}_controller.rb;
 app/controllers/admin/{users,listings,seller_tags,spec_attributes,bulk_options}_controller.rb;
 app/views/{admin/seller_tags/index.html.erb,api/v1/sell/listings/index.json.jbuilder}.
+
+## 2026-11-17 — Phase 8c step C: warm-path query fixes, public HTTP caching, responsive cards, prod perf config
+
+**What changed**
+
+- Admin moderation queue (was 75q/request): `pending_scope` now
+  `.includes(:user, :category, photos_attachments: :blob)`; the status-filter
+  select reuses one `Category.roots.active.ordered.includes(:children)` load
+  (was 3+ queries per option). Warm: 15q, under the ≤20 budget.
+- Category/browse pages (was 35-44q): `ListingSearch` accepts `category:` and
+  reuses the controller's preloaded `@category` (+`.children.load`);
+  breadcrumb skips the already-loaded category id; `spec_option_names`
+  switched to a single JOIN+pluck; `with_card_data`/`with_card_includes`
+  preload `photos_attachments → blob → variant_records` explicitly (kills
+  per-image variant SELECTs on first render; also drops the preview_image
+  attachment load); `pagy.records(...).load` removes the Result#empty? EXISTS;
+  mega/mobile menu fragments load the category tree INSIDE the cached fragment
+  (cache hits pay zero). Warm category: 26q (≤25 budget missed by 1; remainder
+  is flipper + cache-bust MAXes + footer/dictionary, not per-card).
+- API listings index: ETag freshness probe no longer carries the card
+  includes (was an INNER-JOIN tree over photos/blobs/variant records).
+  `@result.records.except(:includes, :preload, :eager_load).reorder(nil).pick(MAX(updated_at))`.
+  Warm SQL 29.2ms → 18.9ms; 18q → 16q. EXPLAIN (ANALYZE, BUFFERS) before/after
+  in tmp/perf/explain_listings_before.txt — page query, COUNT and facet CTE all
+  use `index_listings_on_category_id_and_status` bitmap scans; only seq scans
+  are the 59/52-row label/tag lookup tables (intentionally unindexed). No new
+  index. Wall time stayed >40ms in the dev harness (no YJIT, dev middleware).
+- New `PublicCaching` concern (app/controllers/concerns/public_caching.rb):
+  anonymous 200 HTML gets `public, max-age=60, stale-while-revalidate=300`;
+  signed-in responses stay private. Included on CategoriesController,
+  ListingsController#index (show keeps its ETag-only headers) and
+  PcFinderResultsController. Integration tests assert both sides.
+  *(Superseded same day by step D below — public caching was unsafe.)*
+- Card images responsive: `Listing::PHOTO_VARIANTS` = card 400 webp,
+  card_2x 800 webp (both `preprocessed: true`), gallery 1200 webp;
+  `photo_variant_tag` emits srcset 1x/2x + `sizes` (1024/640 breakpoints).
+  Also fixed `variant_url` (it returned the Variant proxy — the listing-show
+  preload `<link>` contained `#<ActiveStorage::VariantWithRecord…>` instead of
+  a URL).
+- Prod perf: `config/initializers/yjit.rb` (no-op here — local Ruby 4.0.9 is
+  a non-YJIT build; deploy image needs a YJIT-enabled Ruby); puma.rb already
+  honours WEB_CONCURRENCY, RAILS_MAX_THREADS read from env; production.rb
+  already had log_level :info + solid_cache_store — verified, unchanged.
+- ListingsControllerTest query budgets re-based to warm: 3×browse ≤26
+  (+1 is the variant_records preload), 3×search-with-photos ≤6 (was 3; the
+  old budget held only because Variant caches were never preloaded).
+
+**Why**: reviewer step C — warm-SQL hotspots + anonymous HTTP caching +
+responsive images + production perf configuration, verified with
+script/perf_baseline.rb before/after (tmp/perf/baseline_20261117_090640.txt
+vs tmp/perf/after_20261117_095228.txt).
+
+**Files touched**: app/controllers/concerns/public_caching.rb (new);
+app/controllers/{categories,listings,pc_finder_results,api/v1/listings,admin/moderations}_controller.rb;
+app/services/listing_search.rb; app/models/listing.rb;
+app/helpers/{listings_helper,api/v1/serialization_helper}.rb;
+app/views/{listings/show,layouts/_header,admin/moderations/index}.html.erb;
+app/views/api/v1/listings/*.jbuilder; config/initializers/yjit.rb (new);
+test/controllers/{categories_controller_test,listings_controller_test}.rb;
+test/integration/pc_finder_test.rb.
+
+## 2026-11-17 — Phase 8c step D: HTTP cache correctness fix (browser-only HTML caching)
+
+**What changed**
+
+- Correctness bug in step C's `PublicCaching`: HTML pages are NOT identical
+  for every anonymous visitor. Every page embeds `csrf_meta_tags` (a token
+  cached by a CDN and replayed to another visitor breaks their POSTs, e.g.
+  the footer newsletter form) and the guest cart badge (`header_cart_count`,
+  from the signed `cart_token` cookie). Public/shared-cache storage is unsafe.
+- Concern replaced: `public_caching.rb` → `browser_caching.rb`
+  (`BrowserCaching#cache_privately_for_revalidation`): 200 responses get
+  `Cache-Control: private, max-age=0, must-revalidate` — never `public`.
+  Included on Categories, Listings#index (show keeps its own `fresh_when`
+  policy) and PcFinderResults.
+- `ListingsController#show` / `StoresController#show`: `fresh_when` now
+  always `public: false` + `private, max-age=0, must-revalidate` (dropped the
+  `shared_cacheable` branch); ETag revalidation kept. Their ETags additionally
+  include `cart_etag_part` (guest `cart_token` cookie presence +
+  `header_cart_count`) so a 304 can never return a stale cart badge;
+  `header_cart_count` memoized to keep it one query per request.
+- JSON API unchanged: `/api/v1` `fresh_when` calls never pass `public:`, so
+  catalogue endpoints stay `private` (verified they carry no per-user data,
+  but the header is correct regardless).
+- Tests: the four cache tests now assert `private` / no `public` /
+  `max-age=0, must-revalidate` for anonymous AND signed-in; new test asserts
+  anonymous listing GET → add guest-cart item → re-GET with the old ETag is
+  a 200, not a 304.
+
+**Why**: reviewer step D — CDN-cached HTML would leak CSRF tokens and cart
+badges across visitors. A CDN may only cache static assets, Active Storage
+variants and `/sitemaps`.

@@ -25,11 +25,12 @@ class StoresControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "anonymous store page is cacheable by shared caches" do
+  test "anonymous store page is browser-cached only, never shared" do
     get "/en/stores/one-store"
     assert_response :success
-    assert_match(/\bpublic\b/, response.headers["Cache-Control"])
-    assert_no_match(/\bprivate\b/, response.headers["Cache-Control"])
+    assert_match(/\bprivate\b/, response.headers["Cache-Control"])
+    assert_no_match(/\bpublic\b/, response.headers["Cache-Control"])
+    assert_match(/must-revalidate\b/, response.headers["Cache-Control"])
   end
 
   test "store page for a signed-in owner stays private" do

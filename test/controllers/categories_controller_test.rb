@@ -26,4 +26,24 @@ class CategoriesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match(/<html lang="es"/, response.body)
   end
+
+  test "anonymous category page is browser-cached only, never shared" do
+    get "/en/c/graphics-cards"
+    assert_response :success
+    cache_control = response.headers["Cache-Control"]
+    assert_match(/\bprivate\b/, cache_control)
+    assert_no_match(/\bpublic\b/, cache_control)
+    assert_match(/max-age=0\b/, cache_control)
+    assert_match(/must-revalidate\b/, cache_control)
+  end
+
+  test "signed-in category page stays private" do
+    sign_in_as users(:one)
+    get "/en/c/graphics-cards"
+    assert_response :success
+    cache_control = response.headers["Cache-Control"]
+    assert_match(/\bprivate\b/, cache_control)
+    assert_no_match(/\bpublic\b/, cache_control)
+    assert_no_match(/max-age=60\b/, cache_control)
+  end
 end

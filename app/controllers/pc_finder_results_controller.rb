@@ -1,5 +1,6 @@
 class PcFinderResultsController < ApplicationController
   allow_unauthenticated_access
+  include BrowserCaching
 
   def index
     @search = PcFinder::Search.new(finder_params, country_code: current_country_code, request: request)

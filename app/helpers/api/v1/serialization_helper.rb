@@ -38,8 +38,8 @@ module Api
         return nil unless attachment.persisted? && attachment.blob&.persisted?
 
         {
-          card: polymorphic_url(attachment.variant(**Listing::PHOTO_VARIANTS.fetch(:card))),
-          full: polymorphic_url(attachment.variant(**Listing::PHOTO_VARIANTS.fetch(:gallery)))
+          card: polymorphic_url(attachment.variant(:card)),
+          full: polymorphic_url(attachment.variant(:gallery))
         }
       end
 

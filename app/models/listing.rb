@@ -14,9 +14,12 @@ class Listing < ApplicationRecord
   RESERVATION_TTL = 48.hours
 
   # Named variants for rendered photos: small WebP for cards/carousels,
-  # wide WebP for the show-page gallery.
+  # wide WebP for the show-page gallery. card_2x powers the cards' srcset
+  # (400w + 800w); card/card_2x are preprocessed (generated on upload) so
+  # the first card render never pays for a transform.
   PHOTO_VARIANTS = {
     card: { format: :webp, resize_to_limit: [ 400, 400 ] }.freeze,
+    card_2x: { format: :webp, resize_to_limit: [ 800, 800 ] }.freeze,
     gallery: { format: :webp, resize_to_limit: [ 1200, 1200 ] }.freeze
   }.freeze
 
@@ -53,7 +56,11 @@ class Listing < ApplicationRecord
   has_many :seller_tags, through: :listing_tags
   has_many :order_items, dependent: :nullify
 
-  has_many_attached :photos
+  has_many_attached :photos do |attachable|
+    Listing::PHOTO_VARIANTS.each do |name, transformations|
+      attachable.variant name, **transformations, preprocessed: %i[card card_2x].include?(name)
+    end
+  end
 
   # Only these category trees get a performance_score (they carry gpu/cpu
   # spec fields and are what the PC Finder queries).
@@ -137,9 +144,11 @@ class Listing < ApplicationRecord
 
   # Everything a card needs in one round trip: photo attachments plus the
   # store/user/labels/category rendered on the card. Use on every relation that
-  # renders cards.
+  # renders cards. Explicit preload chain (instead of with_attached_photos) so
+  # the blob's preview_image attachments are not dragged in too — cards only
+  # ever read the card variants, whose VariantRecords come preloaded here.
   scope :with_card_data, -> {
-    with_attached_photos.includes(:store, :user, :labels, :category, :seller_tags, photos_attachments: :blob)
+    includes(:store, :user, :labels, :category, :seller_tags, photos_attachments: { blob: :variant_records })
   }
 
   # Listings favorited within the window, most saved first.

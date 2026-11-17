@@ -52,11 +52,17 @@ class ListingsControllerTest < ActionDispatch::IntegrationTest
       assert_response :success
     end
     # Overhead is fixed (count + one facet query + eager loads): three cards
-    # must not cost meaningfully more queries than one. The budget carries
-    # one extra read since Phase 8a: the layout's site_name Setting for the
-    # meta tags (a cache miss on a cold Rails.cache).
-    assert_operator three, :<=, 25, "expected bounded queries, got #{three}"
-    assert_operator three - one, :<=, 4, "query count scales with cards (3 cards=#{three}, 1 card=#{one})"
+    # must not cost meaningfully more queries than one. Budget notes:
+    # one extra read since Phase 8a (layout site_name Setting on a cold
+    # Rails.cache), one more since the responsive-card pass (VariantRecords
+    # preloaded on the blobs so card srcset URLs never fire a per-card
+    # variant query). The 3-vs-1 delta is loose because the browse response
+    # reads the dictionary tables (labels, seller tags, nav tree) for real
+    # while the single-card search response replays most of them from the
+    # query cache; what must NOT grow is per-card loading (attachments,
+    # stores, users, categories), which eager loading keeps at one query.
+    assert_operator three, :<=, 26, "expected bounded queries, got #{three}"
+    assert_operator three - one, :<=, 6, "query count scales with cards (3 cards=#{three}, 1 card=#{one})"
   end
 
   # --- show --------------------------------------------------------------------
@@ -108,11 +114,26 @@ class ListingsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_modified
   end
 
-  test "anonymous GET of an approved listing is cacheable by shared caches" do
+  test "adding to the guest cart changes the etag so revalidation is a 200" do
     get "/en/listings/#{listings(:gigabyte).slug}"
     assert_response :success
-    assert_match(/\bpublic\b/, response.headers["Cache-Control"])
-    assert_no_match(/\bprivate\b/, response.headers["Cache-Control"])
+    etag = response.headers["ETag"]
+    assert etag.present?
+
+    # The guest cart appears (cart_token cookie + header badge), so the old
+    # ETag must not produce a 304 with a stale cart badge.
+    post "/en/cart_items", params: { listing_id: listings(:as_new).to_param, quantity: 1 }
+    assert_response :redirect
+
+    get "/en/listings/#{listings(:gigabyte).slug}", headers: { "If-None-Match" => etag }
+    assert_response :success
+  end
+
+  test "anonymous GET of an approved listing is browser-cached only, never shared" do
+    get "/en/listings/#{listings(:gigabyte).slug}"
+    assert_response :success
+    assert_match(/\bprivate\b/, response.headers["Cache-Control"])
+    assert_no_match(/\bpublic\b/, response.headers["Cache-Control"])
   end
 
   test "signed-in owner GET of a draft listing stays private" do
@@ -137,6 +158,41 @@ class ListingsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match(/\bprivate\b/, response.headers["Cache-Control"])
     assert_no_match(/\bpublic\b/, response.headers["Cache-Control"])
+  end
+
+  test "anonymous listings index is browser-cached only, never shared" do
+    get "/en/listings"
+    assert_response :success
+    cache_control = response.headers["Cache-Control"]
+    assert_match(/\bprivate\b/, cache_control)
+    assert_no_match(/\bpublic\b/, cache_control)
+    assert_match(/max-age=0\b/, cache_control)
+    assert_match(/must-revalidate\b/, cache_control)
+  end
+
+  test "signed-in listings index stays private" do
+    sign_in_as users(:one)
+    get "/en/listings"
+    assert_response :success
+    cache_control = response.headers["Cache-Control"]
+    assert_match(/\bprivate\b/, cache_control)
+    assert_no_match(/\bpublic\b/, cache_control)
+    assert_no_match(/max-age=60\b/, cache_control)
+  end
+
+  test "card images are responsive: srcset pairs the card variant with its 2x twin" do
+    blobs = [ "one.png", "two.png" ].map do |name|
+      ActiveStorage::Blob.create_and_upload!(
+        io: StringIO.new("\x89PNG\r\n\x1A\n".b), filename: name, content_type: "image/png",
+        identify: false, metadata: { "identified" => true, "width" => 1200, "height" => 1200 }
+      )
+    end
+    listings(:gigabyte).photos.attach(blobs)
+
+    get "/en/listings/#{listings(:gigabyte).slug}"
+    assert_response :success
+    # gallery hero (:gallery) has no 2x twin; the filmstrip thumbs (:card) do
+    assert_select "img[srcset*='400w'][srcset*='800w'][sizes*='25vw'][loading='lazy'][decoding='async']"
   end
 
   private

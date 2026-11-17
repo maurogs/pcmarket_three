@@ -30,9 +30,15 @@ module Api
         # personalisation), so anyone's If-None-Match can hit 304. Strong
         # validators on purpose: Rack only ever echoes a strong ETag back to the
         # client, so a weak one could never match the If-None-Match it returns.
+        # The MAX is taken over the PLAIN relation: #maximum on the card
+        # relation would promote the includes into eager-load JOINs (one query
+        # per preloaded association) for a value a single aggregate provides.
+        # reorder(nil): the results' ORDER BY would otherwise leak into the
+        # aggregate query and Postgres would reject the non-grouped column.
+        max_updated_at = @result.records.except(:includes, :preload, :eager_load)
+                                         .reorder(nil).pick(Arel.sql("MAX(updated_at)"))
         fresh_when strong_etag: [ I18n.locale, api_country_code, request.fullpath,
-                                  @result.pagy.count,
-                                  @result.records.maximum(:updated_at) ]
+                                  @result.pagy.count, max_updated_at ]
       end
 
       def show

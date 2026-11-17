@@ -183,7 +183,8 @@ module ListingsHelper
   # Breadcrumb chain for a category, root first (categories are 3 levels deep).
   def breadcrumb_categories(category)
     ids = category.self_and_ancestor_ids
-    by_id = Category.where(id: ids).index_by(&:id)
+    by_id = Category.where(id: ids - [ category.id ]).index_by(&:id)
+    by_id[category.id] = category
     depth = ->(node) do
       steps = 0
       while (node = node.parent_id && by_id[node.parent_id])
@@ -205,14 +206,14 @@ module ListingsHelper
 
   # --- card / gallery photo tags (lazy-loaded, explicit dimensions) ----------
 
+  # Responsive srcset for card-sized variants; sizes mirrors the results grid
+  # (4 columns >=1024px, 3 >=640px, 2 columns below).
+  CARD_IMAGE_SIZES = "(min-width:1024px) 25vw, (min-width:640px) 33vw, 50vw".freeze
+
   def listing_photo_tag(listing, variant: :card, alt: listing.title)
     photo = listing.photos.first
     if photo
-      size = photo_dimensions(variant)
-      image_tag(variant_url(photo, variant),
-                alt: alt, loading: "lazy", decoding: "async",
-                width: size[0], height: size[1],
-                class: "size-full object-cover")
+      photo_variant_tag(photo, variant: variant, alt: alt, class: "size-full object-cover")
     else
       photo_placeholder_tag(alt)
     end
@@ -220,12 +221,27 @@ module ListingsHelper
 
   # Extra HTML options (e.g. `class:`) are merged into the image tag, so
   # callers can restyle the thumbnail instead of relying on the gallery default.
+  # When the variant has a `<name>_2x` twin (card/card_2x) the tag carries a
+  # srcset + sizes so small screens never download the 800px image.
   def photo_variant_tag(photo, variant: :gallery, alt: nil, sizes: nil, **html_options)
     size = photo_dimensions(variant)
-    image_tag(variant_url(photo, variant),
-              **{ alt: alt || photo.filename.to_s, loading: "lazy", decoding: "async",
-                  width: size[0], height: size[1], class: "size-full object-contain" }
-                .merge(html_options))
+    attrs = { alt: alt || photo.filename.to_s, loading: "lazy", decoding: "async",
+              width: size[0], height: size[1], class: "size-full object-contain" }
+    if (srcset = photo_srcset(photo, variant))
+      attrs[:srcset] = srcset
+      attrs[:sizes] = sizes || CARD_IMAGE_SIZES
+    end
+    image_tag(variant_url(photo, variant), **attrs.merge(html_options))
+  end
+
+  # "url 400w, url2x 800w" built from the named variant's declared width;
+  # nil when the variant has no 2x twin (gallery).
+  def photo_srcset(photo, variant)
+    second = :"#{variant}_2x"
+    return nil unless Listing::PHOTO_VARIANTS.key?(second)
+
+    "#{variant_url(photo, variant)} #{photo_dimensions(variant)[0]}w, " \
+      "#{variant_url(photo, second)} #{photo_dimensions(second)[0]}w"
   end
 
   # "Photo: <creator> · <license> via <provider>" credit line for demo
@@ -315,8 +331,11 @@ module ListingsHelper
     url_for(query.compact_blank)
   end
 
+  # URL string for a named variant (photo.variant(:card) etc). url_for keeps
+  # it a plain string so callers can interpolate it (preload links, srcset)
+  # as well as pass it to image_tag; nothing is processed at render time.
   def variant_url(photo, variant)
-    photo.variant(**Listing::PHOTO_VARIANTS.fetch(variant.to_sym))
+    url_for(photo.variant(variant))
   end
 
   def photo_dimensions(variant)
@@ -324,10 +343,11 @@ module ListingsHelper
   end
 
   # SpecOption names for the whole table, preloaded once per request.
+  # joins + pluck (instead of includes) so the dictionary costs ONE query.
   def spec_option_names
     @spec_option_names ||=
-      SpecOption.includes(:spec_attribute)
-                .index_by { |option| [ option.spec_attribute.key, option.value ] }
-                .transform_values(&:names)
+      SpecOption.joins(:spec_attribute)
+                .pluck("spec_attributes.key", "spec_options.value", "spec_options.names")
+                .to_h { |key, value, names| [ [ key, value ], names ] }
   end
 end

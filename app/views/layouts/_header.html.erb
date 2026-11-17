@@ -1,6 +1,6 @@
-<%# Top navigation chrome. The mega menu fragment is cached per locale for
-    one hour and busted whenever any category changes. %>
-<% nav_categories = Category.roots.active.ordered.includes(:children).index_by(&:slug) %>
+<%# Top navigation chrome. The mega menu and mobile menu fragments are cached
+    per locale for one hour and busted whenever any category changes; the
+    category tree is loaded INSIDE the fragments, so cache hits pay nothing. %>
 <div class="border-b border-border bg-surface" data-controller="menu theme">
   <div class="bg-accent px-4 py-1.5 text-center text-sm font-medium text-white">
     <%= t("layouts.announcement") %>
@@ -110,6 +110,10 @@
   <%# Desktop mega menu bar %>
   <div class="hidden border-t border-border md:block">
     <%= cache ["mega_menu", I18n.locale, menu_bust], expires_in: 1.hour do %>
+      <%# ivar-memoised: on cache misses both fragments share ONE load of the
+          tree; on hits neither pays a query. %>
+      <% nav_categories = @nav_categories ||=
+            Category.roots.active.ordered.includes(:children).index_by(&:slug) %>
       <nav class="relative mx-auto max-w-6xl px-4" data-controller="mega-menu"
            data-action="mouseleave->mega-menu#closeAll focusout->mega-menu#focusout keydown.esc->mega-menu#keydown"
            aria-label="<%= t("nav.categories") %>">
@@ -204,6 +208,8 @@
       <%= link_to t("nav.new"), listings_path(sort: "newest"), class: "flex min-h-11 items-center rounded-md px-3 py-2.5 font-medium hover:bg-surface-muted" %>
       <hr class="my-2 border-border">
       <%= cache ["mobile_menu", I18n.locale, menu_bust], expires_in: 1.hour do %>
+        <% nav_categories = @nav_categories ||=
+              Category.roots.active.ordered.includes(:children).index_by(&:slug) %>
         <% nav_categories.values.each do |root| %>
           <% if root.children.any? %>
             <details>

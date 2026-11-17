@@ -57,3 +57,48 @@ bin/rails test          # Minitest; webmock blocks real HTTP in tests
 bin/rubocop
 ruby script/lint_locale_keys.rb
 ```
+
+## Performance
+
+**Caching layers**
+
+- **Fragment cache** — the heavy partials (listing cards, header mega menu,
+  footer, category nav) are Rails fragments keyed on locale + record
+  `updated_at` busting, stored in **Solid Cache** (`cache/production` database)
+  in production; `Rails.cache.clear` on category changes.
+- **HTTP caching is browser-only for HTML** — `BrowserCaching`
+  (`app/controllers/concerns/browser_caching.rb`) sends
+  `Cache-Control: private, max-age=0, must-revalidate` on 200 responses for
+  the catalog pages (category, listings index, PC-finder results), and the
+  listing/store conditional-GET headers pass `public: false`. HTML pages are
+  never `public` because even anonymous pages embed per-session data — the
+  CSRF meta token and the guest cart badge — so a CDN or shared cache must
+  not store them; a CDN should only cache static assets, Active Storage
+  variants and `/sitemaps`.
+- **Conditional GET** — listing and store pages emit an `ETag` derived from
+  `updated_at` (plus locale, signed-in flag and guest-cart state, so a 304
+  can never return a stale cart badge); repeat visitors get a 304 with no
+  body. The JSON API sends ETags on collection endpoints too.
+- **Preprocessed Active Storage variants** — card images (400w/800w WebP) are
+  generated at upload time (`preprocessed: true`) and their URLs are cached;
+  the `<img>` tags ship `srcset` + `sizes` so phones download the 400px file.
+
+**Measuring & N+1 detection**
+
+- `bin/rails runner script/perf_baseline.rb <label>` fetches every key page
+  twice (cold + warm) with caching enabled and prints per-page status, wall
+  time, query count and SQL time — output lands in `tmp/perf/`.
+- **Prosopite** (`group :development, :test`) raises on any N+1 during tests,
+  so regressions fail CI rather than shipping.
+
+**Tuning for production**
+
+- `WEB_CONCURRENCY` (Puma workers) and `RAILS_MAX_THREADS` are read from the
+  environment by `config/puma.rb`; keep workers × threads in step with the
+  database's `POOL` (`.env` default `POOL=5`).
+- YJIT is enabled in production via `config/initializers/yjit.rb` — it is a
+  no-op unless the Ruby build has YJIT, so build the deploy image with
+  `--enable-yjit`.
+- Point a CDN in front of the app for the anonymous catalog pages; the
+  `stale-while-revalidate=300` window means stale copies are served while the
+  origin refreshes, which hides origin latency spikes.

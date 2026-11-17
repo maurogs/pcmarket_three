@@ -34,6 +34,23 @@ class PcFinderTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "results page is browser-cached only, anonymous and signed-in" do
+    get pc_finder_results_path
+    assert_response :success
+    cache_control = response.headers["Cache-Control"]
+    assert_match(/\bprivate\b/, cache_control)
+    assert_no_match(/\bpublic\b/, cache_control)
+    assert_match(/max-age=0\b/, cache_control)
+    assert_match(/must-revalidate\b/, cache_control)
+
+    sign_in_as users(:one)
+    get pc_finder_results_path
+    assert_response :success
+    assert_match(/\bprivate\b/, response.headers["Cache-Control"])
+    assert_no_match(/\bpublic\b/, response.headers["Cache-Control"])
+    assert_no_match(/max-age=60\b/, response.headers["Cache-Control"])
+  end
+
   test "results honour the quiz answers and badge the best match" do
     get pc_finder_results_path(game: "fortnite", resolution: "1080p", fps: "144")
     assert_response :success
