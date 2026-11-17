@@ -38,6 +38,7 @@ en:
         legal_pages: Legal pages
         newsletter: Newsletter
         audit_logs: Audit log
+        trade_ins: Trade-ins
   nav:
     search_placeholder: Search graphics cards, processors, laptops…
     search_submit: Search
@@ -57,10 +58,10 @@ en:
     new: New
     more: More
     all_categories: See all %{name}
-    promo_finder_title: Find the part you need
-    promo_finder_text: Search thousands of listings from sellers across the country.
-    promo_sell_title: Sell your spare gear
-    promo_sell_text: List used components in a couple of minutes.
+    promo_finder_title: PC Finder
+    promo_finder_text: Answer five questions, meet the PCs that run your games.
+    promo_sell_title: Sell to us
+    promo_sell_text: A guaranteed offer for your old graphics card or processor.
     my_store: My store
     my_store_dashboard: Dashboard
     my_store_listings: My listings
@@ -73,6 +74,7 @@ en:
     saved_searches: Saved searches
     addresses: Addresses
     account_settings: Account settings
+    pc_finder: PC Finder
   footer:
     newsletter_title: Subscribe to our newsletter
     newsletter_placeholder: Your email address
@@ -142,6 +144,13 @@ en:
         support:
           title: Friendly support
           text: A team of PC enthusiasts replies in under 24 hours.
+      finder:
+        title: Find your next gaming PC
+        cta: Take the quiz
+        vibe_title: Shop by vibe
+        under_budget_title: Gaming PCs under 1.000 €
+        under_budget_more: See all gaming PCs under 1.000 €
+        best_for_title: Best PCs for popular games
   sessions:
     new:
       title: Log in
@@ -308,6 +317,9 @@ en:
       add_to_cart: Add to cart
       own_listing_cta: This is your own listing
       quantity_label: Quantity
+      performance_label: Estimated performance
+      performance_disclaimer: Estimates based on the GPU and CPU models in this listing
+        — a shopping hint, not a benchmark.
   activerecord:
     errors:
       messages:
@@ -326,7 +338,7 @@ en:
         cannot_block_self: can't be yourself
         not_purchasable: is not available for purchase
         spanish_tax_id_invalid: is not a valid Spanish tax ID (NIF/CIF/NIE)
-        missing_legal_pages: "cannot be enabled: missing legal pages: %{slugs}"
+        missing_legal_pages: 'cannot be enabled: missing legal pages: %{slugs}'
         immutable: cannot be changed after creation
         logo_content_type_invalid: must be a JPEG, PNG or WebP image
         logo_too_large: must be %{max} MB or smaller
@@ -646,6 +658,29 @@ en:
         confirmed_at: Confirmed at
         banned_at: Banned at
         ban_reason: Ban reason
+      trade_in:
+        model: Model
+        component_type: Component
+        condition: Condition
+        has_box: Original box
+        offered_cents: Offer
+        status: Status
+        user: Seller
+        expires_at: Expires at
+        created_at: Requested
+        component_type/gpu: Graphics card
+        component_type/cpu: Processor
+        condition/like_new: Like new
+        condition/good: Good
+        condition/fair: Fair
+        condition/for_parts: For parts
+        status/quoted: Quoted
+        status/accepted: Accepted
+        status/received: Received
+        status/inspected: Inspected
+        status/paid: Paid
+        status/rejected: Rejected
+        status/expired: Expired
   shared:
     error_summary:
       title:
@@ -666,6 +701,8 @@ en:
       follow: Follow store
       following: Following
       follow_login: Log in to follow stores
+    performance_bar:
+      performance: Performance
   stores:
     verified: Verified seller
     types:
@@ -1240,18 +1277,18 @@ en:
       view_sale: View sale
     status_changed:
       subject: Order %{number} updated
-      greeting: "Hi %{name}:"
+      greeting: 'Hi %{name}:'
       intro: The status of your order %{number} changed to “%{status}”.
       view_order: View order
     refund_issued:
       subject: Refund issued for order %{number}
-      greeting: "Hi %{name}:"
+      greeting: 'Hi %{name}:'
       intro: We issued a refund for order %{number}.
-      amount: "Refunded amount: %{amount}"
+      amount: 'Refunded amount: %{amount}'
       view_order: View order
     dispute_resolved:
       subject: Dispute for order %{number} resolved
-      greeting: "Hi %{name}:"
+      greeting: 'Hi %{name}:'
       intro: We resolved the dispute on order %{number}.
       view_order: View order
   orders:
@@ -1974,7 +2011,7 @@ en:
       audit_events:
         title: Admin activity
         by: "%{admin} · %{time}"
-        deleted_admin: (deleted admin)
+        deleted_admin: "(deleted admin)"
         empty: No activity yet
       translation_tabs: Translations
       seller_card:
@@ -2036,7 +2073,8 @@ en:
         conversation: View conversation
         resolve: Resolve dispute
         transition_title: Manual status change
-        transition_hint: Overrides the normal flow; buyer and seller are notified. A reason is required.
+        transition_hint: Overrides the normal flow; buyer and seller are notified.
+          A reason is required.
         transition_pick: New status
         transition_reason_placeholder: Reason for the change…
         transition_submit: Apply change
@@ -2048,7 +2086,7 @@ en:
         note_by: "%{admin}, %{time}"
         note_delete: Delete
         note_confirm: Delete this note?
-        deleted_admin: (deleted admin)
+        deleted_admin: "(deleted admin)"
       update:
         updated: Order %{number} updated
         errors:
@@ -2095,7 +2133,7 @@ en:
         conversation: Order conversation
         open_order: View the order
         resolve: Resolve the dispute
-        refunded: "Refunded amount: %{amount}"
+        refunded: 'Refunded amount: %{amount}'
     resolutions:
       new:
         title: Resolve dispute
@@ -2103,16 +2141,17 @@ en:
         order_title: Order %{number}
         buyer: Buyer
         seller: Seller
-        total: "Paid total: %{amount}"
-        payment_provider: "Provider: %{provider}"
+        total: 'Paid total: %{amount}'
+        payment_provider: 'Provider: %{provider}'
         payment_direct: Direct payment (no provider)
         form_title: Decision
         action_legend: Outcome
         action_refund: Refund the buyer
         action_refund_hint: Full or partial. Stripe payments are actually refunded.
         action_release: Side with the seller
-        action_release_hint: Closes the dispute by completing the order; the seller keeps the money.
-        provider_hint: "No payment reference: the refund will be recorded manually."
+        action_release_hint: Closes the dispute by completing the order; the seller
+          keeps the money.
+        provider_hint: 'No payment reference: the refund will be recorded manually.'
         amount_label: Refund amount (cents, blank = full)
         amount_hint: Maximum %{amount}
         confirm: Resolve the dispute now?
@@ -2142,7 +2181,7 @@ en:
           reviewer: Reviewer
           store: Store
           order: Order
-          rating: ★
+          rating: "★"
           created: Date
           actions: Actions
         hidden_chip: Hidden
@@ -2156,7 +2195,7 @@ en:
         title: Audit log
         subtitle: Every admin action is recorded
         empty: No events
-        deleted_admin: (deleted admin)
+        deleted_admin: "(deleted admin)"
         filters:
           admin: Admin
           all_admins: All
@@ -2176,7 +2215,7 @@ en:
           details: Details
     positions:
       create:
-        moved: “%{name}” moved
+        moved: "“%{name}” moved"
         boundary: It's already at the edge of its level
     categories:
       index:
@@ -2236,8 +2275,8 @@ en:
         subtitle: Global specification glossary reusable per category
         empty: No attributes yet
         new: New attribute
-        yes_chip: "Yes"
-        no_chip: "No"
+        yes_chip: 'Yes'
+        no_chip: 'No'
         columns:
           name: Name
           key: Key
@@ -2267,7 +2306,10 @@ en:
         add_value_placeholder: value (e.g. 12 GB)
         bulk_title: Bulk add
         bulk_hint: One value per line; existing ones are skipped
-        bulk_placeholder: "8 GB\n16 GB\n32 GB"
+        bulk_placeholder: |-
+          8 GB
+          16 GB
+          32 GB
         bulk_submit: Add list
         merge: Merge into…
         merge_pick: Value to replace…
@@ -2294,13 +2336,13 @@ en:
         updated: Value “%{value}” updated
       destroy:
         destroyed: Value “%{value}” deleted
-        in_use: “%{value}” is used by %{count} listings; remove it first
+        in_use: "“%{value}” is used by %{count} listings; remove it first"
     bulk_options:
       create:
         done: "%{created} values added, %{skipped} already existed"
     spec_option_merges:
       create:
-        merged: “%{source}” merged into “%{target}” (%{count} listings)
+        merged: "“%{source}” merged into “%{target}” (%{count} listings)"
         invalid_target: Choose a different target value
     labels:
       index:
@@ -2387,7 +2429,7 @@ en:
         checklist_title: Launch checklist
         checklist:
           legal_pages_ok: Legal pages published
-          legal_pages_missing: "Missing legal pages: %{slugs}"
+          legal_pages_missing: 'Missing legal pages: %{slugs}'
           categories_ok: Active categories exist
           categories_missing: Create at least one active category
           support_email_ok: Support email configured
@@ -2401,9 +2443,9 @@ en:
       index:
         title: Feature flags
         subtitle: Enable features per market or percentage of users
-        on_chip: "On"
-        off_chip: "Off"
-        rollout: "Rollout: %{percent}%"
+        on_chip: 'On'
+        off_chip: 'Off'
+        rollout: 'Rollout: %{percent}%'
         percentage: Percentage of users
         rollout_set: Set
         turn_on: Turn on
@@ -2420,10 +2462,11 @@ en:
         google_login:
           description: Sign in with a Google account
       warnings:
-        missing_stripe_env: "STRIPE_SECRET_KEY / STRIPE_WEBHOOK_SECRET are missing: payments will fail"
-        commission_percent_zero: "commission_percent is 0: no commission will be charged"
+        missing_stripe_env: 'STRIPE_SECRET_KEY / STRIPE_WEBHOOK_SECRET are missing:
+          payments will fail'
+        commission_percent_zero: 'commission_percent is 0: no commission will be charged'
       update:
-        updated: "Feature “%{key}”: %{outcome}"
+        updated: 'Feature “%{key}”: %{outcome}'
     settings:
       edit:
         title: Site settings
@@ -2434,7 +2477,8 @@ en:
         group_social: Social links
         group_meta: SEO
         maintenance_mode: Maintenance mode
-        maintenance_hint: While on, the public site shows a 503 notice; admins can still browse
+        maintenance_hint: While on, the public site shows a 503 notice; admins can
+          still browse
         commission_hint: Percentage charged to each seller (0-20)
         min_offer_hint: Minimum percentage of the price to accept an offer
         announcement_enabled: Show the announcement
@@ -2488,7 +2532,7 @@ en:
           destroy_confirm: Delete this legal page?
       new:
         title: New legal page
-        prefilled_note: "Tip: copy an existing page to start from a translated draft"
+        prefilled_note: 'Tip: copy an existing page to start from a translated draft'
       edit:
         title: Edit “%{title}”
         copy_note: Copy created from “%{language}”
@@ -2499,7 +2543,7 @@ en:
         submit: Save
         cancel: Cancel
       show:
-        title: “%{title}” (%{country} · %{language})
+        title: "“%{title}” (%{country} · %{language})"
         back: Back to legal pages
         edit: Edit
         published_chip: Published
@@ -2534,6 +2578,30 @@ en:
           actions: Actions
       destroy:
         destroyed: "%{email} unsubscribed"
+    trade_ins:
+      index:
+        title: Trade-ins
+        subtitle:
+          one: "%{count} trade-in quote"
+          other: "%{count} trade-in quotes"
+        anonymous: Anonymous
+      update:
+        updated: Trade-in updated.
+        invalid_transition: That state change is not allowed.
+      show:
+        back: All trade-ins
+        'yes': 'Yes'
+        'no': 'No'
+        anonymous: Anonymous
+        status_title: Status
+        terminal: This trade-in is finished.
+        transitions:
+          accepted: Mark accepted
+          received: Package received
+          inspected: Inspection passed
+          paid: Payment sent
+          rejected: Reject
+          expired: Mark expired
   legal_pages:
     slugs:
       terms: Terms of service
@@ -2547,8 +2615,9 @@ en:
   application:
     maintenance:
       title: Scheduled maintenance
-      body: We're making improvements. The platform will be back shortly. Thanks for your patience.
-      contact: "Questions? Write to us at %{email}"
+      body: We're making improvements. The platform will be back shortly. Thanks for
+        your patience.
+      contact: Questions? Write to us at %{email}
   moderation_mailer:
     approved:
       subject: Your listing "%{title}" passed moderation
@@ -2561,3 +2630,178 @@ en:
       body: We reviewed "%{title}" but it does not meet our listing rules yet.
       view_listing: View listing
       edit_hint: You can edit the listing and submit it for review again.
+  pc_finders:
+    show:
+      title: PC Finder
+      subtitle: Answer five quick questions and we will match you with gaming PCs
+        that actually run the games you play.
+      steps_label: Quiz progress
+      steps:
+        games: Which games do you play?
+        resolution: Target resolution
+        fps: Target FPS
+        budget: Your budget
+        extras: Nice-to-haves
+      games_hint: Pick up to %{max} titles — we match PCs that run all of them.
+      demand:
+        light: Light
+        medium: Medium
+        heavy: Heavy
+      resolutions:
+        1080p: 1080p Full HD
+        1440p: 1440p QHD
+        2160p: 2160p 4K UHD
+      fps_targets:
+        '60': 60 FPS — smooth
+        '144': 144 FPS — competitive
+        '240': 240 FPS — esports
+      budgets:
+        under_700: Under 700 €
+        '700_1200': 700 – 1.200 €
+        '1200_2000': 1.200 – 2.000 €
+        over_2000: Over 2.000 €
+      extras_hint: Optional build traits — cooling, lighting or style. All selected
+        traits must match.
+      back: Back
+      next: Next
+      submit: Find my PC
+      best_for: Best PCs for popular games
+      no_pick: No match in this range yet.
+  pc_finder_results:
+    index:
+      title: PCs that match your quiz
+      count:
+        one: "%{count} PC matches your quiz"
+        other: "%{count} PCs match your quiz"
+      required_score: Needs at least %{score}/1000 performance
+      sorted_by_value: Sorted by performance per euro
+      applied_filters: Applied filters
+      remove_filter: Remove filter
+      clear_all: Start over
+      empty_title: No PC clears that bar
+      empty_text: Try relaxing one requirement — the links below re-run your search
+        instantly.
+      suggestions:
+        lower_fps: Lower the FPS target
+        cheaper_budget: Look under 700 €
+        raise_budget: Raise the budget
+        drop_tags: Drop the extra filters
+        fewer_games: Search with one game only
+      retake: Retake the quiz
+      load_more: Load more
+    page:
+      load_more: Load more
+    result:
+      best_match: Best match
+      estimated_fps: Estimated FPS
+      why: By our estimate it clears every selected game at %{resolution}.
+  trade_ins:
+    transition:
+      invalid: A trade-in cannot move from %{from} to %{to}.
+  trade_in_quotes:
+    new:
+      title: Sell your old GPU or CPU to us
+      subtitle: Instant quote, prepaid shipping label, payment within 48 hours of
+        inspection.
+      hero:
+        point_fast: Instant offer, no account needed to get one
+        point_checked: Every part is tested before we pay
+        point_paid: Bank transfer within 48 hours of inspection
+      form_title: Get your instant offer
+      model_label: What are you selling?
+      model_prompt: Choose a component…
+      components:
+        gpu: Graphics cards
+        cpu: Processors
+      condition_label: Condition
+      conditions:
+        like_new: Like new
+        good: Good
+        fair: Fair
+        for_parts: For parts
+      has_box: I still have the original box
+      box_note: Keeping the original box makes your offer 5% higher.
+      submit: Get my offer
+      form_note: Once you accept, the price is locked for 7 days.
+      how_title: How it works
+      how:
+        quote:
+          title: Get a quote
+          text: Pick your model and condition — the offer appears instantly and stays
+            valid for a week.
+        ship:
+          title: Ship for free
+          text: Accept the offer and we send you a prepaid courier label.
+        inspect:
+          title: We test it
+          text: Our technicians verify the part on real hardware within two working
+            days.
+        get_paid:
+          title: Get paid
+          text: The agreed amount lands on your bank account within 48 hours.
+      examples_title: Example offers
+      examples_subtitle: Working parts with original box included, per condition.
+      faq_title: Questions, answered
+      faq:
+        q1:
+          question: Which components do you buy?
+          answer: Desktop graphics cards and processors from the major generations
+            of the last seven years — everything in the dropdown above.
+        q2:
+          question: Is the online offer guaranteed?
+          answer: Yes, as long as the part matches the condition you selected when
+            our technician tests it.
+        q3:
+          question: Who pays for shipping?
+          answer: We do. Once you accept an offer we send a prepaid label; packing
+            is on you.
+        q4:
+          question: What if the part fails testing?
+          answer: We send you a revised offer or return the part for free — your choice.
+        q5:
+          question: Do I need an account?
+          answer: You can get a quote as a guest; accepting one just needs a PCMarket
+            account.
+      testimonials_title: What sellers say
+      testimonials:
+        one:
+          quote: 'An old mining GPU sat in a drawer for two years. Quote, label, money:
+            one week end to end.'
+          name: Marta, Barcelona
+        two:
+          quote: I liked that the price shown was the price paid — no surprise deductions.
+          name: Kenan, Valencia
+        three:
+          quote: They tested my CPU on camera and paid in two days. Fair deal.
+          name: Lucía, Sevilla
+      testimonials_note: Illustrative examples of typical seller feedback.
+    create:
+      errors:
+        unknown_model: Please choose a model from the list.
+        unknown_condition: Please choose a condition.
+    show:
+      breadcrumb: Trade-in breadcrumb
+      breadcrumb_sell: Sell to us
+      title: Your trade-in offer
+      subtitle: Review it below; accepting locks the price for the rest of the validity
+        window.
+      model: Component
+      component_type: Type
+      condition: Condition
+      has_box: Original box
+      'yes': 'Yes'
+      'no': 'No'
+      offer: Our offer
+      valid_until: Valid until %{date}
+      accept: Accept this offer
+      accept_note: We will email you a prepaid shipping label once you accept.
+      log_in_to_accept: Log in to accept this offer
+      expired: This offer has expired.
+      new_quote: Request a new quote
+      progress_hint: We update this page as your shipment moves through inspection
+        and payment.
+  trade_in_acceptances:
+    create:
+      accepted: Trade-in accepted — ship the part when you receive the label.
+      expired: This offer expired before you accepted it.
+      invalid: This offer can no longer be accepted.

@@ -1468,6 +1468,44 @@ ALTER SEQUENCE public.stores_id_seq OWNED BY public.stores.id;
 
 
 --
+-- Name: trade_ins; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.trade_ins (
+    id bigint NOT NULL,
+    user_id bigint,
+    component_type integer NOT NULL,
+    model character varying NOT NULL,
+    condition integer NOT NULL,
+    has_box boolean DEFAULT true NOT NULL,
+    offered_cents integer NOT NULL,
+    status integer DEFAULT 0 NOT NULL,
+    expires_at timestamp(6) without time zone NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: trade_ins_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.trade_ins_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: trade_ins_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.trade_ins_id_seq OWNED BY public.trade_ins.id;
+
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1781,6 +1819,13 @@ ALTER TABLE ONLY public.spec_options ALTER COLUMN id SET DEFAULT nextval('public
 --
 
 ALTER TABLE ONLY public.stores ALTER COLUMN id SET DEFAULT nextval('public.stores_id_seq'::regclass);
+
+
+--
+-- Name: trade_ins id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.trade_ins ALTER COLUMN id SET DEFAULT nextval('public.trade_ins_id_seq'::regclass);
 
 
 --
@@ -2116,6 +2161,14 @@ ALTER TABLE ONLY public.spec_options
 
 ALTER TABLE ONLY public.stores
     ADD CONSTRAINT stores_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: trade_ins trade_ins_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.trade_ins
+    ADD CONSTRAINT trade_ins_pkey PRIMARY KEY (id);
 
 
 --
@@ -2484,6 +2537,13 @@ CREATE INDEX index_listings_on_featured_until ON public.listings USING btree (fe
 
 
 --
+-- Name: index_listings_on_performance_score; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_listings_on_performance_score ON public.listings USING btree (performance_score) WHERE (performance_score IS NOT NULL);
+
+
+--
 -- Name: index_listings_on_price_cents; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2820,6 +2880,27 @@ CREATE UNIQUE INDEX index_stores_on_user_id ON public.stores USING btree (user_i
 
 
 --
+-- Name: index_trade_ins_on_expires_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_trade_ins_on_expires_at ON public.trade_ins USING btree (expires_at);
+
+
+--
+-- Name: index_trade_ins_on_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_trade_ins_on_status ON public.trade_ins USING btree (status);
+
+
+--
+-- Name: index_trade_ins_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_trade_ins_on_user_id ON public.trade_ins USING btree (user_id);
+
+
+--
 -- Name: index_users_on_email_address; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3022,6 +3103,14 @@ ALTER TABLE ONLY public.listings
 
 ALTER TABLE ONLY public.cart_items
     ADD CONSTRAINT fk_rails_6cdb1f0139 FOREIGN KEY (cart_id) REFERENCES public.carts(id);
+
+
+--
+-- Name: trade_ins fk_rails_7344bfd69c; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.trade_ins
+    ADD CONSTRAINT fk_rails_7344bfd69c FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --
@@ -3255,6 +3344,8 @@ ALTER TABLE ONLY public.moderation_events
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261118020002'),
+('20261118020001'),
 ('20261118015003'),
 ('20261118015002'),
 ('20261118015001'),

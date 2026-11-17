@@ -39,11 +39,12 @@ es:
         legal_pages: Páginas legales
         newsletter: Boletín
         audit_logs: Registro de actividad
+        trade_ins: Trade-ins
   nav:
     search_placeholder: Busca tarjetas gráficas, procesadores, portátiles…
     search_submit: Buscar
     list_item: Publicar un anuncio
-    sell_to_us: Véndenos tu hardware
+    sell_to_us: Véndenoslo
     wishlist: Lista de deseos
     notifications: Notificaciones
     cart: Cesta
@@ -58,10 +59,10 @@ es:
     new: Novedades
     more: Más
     all_categories: Ver todo en %{name}
-    promo_finder_title: Encuentra tu pieza
-    promo_finder_text: Miles de anuncios de vendedores de todo el país.
-    promo_sell_title: Vende tus componentes
-    promo_sell_text: Publica tus piezas de segunda mano en dos minutos.
+    promo_finder_title: Busca tu PC
+    promo_finder_text: Cinco preguntas y conoces los PCs que corren tus juegos.
+    promo_sell_title: Véndenoslo
+    promo_sell_text: Una oferta garantizada para tu gráfica o procesador viejo.
     my_store: Mi tienda
     my_store_dashboard: Panel
     my_store_listings: Mis anuncios
@@ -74,6 +75,7 @@ es:
     saved_searches: Búsquedas guardadas
     addresses: Direcciones
     account_settings: Ajustes de cuenta
+    pc_finder: Busca tu PC
   footer:
     newsletter_title: Suscríbete a nuestra newsletter
     newsletter_placeholder: Tu correo electrónico
@@ -145,6 +147,13 @@ es:
           title: Atención cercana
           text: Un equipo de entusiastas de la informática responde en menos de 24
             horas.
+      finder:
+        title: Encuentra tu próximo PC gamer
+        cta: Haz el test
+        vibe_title: Compra por estilo
+        under_budget_title: PCs gamer por menos de 1.000 €
+        under_budget_more: Ver todos los PCs gamer por menos de 1.000 €
+        best_for_title: Los mejores PCs para juegos populares
   sessions:
     new:
       title: Iniciar sesión
@@ -314,6 +323,9 @@ es:
       add_to_cart: Añadir a la cesta
       own_listing_cta: Este es tu propio anuncio
       quantity_label: Cantidad
+      performance_label: Rendimiento estimado
+      performance_disclaimer: 'Estimación basada en los modelos de GPU y CPU del anuncio:
+        una pista de compra, no un benchmark.'
   activerecord:
     errors:
       messages:
@@ -332,7 +344,7 @@ es:
         cannot_block_self: no puede ser usted mismo
         not_purchasable: no está disponible para la compra
         spanish_tax_id_invalid: no es un identificador fiscal español válido (NIF/CIF/NIE)
-        missing_legal_pages: "no se puede activar: faltan páginas legales: %{slugs}"
+        missing_legal_pages: 'no se puede activar: faltan páginas legales: %{slugs}'
         immutable: no se puede cambiar una vez creado
         logo_content_type_invalid: debe ser una imagen JPEG, PNG o WebP
         logo_too_large: debe ser de %{max} MB o menos
@@ -652,6 +664,29 @@ es:
         confirmed_at: Confirmado el
         banned_at: Sancionado el
         ban_reason: Motivo de la sanción
+      trade_in:
+        model: Modelo
+        component_type: Componente
+        condition: Estado
+        has_box: Caja original
+        offered_cents: Oferta
+        status: Estado
+        user: Vendedor
+        expires_at: Caduca
+        created_at: Solicitado
+        component_type/gpu: Tarjeta gráfica
+        component_type/cpu: Procesador
+        condition/like_new: Como nuevo
+        condition/good: Bueno
+        condition/fair: Aceptable
+        condition/for_parts: Para piezas
+        status/quoted: Presupuestado
+        status/accepted: Aceptado
+        status/received: Recibido
+        status/inspected: Inspeccionado
+        status/paid: Pagado
+        status/rejected: Rechazado
+        status/expired: Caducado
   shared:
     error_summary:
       title:
@@ -672,6 +707,8 @@ es:
       follow: Seguir tienda
       following: Siguiendo
       follow_login: Inicia sesión para seguir tiendas
+    performance_bar:
+      performance: Rendimiento
   stores:
     verified: Vendedor verificado
     types:
@@ -1254,18 +1291,18 @@ es:
       view_sale: Ver venta
     status_changed:
       subject: Actualización del pedido %{number}
-      greeting: "Hola %{name}:"
+      greeting: 'Hola %{name}:'
       intro: El estado de tu pedido %{number} ha cambiado a «%{status}».
       view_order: Ver pedido
     refund_issued:
       subject: Reembolso emitido del pedido %{number}
-      greeting: "Hola %{name}:"
+      greeting: 'Hola %{name}:'
       intro: Hemos emitido un reembolso para el pedido %{number}.
-      amount: "Importe reembolsado: %{amount}"
+      amount: 'Importe reembolsado: %{amount}'
       view_order: Ver pedido
     dispute_resolved:
       subject: Disputa del pedido %{number} resuelta
-      greeting: "Hola %{name}:"
+      greeting: 'Hola %{name}:'
       intro: Hemos resuelto la disputa del pedido %{number}.
       view_order: Ver pedido
   orders:
@@ -1988,7 +2025,7 @@ es:
       audit_events:
         title: Actividad de administración
         by: "%{admin} · %{time}"
-        deleted_admin: (admin eliminado)
+        deleted_admin: "(admin eliminado)"
         empty: Sin actividad todavía
       translation_tabs: Traducciones
       seller_card:
@@ -2050,19 +2087,20 @@ es:
         conversation: Ver conversación
         resolve: Resolver disputa
         transition_title: Cambio manual de estado
-        transition_hint: Sobrescribe el flujo normal; comprador y vendedor reciben un aviso. El motivo es obligatorio.
+        transition_hint: Sobrescribe el flujo normal; comprador y vendedor reciben
+          un aviso. El motivo es obligatorio.
         transition_pick: Nuevo estado
         transition_reason_placeholder: Motivo del cambio…
         transition_submit: Aplicar cambio
-        transition_confirm: ¿Forzar este cambio de estado?
+        transition_confirm: "¿Forzar este cambio de estado?"
         notes_title: Notas internas
         notes_empty: Sin notas todavía
         notes_placeholder: Escribe una nota para el equipo…
         notes_add: Añadir nota
         note_by: "%{admin}, %{time}"
         note_delete: Eliminar
-        note_confirm: ¿Eliminar esta nota?
-        deleted_admin: (admin eliminado)
+        note_confirm: "¿Eliminar esta nota?"
+        deleted_admin: "(admin eliminado)"
       update:
         updated: El pedido %{number} se ha actualizado
         errors:
@@ -2109,7 +2147,7 @@ es:
         conversation: Conversación del pedido
         open_order: Ver el pedido
         resolve: Resolver la disputa
-        refunded: "Importe reembolsado: %{amount}"
+        refunded: 'Importe reembolsado: %{amount}'
     resolutions:
       new:
         title: Resolver disputa
@@ -2117,19 +2155,21 @@ es:
         order_title: Pedido %{number}
         buyer: Comprador
         seller: Vendedor
-        total: "Total pagado: %{amount}"
-        payment_provider: "Pasarela: %{provider}"
+        total: 'Total pagado: %{amount}'
+        payment_provider: 'Pasarela: %{provider}'
         payment_direct: Pago directo (sin pasarela)
         form_title: Decisión
         action_legend: Resultado
         action_refund: Reembolso al comprador
-        action_refund_hint: Total o parcial. Los pagos con Stripe se reembolsan de verdad.
+        action_refund_hint: Total o parcial. Los pagos con Stripe se reembolsan de
+          verdad.
         action_release: Dar la razón al vendedor
-        action_release_hint: Cierra la disputa completando el pedido; el vendedor conserva el dinero.
-        provider_hint: "Sin referencia de pago: el reembolso se registrará manualmente."
+        action_release_hint: Cierra la disputa completando el pedido; el vendedor
+          conserva el dinero.
+        provider_hint: 'Sin referencia de pago: el reembolso se registrará manualmente.'
         amount_label: Importe del reembolso (centavos, vacío = total)
         amount_hint: Máximo %{amount}
-        confirm: ¿Resolver la disputa ahora?
+        confirm: "¿Resolver la disputa ahora?"
         submit: Resolver
         cancel: Cancelar
       create:
@@ -2156,7 +2196,7 @@ es:
           reviewer: Autor
           store: Tienda
           order: Pedido
-          rating: ★
+          rating: "★"
           created: Fecha
           actions: Acciones
         hidden_chip: Ocultada
@@ -2170,7 +2210,7 @@ es:
         title: Registro de actividad
         subtitle: Cada acción de administración queda registrada
         empty: Sin eventos
-        deleted_admin: (admin eliminado)
+        deleted_admin: "(admin eliminado)"
         filters:
           admin: Administrador
           all_admins: Todos
@@ -2190,7 +2230,7 @@ es:
           details: Detalles
     positions:
       create:
-        moved: «%{name}» se ha movido
+        moved: "«%{name}» se ha movido"
         boundary: Ya está en el extremo de su nivel
     categories:
       index:
@@ -2234,7 +2274,7 @@ es:
         attach: Asignar
         attach_all_attached: Todos los atributos ya están asignados
         detach: Quitar
-        detach_confirm: ¿Quitar este atributo de la categoría?
+        detach_confirm: "¿Quitar este atributo de la categoría?"
         required: Obligatorio
         position: Posición
         save: Guardar orden
@@ -2251,7 +2291,7 @@ es:
         empty: Todavía no hay atributos
         new: Nuevo atributo
         yes_chip: Sí
-        no_chip: "No"
+        no_chip: 'No'
         columns:
           name: Nombre
           key: Clave
@@ -2263,7 +2303,7 @@ es:
         actions:
           edit: Editar
           destroy: Eliminar
-          destroy_confirm: ¿Eliminar este atributo? También se quitará de las categorías.
+          destroy_confirm: "¿Eliminar este atributo? También se quitará de las categorías."
       new:
         title: Nuevo atributo técnico
       edit:
@@ -2274,14 +2314,17 @@ es:
         options_empty: Sin valores definidos
         option_save: Guardar
         option_delete: Eliminar
-        option_delete_confirm: ¿Eliminar este valor? Los anuncios dejarán de mostrarlo.
+        option_delete_confirm: "¿Eliminar este valor? Los anuncios dejarán de mostrarlo."
         in_use: En %{count} anuncios; eliminar desactivará el valor
         add: Añadir
         add_title: Añadir un valor
         add_value_placeholder: valor (ej. 12 GB)
         bulk_title: Añadir en bloque
         bulk_hint: Un valor por línea; los existentes se ignoran
-        bulk_placeholder: "8 GB\n16 GB\n32 GB"
+        bulk_placeholder: |-
+          8 GB
+          16 GB
+          32 GB
         bulk_submit: Añadir lista
         merge: Fusionar en…
         merge_pick: Valor a reemplazar…
@@ -2308,13 +2351,13 @@ es:
         updated: Valor «%{value}» actualizado
       destroy:
         destroyed: Valor «%{value}» eliminado
-        in_use: «%{value}» se usa en %{count} anuncios; retíralo antes
+        in_use: "«%{value}» se usa en %{count} anuncios; retíralo antes"
     bulk_options:
       create:
         done: "%{created} valores añadidos, %{skipped} ya existían"
     spec_option_merges:
       create:
-        merged: «%{source}» fusionado en «%{target}» (%{count} anuncios)
+        merged: "«%{source}» fusionado en «%{target}» (%{count} anuncios)"
         invalid_target: Elige un valor de destino distinto
     labels:
       index:
@@ -2330,7 +2373,7 @@ es:
         actions:
           edit: Editar
           destroy: Eliminar
-          destroy_confirm: ¿Eliminar esta etiqueta?
+          destroy_confirm: "¿Eliminar esta etiqueta?"
       new:
         title: Nueva etiqueta
       edit:
@@ -2359,7 +2402,7 @@ es:
         actions:
           edit: Editar
           destroy: Eliminar
-          destroy_confirm: ¿Eliminar esta etiqueta?
+          destroy_confirm: "¿Eliminar esta etiqueta?"
       new:
         title: Nueva etiqueta de vendedor
       edit:
@@ -2401,7 +2444,7 @@ es:
         checklist_title: Lista de verificación de lanzamiento
         checklist:
           legal_pages_ok: Páginas legales publicadas
-          legal_pages_missing: "Faltan páginas legales: %{slugs}"
+          legal_pages_missing: 'Faltan páginas legales: %{slugs}'
           categories_ok: Hay categorías activas
           categories_missing: Crea al menos una categoría activa
           support_email_ok: Correo de soporte configurado
@@ -2417,7 +2460,7 @@ es:
         subtitle: Activa funciones por mercado o porcentaje de usuarios
         on_chip: Activada
         off_chip: Desactivada
-        rollout: "Despliegue: %{percent}%"
+        rollout: 'Despliegue: %{percent}%'
         percentage: Porcentaje de usuarios
         rollout_set: Aplicar
         turn_on: Activar
@@ -2434,10 +2477,11 @@ es:
         google_login:
           description: Inicio de sesión con cuenta de Google
       warnings:
-        missing_stripe_env: "Faltan STRIPE_SECRET_KEY / STRIPE_WEBHOOK_SECRET: los pagos fallarán"
-        commission_percent_zero: "commission_percent es 0: no se cobrará comisión"
+        missing_stripe_env: 'Faltan STRIPE_SECRET_KEY / STRIPE_WEBHOOK_SECRET: los
+          pagos fallarán'
+        commission_percent_zero: 'commission_percent es 0: no se cobrará comisión'
       update:
-        updated: "Función «%{key}»: %{outcome}"
+        updated: 'Función «%{key}»: %{outcome}'
     settings:
       edit:
         title: Ajustes globales
@@ -2448,7 +2492,8 @@ es:
         group_social: Redes sociales
         group_meta: SEO
         maintenance_mode: Modo mantenimiento
-        maintenance_hint: Mientras esté activo, la web pública muestra un aviso 503; los administradores siguen pudiendo navegar
+        maintenance_hint: Mientras esté activo, la web pública muestra un aviso 503;
+          los administradores siguen pudiendo navegar
         commission_hint: Porcentaje cobrado a cada vendedor (0-20)
         min_offer_hint: Porcentaje mínimo sobre el precio para aceptar una oferta
         announcement_enabled: Mostrar el anuncio
@@ -2475,7 +2520,8 @@ es:
     legal_pages:
       index:
         title: Páginas legales
-        subtitle: Textos por país e idioma que deben publicarse antes de activar un mercado
+        subtitle: Textos por país e idioma que deben publicarse antes de activar un
+          mercado
         empty: Todavía no hay páginas legales
         new: Nueva página legal
         published_chip: Publicada
@@ -2499,10 +2545,11 @@ es:
           edit: Editar
           copy: Duplicar
           destroy: Eliminar
-          destroy_confirm: ¿Eliminar esta página legal?
+          destroy_confirm: "¿Eliminar esta página legal?"
       new:
         title: Nueva página legal
-        prefilled_note: "Consejo: duplica una página existente para partir de un borrador ya traducido"
+        prefilled_note: 'Consejo: duplica una página existente para partir de un borrador
+          ya traducido'
       edit:
         title: Editar «%{title}»
         copy_note: Copia creada desde «%{language}»
@@ -2513,7 +2560,7 @@ es:
         submit: Guardar
         cancel: Cancelar
       show:
-        title: «%{title}» (%{country} · %{language})
+        title: "«%{title}» (%{country} · %{language})"
         back: Volver a páginas legales
         edit: Editar
         published_chip: Publicada
@@ -2531,7 +2578,7 @@ es:
         empty: Ningún suscriptor coincide
         export_csv: Exportar CSV
         unsubscribe: Dar de baja
-        unsubscribe_confirm: ¿Dar de baja a este correo?
+        unsubscribe_confirm: "¿Dar de baja a este correo?"
         pending_chip: Pendiente
         confirmed_chip: Confirmado
         filters:
@@ -2548,6 +2595,30 @@ es:
           actions: Acciones
       destroy:
         destroyed: "%{email} dado de baja"
+    trade_ins:
+      index:
+        title: Trade-ins
+        subtitle:
+          one: "%{count} presupuesto de trade-in"
+          other: "%{count} presupuestos de trade-in"
+        anonymous: Anónimo
+      update:
+        updated: Trade-in actualizado.
+        invalid_transition: Ese cambio de estado no está permitido.
+      show:
+        back: Todos los trade-ins
+        'yes': Sí
+        'no': 'No'
+        anonymous: Anónimo
+        status_title: Estado
+        terminal: Este trade-in ha finalizado.
+        transitions:
+          accepted: Marcar aceptado
+          received: Paquete recibido
+          inspected: Inspección superada
+          paid: Pago enviado
+          rejected: Rechazar
+          expired: Marcar caducado
   legal_pages:
     slugs:
       terms: Términos del servicio
@@ -2561,7 +2632,8 @@ es:
   application:
     maintenance:
       title: Mantenimiento programado
-      body: Estamos realizando mejoras. La plataforma volverá en breve. Gracias por tu paciencia.
+      body: Estamos realizando mejoras. La plataforma volverá en breve. Gracias por
+        tu paciencia.
       contact: "¿Dudas? Escríbenos a %{email}"
   moderation_mailer:
     approved:
@@ -2575,3 +2647,178 @@ es:
       body: Hemos revisado «%{title}» pero aún no cumple nuestras normas de publicación.
       view_listing: Ver anuncio
       edit_hint: Puedes editar el anuncio y enviarlo de nuevo a revisión.
+  pc_finders:
+    show:
+      title: Busca tu PC
+      subtitle: Responde cinco preguntas rápidas y te emparejamos con PCs gamer que
+        de verdad corren los juegos que juegas.
+      steps_label: Progreso del test
+      steps:
+        games: "¿A qué juegos juegas?"
+        resolution: Resolución objetivo
+        fps: FPS objetivo
+        budget: Tu presupuesto
+        extras: Extras opcionales
+      games_hint: Elige hasta %{max} juegos — emparejamos PCs que los corran todos.
+      demand:
+        light: Ligero
+        medium: Medio
+        heavy: Pesado
+      resolutions:
+        1080p: 1080p Full HD
+        1440p: 1440p QHD
+        2160p: 2160p 4K UHD
+      fps_targets:
+        '60': 60 FPS — fluido
+        '144': 144 FPS — competitivo
+        '240': 240 FPS — esports
+      budgets:
+        under_700: Menos de 700 €
+        '700_1200': 700 – 1.200 €
+        '1200_2000': 1.200 – 2.000 €
+        over_2000: Más de 2.000 €
+      extras_hint: 'Rasgos opcionales de la build: refrigeración, iluminación o estilo.
+        Todos los elegidos deben coincidir.'
+      back: Atrás
+      next: Siguiente
+      submit: Encontrar mi PC
+      best_for: Los mejores PCs para juegos populares
+      no_pick: Aún no hay coincidencias en este rango.
+  pc_finder_results:
+    index:
+      title: PCs que coinciden con tu test
+      count:
+        one: "%{count} PC coincide con tu test"
+        other: "%{count} PCs coinciden con tu test"
+      required_score: Necesita al menos %{score}/1000 de rendimiento
+      sorted_by_value: Ordenado por rendimiento por euro
+      applied_filters: Filtros aplicados
+      remove_filter: Quitar filtro
+      clear_all: Empezar de nuevo
+      empty_title: Ningún PC supera ese listón
+      empty_text: Prueba a relajar un requisito — los enlaces de abajo repiten tu
+        búsqueda al instante.
+      suggestions:
+        lower_fps: Baja el objetivo de FPS
+        cheaper_budget: Busca por menos de 700 €
+        raise_budget: Sube el presupuesto
+        drop_tags: Quita los filtros extra
+        fewer_games: Busca con un solo juego
+      retake: Repetir el test
+      load_more: Cargar más
+    page:
+      load_more: Cargar más
+    result:
+      best_match: Mejor coincidencia
+      estimated_fps: FPS estimados
+      why: Según nuestra estimación supera todos los juegos elegidos a %{resolution}.
+  trade_ins:
+    transition:
+      invalid: Un trade-in no puede pasar de %{from} a %{to}.
+  trade_in_quotes:
+    new:
+      title: Véndenos tu gráfica o procesador viejos
+      subtitle: Presupuesto al instante, etiqueta de envío prepago y pago en 48 horas
+        tras la inspección.
+      hero:
+        point_fast: Oferta al momento, sin necesidad de cuenta
+        point_checked: Cada pieza se prueba antes de pagar
+        point_paid: Transferencia bancaria en 48 horas tras la inspección
+      form_title: Consigue tu oferta al instante
+      model_label: "¿Qué vendes?"
+      model_prompt: Elige un componente…
+      components:
+        gpu: Tarjetas gráficas
+        cpu: Procesadores
+      condition_label: Estado
+      conditions:
+        like_new: Como nuevo
+        good: Bueno
+        fair: Aceptable
+        for_parts: Para piezas
+      has_box: Conservo la caja original
+      box_note: Conservar la caja original sube tu oferta un 5 %.
+      submit: Ver mi oferta
+      form_note: Al aceptarla, el precio queda congelado durante 7 días.
+      how_title: Cómo funciona
+      how:
+        quote:
+          title: Pide presupuesto
+          text: 'Elige modelo y estado: la oferta aparece al instante y vale una semana.'
+        ship:
+          title: Envío gratis
+          text: Acepta la oferta y te enviamos una etiqueta de mensajería prepago.
+        inspect:
+          title: La probamos
+          text: Nuestros técnicos verifican la pieza en hardware real en dos días
+            laborables.
+        get_paid:
+          title: Cobra
+          text: El importe acordado llega a tu cuenta bancaria en 48 horas.
+      examples_title: Ofertas de ejemplo
+      examples_subtitle: Piezas funcionales con caja original incluida, según el estado.
+      faq_title: Preguntas con respuesta
+      faq:
+        q1:
+          question: "¿Qué componentes compráis?"
+          answer: 'Tarjetas gráficas y procesadores de sobremesa de las grandes generaciones
+            de los últimos siete años: todo lo del desplegable de arriba.'
+        q2:
+          question: "¿La oferta online está garantizada?"
+          answer: Sí, siempre que la pieza coincida con el estado elegido cuando la
+            pruebe nuestro técnico.
+        q3:
+          question: "¿Quién paga el envío?"
+          answer: Nosotros. Al aceptar la oferta enviamos una etiqueta prepago; embalar
+            corre de tu parte.
+        q4:
+          question: "¿Y si la pieza no pasa la prueba?"
+          answer: 'Te enviamos una oferta revisada o te devolvemos la pieza gratis:
+            tú eliges.'
+        q5:
+          question: "¿Necesito una cuenta?"
+          answer: Puedes pedir presupuesto como invitado; para aceptar solo hace falta
+            una cuenta de PCMarket.
+      testimonials_title: Lo que dicen los vendedores
+      testimonials:
+        one:
+          quote: 'Una GPU minera vieja llevaba dos años en un cajón. Presupuesto,
+            etiqueta, dinero: una semana de principio a fin.'
+          name: Marta, Barcelona
+        two:
+          quote: Me gustó que el precio mostrado fue el precio pagado, sin sorpresas
+            ni descuentos.
+          name: Kenan, Valencia
+        three:
+          quote: Probaron mi CPU ante la cámara y pagaron en dos días. Trato justo.
+          name: Lucía, Sevilla
+      testimonials_note: Ejemplos ilustrativos de opiniones habituales de vendedores.
+    create:
+      errors:
+        unknown_model: Elige un modelo de la lista.
+        unknown_condition: Elige un estado.
+    show:
+      breadcrumb: Migas de pan del trade-in
+      breadcrumb_sell: Véndenoslo
+      title: Tu oferta de trade-in
+      subtitle: 'Revísala abajo: al aceptarla el precio queda cerrado durante la validez.'
+      model: Componente
+      component_type: Tipo
+      condition: Estado
+      has_box: Caja original
+      'yes': Sí
+      'no': 'No'
+      offer: Nuestra oferta
+      valid_until: Válida hasta el %{date}
+      accept: Aceptar esta oferta
+      accept_note: Te enviaremos una etiqueta de envío prepago al aceptar.
+      log_in_to_accept: Inicia sesión para aceptar esta oferta
+      expired: Esta oferta ha caducado.
+      new_quote: Pedir un presupuesto nuevo
+      progress_hint: Actualizamos esta página según avanza el envío por inspección
+        y pago.
+  trade_in_acceptances:
+    create:
+      accepted: 'Trade-in aceptado: envía la pieza cuando recibas la etiqueta.'
+      expired: Esta oferta caducó antes de que la aceptaras.
+      invalid: Esta oferta ya no se puede aceptar.

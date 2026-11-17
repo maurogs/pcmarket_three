@@ -1,0 +1,70 @@
+# Base trade-in payouts per component model, BEFORE the condition multiplier
+# and box discount applied by TradeIns::Quote:
+#   offered = base_cents × condition_multiplier × (has_box ? 1 : 0.95)
+#
+# Model keys match the normalized keys of gpu_tiers.yml / cpu_tiers.yml
+# (Performance::Scorer.normalize) and carry a human `display` name for the
+# dropdown. Values are conservative second-hand market estimates (resale
+# minus refurb margin). "Admin-editable later" — the plan is to move this to
+# a DB table; models absent here simply have no offer (the form only lists
+# the models found in this file).
+
+gpu:
+  rtx5090: { display: "RTX 5090", base_cents: 165000 }
+  rtx5080: { display: "RTX 5080", base_cents: 78000 }
+  rtx5070ti: { display: "RTX 5070 Ti", base_cents: 52000 }
+  rtx5070: { display: "RTX 5070", base_cents: 40000 }
+  rtx4090: { display: "RTX 4090", base_cents: 135000 }
+  rtx4080super: { display: "RTX 4080 Super", base_cents: 62000 }
+  rtx4070tisuper: { display: "RTX 4070 Ti Super", base_cents: 48000 }
+  rtx4070super: { display: "RTX 4070 Super", base_cents: 38000 }
+  rtx4070: { display: "RTX 4070", base_cents: 33000 }
+  rtx4060ti: { display: "RTX 4060 Ti", base_cents: 24000 }
+  rtx4060: { display: "RTX 4060", base_cents: 20000 }
+  rtx3080: { display: "RTX 3080", base_cents: 30000 }
+  rtx3070: { display: "RTX 3070", base_cents: 21000 }
+  rtx3060: { display: "RTX 3060", base_cents: 14000 }
+  rtx3050: { display: "RTX 3050", base_cents: 9000 }
+  rtx2060: { display: "RTX 2060", base_cents: 8000 }
+  gtx1660super: { display: "GTX 1660 Super", base_cents: 7500 }
+  gtx1050ti: { display: "GTX 1050 Ti", base_cents: 3500 }
+  rx9070xt: { display: "RX 9070 XT", base_cents: 48000 }
+  rx7900xtx: { display: "RX 7900 XTX", base_cents: 62000 }
+  rx7800xt: { display: "RX 7800 XT", base_cents: 38000 }
+  rx7600: { display: "RX 7600", base_cents: 20000 }
+  rx6800xt: { display: "RX 6800 XT", base_cents: 28000 }
+  rx6700xt: { display: "RX 6700 XT", base_cents: 17000 }
+  rx6600: { display: "RX 6600", base_cents: 12000 }
+  rx580: { display: "RX 580", base_cents: 6000 }
+  rx470: { display: "RX 470", base_cents: 4000 }
+  arcb580: { display: "Arc B580", base_cents: 16000 }
+  arca770: { display: "Arc A770", base_cents: 13000 }
+
+cpu:
+  i914900k: { display: "Core i9-14900K", base_cents: 35000 }
+  i913900k: { display: "Core i9-13900K", base_cents: 30000 }
+  i714700k: { display: "Core i7-14700K", base_cents: 26000 }
+  i713700k: { display: "Core i7-13700K", base_cents: 22000 }
+  i712700k: { display: "Core i7-12700K", base_cents: 14000 }
+  i79700k: { display: "Core i7-9700K", base_cents: 6500 }
+  i514600k: { display: "Core i5-14600K", base_cents: 20000 }
+  i513600k: { display: "Core i5-13600K", base_cents: 17000 }
+  i512400f: { display: "Core i5-12400F", base_cents: 8000 }
+  i511400: { display: "Core i5-11400", base_cents: 7000 }
+  i510400f: { display: "Core i5-10400F", base_cents: 5500 }
+  i59400f: { display: "Core i5-9400F", base_cents: 4000 }
+  i312100: { display: "Core i3-12100", base_cents: 6000 }
+  ryzen99900x: { display: "Ryzen 9 9900X", base_cents: 38000 }
+  ryzen97950x3d: { display: "Ryzen 9 7950X3D", base_cents: 30000 }
+  ryzen79800x3d: { display: "Ryzen 7 9800X3D", base_cents: 42000 }
+  ryzen77800x3d: { display: "Ryzen 7 7800X3D", base_cents: 32000 }
+  ryzen77700x: { display: "Ryzen 7 7700X", base_cents: 19000 }
+  ryzen75800x3d: { display: "Ryzen 7 5800X3D", base_cents: 24000 }
+  ryzen75700x: { display: "Ryzen 7 5700X", base_cents: 15000 }
+  ryzen59600x: { display: "Ryzen 5 9600X", base_cents: 21000 }
+  ryzen57600x: { display: "Ryzen 5 7600X", base_cents: 13000 }
+  ryzen55600x: { display: "Ryzen 5 5600X", base_cents: 9000 }
+  ryzen55500: { display: "Ryzen 5 5500", base_cents: 7000 }
+  ryzen53600x: { display: "Ryzen 5 3600X", base_cents: 6500 }
+  ryzen34100g: { display: "Ryzen 3 4100G", base_cents: 2500 }
+  threadripper3960x: { display: "Threadripper 3960X", base_cents: 8000 }

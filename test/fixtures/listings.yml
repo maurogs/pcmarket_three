@@ -107,3 +107,74 @@ rejected:
   rejection_reason: Photos unreadable
   specs:
     negotiable: false
+
+# Gaming PCs (PC Finder). Fixtures bypass the model callbacks, so
+# performance_score is written explicitly — the values match exactly what
+# Performance::Scorer computes from these gpu_model/cpu_model pairs.
+beast_rtx4080s:
+  user: one
+  store: one
+  category: gaming-desktops
+  title: Custom RTX 4080 Super Gaming PC
+  slug: custom-rtx-4080-super-gaming-pc
+  description: Flagship build, AIO cooled, quiet and fast
+  price_cents: 189900
+  condition: used_like_new
+  status: approved
+  city: Barcelona
+  performance_score: 838
+  published_at: 2026-10-01 10:00:00
+  specs:
+    gpu_model: NVIDIA GeForce RTX 4080 Super
+    cpu_model: AMD Ryzen 7 9800X3D
+
+mid_rgb_build:
+  user: two
+  store: two
+  category: gaming-desktops
+  title: Mid-range Ryzen 5 Gaming Desktop
+  slug: mid-range-ryzen-5-gaming-desktop
+  description: Solid 1440p machine, tempered glass, RGB
+  price_cents: 109900
+  condition: used_good
+  status: approved
+  city: Valencia
+  performance_score: 560
+  published_at: 2026-10-05 10:00:00
+  specs:
+    gpu_model: NVIDIA GeForce RTX 4070
+    cpu_model: AMD Ryzen 5 7600X
+
+budget_3060_build:
+  user: one
+  store: one
+  category: gaming-desktops
+  title: Budget RTX 3060 Starter PC
+  slug: budget-rtx-3060-starter-pc
+  description: Great first rig for 1080p gaming
+  price_cents: 64900
+  condition: used_good
+  status: approved
+  city: Madrid
+  performance_score: 383
+  published_at: 2026-10-10 10:00:00
+  specs:
+    gpu_model: NVIDIA GeForce RTX 3060
+    cpu_model: Intel Core i5-12400F
+
+value_5800x3d_build:
+  user: two
+  store: two
+  category: gaming-desktops
+  title: Ryzen 7 5800X3D Value Build
+  slug: ryzen-7-5800x3d-value-build
+  description: Best bang for euro, silent air cooling
+  price_cents: 59900
+  condition: used_like_new
+  status: approved
+  city: Sevilla
+  performance_score: 498
+  published_at: 2026-10-12 10:00:00
+  specs:
+    gpu_model: AMD Radeon RX 6700 XT
+    cpu_model: AMD Ryzen 7 5800X3D

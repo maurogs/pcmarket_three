@@ -12,3 +12,13 @@ ports_gpus:
   category: gpus
   spec_attribute: ports
   position: 2
+
+gpu_model_gaming_pcs:
+  category: gaming-pcs
+  spec_attribute: gpu_model
+  required: true
+
+cpu_model_gaming_pcs:
+  category: gaming-pcs
+  spec_attribute: cpu_model
+  required: true

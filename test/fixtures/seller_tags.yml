@@ -9,3 +9,21 @@ silent_build:
   names:
     en: Silent build
     es: Montaje silencioso
+
+competitive:
+  slug: competitive
+  names:
+    en: Competitive
+    es: Competitivo
+
+air-cooling:
+  slug: air-cooling
+  names:
+    en: Air cooling
+    es: Refrigeración por aire
+
+aio-cooling:
+  slug: aio-cooling
+  names:
+    en: AIO cooling
+    es: Refrigeración líquida AIO

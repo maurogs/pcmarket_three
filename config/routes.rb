@@ -14,6 +14,19 @@ Rails.application.routes.draw do
     resources :stores, only: :show, path: "stores"
     get "search", to: "listings#index", as: :search
 
+    # PC Finder (Phase 7a): the quiz form GETs to the results page, which is
+    # a plain index over published gaming PCs (see PcFinder::Search).
+    resource :pc_finder, only: :show, path: "pc-finder"
+    resources :pc_finder_results, only: :index, path: "pc-finder/results"
+
+    # "Sell to us" trade-in (Phase 7a, behind the :sell_to_us flag — see the
+    # controllers). Quotes are created anonymously; accepting one is a nested
+    # singular resource POST (state transition), matching the listing status
+    # convention used in the sell area.
+    resources :trade_in_quotes, only: %i[new create show], path: "sell-to-us" do
+      resource :acceptance, only: :create, controller: "trade_in_acceptances"
+    end
+
     resource :session
     resources :passwords, param: :token
     resource :registration, only: %i[new create]
@@ -191,6 +204,7 @@ Rails.application.routes.draw do
       # site settings, legal pages, newsletter list and the audit log browse.
       resources :countries, only: %i[index edit update]
       resources :feature_flags, only: %i[index update]
+      resources :trade_ins, only: %i[index show update]
       resource :settings, only: %i[edit update]
       resources :legal_pages
       resources :newsletter_subscriptions, only: %i[index destroy]

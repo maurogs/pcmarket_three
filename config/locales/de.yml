@@ -39,6 +39,7 @@ de:
         legal_pages: Rechtstexte
         newsletter: Newsletter
         audit_logs: Audit-Protokoll
+        trade_ins: Trade-ins
   nav:
     search_placeholder: Grafikkarten, Prozessoren, Laptops suchen…
     search_submit: Suchen
@@ -58,10 +59,11 @@ de:
     new: Neuheiten
     more: Mehr
     all_categories: Alle %{name} ansehen
-    promo_finder_title: Finden Sie Ihr Ersatzteil
-    promo_finder_text: Tausende Angebote von Verkäufern im ganzen Land.
-    promo_sell_title: Verkaufen Sie Ihre Hardware
-    promo_sell_text: Gebrauchte Komponenten in zwei Minuten inserieren.
+    promo_finder_title: PC-Finder
+    promo_finder_text: Fünf Fragen, und du lernst die PCs kennen, die deine Spiele
+      schaffen.
+    promo_sell_title: An uns verkaufen
+    promo_sell_text: Ein garantierter Preis für deine alte Grafikkarte oder CPU.
     my_store: Mein Shop
     my_store_dashboard: Dashboard
     my_store_listings: Meine Angebote
@@ -74,6 +76,7 @@ de:
     saved_searches: Gespeicherte Suchen
     addresses: Adressen
     account_settings: Kontoeinstellungen
+    pc_finder: PC-Finder
   footer:
     newsletter_title: Newsletter abonnieren
     newsletter_placeholder: Ihre E-Mail-Adresse
@@ -144,6 +147,13 @@ de:
         support:
           title: Freundlicher Support
           text: Ein Team aus PC-Enthusiasten antwortet innerhalb von 24 Stunden.
+      finder:
+        title: Finde deinen nächsten Gaming-PC
+        cta: Quiz starten
+        vibe_title: Nach Stil kaufen
+        under_budget_title: Gaming-PCs unter 1.000 €
+        under_budget_more: Alle Gaming-PCs unter 1.000 € ansehen
+        best_for_title: Die besten PCs für beliebte Spiele
   sessions:
     new:
       title: Anmelden
@@ -314,6 +324,9 @@ de:
       add_to_cart: In den Warenkorb
       own_listing_cta: Dies ist deine eigene Anzeige
       quantity_label: Menge
+      performance_label: Geschätzte Leistung
+      performance_disclaimer: Schätzung auf Basis der GPU- und CPU-Modelle in diesem
+        Angebot — ein Einkaufstipp, kein Benchmark.
   activerecord:
     errors:
       messages:
@@ -333,7 +346,8 @@ de:
         cannot_block_self: darf nicht Sie selbst sein
         not_purchasable: ist nicht kaufbar
         spanish_tax_id_invalid: ist keine gültige spanische Steuer-ID (NIF/CIF/NIE)
-        missing_legal_pages: "kann nicht aktiviert werden: fehlende Rechtsseiten: %{slugs}"
+        missing_legal_pages: 'kann nicht aktiviert werden: fehlende Rechtsseiten:
+          %{slugs}'
         immutable: kann nach dem Anlegen nicht geändert werden
         logo_content_type_invalid: muss ein JPEG-, PNG- oder WebP-Bild sein
         logo_too_large: muss %{max} MB oder kleiner sein
@@ -653,6 +667,29 @@ de:
         confirmed_at: Bestätigt am
         banned_at: Gesperrt am
         ban_reason: Grund der Sperre
+      trade_in:
+        model: Modell
+        component_type: Komponente
+        condition: Zustand
+        has_box: Originalverpackung
+        offered_cents: Angebot
+        status: Status
+        user: Verkäufer
+        expires_at: Läuft ab am
+        created_at: Angefragt
+        component_type/gpu: Grafikkarte
+        component_type/cpu: Prozessor
+        condition/like_new: Wie neu
+        condition/good: Gut
+        condition/fair: Gebraucht
+        condition/for_parts: Schrott
+        status/quoted: Angeboten
+        status/accepted: Angenommen
+        status/received: Erhalten
+        status/inspected: Geprüft
+        status/paid: Bezahlt
+        status/rejected: Abgelehnt
+        status/expired: Abgelaufen
   shared:
     error_summary:
       title:
@@ -673,6 +710,8 @@ de:
       follow: Shop folgen
       following: Du folgst
       follow_login: Melde dich an, um Shops zu folgen
+    performance_bar:
+      performance: Leistung
   stores:
     verified: Verifizierter Verkäufer
     types:
@@ -1267,7 +1306,7 @@ de:
       subject: Erstattung für Bestellung %{number}
       greeting: Hallo %{name},
       intro: Wir haben eine Erstattung für Bestellung %{number} veranlasst.
-      amount: "Erstatteter Betrag: %{amount}"
+      amount: 'Erstatteter Betrag: %{amount}'
       view_order: Bestellung ansehen
     dispute_resolved:
       subject: Streitfall zu Bestellung %{number} gelöst
@@ -1942,7 +1981,7 @@ de:
           edit: Bearbeiten
         empty: Keine Shops passen zu diesen Filtern.
       edit:
-        title: „%{name}“ bearbeiten
+        title: "„%{name}“ bearbeiten"
         subtitle: Öffentliches Profil und Richtlinien
         back: Zurück zum Shop
         submit: Änderungen speichern
@@ -2003,7 +2042,7 @@ de:
       audit_events:
         title: Admin-Aktivität
         by: "%{admin} · %{time}"
-        deleted_admin: (gelöschter Admin)
+        deleted_admin: "(gelöschter Admin)"
         empty: Noch keine Aktivität
       translation_tabs: Übersetzungen
       seller_card:
@@ -2065,7 +2104,8 @@ de:
         conversation: Unterhaltung ansehen
         resolve: Streitfall lösen
         transition_title: Manuelle Statusänderung
-        transition_hint: Überschreibt den normalen Ablauf; Käufer und Verkäufer werden benachrichtigt. Der Grund ist Pflicht.
+        transition_hint: Überschreibt den normalen Ablauf; Käufer und Verkäufer werden
+          benachrichtigt. Der Grund ist Pflicht.
         transition_pick: Neuer Status
         transition_reason_placeholder: Grund der Änderung…
         transition_submit: Änderung anwenden
@@ -2077,7 +2117,7 @@ de:
         note_by: "%{admin}, %{time}"
         note_delete: Löschen
         note_confirm: Diese Notiz löschen?
-        deleted_admin: (gelöschter Admin)
+        deleted_admin: "(gelöschter Admin)"
       update:
         updated: Bestellung %{number} aktualisiert
         errors:
@@ -2124,7 +2164,7 @@ de:
         conversation: Bestell-Unterhaltung
         open_order: Bestellung ansehen
         resolve: Streitfall lösen
-        refunded: "Erstatteter Betrag: %{amount}"
+        refunded: 'Erstatteter Betrag: %{amount}'
     resolutions:
       new:
         title: Streitfall lösen
@@ -2132,16 +2172,18 @@ de:
         order_title: Bestellung %{number}
         buyer: Käufer
         seller: Verkäufer
-        total: "Gesamtbetrag: %{amount}"
-        payment_provider: "Anbieter: %{provider}"
+        total: 'Gesamtbetrag: %{amount}'
+        payment_provider: 'Anbieter: %{provider}'
         payment_direct: Direktzahlung (ohne Anbieter)
         form_title: Entscheidung
         action_legend: Ergebnis
         action_refund: Käufer erstatten
-        action_refund_hint: Voll oder teilweise. Stripe-Zahlungen werden tatsächlich erstattet.
+        action_refund_hint: Voll oder teilweise. Stripe-Zahlungen werden tatsächlich
+          erstattet.
         action_release: Verkäufer den Vorzug geben
-        action_release_hint: Schließt den Streitfall durch Abschluss der Bestellung; der Verkäufer behält den Betrag.
-        provider_hint: "Keine Zahlungsreferenz: Die Erstattung wird manuell erfasst."
+        action_release_hint: Schließt den Streitfall durch Abschluss der Bestellung;
+          der Verkäufer behält den Betrag.
+        provider_hint: 'Keine Zahlungsreferenz: Die Erstattung wird manuell erfasst.'
         amount_label: Erstattungsbetrag (Cent, leer = vollständig)
         amount_hint: Höchstens %{amount}
         confirm: Streitfall jetzt lösen?
@@ -2171,7 +2213,7 @@ de:
           reviewer: Autor
           store: Shop
           order: Bestellung
-          rating: ★
+          rating: "★"
           created: Datum
           actions: Aktionen
         hidden_chip: Ausgeblendet
@@ -2185,7 +2227,7 @@ de:
         title: Audit-Protokoll
         subtitle: Jede Admin-Aktion wird protokolliert
         empty: Keine Ereignisse
-        deleted_admin: (gelöschter Admin)
+        deleted_admin: "(gelöschter Admin)"
         filters:
           admin: Administrator
           all_admins: Alle
@@ -2205,7 +2247,7 @@ de:
           details: Details
     positions:
       create:
-        moved: „%{name}“ verschoben
+        moved: "„%{name}“ verschoben"
         boundary: Sie ist bereits am Rand ihrer Ebene
     categories:
       index:
@@ -2224,7 +2266,7 @@ de:
       new:
         title: Neue Kategorie
       edit:
-        title: „%{name}“ bearbeiten
+        title: "„%{name}“ bearbeiten"
       form:
         parent_none: Keine übergeordnete Kategorie
         icon_placeholder: Icon-Name (optional)
@@ -2282,7 +2324,7 @@ de:
       new:
         title: Neues technisches Merkmal
       edit:
-        title: „%{name}“ bearbeiten
+        title: "„%{name}“ bearbeiten"
         subtitle: Verfügbare Werte und Anzeigen-Nutzung
         back: Zurück zu Merkmalen
         options_title: Zulässige Werte
@@ -2296,7 +2338,10 @@ de:
         add_value_placeholder: Wert (z. B. 12 GB)
         bulk_title: Massen-Hinzufügen
         bulk_hint: Ein Wert pro Zeile; vorhandene werden übersprungen
-        bulk_placeholder: "8 GB\n16 GB\n32 GB"
+        bulk_placeholder: |-
+          8 GB
+          16 GB
+          32 GB
         bulk_submit: Liste hinzufügen
         merge: Zusammenführen mit…
         merge_pick: Zu ersetzender Wert…
@@ -2323,13 +2368,13 @@ de:
         updated: Wert „%{value}“ aktualisiert
       destroy:
         destroyed: Wert „%{value}“ gelöscht
-        in_use: „%{value}“ wird von %{count} Anzeigen genutzt; zuerst entfernen
+        in_use: "„%{value}“ wird von %{count} Anzeigen genutzt; zuerst entfernen"
     bulk_options:
       create:
         done: "%{created} Werte hinzugefügt, %{skipped} bereits vorhanden"
     spec_option_merges:
       create:
-        merged: „%{source}“ mit „%{target}“ zusammengeführt (%{count} Anzeigen)
+        merged: "„%{source}“ mit „%{target}“ zusammengeführt (%{count} Anzeigen)"
         invalid_target: Wähle einen anderen Zielwert
     labels:
       index:
@@ -2349,7 +2394,7 @@ de:
       new:
         title: Neues Label
       edit:
-        title: „%{name}“ bearbeiten
+        title: "„%{name}“ bearbeiten"
       form:
         names_label: Name (pro Sprache)
         submit: Speichern
@@ -2378,7 +2423,7 @@ de:
       new:
         title: Neuer Verkäufer-Tag
       edit:
-        title: „%{name}“ bearbeiten
+        title: "„%{name}“ bearbeiten"
       form:
         names_label: Name (pro Sprache)
         submit: Speichern
@@ -2416,7 +2461,7 @@ de:
         checklist_title: Start-Checkliste
         checklist:
           legal_pages_ok: Rechtstexte veröffentlicht
-          legal_pages_missing: "Fehlende Rechtstexte: %{slugs}"
+          legal_pages_missing: 'Fehlende Rechtstexte: %{slugs}'
           categories_ok: Aktive Kategorien vorhanden
           categories_missing: Mindestens eine aktive Kategorie anlegen
           support_email_ok: Support-E-Mail konfiguriert
@@ -2432,7 +2477,7 @@ de:
         subtitle: Funktionen je Markt oder Nutzerprozentsatz aktivieren
         on_chip: Ein
         off_chip: Aus
-        rollout: "Rollout: %{percent}%"
+        rollout: 'Rollout: %{percent}%'
         percentage: Nutzerprozentsatz
         rollout_set: Setzen
         turn_on: Einschalten
@@ -2449,10 +2494,11 @@ de:
         google_login:
           description: Anmeldung mit Google-Konto
       warnings:
-        missing_stripe_env: "STRIPE_SECRET_KEY / STRIPE_WEBHOOK_SECRET fehlen: Zahlungen schlagen fehl"
-        commission_percent_zero: "commission_percent ist 0: es wird keine Gebühr berechnet"
+        missing_stripe_env: 'STRIPE_SECRET_KEY / STRIPE_WEBHOOK_SECRET fehlen: Zahlungen
+          schlagen fehl'
+        commission_percent_zero: 'commission_percent ist 0: es wird keine Gebühr berechnet'
       update:
-        updated: "Feature „%{key}“: %{outcome}"
+        updated: 'Feature „%{key}“: %{outcome}'
     settings:
       edit:
         title: Website-Einstellungen
@@ -2463,7 +2509,8 @@ de:
         group_social: Soziale Netzwerke
         group_meta: SEO
         maintenance_mode: Wartungsmodus
-        maintenance_hint: Ist er aktiv, zeigt die öffentliche Seite einen 503-Hinweis; Admins können weiter stöbern
+        maintenance_hint: Ist er aktiv, zeigt die öffentliche Seite einen 503-Hinweis;
+          Admins können weiter stöbern
         commission_hint: Prozentsatz pro Verkäufer (0-20)
         min_offer_hint: Mindestprozentsatz des Preises für Angebotsannahme
         announcement_enabled: Banner anzeigen
@@ -2517,9 +2564,10 @@ de:
           destroy_confirm: Diesen Rechtstext löschen?
       new:
         title: Neuer Rechtstext
-        prefilled_note: "Tipp: Kopiere einen bestehenden Text für einen übersetzten Entwurf"
+        prefilled_note: 'Tipp: Kopiere einen bestehenden Text für einen übersetzten
+          Entwurf'
       edit:
-        title: „%{title}“ bearbeiten
+        title: "„%{title}“ bearbeiten"
         copy_note: Kopie von „%{language}“ erstellt
       form:
         slug_pick: Textart
@@ -2528,7 +2576,7 @@ de:
         submit: Speichern
         cancel: Abbrechen
       show:
-        title: „%{title}“ (%{country} · %{language})
+        title: "„%{title}“ (%{country} · %{language})"
         back: Zurück zu Rechtstexten
         edit: Bearbeiten
         published_chip: Veröffentlicht
@@ -2563,6 +2611,30 @@ de:
           actions: Aktionen
       destroy:
         destroyed: "%{email} abgemeldet"
+    trade_ins:
+      index:
+        title: Trade-ins
+        subtitle:
+          one: "%{count} Trade-in-Angebot"
+          other: "%{count} Trade-in-Angebote"
+        anonymous: Anonym
+      update:
+        updated: Trade-in aktualisiert.
+        invalid_transition: Dieser Statuswechsel ist nicht erlaubt.
+      show:
+        back: Alle Trade-ins
+        'yes': Ja
+        'no': Nein
+        anonymous: Anonym
+        status_title: Status
+        terminal: Dieser Trade-in ist abgeschlossen.
+        transitions:
+          accepted: Als angenommen markieren
+          received: Paket erhalten
+          inspected: Prüfung bestanden
+          paid: Zahlung gesendet
+          rejected: Ablehnen
+          expired: Als abgelaufen markieren
   legal_pages:
     slugs:
       terms: Nutzungsbedingungen
@@ -2576,8 +2648,9 @@ de:
   application:
     maintenance:
       title: Geplante Wartung
-      body: Wir führen Verbesserungen durch. Die Plattform ist bald wieder verfügbar. Danke für deine Geduld.
-      contact: "Fragen? Schreiben Sie uns an %{email}"
+      body: Wir führen Verbesserungen durch. Die Plattform ist bald wieder verfügbar.
+        Danke für deine Geduld.
+      contact: Fragen? Schreiben Sie uns an %{email}
   moderation_mailer:
     approved:
       subject: Ihre Anzeige „%{title}“ wurde freigegeben
@@ -2590,3 +2663,180 @@ de:
       body: Wir haben „%{title}“ geprüft – sie erfüllt unsere Regeln noch nicht.
       view_listing: Anzeige ansehen
       edit_hint: Sie können die Anzeige bearbeiten und erneut zur Prüfung einreichen.
+  pc_finders:
+    show:
+      title: PC-Finder
+      subtitle: Beantworte fünf kurze Fragen, und wir matchen dich mit Gaming-PCs,
+        die deine Spiele wirklich laufen lassen.
+      steps_label: Quiz-Fortschritt
+      steps:
+        games: Welche Spiele spielst du?
+        resolution: Zielauflösung
+        fps: Ziel-FPS
+        budget: Dein Budget
+        extras: Optionale Extras
+      games_hint: Wähle bis zu %{max} Titel — wir matchen PCs, die alle schaffen.
+      demand:
+        light: Leicht
+        medium: Mittel
+        heavy: Schwer
+      resolutions:
+        1080p: 1080p Full HD
+        1440p: 1440p QHD
+        2160p: 2160p 4K UHD
+      fps_targets:
+        '60': 60 FPS — flüssig
+        '144': 144 FPS — kompetitiv
+        '240': 240 FPS — Esports
+      budgets:
+        under_700: Unter 700 €
+        '700_1200': 700 – 1.200 €
+        '1200_2000': 1.200 – 2.000 €
+        over_2000: Über 2.000 €
+      extras_hint: 'Optionale Build-Merkmale: Kühlung, Beleuchtung oder Stil. Alle
+        gewählten Merkmale müssen passen.'
+      back: Zurück
+      next: Weiter
+      submit: Meinen PC finden
+      best_for: Die besten PCs für beliebte Spiele
+      no_pick: In dieser Preisklasse ist noch nichts dabei.
+  pc_finder_results:
+    index:
+      title: PCs, die zu deinem Quiz passen
+      count:
+        one: "%{count} PC passt zu deinem Quiz"
+        other: "%{count} PCs passen zu deinem Quiz"
+      required_score: Braucht mindestens %{score}/1000 Leistung
+      sorted_by_value: Sortiert nach Leistung pro Euro
+      applied_filters: Angewendete Filter
+      remove_filter: Filter entfernen
+      clear_all: Neu beginnen
+      empty_title: Kein PC schafft diese Latte
+      empty_text: Lockere eine Anforderung — die Links unten starten deine Suche sofort
+        neu.
+      suggestions:
+        lower_fps: Ziel-FPS senken
+        cheaper_budget: Unter 700 € suchen
+        raise_budget: Budget erhöhen
+        drop_tags: Extra-Filter weglassen
+        fewer_games: Mit nur einem Spiel suchen
+      retake: Quiz erneut machen
+      load_more: Mehr laden
+    page:
+      load_more: Mehr laden
+    result:
+      best_match: Bestes Match
+      estimated_fps: Geschätzte FPS
+      why: 'Unsere Schätzung: schafft alle gewählten Spiele in %{resolution}.'
+  trade_ins:
+    transition:
+      invalid: Ein Trade-in kann nicht von %{from} nach %{to} wechseln.
+  trade_in_quotes:
+    new:
+      title: Verkauf uns deine alte GPU oder CPU
+      subtitle: Sofortangebot, frankiertes Versandlabel, Zahlung innerhalb von 48
+        Stunden nach Prüfung.
+      hero:
+        point_fast: Sofortangebot, auch ohne Konto
+        point_checked: Jedes Teil wird vor der Zahlung getestet
+        point_paid: Überweisung innerhalb von 48 Stunden nach Prüfung
+      form_title: Hole dein Sofortangebot
+      model_label: Was verkaufst du?
+      model_prompt: Komponente wählen…
+      components:
+        gpu: Grafikkarten
+        cpu: Prozessoren
+      condition_label: Zustand
+      conditions:
+        like_new: Wie neu
+        good: Gut
+        fair: Gebraucht
+        for_parts: Schrott
+      has_box: Die Originalverpackung ist noch da
+      box_note: Mit Originalverpackung steigt dein Angebot um 5 %.
+      submit: Mein Angebot ansehen
+      form_note: Nach der Annahme ist der Preis 7 Tage lang garantiert.
+      how_title: So funktioniert's
+      how:
+        quote:
+          title: Angebot holen
+          text: Modell und Zustand wählen — das Angebot erscheint sofort und gilt
+            eine Woche.
+        ship:
+          title: Gratis versenden
+          text: Nimm das Angebot an, und wir schicken ein frankiertes Versandlabel.
+        inspect:
+          title: Wir testen
+          text: Unsere Techniker prüfen das Teil auf echter Hardware in zwei Werktagen.
+        get_paid:
+          title: Geld erhalten
+          text: Der vereinbarte Betrag kommt innerhalb von 48 Stunden auf dein Konto.
+      examples_title: Beispielangebote
+      examples_subtitle: Funktionierende Teile mit Originalverpackung, je nach Zustand.
+      faq_title: Fragen, beantwortet
+      faq:
+        q1:
+          question: Welche Komponenten kauft ihr an?
+          answer: Desktop-Grafikkarten und Prozessoren der wichtigsten Generationen
+            der letzten sieben Jahre — alles, was im Menü oben steht.
+        q2:
+          question: Ist das Online-Angebot garantiert?
+          answer: Ja, solange das Teil dem gewählten Zustand entspricht, wenn unser
+            Techniker es testet.
+        q3:
+          question: Wer zahlt den Versand?
+          answer: Wir. Nach der Annahme schicken wir ein frankiertes Label; das Verpacken
+            übernimmst du.
+        q4:
+          question: Und wenn das Teil den Test nicht besteht?
+          answer: Wir schicken ein neues Angebot oder senden das Teil kostenlos zurück
+            — du entscheidest.
+        q5:
+          question: Brauche ich ein Konto?
+          answer: Ein Angebot bekommst du als Gast; zum Annehmen brauchst du nur ein
+            PCMarket-Konto.
+      testimonials_title: Was Verkäufer sagen
+      testimonials:
+        one:
+          quote: 'Eine alte Mining-GPU lag zwei Jahre im Schrank. Angebot, Label,
+            Geld: eine Woche von Anfang bis Ende.'
+          name: Marta, Barcelona
+        two:
+          quote: Mir gefiel, dass der gezeigte Preis der ausgezahlte Preis war — keine
+            Abzüge überraschend.
+          name: Kenan, Valencia
+        three:
+          quote: Sie haben meine CPU vor der Kamera getestet und in zwei Tagen bezahlt.
+            Fairer Deal.
+          name: Lucía, Sevilla
+      testimonials_note: Beispielhafte Stimmen typischer Verkäufer.
+    create:
+      errors:
+        unknown_model: Bitte wähle ein Modell aus der Liste.
+        unknown_condition: Bitte wähle einen Zustand.
+    show:
+      breadcrumb: Trade-in-Brotkrümelnavigation
+      breadcrumb_sell: An uns verkaufen
+      title: Dein Trade-in-Angebot
+      subtitle: Sieh es unten durch; mit der Annahme gilt der Preis für den Rest der
+        Frist.
+      model: Komponente
+      component_type: Typ
+      condition: Zustand
+      has_box: Originalverpackung
+      'yes': Ja
+      'no': Nein
+      offer: Unser Angebot
+      valid_until: Gültig bis %{date}
+      accept: Dieses Angebot annehmen
+      accept_note: Nach der Annahme mailen wir dir ein frankiertes Versandlabel.
+      log_in_to_accept: Melde dich an, um dieses Angebot anzunehmen
+      expired: Dieses Angebot ist abgelaufen.
+      new_quote: Neues Angebot anfordern
+      progress_hint: Wir aktualisieren diese Seite, während deine Sendung Prüfung
+        und Zahlung durchläuft.
+  trade_in_acceptances:
+    create:
+      accepted: Trade-in angenommen — schicke das Teil, sobald du das Label erhältst.
+      expired: Dieses Angebot ist abgelaufen, bevor du angenommen hast.
+      invalid: Dieses Angebot kann nicht mehr angenommen werden.

@@ -1,0 +1,68 @@
+<%# Trade-in quote detail: the offer, its validity, and the login-gated
+    accept CTA (or the next step once accepted). %>
+<% quote = @quote %>
+<% model_display = TradeIns::Quote.model_entry(quote.component_type, quote.model)&.fetch("display") %>
+
+<div class="mx-auto max-w-2xl px-4 py-8 sm:py-12">
+  <nav aria-label="<%= t(".breadcrumb") %>" class="mb-3 flex items-center gap-1 text-xs text-muted">
+    <%= link_to t(".breadcrumb_sell"), new_trade_in_quote_path, class: "hover:text-primary" %>
+    <%= inline_icon :chevron_right, classes: "size-3.5" %>
+    <span><%= t(".title") %></span>
+  </nav>
+
+  <h1 class="text-2xl font-bold tracking-tight"><%= t(".title") %></h1>
+  <p class="mt-1 text-sm text-muted"><%= t(".subtitle") %></p>
+
+  <div class="mt-6 rounded-xl border border-border bg-surface p-5 shadow-sm sm:p-6">
+    <dl class="grid gap-x-6 gap-y-4 sm:grid-cols-2">
+      <div>
+        <dt class="text-xs font-medium uppercase tracking-wide text-muted"><%= t(".model") %></dt>
+        <dd class="mt-1 text-sm font-semibold"><%= model_display || quote.model %></dd>
+      </div>
+      <div>
+        <dt class="text-xs font-medium uppercase tracking-wide text-muted"><%= t(".component_type") %></dt>
+        <dd class="mt-1 text-sm font-medium"><%= TradeIn.human_attribute_name("component_type/#{quote.component_type}") %></dd>
+      </div>
+      <div>
+        <dt class="text-xs font-medium uppercase tracking-wide text-muted"><%= t(".condition") %></dt>
+        <dd class="mt-1 text-sm font-medium"><%= quote.class.human_attribute_name("condition/#{quote.condition}") %></dd>
+      </div>
+      <div>
+        <dt class="text-xs font-medium uppercase tracking-wide text-muted"><%= t(".has_box") %></dt>
+        <dd class="mt-1 text-sm font-medium"><%= quote.has_box? ? t(".yes") : t(".no") %></dd>
+      </div>
+    </dl>
+
+    <div class="mt-6 flex flex-wrap items-baseline justify-between gap-3 rounded-lg bg-surface-muted px-4 py-3">
+      <span class="text-sm font-medium text-muted"><%= t(".offer") %></span>
+      <span class="text-3xl font-bold text-primary"><%= money(quote.offered_cents, "EUR") %></span>
+    </div>
+
+    <% if quote.quoted? %>
+      <p class="mt-3 text-sm text-muted">
+        <%= t(".valid_until", date: l(quote.expires_at.to_date, format: :long)) %>
+      </p>
+
+      <% if authenticated? %>
+        <%= button_to t(".accept"), trade_in_quote_acceptance_path(quote), method: :post,
+              class: "mt-5 w-full cursor-pointer rounded-md bg-primary px-4 py-3 text-sm font-semibold text-white hover:bg-primary-hover" %>
+        <p class="mt-2 text-xs text-muted"><%= t(".accept_note") %></p>
+      <% else %>
+        <%= link_to t(".log_in_to_accept"), new_session_path,
+              class: "mt-5 inline-flex w-full min-h-11 items-center justify-center rounded-md bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-hover" %>
+        <p class="mt-2 text-xs text-muted"><%= t(".accept_note") %></p>
+      <% end %>
+    <% elsif quote.expired? %>
+      <p class="mt-4 rounded-md border border-accent/40 bg-accent/10 px-3 py-2.5 text-sm font-medium text-accent">
+        <%= t(".expired") %>
+      </p>
+      <%= link_to t(".new_quote"), new_trade_in_quote_path,
+            class: "mt-4 inline-flex min-h-11 items-center rounded-md bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-hover" %>
+    <% else %>
+      <p class="mt-4 text-sm font-medium">
+        <%= quote.class.human_attribute_name("status/#{quote.status}") %>
+      </p>
+      <p class="mt-1 text-sm text-muted"><%= t(".progress_hint") %></p>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,87 @@
+# Popular game titles used by the PC Finder quiz and the FPS estimator.
+#
+# demand        rough hardware appetite (light / medium / heavy) — display copy.
+# required_score  approximate Performance::Scorer composite score a PC needs
+#                 to run the title smoothly at that resolution / FPS target
+#                 (defaults settings; capped at 1000, the RTX 5090 reference).
+# Names are product names (proper nouns) and stay as-is in every locale.
+
+fortnite:
+  name: Fortnite
+  demand: medium
+  required_score:
+    "1080p": { "60": 250, "144": 480, "240": 800 }
+    "1440p": { "60": 380, "144": 700, "240": 980 }
+    "2160p": { "60": 580, "144": 950, "240": 1000 }
+
+league-of-legends:
+  name: League of Legends
+  demand: light
+  required_score:
+    "1080p": { "60": 80, "144": 180, "240": 320 }
+    "1440p": { "60": 130, "144": 280, "240": 500 }
+    "2160p": { "60": 220, "144": 450, "240": 800 }
+
+valorant:
+  name: Valorant
+  demand: light
+  required_score:
+    "1080p": { "60": 100, "144": 220, "240": 400 }
+    "1440p": { "60": 160, "144": 340, "240": 620 }
+    "2160p": { "60": 260, "144": 540, "240": 950 }
+
+counter-strike-2:
+  name: Counter-Strike 2
+  demand: light
+  required_score:
+    "1080p": { "60": 150, "144": 320, "240": 550 }
+    "1440p": { "60": 220, "144": 460, "240": 780 }
+    "2160p": { "60": 380, "144": 720, "240": 1000 }
+
+minecraft:
+  name: Minecraft
+  demand: light
+  required_score:
+    "1080p": { "60": 120, "144": 260, "240": 450 }
+    "1440p": { "60": 180, "144": 380, "240": 650 }
+    "2160p": { "60": 300, "144": 600, "240": 950 }
+
+gta-v:
+  name: GTA V
+  demand: medium
+  required_score:
+    "1080p": { "60": 260, "144": 500, "240": 820 }
+    "1440p": { "60": 400, "144": 760, "240": 1000 }
+    "2160p": { "60": 620, "144": 950, "240": 1000 }
+
+cyberpunk-2077:
+  name: Cyberpunk 2077
+  demand: heavy
+  required_score:
+    "1080p": { "60": 350, "144": 650, "240": 1000 }
+    "1440p": { "60": 520, "144": 900, "240": 1000 }
+    "2160p": { "60": 750, "144": 980, "240": 1000 }
+
+call-of-duty-warzone:
+  name: "Call of Duty: Warzone"
+  demand: heavy
+  required_score:
+    "1080p": { "60": 320, "144": 620, "240": 980 }
+    "1440p": { "60": 480, "144": 900, "240": 1000 }
+    "2160p": { "60": 700, "144": 960, "240": 1000 }
+
+baldurs-gate-3:
+  name: Baldur's Gate 3
+  demand: medium
+  required_score:
+    "1080p": { "60": 320, "144": 600, "240": 950 }
+    "1440p": { "60": 480, "144": 880, "240": 1000 }
+    "2160p": { "60": 700, "144": 960, "240": 1000 }
+
+ea-sports-fc:
+  name: EA Sports FC
+  demand: light
+  required_score:
+    "1080p": { "60": 180, "144": 360, "240": 620 }
+    "1440p": { "60": 280, "144": 540, "240": 900 }
+    "2160p": { "60": 450, "144": 850, "240": 1000 }

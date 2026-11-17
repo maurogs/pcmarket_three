@@ -1,0 +1,122 @@
+# Relative CPU performance scores (0-1000, desktop parts, roughly single-
+# threaded gaming + multi-core blended — same scale as gpu_tiers.yml).
+#
+# Keys are ALREADY NORMALIZED exactly like Performance::Scorer.normalize does
+# (downcase, brand words "intel"/"amd"/"core" removed, every non-alphanumeric
+# char stripped): "Intel Core i5-12400F" -> "i512400f", "AMD Ryzen 7 5800X3D"
+# -> "ryzen75800x3d". Mobile CPU suffixes (H/HK/U/HS/Ultra) keep their token,
+# so laptop chips need their own entry when they differ materially.
+
+# --- Intel Core (desktop) ------------------------------------------------------
+i914900ks: 970
+i914900k: 950
+i914900f: 930
+i913900ks: 930
+i913900k: 900
+i912900ks: 870
+i912900k: 850
+i911900k: 720
+i910900k: 660
+i99900k: 600
+i714700k: 850
+i714700f: 820
+i713700k: 800
+i712700k: 660
+i711700k: 580
+i710700k: 510
+i79700k: 400
+i78700k: 370
+i78700: 350
+i77700k: 300
+i76700k: 260
+i74790k: 250
+i74790: 240
+i73770k: 180
+i514600k: 720
+i514500: 640
+i513600k: 680
+i513500: 590
+i513400: 540
+i512600k: 600
+i512500: 550
+i512400f: 510
+i511400: 450
+i510600: 420
+i510400f: 380
+i59400f: 330
+i58400: 290
+i57400: 200
+i56500: 190
+i54570: 170
+i53470: 120
+i314100: 520
+i313100: 480
+i312100: 450
+i310100: 300
+i39100: 230
+i38100: 210
+i34130: 120
+
+# --- Intel Core (laptop common suffixes) --------------------------------------
+i913980hx: 900
+i913900hx: 830
+i713700hx: 760
+i713700h: 680
+i712700h: 580
+i513500h: 540
+i512500h: 480
+i511300h: 380
+i71260p: 460
+i51240p: 400
+
+# --- AMD Ryzen (desktop) -------------------------------------------------------
+ryzen99950x: 940
+ryzen99900x: 900
+ryzen97950x3d: 930
+ryzen97900x: 780
+ryzen95950x: 750
+ryzen95900x: 640
+ryzen79800x3d: 920
+ryzen79700x: 800
+ryzen77800x3d: 830
+ryzen77700x: 660
+ryzen75800x3d: 640
+ryzen75800x: 560
+ryzen75700x: 520
+ryzen73700x: 400
+ryzen72700x: 330
+ryzen71800x: 300
+ryzen59600x: 740
+ryzen58600x: 610
+ryzen57600x: 500
+ryzen57500x: 450
+ryzen55600x: 410
+ryzen55600: 390
+ryzen55500: 340
+ryzen54600x: 280
+ryzen53600x: 260
+ryzen53500x: 210
+ryzen52600x: 190
+ryzen51600x: 160
+ryzen38300x: 350
+ryzen37300x: 290
+ryzen35300x: 200
+ryzen34100g: 130
+ryzen33200g: 100
+
+# --- AMD Ryzen (laptop common suffixes) ----------------------------------------
+ryzen97945hx: 780
+ryzen97940hx: 750
+ryzen78845hs: 660
+ryzen77735hs: 520
+ryzen76800h: 440
+ryzen75800h: 400
+ryzen58640hs: 560
+ryzen57535hs: 420
+ryzen56600h: 380
+ryzen55600h: 340
+
+# --- AMD Threadripper (workstation) --------------------------------------------
+threadripper9960x: 980
+threadripper7960x: 900
+threadripper3960x: 620

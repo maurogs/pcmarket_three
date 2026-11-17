@@ -1,0 +1,144 @@
+<%# PC Finder quiz: five steps (games → resolution → FPS → budget → extras).
+    Progressive enhancement: with JS the steps become panels (quiz Stimulus
+    controller); without it the whole GET form renders inline and still works. %>
+<div class="mx-auto max-w-3xl px-4 py-8 sm:py-12">
+  <header class="text-center">
+    <h1 class="text-2xl font-bold tracking-tight sm:text-3xl"><%= t(".title") %></h1>
+    <p class="mx-auto mt-2 max-w-xl text-sm text-muted sm:text-base"><%= t(".subtitle") %></p>
+  </header>
+
+  <%= form_with url: pc_finder_results_path, method: :get, data: {
+        controller: "quiz",
+        quiz_max_games_value: PcFinder::Search::MAX_GAMES
+      }, class: "mt-8 rounded-xl border border-border bg-surface p-4 shadow-sm sm:p-6" do |form| %>
+
+    <%# Progress dots (decorative without JS). %>
+    <ol class="mb-6 flex items-center justify-center gap-2" aria-label="<%= t(".steps_label") %>">
+      <% %i[games resolution fps budget extras].each_with_index do |step, i| %>
+        <li>
+          <button type="button" data-quiz-target="dot" data-action="quiz#goTo" data-quiz-index-param="<%= i %>"
+                  aria-current="<%= "step" if i.zero? %>"
+                  class="size-2.5 rounded-full bg-<%= i.zero? ? "primary" : "border" %> transition"
+                  title="<%= t(".steps.#{step}") %>">
+            <span class="sr-only"><%= t(".steps.#{step}") %></span>
+          </button>
+        </li>
+      <% end %>
+    </ol>
+
+    <%# Step 1 — games (pick up to MAX_GAMES). %>
+    <fieldset data-quiz-target="step">
+      <legend class="text-base font-semibold"><%= t(".steps.games") %></legend>
+      <p class="mt-1 text-sm text-muted"><%= t(".games_hint", max: PcFinder::Search::MAX_GAMES) %></p>
+      <ul class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <% Performance::FpsEstimator.games.each do |game| %>
+          <li>
+            <label class="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-border bg-surface-muted px-3 py-2 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+              <%= check_box_tag "games[]", game[:slug], false,
+                    data: { quiz_target: "game", action: "quiz#toggleGame" },
+                    class: "size-4 accent-indigo-600" %>
+              <span class="flex-1 text-sm font-medium"><%= game[:name] %></span>
+              <span class="text-[11px] font-semibold uppercase tracking-wide text-muted"><%= t(".demand.#{game[:demand]}") %></span>
+            </label>
+          </li>
+        <% end %>
+      </ul>
+    </fieldset>
+
+    <%# Step 2 — target resolution. %>
+    <fieldset data-quiz-target="step" hidden>
+      <legend class="text-base font-semibold"><%= t(".steps.resolution") %></legend>
+      <ul class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
+        <% PcFinder::Search::RESOLUTIONS.each do |resolution| %>
+          <li>
+            <label class="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-border bg-surface-muted px-3 py-2 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+              <%= radio_button_tag :resolution, resolution, resolution == "1080p", class: "size-4 accent-indigo-600" %>
+              <span class="text-sm font-medium"><%= t(".resolutions.#{resolution}") %></span>
+            </label>
+          </li>
+        <% end %>
+      </ul>
+    </fieldset>
+
+    <%# Step 3 — FPS target. %>
+    <fieldset data-quiz-target="step" hidden>
+      <legend class="text-base font-semibold"><%= t(".steps.fps") %></legend>
+      <ul class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
+        <% PcFinder::Search::FPS_TARGETS.each do |fps| %>
+          <li>
+            <label class="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-border bg-surface-muted px-3 py-2 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+              <%= radio_button_tag :fps, fps, fps == "60", class: "size-4 accent-indigo-600" %>
+              <span class="text-sm font-medium"><%= t(".fps_targets.#{fps}") %></span>
+            </label>
+          </li>
+        <% end %>
+      </ul>
+    </fieldset>
+
+    <%# Step 4 — budget band. %>
+    <fieldset data-quiz-target="step" hidden>
+      <legend class="text-base font-semibold"><%= t(".steps.budget") %></legend>
+      <ul class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <% PcFinder::Search::BUDGETS.each_key do |budget| %>
+          <li>
+            <label class="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-border bg-surface-muted px-3 py-2 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+              <%= radio_button_tag :budget, budget, false, class: "size-4 accent-indigo-600" %>
+              <span class="text-sm font-medium"><%= t(".budgets.#{budget}") %></span>
+            </label>
+          </li>
+        <% end %>
+      </ul>
+    </fieldset>
+
+    <%# Step 5 — optional build traits (seller tags). %>
+    <fieldset data-quiz-target="step" hidden>
+      <legend class="text-base font-semibold"><%= t(".steps.extras") %></legend>
+      <p class="mt-1 text-sm text-muted"><%= t(".extras_hint") %></p>
+      <ul class="mt-3 flex flex-wrap gap-2">
+        <% SellerTag.where(slug: PcFinder::Search::FILTER_TAGS).order(:slug).each do |tag| %>
+          <li>
+            <label class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full border border-border bg-surface-muted px-3.5 text-sm font-medium has-[:checked]:border-primary has-[:checked]:bg-primary/10">
+              <%= check_box_tag "tags[]", tag.slug, false, class: "size-4 accent-indigo-600" %>
+              <%= tag.name %>
+            </label>
+          </li>
+        <% end %>
+      </ul>
+    </fieldset>
+
+    <div class="mt-6 flex items-center gap-3">
+      <button type="button" data-action="quiz#back" hidden
+              class="inline-flex min-h-11 items-center rounded-md border border-border px-4 text-sm font-medium hover:border-primary hover:text-primary">
+        <%= t(".back") %>
+      </button>
+      <button type="button" data-action="quiz#next"
+              class="inline-flex min-h-11 items-center rounded-md border border-primary px-4 text-sm font-semibold text-primary hover:bg-primary/5">
+        <%= t(".next") %>
+      </button>
+      <%= form.submit t(".submit"), class: "ml-auto inline-flex min-h-11 cursor-pointer items-center rounded-md bg-primary px-5 text-sm font-semibold text-white hover:bg-primary-hover" %>
+    </div>
+  <% end %>
+
+  <%# "Best PCs for…" strip: one sample machine per popular game, each link
+      pre-fills the quiz results for that title. %>
+  <section class="mt-10" aria-labelledby="finder-best">
+    <h2 id="finder-best" class="text-lg font-semibold"><%= t(".best_for") %></h2>
+    <ul class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <% @games.each do |game| %>
+        <% pick = @game_picks[game] %>
+        <li class="rounded-lg border border-border bg-surface p-3">
+          <p class="text-sm font-semibold"><%= game[:name] %></p>
+          <% if pick %>
+            <%= link_to pc_finder_results_path(games: game[:slug], resolution: "1440p", fps: "144"),
+                  class: "mt-2 flex items-center gap-3 rounded-md bg-surface-muted p-2 hover:bg-primary/5" do %>
+              <span class="flex-1 truncate text-sm"><%= pick.title %></span>
+              <span class="text-sm font-bold"><%= money(pick.price_cents, pick.currency) %></span>
+            <% end %>
+          <% else %>
+            <p class="mt-2 text-sm text-muted"><%= t(".no_pick") %></p>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+</div>

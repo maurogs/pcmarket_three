@@ -1,0 +1,141 @@
+<%# "Sell to us" landing: instant quote form + marketing (how it works,
+    payout examples, FAQ, testimonials). Flag-gated in the controller. %>
+<% example_conditions = %w[like_new good fair] %>
+
+<div class="mx-auto max-w-5xl px-4 py-8 sm:py-12">
+  <%# --- hero + quote form ---------------------------------------------- %>
+  <section class="grid gap-8 lg:grid-cols-2 lg:items-center">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight sm:text-4xl"><%= t(".title") %></h1>
+      <p class="mt-3 max-w-md text-sm text-muted sm:text-base"><%= t(".subtitle") %></p>
+      <ul class="mt-5 space-y-2 text-sm">
+        <% %w[point_fast point_checked point_paid].each do |point| %>
+          <li class="flex items-start gap-2">
+            <%= inline_icon :check, classes: "size-5 shrink-0 text-primary" %>
+            <span><%= t(".hero.#{point}") %></span>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+
+    <%= form_with url: trade_in_quotes_path, method: :post,
+          class: "rounded-xl border border-border bg-surface p-4 shadow-sm sm:p-6" do |form| %>
+      <h2 class="text-lg font-semibold"><%= t(".form_title") %></h2>
+
+      <div class="mt-4 space-y-4">
+        <div>
+          <%= form.label :model, t(".model_label"), class: "block text-sm font-medium" %>
+          <%= select_tag :model,
+                grouped_options_for_select({
+                  t(".components.gpu") => @gpu_models.map { |key, display| [ display, "gpu:#{key}" ] },
+                  t(".components.cpu") => @cpu_models.map { |key, display| [ display, "cpu:#{key}" ] }
+                }),
+                include_blank: t(".model_prompt"), required: true,
+                class: "mt-1.5 h-11 w-full rounded-md border border-border bg-surface px-3 text-sm font-medium focus:border-primary focus:outline-none" %>
+        </div>
+
+        <fieldset>
+          <legend class="text-sm font-medium"><%= t(".condition_label") %></legend>
+          <ul class="mt-2 grid grid-cols-2 gap-2">
+            <% TradeIn.conditions.each_key do |condition| %>
+              <li>
+                <label class="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-lg border border-border bg-surface-muted px-3 py-2 text-sm has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                  <%= radio_button_tag :condition, condition, condition == "good", class: "size-4 accent-indigo-600" %>
+                  <span><%= t(".conditions.#{condition}") %></span>
+                </label>
+              </li>
+            <% end %>
+          </ul>
+        </fieldset>
+
+        <label class="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-border bg-surface-muted px-3 py-2 text-sm">
+          <%= check_box_tag :has_box, "1", true, class: "size-4 accent-indigo-600" %>
+          <span><%= t(".has_box") %></span>
+        </label>
+        <p class="text-xs text-muted"><%= t(".box_note") %></p>
+
+        <%= form.submit t(".submit"),
+              class: "w-full cursor-pointer rounded-md bg-primary px-4 py-3 text-sm font-semibold text-white hover:bg-primary-hover" %>
+        <p class="text-center text-xs text-muted"><%= t(".form_note") %></p>
+      </div>
+    <% end %>
+  </section>
+
+  <%# --- how it works ---------------------------------------------------- %>
+  <section class="mt-12">
+    <h2 class="text-lg font-semibold"><%= t(".how_title") %></h2>
+    <ol class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <% %w[quote ship inspect get_paid].each_with_index do |step, index| %>
+        <li class="rounded-lg border border-border bg-surface p-4">
+          <span class="inline-flex size-8 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary"><%= index + 1 %></span>
+          <h3 class="mt-2 text-sm font-semibold"><%= t(".how.#{step}.title") %></h3>
+          <p class="mt-1 text-sm text-muted"><%= t(".how.#{step}.text") %></p>
+        </li>
+      <% end %>
+    </ol>
+  </section>
+
+  <%# --- payout examples -------------------------------------------------- %>
+  <section class="mt-12">
+    <h2 class="text-lg font-semibold"><%= t(".examples_title") %></h2>
+    <p class="mt-1 text-sm text-muted"><%= t(".examples_subtitle") %></p>
+    <div class="mt-4 grid gap-4 lg:grid-cols-2">
+      <% { "gpu" => @gpu_examples, "cpu" => @cpu_examples }.each do |type, rows| %>
+        <% next if rows.empty? %>
+        <div class="overflow-hidden rounded-lg border border-border bg-surface">
+          <table class="w-full text-sm">
+            <caption class="sr-only"><%= t(".components.#{type}") %></caption>
+            <thead>
+              <tr class="border-b border-border bg-surface-muted text-left text-xs uppercase tracking-wide text-muted">
+                <th scope="col" class="px-3 py-2"><%= t(".components.#{type}") %></th>
+                <% example_conditions.each do |condition| %>
+                  <th scope="col" class="px-3 py-2 text-right"><%= t(".conditions.#{condition}") %></th>
+                <% end %>
+              </tr>
+            </thead>
+            <tbody>
+              <% rows.each do |row| %>
+                <tr class="border-b border-border last:border-0">
+                  <th scope="row" class="px-3 py-2 text-left font-medium"><%= row[:display] %></th>
+                  <% example_conditions.each do |condition| %>
+                    <td class="px-3 py-2 text-right font-semibold"><%= money(row[:offers][condition], "EUR") %></td>
+                  <% end %>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <%# --- FAQ -------------------------------------------------------------- %>
+  <section class="mt-12">
+    <h2 class="text-lg font-semibold"><%= t(".faq_title") %></h2>
+    <div class="mt-4 space-y-2">
+      <% %w[q1 q2 q3 q4 q5].each do |question| %>
+        <details class="group rounded-lg border border-border bg-surface px-4 py-3">
+          <summary class="flex cursor-pointer items-center justify-between gap-3 text-sm font-medium">
+            <%= t(".faq.#{question}.question") %>
+            <span aria-hidden="true" class="text-muted transition group-open:rotate-45">+</span>
+          </summary>
+          <p class="mt-2 text-sm text-muted"><%= t(".faq.#{question}.answer") %></p>
+        </details>
+      <% end %>
+    </div>
+  </section>
+
+  <%# --- testimonials (illustrative, clearly labelled as such) ----------- %>
+  <section class="mt-12">
+    <h2 class="text-lg font-semibold"><%= t(".testimonials_title") %></h2>
+    <ul class="mt-4 grid gap-4 sm:grid-cols-3">
+      <% %w[one two three].each do |person| %>
+        <li class="rounded-lg border border-border bg-surface p-4">
+          <p class="text-sm leading-6">“<%= t(".testimonials.#{person}.quote") %>”</p>
+          <p class="mt-3 text-xs font-semibold text-muted"><%= t(".testimonials.#{person}.name") %></p>
+        </li>
+      <% end %>
+    </ul>
+    <p class="mt-3 text-xs text-muted"><%= t(".testimonials_note") %></p>
+  </section>
+</div>

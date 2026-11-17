@@ -2,6 +2,22 @@
 # `slug` is stable; names in 6 locales — brand-like words (noctua, sakura,
 # lo-fi, rgb, steampunk, anime) stay identical, the rest are translated.
 
+air-cooling:
+  names:
+    es: "Refrigeración por aire"
+    en: "Air cooling"
+    fr: "Refroidissement à air"
+    de: "Luftkühlung"
+    it: "Raffreddamento ad aria"
+    pt: "Arrefecimento a ar"
+aio-cooling:
+  names:
+    es: "Refrigeración líquida AIO"
+    en: "AIO cooling"
+    fr: "Refroidissement AIO"
+    de: "AIO-Wasserkühlung"
+    it: "Raffreddamento AIO"
+    pt: "Refrigeração líquida AIO"
 anime:
   names:
     es: "Anime"
@@ -18,6 +34,14 @@ basic:
     de: "Basis"
     it: "Basico"
     pt: "Básico"
+competitive:
+  names:
+    es: "Competitivo"
+    en: "Competitive"
+    fr: "Compétitif"
+    de: "Wettbewerbsorientiert"
+    it: "Competitivo"
+    pt: "Competitivo"
 blackout:
   names:
     es: "Negro total"

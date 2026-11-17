@@ -1,0 +1,17 @@
+<%# Relative performance bar (Performance::Scorer, 0-1000) shown when a
+    gaming PC / workstation / laptop has known enough specs to be scored.
+    locals: listing, label (defaults to the card label) %>
+<% score = listing.performance_score %>
+<% if score %>
+  <div class="space-y-1">
+    <div class="flex items-baseline justify-between text-[11px] font-medium text-muted">
+      <span><%= local_assigns.fetch(:label) { t(".performance") } %></span>
+      <span class="tabular-nums"><%= score %>/1000</span>
+    </div>
+    <div class="h-1.5 overflow-hidden rounded-full bg-surface-muted"
+         role="meter" aria-valuenow="<%= score %>" aria-valuemin="0" aria-valuemax="1000"
+         aria-label="<%= t(".performance") %>">
+      <div class="h-full rounded-full bg-primary" style="width: <%= (score / 10.0).round(1) %>%"></div>
+    </div>
+  </div>
+<% end %>

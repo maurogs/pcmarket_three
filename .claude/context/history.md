@@ -1,5 +1,106 @@
 # History
 
+## 2026-11-18 — Phase 7a: PC Finder, performance scoring & sell-to-us trade-ins (flag `sell_to_us`)
+
+**What changed**
+
+- **Performance scoring**: `Performance::Scorer` (`app/services/performance/`)
+  turns the free-text `gpu_model`/`cpu_model` listing specs into a 0–1000
+  `listings.performance_score` from tier tables `config/data/gpu_tiers.yml` +
+  `cpu_tiers.yml` (model names fuzzy-normalized: brand words and laptop/mobile
+  suffixes dropped, punctuation stripped; 75% GPU + 25% CPU, weights
+  re-normalized when only one resolves, **nil** when neither matches — never a
+  fake score). Only `Listing::SCORABLE_CATEGORY_SLUGS` (gaming-pcs,
+  workstations, laptops + descendants) score, via `Listing#scorable_category?`
+  (public for the rake task) + `refresh_performance_score` before_save.
+  Column existed since Phase 1; migration `20261118020002` adds a partial
+  index (`WHERE performance_score IS NOT NULL`). Backfill: `bin/rails
+  performance:backfill` (deliberate `update_column`). Dev after seeding:
+  **4 of 46 listings scored** (383/498/560/838 — same numbers the test
+  fixtures pin). `Performance::FpsEstimator` maps score → estimated FPS per
+  game from `config/data/games.yml` (per-game `required_score` per
+  resolution/FPS target); `estimate` clamps input to `SCORE_CAP = 1000`
+  because extrapolation slopes cross and invert above the tier scale.
+  UI: `shared/_performance_bar` in listing cards + `listings/show` score/FPS
+  block.
+- **PC Finder**: `/pc-finder` quiz (`PcFindersController#show`, Stimulus
+  `quiz_controller.js`, progressive-enhanced GET form) → results page
+  `/pc-finder/results` (`PcFinderResultsController#index`). `PcFinder::Search`
+  builds on ListingSearch-era patterns but its own query: gaming-pcs subtree,
+  budget bands, chosen seller tags AND-ed, and a score floor = **max** of the
+  selected games' `required_score` at the chosen resolution×FPS; ordered by
+  **value = performance_score / price** (unscored fall to 0 and sink), 9 per
+  page, "best match" badge, pagy "Load more" turbo frame.
+  `PcFinder::Search.sample_for(game_slug)` feeds the `pages/home/_finder`
+  strip. Both controllers `allow_unauthenticated_access`.
+- **Sell-to-us trade-ins** behind Flipper `:sell_to_us` (public controllers
+  `head :not_found` while off): `TradeIn` model (migration `20261118020001`) —
+  `component_type` gpu/cpu, 4 conditions, status enum
+  `quoted/accepted/received/inspected/paid/rejected/expired` + `TRANSITIONS`
+  map, `transition_to!`/`expire!` raising `TradeIn::InvalidTransition`,
+  `QUOTE_TTL` 7 days. Public flow `/sell-to-us` (`TradeInQuotesController`
+  new/create/show) → `TradeIns::Quote` prices from
+  `config/data/trade_in_prices.yml`; sign-in + accept
+  (`TradeInAcceptancesController` → `TradeIns::Accept`, stale quotes
+  refused). Admin shipment walk: `Admin::TradeInsController`
+  (index/show/audited `update` via `transition_to!`) + sidebar entry.
+- **Dev seed**: `db/seeds/sample_listings.rb` gained 4 gaming PCs in the
+  gaming-pcs subtree (`value-pcs`/`mid-range-pcs`/`pro-gamer-pcs`) carrying
+  `gpu_model`/`cpu_model` specs + finder-relevant seller tags
+  (`air-cooling`/`aio-cooling`/`competitive` added to `seller_tags.yml`), and
+  per-sample `tags:` support in the loader.
+
+**Pre-existing bugs fixed along the way**
+
+- `layouts/_header.html.erb` cart link rendered broken (`link_to cart_path,
+  class:` — text arg missing since Phase 6a) → `link_to t("nav.cart"), …`.
+- PC Finder locale scopes `_result:`/`_page:` never resolved: partial lazy
+  lookup searches for `pc_finder_results.result.*` (leading underscore is
+  stripped from the lookup, not part of it). Renamed to `result:`/`page:` in
+  all 6 locale files + new `pc_finder_results.index.title` with an `<h1>`.
+- Custom `TradeIn#expired?` shadowed the status-enum predicate, so the show
+  view's `expired?` branch died → removed; wall-clock staleness is
+  `stale_quote?` (`quoted? && expires_at <= Time.current`), used by
+  `TradeIns::Accept`, `TradeInQuotesController#show` and
+  `Admin::TradeInsController#show`.
+- `performance:backfill` called non-existent
+  `Performance::Scorer.score_for_listing`; `Listing#scorable_category?` was
+  private → made public.
+- Sample seed wrote autonomous-community names into `listings.region`, which
+  fails `Listing#region_known` (validates **province** names via `EsProvince`)
+  — latent because the dev rows predated the validation; sample sellers now
+  carry `province:` and the existing dev rows were normalized.
+
+**Pre-existing tests adjusted (fixture-count shifts / contradictions)**
+
+- `test/services/listing_search_test.rb`: expectations rewritten for the 4
+  new gaming-PC fixtures (7 approved listings; q=rtx 5; price/condition
+  counts; facet maps; seller_tag counts; `spec_facets` now includes
+  cpu_model/gpu_model — those fixture specs are TEXT specs so
+  `facet_attributes` stays `negotiable ports vram`).
+- `test/controllers/listings_controller_test.rb`: index h3 3→7, search
+  h3 3→5.
+- `test/services/sell/dashboard_stats_test.rb`: live_listings 1→3;
+  top_listings made deterministic (views 120/80).
+- `test/seeds/reference_data_test.rb`: created counts 61→60 categories,
+  34→32 spec attributes, 88→86 attachments, 24→21 seller tags (gaming-pcs,
+  gpu_model/cpu_model, competitive/air-cooling/aio-cooling pre-exist in
+  fixtures).
+- `test/integration/trade_in_test.rb`: "another user cannot steal a claimed
+  quote" was self-contradictory (the anonymous quote IS legitimately
+  claimable by the second user) → success expectations; flag-off test
+  extended with show + acceptance 404 asserts.
+- `test/integration/pc_finder_test.rb`: `_result.best_match` key ref →
+  `result.best_match`.
+
+**New tests**: `test/services/performance/{scorer,fps_estimator}_test.rb`,
+`test/services/pc_finder/search_test.rb`, `test/integration/{pc_finder,trade_in}_test.rb`,
+`test/controllers/admin/trade_ins_test.rb`; fixtures: 4 gaming PCs
+(+`listing_tags`), `gaming-pcs`/`gaming-desktops` categories,
+`cpu_model`/`gpu_model` spec attributes (+category attachments), seller
+tags. Suite: 707 runs / 11 434 assertions green; locale tree now **2153
+keys** ×6.
+
 ## 2026-11-18 — Phase 6b: admin panel part 2 — orders/disputes/refunds, review moderation, taxonomy, countries, feature flags, settings, legal pages, audit log browse
 
 **What changed**

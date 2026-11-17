@@ -21,3 +21,19 @@ ports:
     es: Puertos
   input_type: multi_select
   position: 3
+
+gpu_model:
+  key: gpu_model
+  names:
+    en: Graphics card model
+    es: Modelo de tarjeta gráfica
+  input_type: text
+  position: 4
+
+cpu_model:
+  key: cpu_model
+  names:
+    en: Processor model
+    es: Modelo de procesador
+  input_type: text
+  position: 5

@@ -12,3 +12,18 @@ rtx:
     es: Serie RTX
   parent: gpus
   position: 1
+
+gaming-pcs:
+  slug: gaming-pcs
+  names:
+    en: Gaming PCs
+    es: PC gaming
+  position: 2
+
+gaming-desktops:
+  slug: gaming-desktops
+  names:
+    en: Gaming Desktops
+    es: Sobremesa gaming
+  parent: gaming-pcs
+  position: 1

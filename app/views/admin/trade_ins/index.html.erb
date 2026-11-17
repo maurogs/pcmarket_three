@@ -1,0 +1,39 @@
+<%# Admin trade-in queue: every quote ever requested, newest first. %>
+<h1 class="text-xl font-semibold"><%= t(".title") %></h1>
+<p class="mb-4 mt-1 text-sm text-muted"><%= t(".subtitle", count: @pagy.count) %></p>
+
+<div class="overflow-x-auto rounded-lg border border-border bg-surface">
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="border-b border-border bg-surface-muted text-left text-xs uppercase tracking-wide text-muted">
+        <th scope="col" class="px-3 py-2"><%= TradeIn.human_attribute_name(:model) %></th>
+        <th scope="col" class="px-3 py-2"><%= TradeIn.human_attribute_name(:component_type) %></th>
+        <th scope="col" class="px-3 py-2"><%= TradeIn.human_attribute_name(:offered_cents) %></th>
+        <th scope="col" class="px-3 py-2"><%= TradeIn.human_attribute_name(:status) %></th>
+        <th scope="col" class="px-3 py-2"><%= TradeIn.human_attribute_name(:user) %></th>
+        <th scope="col" class="px-3 py-2"><%= TradeIn.human_attribute_name(:created_at) %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @trade_ins.each do |trade_in| %>
+        <% model_display = TradeIns::Quote.model_entry(trade_in.component_type, trade_in.model)&.fetch("display") %>
+        <tr class="border-b border-border last:border-0">
+          <th scope="row" class="px-3 py-2 text-left font-medium">
+            <%= link_to model_display || trade_in.model, admin_trade_in_path(trade_in), class: "text-primary hover:underline" %>
+          </th>
+          <td class="px-3 py-2"><%= TradeIn.human_attribute_name("component_type/#{trade_in.component_type}") %></td>
+          <td class="px-3 py-2 font-semibold"><%= money(trade_in.offered_cents, "EUR") %></td>
+          <td class="px-3 py-2">
+            <span class="rounded-full bg-surface-muted px-2 py-0.5 text-xs font-semibold">
+              <%= TradeIn.human_attribute_name("status/#{trade_in.status}") %>
+            </span>
+          </td>
+          <td class="px-3 py-2"><%= trade_in.user&.display_name || t(".anonymous") %></td>
+          <td class="px-3 py-2 text-muted"><%= l(trade_in.created_at.to_date) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="mt-4"><%= results_pagination(@pagy) %></div>

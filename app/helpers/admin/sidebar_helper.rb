@@ -14,6 +14,7 @@ module Admin
     ADMIN_NAV = [
       [ "admin/dashboards", "layouts.admin.nav.dashboard", :dashboard ],
       [ "admin/moderations", "layouts.admin.nav.moderations", :moderations ],
+      [ "admin/trade_ins", "layouts.admin.nav.trade_ins", :trade_ins ],
       [ "admin/listings", "layouts.admin.nav.listings", :listings ],
       [ "admin/orders", "layouts.admin.nav.orders", :orders ],
       [ "admin/disputes", "layouts.admin.nav.disputes", :disputes ],
@@ -35,6 +36,7 @@ module Admin
     ADMIN_NAV_PATHS = {
       "admin/dashboards" => :admin_dashboard_path,
       "admin/moderations" => :admin_moderations_path,
+      "admin/trade_ins" => :admin_trade_ins_path,
       "admin/listings" => :admin_listings_path,
       "admin/orders" => :admin_orders_path,
       "admin/disputes" => :admin_disputes_path,
@@ -56,6 +58,7 @@ module Admin
     ADMIN_SECTIONS = {
       "admin/dashboards" => %w[dashboards],
       "admin/moderations" => %w[moderations approvals rejections bulk_moderations],
+      "admin/trade_ins" => %w[trade_ins],
       "admin/listings" => %w[listings unpublications],
       "admin/orders" => %w[orders notes],
       "admin/disputes" => %w[disputes resolutions],
@@ -103,6 +106,7 @@ module Admin
       spec_attributes: "M5 7.5h14M5 12h14M5 16.5h14M8.25 5.25v4.5m7.5-1.5v4.5m-6 1.5v4.5",
       labels: "M7.5 6.75h.01M4.5 4.5h7l8.5 8.5-7 7-8.5-8.5v-7zM9 15.5l5.5-5.5",
       seller_tags: "M7.5 3.75h9a1.5 1.5 0 011.5 1.5v15l-6-3-6 3v-15a1.5 1.5 0 011.5-1.5z",
+      trade_ins: "M4.5 8.25h15l-2.7-2.7m2.7 2.7l-2.7 2.7m0 5.25h-15m15 0l-2.7-2.7m2.7 2.7l-2.7 2.7",
       countries: "M12 3.75a8.25 8.25 0 100 16.5 8.25 8.25 0 000-16.5zM3.75 12h16.5M12 3.75c2.2 2.1 3.3 5.2 3.3 8.25S14.2 18.15 12 20.25c-2.2-2.1-3.3-5.2-3.3-8.25S9.8 5.85 12 3.75z",
       feature_flags: "M6.75 20.25V4.5m0 1.5h10.5l-2.25 3.75 2.25 3.75H6.75",
       settings: "M12 15a3 3 0 100-6 3 3 0 000 6zM12 3.75l1.5 2.25h2.6l.65 2.6L18.75 12l-2 3.4-.65 2.6h-2.6L12 20.25l-1.5-2.25h-2.6l-.65-2.6-2-3.4.65-2.6h2.6L12 3.75z",

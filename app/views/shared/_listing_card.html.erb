@@ -51,6 +51,7 @@
       </h3>
 
       <% unless compact %>
+        <%= render "shared/performance_bar", listing: listing %>
         <div class="mt-auto space-y-0.5 pt-1 text-xs text-muted">
           <div class="flex items-center gap-1">
             <% if listing.store %>

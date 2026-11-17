@@ -51,6 +51,17 @@ class Listing < ApplicationRecord
 
   has_many_attached :photos
 
+  # Only these category trees get a performance_score (they carry gpu/cpu
+  # spec fields and are what the PC Finder queries).
+  SCORABLE_CATEGORY_SLUGS = %w[gaming-pcs workstations laptops].freeze
+  # The PC Finder only surfaces complete gaming PCs.
+  FINDER_CATEGORY_SLUGS = %w[gaming-pcs].freeze
+
+  # The composite score (Performance::Scorer) is recomputed whenever the
+  # specs or the category move — see the service for the weighting rules.
+  before_save :refresh_performance_score,
+              if: -> { new_record? || will_save_change_to_specs? || will_save_change_to_category_id? }
+
   # A price CUT on a live listing alerts the users who saved it (at most once
   # per listing per 24h — see Listings::PriceDropNotifier) and a listing
   # that just became APPROVED fans out to saved-search matches.
@@ -95,6 +106,10 @@ class Listing < ApplicationRecord
   scope :recent, -> { order(published_at: :desc, id: :desc) }
   scope :discounted, -> { where("original_price_cents IS NOT NULL AND original_price_cents > price_cents") }
   scope :in_category_slug, ->(slug) { where(category: Category.where(slug: slug)) }
+  # Gaming PCs and every subcategory below them (PC Finder scope, phase 7a).
+  scope :in_finder_categories, -> {
+    where(category_id: Category.where(slug: FINDER_CATEGORY_SLUGS).flat_map(&:self_and_descendant_ids))
+  }
   scope :recently_sold, -> { where(status: :sold).order(sold_at: :desc, id: :desc) }
 
   # Most recently rejected listings of one seller, for the dashboard's
@@ -313,6 +328,16 @@ class Listing < ApplicationRecord
     counts
   end
 
+  # Scoring applies to gaming PCs, workstations and laptops — checked
+  # against the category's ancestor chain so subcategories inherit it.
+  # Public: the performance:backfill task calls it per listing.
+  def scorable_category?
+    return false if category.nil?
+
+    Category.where(id: category.self_and_ancestor_ids)
+            .exists?(slug: SCORABLE_CATEGORY_SLUGS)
+  end
+
   private
 
   def alert_price_drop
@@ -343,6 +368,13 @@ class Listing < ApplicationRecord
     return if specs.is_a?(Hash)
 
     errors.add(:specs, :invalid)
+  end
+
+  # Composite 0-1000 gaming score from the gpu_model/cpu_model specs
+  # (Performance::Scorer). nil when no tier matches — never a fake score.
+  def refresh_performance_score
+    self.performance_score =
+      scorable_category? ? Performance::Scorer.score_from_specs(specs) : nil
   end
 
   # Specs must belong to the category's attribute set (own + inherited) and

@@ -15,19 +15,20 @@ require "faker"
 
 # --- Sample stores -------------------------------------------------------
 
-# `city`/`region` describe the seller location; they are copied onto the
-# sample listings (stores themselves have no location columns).
+# `city`/`province` describe the seller location; they are copied onto the
+# sample listings (the listing `region` column holds the PROVINCE name — the
+# same value the seller location form writes, validated by EsProvince).
 SAMPLE_SELLERS = [
   { name: "Componentes Barcelona", store_type: "business",
-    city: "Barcelona", region: "Cataluña", vat_number: "B12345678", verified: true },
+    city: "Barcelona", province: "Barcelona", vat_number: "B12345678", verified: true },
   { name: "Rig y Gaming Madrid", store_type: "business",
-    city: "Madrid", region: "Comunidad de Madrid", vat_number: "B87654321", verified: true },
+    city: "Madrid", province: "Madrid", vat_number: "B87654321", verified: true },
   { name: "TechValencia Outlet", store_type: "business",
-    city: "Valencia", region: "Comunidad Valenciana" },
+    city: "Valencia", province: "Valencia", vat_number: nil },
   { name: "Marcosused", store_type: "individual",
-    city: "Sevilla", region: "Andalucía" },
+    city: "Sevilla", province: "Sevilla" },
   { name: "Bilbao PC Parts", store_type: "individual",
-    city: "Bilbao", region: "País Vasco" }
+    city: "Bilbao", province: "Vizcaya" }
 ].freeze
 
 def seed_sample_stores!
@@ -168,7 +169,26 @@ SAMPLE_LISTINGS = [
   { category: "games", title: "Juego físico precintado edición estándar", price: 4_900,
     condition: "brand_new", specs: {} },
   { category: "gpus", title: "GPU para repuestos, ventiladores rotos", price: 9_900,
-    condition: "for_parts", specs: { "gpu_chipset" => "nvidia", "gpu_memory" => "8" } }
+    condition: "for_parts", specs: { "gpu_chipset" => "nvidia", "gpu_memory" => "8" } },
+  # Prebuilt/used gaming PCs behind the PC Finder (Phase 7a). Specs carry the
+  # free-text gpu_model/cpu_model keys the Performance::Scorer reads, so these
+  # listings get a real performance_score and the /pc-finder results page has
+  # something to rank.
+  { category: "pro-gamer-pcs", title: "PC Gaming RTX 4080 Super, AIO silencioso", price: 189_900,
+    condition: "used_like_new", specs: { "gpu_model" => "NVIDIA GeForce RTX 4080 Super",
+                                         "cpu_model" => "AMD Ryzen 7 9800X3D" },
+    tags: %w[aio-cooling competitive], free_shipping: true, labels: %w[staff-pick] },
+  { category: "mid-range-pcs", title: "PC Gaming Ryzen 5 7600X + RTX 4070 1440p", price: 109_900,
+    condition: "used_good", specs: { "gpu_model" => "NVIDIA GeForce RTX 4070",
+                                     "cpu_model" => "AMD Ryzen 5 7600X" },
+    tags: %w[rgb competitive] },
+  { category: "value-pcs", title: "PC Gaming barato RTX 3060 para 1080p", price: 64_900,
+    condition: "used_good", specs: { "gpu_model" => "NVIDIA GeForce RTX 3060",
+                                     "cpu_model" => "Intel Core i5-12400F" } },
+  { category: "value-pcs", title: "PC Gaming Ryzen 7 5800X3D calidad-precio", price: 59_900,
+    condition: "used_like_new", specs: { "gpu_model" => "AMD Radeon RX 6700 XT",
+                                         "cpu_model" => "AMD Ryzen 7 5800X3D" },
+    tags: %w[air-cooling] }
 ].freeze
 
 def seed_sample_listings!(stores)
@@ -219,7 +239,7 @@ def seed_sample_listings!(stores)
       status: sold_slots.include?(index) ? "sold" : "approved",
       specs: specs,
       city: seller_info[:city],
-      region: seller_info[:region],
+      region: seller_info[:province],
       shipping_available: sample.fetch(:shipping, true),
       local_pickup: sample.fetch(:local_pickup, false),
       free_shipping: sample.fetch(:free_shipping, false),
@@ -232,7 +252,11 @@ def seed_sample_listings!(stores)
     listing.sold_at = 3.days.ago if sold_slots.include?(index)
     listing.featured_until = 7.days.from_now if sample[:featured]
     listing.labels = Label.where(slug: sample[:labels]) if sample[:labels]
-    listing.seller_tags = SellerTag.order(:id).to_a.rotate(index).first(2) if index.even?
+    if sample[:tags]
+      listing.seller_tags = SellerTag.where(slug: sample[:tags])
+    elsif index.even?
+      listing.seller_tags = SellerTag.order(:id).to_a.rotate(index).first(2)
+    end
     listing.save!
     created += 1
   end

@@ -1,0 +1,20 @@
+<%# Appended page frame: items for one page plus the next chained frame. %>
+<turbo-frame id="finder_results_page_<%= page %>">
+  <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    <% @results.records.each do |listing| %>
+      <li>
+        <%= render "result", listing: listing, best: false,
+              games: @results.filters[:games], resolution: @results.filters[:resolution] %>
+      </li>
+    <% end %>
+  </ul>
+
+  <% if next_page %>
+    <div class="mt-4 flex justify-center">
+      <turbo-frame id="finder_results_page_<%= next_page %>">
+        <%= link_to t(".load_more"), pc_finder_results_path(page: next_page),
+              class: "inline-flex min-h-11 items-center rounded-md border border-primary px-5 text-sm font-semibold text-primary hover:bg-primary hover:text-white" %>
+      </turbo-frame>
+    </div>
+  <% end %>
+</turbo-frame>

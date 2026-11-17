@@ -22,7 +22,7 @@ class Sell::DashboardStatsTest < ActiveSupport::TestCase
   test "counts live and in-review listings and sums lifetime views" do
     stats = Sell::DashboardStats.new(@seller).call
 
-    assert_equal 1, stats.live_listings          # as_new (draft and rejected excluded)
+    assert_equal 3, stats.live_listings  # as_new + the two approved gaming PCs (draft and rejected excluded)
     assert_equal 0, stats.in_review
     assert_equal 200, stats.total_views
   end
@@ -103,9 +103,14 @@ class Sell::DashboardStatsTest < ActiveSupport::TestCase
     listings(:sold).update_column(:views_count, 500) # user one's sold listing
     @listing.update_column(:views_count, 50)
     listings(:draft).update_column(:views_count, 999)
+    # seller two's two gaming-PC fixtures join the ranking; give them distinct
+    # view counts so the expected order is deterministic.
+    listings(:mid_rgb_build).update_column(:views_count, 120)
+    listings(:value_5800x3d_build).update_column(:views_count, 80)
 
     top = Sell::DashboardStats.new(@seller).call.top_listings
-    assert_equal [ @listing.id ], top.ids
+    assert_equal [ listings(:mid_rgb_build).id, listings(:value_5800x3d_build).id, @listing.id ],
+                 top.ids
     assert_operator top.to_a.size, :<=, 5
   end
 end

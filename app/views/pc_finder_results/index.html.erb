@@ -1,0 +1,82 @@
+<%# Quiz results: header + removable filter chips + results grid.
+    "Load more" chains nested Turbo frames (one per page) so later pages
+    append instead of replacing. %>
+<% filters = @results.filters %>
+<% next_page = @results.pagy.page < @results.pagy.pages ? @results.pagy.page + 1 : nil %>
+<% page = @results.pagy.page %>
+
+<% if page > 1 %>
+  <%= render "page", results: @results, page: page, next_page: next_page %>
+<% else %>
+  <turbo-frame id="finder_results">
+    <h1 class="mb-4 text-2xl font-bold tracking-tight"><%= t(".title") %></h1>
+    <div class="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2">
+      <p class="text-sm text-muted">
+        <span class="font-semibold text-text"><%= number_with_delimiter(@results.total_count) %></span>
+        <%= t(".count", count: @results.total_count) %>
+      </p>
+      <% if @results.required_score %>
+        <p class="text-sm text-muted"><%= t(".required_score", score: @results.required_score) %></p>
+      <% end %>
+      <p class="ml-auto text-xs text-muted"><%= t(".sorted_by_value") %></p>
+    </div>
+
+    <%# Applied quiz answers as one-click editable chips (each link re-runs
+        the search with just that piece changed / removed). %>
+    <% chips = finder_result_chips(@results) %>
+    <% if chips.any? %>
+      <ul class="mb-5 flex flex-wrap gap-2" aria-label="<%= t(".applied_filters") %>">
+        <% chips.each do |label, href| %>
+          <li>
+            <%= link_to href, rel: "nofollow",
+                  class: "group inline-flex min-h-9 items-center gap-1.5 rounded-full bg-surface-muted px-3 text-xs font-medium text-text hover:bg-primary hover:text-white" do %>
+              <span class="truncate"><%= label %></span>
+              <span aria-hidden="true" class="text-muted group-hover:text-white">&times;</span>
+              <span class="sr-only"><%= t(".remove_filter") %></span>
+            <% end %>
+          </li>
+        <% end %>
+        <li><%= link_to t(".clear_all"), pc_finder_path, class: "inline-flex min-h-9 items-center px-1 text-xs font-semibold text-primary hover:underline" %></li>
+      </ul>
+    <% end %>
+
+    <% if @results.empty? %>
+      <div class="rounded-lg border border-dashed border-border bg-surface-muted px-4 py-10 text-center">
+        <h2 class="text-base font-semibold"><%= t(".empty_title") %></h2>
+        <p class="mx-auto mt-1 max-w-md text-sm text-muted"><%= t(".empty_text") %></p>
+        <% if @results.suggestions.any? %>
+          <ul class="mt-4 flex flex-wrap justify-center gap-2">
+            <% @results.suggestions.each do |suggestion| %>
+              <li>
+                <%= link_to t(".suggestions.#{suggestion[:key]}"), pc_finder_results_path(suggestion[:params]),
+                      class: "inline-flex min-h-11 items-center rounded-full border border-primary/40 bg-surface px-4 text-sm font-semibold text-primary hover:bg-primary hover:text-white" %>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+        <%= link_to t(".retake"), pc_finder_path,
+              class: "mt-5 inline-flex min-h-11 items-center rounded-md bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-hover" %>
+      </div>
+    <% else %>
+      <div class="space-y-6">
+        <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <% @results.records.each_with_index do |listing, index| %>
+            <li>
+              <%= render "result", listing: listing, best: (index.zero? && page == 1),
+                    games: filters[:games], resolution: filters[:resolution] %>
+            </li>
+          <% end %>
+        </ul>
+
+        <% if next_page %>
+          <turbo-frame id="finder_results_page_<%= next_page %>">
+            <div class="flex justify-center">
+              <%= link_to t(".load_more"), pc_finder_results_path(page: next_page),
+                    class: "inline-flex min-h-11 items-center rounded-md border border-primary px-5 text-sm font-semibold text-primary hover:bg-primary hover:text-white" %>
+            </div>
+          </turbo-frame>
+        <% end %>
+      </div>
+    <% end %>
+  </turbo-frame>
+<% end %>

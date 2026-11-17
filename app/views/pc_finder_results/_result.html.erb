@@ -1,0 +1,30 @@
+<%# Finder result: the standard card plus the estimated-FPS strip for the
+    games chosen in the quiz, and the "best match" badge on the top hit. %>
+<div class="flex h-full flex-col gap-2">
+  <% if best %>
+    <span class="inline-flex w-fit items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-xs font-bold text-white">
+      <%= inline_icon :bolt, classes: "size-3.5" %>
+      <%= t(".best_match") %>
+    </span>
+  <% end %>
+
+  <%= render "shared/listing_card", listing: listing %>
+
+  <% estimates = games.filter_map do |slug|
+       fps = Performance::FpsEstimator.estimate(listing.performance_score, slug, resolution)
+       [ Performance::FpsEstimator::GAMES.dig(slug, "name"), fps ] if fps
+     end %>
+  <% if estimates.any? %>
+    <div class="flex flex-1 flex-col gap-2 rounded-lg border border-border bg-surface-muted p-3">
+      <p class="text-xs font-semibold text-muted"><%= t(".estimated_fps") %></p>
+      <ul class="flex flex-wrap gap-1.5">
+        <% estimates.each do |name, fps| %>
+          <li class="rounded-full bg-surface px-2.5 py-1 text-xs font-medium">
+            <%= name %> · <span class="font-bold text-primary">~<%= fps %> FPS</span>
+          </li>
+        <% end %>
+      </ul>
+      <p class="mt-auto text-[11px] text-muted"><%= t(".why", resolution: resolution) %></p>
+    </div>
+  <% end %>
+</div>

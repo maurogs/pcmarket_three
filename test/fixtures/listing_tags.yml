@@ -5,3 +5,19 @@ gigabyte_watercooled:
 as_new_watercooled:
   listing: as_new
   seller_tag: watercooled
+
+beast_aio:
+  listing: beast_rtx4080s
+  seller_tag: aio-cooling
+
+beast_competitive:
+  listing: beast_rtx4080s
+  seller_tag: competitive
+
+value_air:
+  listing: value_5800x3d_build
+  seller_tag: air-cooling
+
+value_silent:
+  listing: value_5800x3d_build
+  seller_tag: silent_build

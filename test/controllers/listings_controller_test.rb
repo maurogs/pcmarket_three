@@ -6,7 +6,7 @@ class ListingsControllerTest < ActionDispatch::IntegrationTest
   test "index lists approved listings only" do
     get "/en/listings"
     assert_response :success
-    assert_select "h3", count: 3
+    assert_select "h3", count: 7
     assert_no_match(/Used RTX 3080/, response.body)
     assert_no_match(/Sold ASUS ROG Strix/, response.body)
   end
@@ -14,7 +14,7 @@ class ListingsControllerTest < ActionDispatch::IntegrationTest
   test "GET /search renders results without redirecting" do
     get "/en/search", params: { q: "rtx" }
     assert_response :ok
-    assert_select "h3", count: 3
+    assert_select "h3", count: 5
   end
 
   test "index filters from the query string" do

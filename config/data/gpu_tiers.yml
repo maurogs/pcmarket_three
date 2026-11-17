@@ -1,0 +1,112 @@
+# Relative GPU performance scores (0-1000, RTX 5090 = reference 1000).
+#
+# Keys are ALREADY NORMALIZED exactly like Performance::Scorer.normalize does
+# (downcase, brand words removed, every non-alphanumeric char stripped), so
+# the lookup is a plain hash read. Add new models in that compact form:
+# "NVIDIA GeForce RTX 4070 Super" -> "rtx4070super".
+#
+# Laptop variants map to their desktop sibling (Scorer strips a trailing
+# "laptop"/"mobile"/"notebook" suffix) — a documented approximation.
+
+# --- NVIDIA desktop -----------------------------------------------------------
+rtx5090: 1000
+rtx5080: 880
+rtx5070ti: 780
+rtx5070: 700
+rtx5060ti: 580
+rtx5060: 520
+rtx4090: 920
+rtx4090d: 880
+rtx4080super: 810
+rtx4080: 790
+rtx4070tisuper: 730
+rtx4070ti: 680
+rtx4070super: 650
+rtx4070: 580
+rtx4060ti: 480
+rtx4060: 440
+rtx3090ti: 730
+rtx3090: 700
+rtx3080ti: 650
+rtx3080: 600
+rtx3070ti: 520
+rtx3070: 480
+rtx3060ti: 420
+rtx3060: 340
+rtx3050: 230
+rtx2080ti: 480
+rtx2080super: 400
+rtx2080: 380
+rtx2070super: 350
+rtx2070: 310
+rtx2060super: 300
+rtx2060: 270
+gtx1660super: 200
+gtx1660ti: 190
+gtx1660: 180
+gtx1650super: 145
+gtx1650: 120
+gtx1080ti: 270
+gtx1080: 220
+gtx1070ti: 190
+gtx1070: 165
+gtx1060: 130
+gtx1050ti: 100
+gtx1050: 80
+
+# --- AMD desktop --------------------------------------------------------------
+rx9070xt: 800
+rx9070: 720
+rx7900xtx: 820
+rx7900xt: 740
+rx7900gre: 620
+rx7800xt: 600
+rx7700xt: 530
+rx7600xt: 440
+rx7600: 410
+rx6950xt: 630
+rx6900xt: 600
+rx6800xt: 560
+rx6800: 510
+rx6750xt: 480
+rx6700xt: 450
+rx6650xt: 380
+rx6600xt: 350
+rx6600: 330
+rx6500xt: 200
+rx5700xt: 330
+rx5700: 290
+rx5600xt: 260
+rx5500xt: 160
+rx590: 210
+rx580: 200
+rx570: 170
+rx480: 170
+rx470: 150
+
+# --- Intel Arc desktop --------------------------------------------------------
+arcb580: 350
+arcb570: 300
+arcb380: 170
+arca770: 330
+arca750: 280
+arca380: 150
+
+# --- Integrated / laptop iGPUs ------------------------------------------------
+# NOTE: the Scorer only strips "radeon" in front of "rx …", so Radeon iGPUs
+# keep their brand token as the key. "Radeon Graphics" normalizes to "radeon".
+radeon780m: 180
+radeon760m: 130
+radeon680m: 150
+radeon660m: 110
+radeon610m: 60
+radeonvega11: 55
+radeonvega8: 40
+radeon: 60
+arc: 160
+irisxe: 110
+irismax: 130
+uhd: 30
+uhd630: 32
+uhd730: 35
+uhd770: 55

@@ -18,11 +18,17 @@ class ReferenceDataSeedTest < ActiveSupport::TestCase
     assert_equal first, second, "re-running db/seeds.rb must not change any table count"
 
     created = first.keys.to_h { |table| [ table, first[table] - before[table] ] }
-    assert_equal 61, created[:categories], "10 roots + 51 children"
-    assert_equal 34, created[:spec_attributes]
+    # 10 roots + 51 children, but the gaming-pcs root pre-exists in the fixtures
+    # (Phase 7a), so the seed upserts it instead of creating it.
+    assert_equal 60, created[:categories]
+    # gpu_model / cpu_model spec attributes already exist in the fixtures too.
+    assert_equal 32, created[:spec_attributes]
     assert_equal 293, created[:spec_options]
-    assert_equal 88, created[:category_spec_attributes]
+    # …and their two gaming-pcs / gaming-desktops category links pre-exist too.
+    assert_equal 86, created[:category_spec_attributes]
     assert_equal 13, created[:labels]
+    # 21 style tags are created; the 3 phase-7a finder filters (competitive,
+    # air-cooling, aio-cooling) already exist in the fixtures.
     assert_equal 21, created[:seller_tags]
     assert_equal 4, created[:countries], "fixtures ship ES + GB, seeds add FR DE IT PT"
     assert_equal 5, created[:settings], "4 core + min_offer_percent (Phase 4a)"
@@ -55,7 +61,13 @@ class ReferenceDataSeedTest < ActiveSupport::TestCase
 
     ROOT_SLUGS.each do |slug|
       category = Category.find_by!(slug:)
-      assert seeded[:categories].include?(category.id), "#{slug} was not seeded by this run"
+      if slug == "gaming-pcs"
+        # Pre-exists in the fixtures (Phase 7a), so the seed upserts the row
+        # instead of creating it; icon/seo assertions below still must hold.
+        assert_not_includes seeded[:categories], category.id
+      else
+        assert seeded[:categories].include?(category.id), "#{slug} was not seeded by this run"
+      end
       assert category.icon.present?, "#{slug} needs an icon"
       assert_equal LOCALES.sort, category.seo_descriptions.keys.sort, "#{slug} seo_description"
     end
