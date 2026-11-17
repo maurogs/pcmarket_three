@@ -3416,3 +3416,97 @@ pt:
       subject_line: 'Assunto: %{subject}'
       locale_label: 'Escrito em: %{locale}'
       in_admin: Leia na caixa de entrada admin
+
+  api:
+    errors:
+      unauthorized: Autenticação necessária
+      forbidden: Não permitido
+      not_found: Não encontrado
+      invalid_request: Requisição inválida
+      invalid_transition: Essa ação não está disponível no momento
+      stale_transition: O estado deste pedido mudou; recarregue e tente de novo
+      rate_limited: Muitas requisições
+      banned: Esta conta foi suspensa
+    registration:
+      created: Conta criada
+    sessions:
+      banned: Esta conta foi suspensa
+      destroyed: Sessão encerrada
+    passwords:
+      sent: Se este e-mail estiver registrado, enviamos as instruções
+    notifications:
+      read_all: Notificações marcadas como lidas
+    follows:
+      followed: Passaste a seguir esta loja
+      unfollowed: Deixaste de seguir esta loja
+    favorites:
+      added: Adicionado aos favoritos
+      removed: Removido dos favoritos
+    saved_searches:
+      removed: Pesquisa guardada eliminada
+    carts:
+      emptied: Carrinho esvaziado
+      placed: Encomendas realizadas
+    order_reviews:
+      created: Avaliação publicada
+    accepts:
+      missing_payment_url: Nenhuma URL de pagamento foi retornada; conclua o pagamento no checkout
+    cart_items:
+      added: Adicionado ao carrinho
+      updated: Carrinho atualizado
+      destroyed: Removido do carrinho
+      update_errors:
+        invalid: Quantidade inválida
+        not_purchasable: Este item não está mais à venda
+        quantity_exceeded: Restam apenas %{count}
+    checkouts:
+      errors:
+        invalid_token: O token de checkout não corresponde à sua sessão
+        invalid_address: O endereço não pertence a você
+        empty_cart: Seu carrinho está vazio
+        own_listing: Você não pode comprar seus próprios anúncios
+        vacation: O vendedor está de férias e não pode vender agora
+        not_purchasable: Este anúncio não pode mais ser comprado
+        quantity_exceeded: Não há unidades suficientes para a quantidade escolhida
+      placed: Pedidos realizados
+    order_transitions:
+      confirmed: Pagamento confirmado
+      shipped: Pedido enviado
+      delivered: Marcado como entregue
+      completed: Pedido concluído
+      cancelled: Pedido cancelado
+      disputed: Pedido contestado
+    sells:
+      submitted: Anúncio enviado para revisão
+      archived: Anúncio arquivado
+      sale_marked: Marcado como vendido
+    devices:
+      destroyed: Dispositivo removido
+    api_tokens:
+      destroyed: Token revogado
+    conversations:
+      errors:
+        self: Você não pode iniciar uma conversa consigo mesmo
+        blocked: Este usuário não aceita mensagens de você
+    messages:
+      errors:
+        recipient_not_found: Destinatário não encontrado
+        blocked: Este usuário não aceita mensagens de você
+        rate_limited: Você está enviando mensagens rápido demais
+    offers:
+      created: Oferta enviada
+      accepted: Oferta aceita
+      declined: Oferta recusada
+      withdrawn: Oferta retirada
+      errors:
+        recipient_not_found: Vendedor não encontrado
+        self_offer: Você não pode fazer uma oferta no seu próprio anúncio
+        blocked: Este vendedor não aceita ofertas de você
+        below_minimum: A oferta está abaixo do valor mínimo
+        not_owner: Você só pode gerenciar suas próprias ofertas
+        not_pending: Esta oferta não está mais pendente
+        not_seller: Você não é o vendedor desta oferta
+        not_buyer: Você não é o comprador desta oferta
+    shipments:
+      errors:
+        unknown_carrier: Transportadora desconhecida

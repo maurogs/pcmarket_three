@@ -1,5 +1,129 @@
 # History
 
+## 2026-11-17 — Phase 8b: JSON API v1 (bearer auth, full REST surface, OpenAPI docs, devices)
+
+**What changed**
+
+- **Routing**: `namespace :api { namespace :v1 }` in `config/routes.rb`, deliberately
+  OUTSIDE the `(:locale)` scope — language is negotiated with `Accept-Language`,
+  not the URL (a `/es/api/v1` duplicate would fork cache keys; `route_actions_test`
+  asserts it never routes). `defaults format: :json`; public docs routes
+  `/api/v1/docs` (Redoc HTML) and `/api/v1/openapi` (serves the hand-written
+  3.1 spec from `public/api/v1/openapi.yaml`, 2251 lines).
+- **Auth**: `Api::V1::BaseController` (plain `ActionController::API`) resolves
+  `Authorization: Bearer <token>` through `ApiToken.authenticate` (the Phase 1
+  model: SHA-256 digest, `active` = `expires_at IS NULL OR > now`, stamps
+  `last_used_at`); `Current.api_token` added and `Current.user` now falls back
+  to the API user. Banned accounts → 403 `banned`. Public endpoints
+  (`listings`, `stores`, `config`, …) skip the callback and use
+  `authenticate_token_if_present` so token owners still see their own drafts.
+  Token-issuing endpoints: `POST /session` (10/min/IP throttle), `DELETE
+  /session` revokes, `POST /registration`, `POST /password_reset`, `GET /me`,
+  `GET/DELETE /api_tokens` (device-side token management).
+- **Error envelope**: every failure renders
+  `{ error: { code, message, details } }` via `render_error` —
+  `rescue_from` maps RecordNotFound→404, RecordInvalid→422 (details =
+  `record.errors.as_json(full_messages: true)`), ParameterMissing→400,
+  `Api::V1::Forbidden`→403, `Listing::InvalidTransition`→409. State changes are
+  modelled exactly like the web: singular nested POST resources (`submission`,
+  `archival`, `sale_mark`, `acceptance`, `decline`, `withdrawal`, `shipment`,
+  `payment_confirmation`, `delivery_confirmation`, `completion`, `cancellation`,
+  `dispute`). Scoping is the web's: outsiders 404 (never 403), buyer vs seller
+  transitions 404 across roles.
+- **Rate limiting**: global `rate_limit to: 300, within: 1.minute` keyed by
+  token id (remote IP while anonymous) → 429 with the same envelope; the test
+  memory cache makes it exercisable (`throttling_test`).
+- **Pagination/conditional GET**: list endpoints return `meta.pagination`
+  (`page/per_page/total/total_pages`) plus a `Link` header
+  (`rel="first|prev|next|last"`, `set_link_header`); catalogue/config use
+  `fresh_when strong_etag:` (strong validators — Rack only echoes strong ETags
+  back, so a weak one could never match its own If-None-Match) → 304. Messages
+  page with a `?before_id=` cursor (chronological page back).
+- **Surface mirrors the web app**: catalogue (listings index = `ListingSearch`
+  with `f[attr]` spec filters, facets + echoed filters in `meta`; store
+  listings/reviews/follow; categories; countries), `GET /config` (category
+  tree, localized enum/sort/PC-finder labels, carriers, `flags` = every
+  `FeatureFlags::FEATURES` key as a boolean, `min_app_version` from two new
+  nil-default Settings), engagement (favorites, saved searches, notifications
+  + mark-all-read), conversations/messages, offers (+accept/decline/withdraw),
+  cart/checkout (direct-buy mode and conversation-offer ids), orders with all
+  transitions + review, PC Finder, and the sell area (dashboard, listing
+  create/update, submission/archival/sale_mark).
+- **Direct uploads**: `POST /api/v1/direct_uploads` mirrors
+  ActiveStorage::DirectUploadsController's JSON shape over bearer auth (the
+  engine's is cookie+CSRF). Needs `include ActiveStorage::SetCurrent` or the
+  disk service can't sign its PUT URL ("Missing host to link to!"). Client
+  PUTs the bytes to the returned url+headers (disk answers 204), then puts the
+  `signed_id` into listing create/update `photos`.
+- **Devices**: `Device` model + migration `20261118060000` (user FK,
+  `push_token` ≤4096 unique per user, `platform` ios|android) with
+  index/create/destroy endpoints — registry only, no push sender wired yet.
+- **Action Cable**: `ApplicationCable::Connection` accepts the same bearer
+  token via `?token=` or the Authorization header (native apps have no
+  cookies), falling back to the session cookie.
+- **CORS**: `rack-cors` (new gem) in `config/initializers/cors.rb` —
+  `/api/*` is cross-origin only for origins in `API_CORS_ORIGINS`; exposes
+  `Link`/`ETag`.
+- **Tests** (13 request specs in `test/integration/api/v1/` + channel test):
+  `route_actions_test` (every api/v1 route resolves to a real action, ≥60
+  routes, locale-prefixed API paths must NOT route), `openapi_coverage_test`
+  (routes↔spec both directions, verb-exact), `listings_test` (pagination
+  meta + Link header, `f[...]` filters, facets, ETag 304, draft 404, Accept-
+  Language `fr`, N+1 guard via `api_query_count`), `config_test` (flags
+  booleans, Flipper on/off), `engagement_test` (favorites, saved searches,
+  notifications),
+  `conversations_messages_test` (before_id cursor, outsider 404),
+  `offers_test`, `cart_checkout_test`, `orders_transition_test` (buyer
+  cannot ship), `sell_test` (direct upload → signed_id → create with photo →
+  submission → pending_review), `devices_test`, `auth_test`,
+  `throttling_test`; `connection_test.rb` for Cable bearer auth.
+
+**Why**
+
+Native clients need the same rules as the web without cookies or CSRF: one
+bearer credential reused by REST and Action Cable, state transitions as
+resources (never magic PATCH fields), and a spec kept honest by a test that
+diffs routes against `openapi.yaml`. The Phase 1 `ApiToken` model was already
+right — only expiry scope + stamping are used now.
+
+**Gotchas learned**
+
+- `ActionController::API` does NOT auto-include app helpers or the translation
+  proxy: `helper Api::V1::SerializationHelper` + `include
+  AbstractController::Translation` in the base controller.
+- Iterating `listing.photos` yields `ActiveStorage::Attachment` records (which
+  `delegate_missing_to :blob`) — `attached?` exists on neither, so the
+  serializer guard is `attachment.persisted? && attachment.blob&.persisted?`
+  (the fixture catalogue has no photos, which is why this latent bug only
+  surfaced once an upload test attached one).
+- Integration-test headers: underscore names like `ACCEPT_LANGUAGE` never
+  become `HTTP_ACCEPT_LANGUAGE` env vars (ActionDispatch only upcases
+  `[A-Za-z0-9-]+` names); send the real header name (`"Accept-Language"`).
+- Rails 8.1's per-connection query cache keeps working ACROSS requests in one
+  test (repeat SQL re-emits `sql.active_record` events with `cached: true`);
+  `api_query_count` counts those events on purpose (skipping them makes the
+  second request count 0 and the guard vacuous). The listings N+1 guard
+  compares limit 5 vs 100 with a +1 tolerance: the 100-row page contains the
+  two labelled listings, and Active Record skips the whole `Label` preload
+  when the join query returns no rows — a real per-row loop still blows past
+  the +1 and the ≤16 cap.
+- Action Cable test helper is `assert_reject_connection` (8.1 naming).
+- Fixtures have no user photos at all, so any ActiveStorage attach in an API
+  test needs a real `create_and_upload!`/direct-upload round trip.
+
+**Files touched**: `Gemfile` (+`rack-cors`), `config/routes.rb`,
+`config/initializers/cors.rb`, `app/controllers/api/**` (41 controllers incl.
+`api/v1/base_controller.rb`, `sell/`), `app/errors/api/v1/forbidden.rb`,
+`app/helpers/api/v1/serialization_helper.rb`, `app/views/api/v1/**`
+(jbuilders incl. `partials/_listing_card|_listing_full`), `app/models/device.rb`,
+`app/models/current.rb`, `app/models/user.rb` (+`has_many :devices`),
+`app/models/offer.rb` (+`has_one :seller, through: :listing`), `app/models/setting.rb`
+(+2 nil-default app-version keys, `seed_defaults!` skips nils),
+`app/channels/application_cable/connection.rb`, `db/migrate/20261118060000`,
+`public/api/v1/openapi.yaml`, `config/locales/*.yml` (`api.*` keys — 2656 now),
+`test/test_helpers/api_v1_test_helper.rb`, `test/integration/api/v1/**`,
+`test/channels/application_cable/connection_test.rb`.
+
 ## 2026-11-17 — Phase 8a: SEO (meta tags + JSON-LD, robots.txt, sitemap, localized error pages, brand assets)
 
 **What changed**

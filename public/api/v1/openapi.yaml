@@ -1,0 +1,2251 @@
+openapi: 3.1.0
+info:
+  title: PCMarket API
+  version: 1.0.0
+  description: |-
+    JSON API v1 for the PCMarket PC-hardware marketplace. Every endpoint is served
+    under `/api/v1` and returns JSON by default; the client locale for translated
+    labels and messages comes from the `Accept-Language` header (supported: es, en,
+    fr, de, it, pt; default es).
+
+    Authentication uses bearer tokens (`Authorization: Bearer <token>`). Tokens are
+    obtained from `POST /api/v1/sessions` (or `POST /api/v1/registration`) and are
+    the same credentials used by the WebSocket layer: the `/cable` Action Cable
+    endpoint accepts them either as a `?token=<token>` query parameter or as an
+    `Authorization` header, and falls back to the website session cookie when no
+    token is present.
+
+    Errors use a uniform envelope: `{"error": {"code", "message", "details"}}`.
+    List endpoints accept `page` and return `meta.pagination` plus a standard
+    `Link` header. Public GET catalogue responses support `ETag` / `If-None-Match`.
+
+    Rate limit: 300 requests per minute per token (per IP for anonymous requests);
+    exceeding it returns 429 with the error envelope.
+  contact:
+    name: PCMarket
+servers:
+  - url: https://pcmarket.example.com/api
+    description: Production
+  - url: http://localhost:3000/api
+    description: Local development
+tags:
+  - name: Session
+    description: Token authentication and account lifecycle
+  - name: Catalogue
+    description: Public marketplace browsing
+  - name: Engagement
+    description: Favorites, saved searches, notifications, conversations, offers
+  - name: Commerce
+    description: Cart, checkout and orders
+  - name: Sell
+    description: Seller listing management and dashboard
+  - name: Account
+    description: Addresses, devices and API tokens
+security:
+  - bearerAuth: []
+paths:
+  /v1/config:
+    get:
+      tags: [Catalogue]
+      summary: App configuration (categories, conditions, sort options, minimum offer price, web URLs, minimum app versions)
+      security: []
+      responses:
+        '200':
+          description: Configuration payload
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [categories, conditions, conditions_labels, sort_options_labels, pc_finder_labels, flags, web_urls, min_app_version]
+                properties:
+                  categories:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Category'
+                  conditions:
+                    type: array
+                    items: { type: string }
+                  conditions_labels:
+                    type: object
+                    additionalProperties: { type: string }
+                  carriers:
+                    type: array
+                    items: { type: string }
+                    description: Carrier names accepted by the shipment transition
+                  order_statuses:
+                    type: array
+                    items: { type: string }
+                  flags:
+                    type: object
+                    additionalProperties: { type: boolean }
+                    description: Feature-flag states (registry FeatureFlags::FEATURES) that gate app screens
+                  sort_options_labels:
+                    type: object
+                    additionalProperties: { type: string }
+                  pc_finder_labels:
+                    type: object
+                    additionalProperties:
+                      type: object
+                      additionalProperties: { type: string }
+                  web_urls:
+                    type: object
+                    additionalProperties: { type: string }
+                  min_app_version:
+                    type: object
+                    properties:
+                      ios: { type: [string, 'null'] }
+                      android: { type: [string, 'null'] }
+        '429':
+          $ref: '#/components/responses/RateLimited'
+  /v1/docs:
+    get:
+      tags: [Session]
+      summary: Interactive API documentation (Redoc HTML page)
+      security: []
+      responses:
+        '200':
+          description: HTML documentation page
+          content:
+            text/html:
+              schema: { type: string }
+  /v1/openapi:
+    get:
+      tags: [Session]
+      summary: This OpenAPI document
+      security: []
+      responses:
+        '200':
+          description: OpenAPI 3.1 specification
+          content:
+            application/yaml:
+              schema: { type: string }
+  /v1/registration:
+    post:
+      tags: [Session]
+      summary: Create an account and issue an API token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, email_address, password]
+              properties:
+                username: { type: string, minLength: 3, maxLength: 30 }
+                email_address: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+                password_confirmation: { type: string }
+                first_name: { type: string }
+                last_name: { type: string }
+                phone: { type: string }
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [user, token]
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  token: { type: string, description: Plaintext bearer token, shown once }
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /v1/session:
+    post:
+      tags: [Session]
+      summary: Sign in with email and password and get a token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email_address, password]
+              properties:
+                email_address: { type: string }
+                password: { type: string }
+      responses:
+        '200':
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [user, token]
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  token: { type: string }
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags: [Session]
+      summary: Revoke the current token (sign out)
+      responses:
+        '200':
+          description: Signed out
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+  /v1/password_reset:
+    post:
+      tags: [Session]
+      summary: Request a password reset email
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email_address]
+              properties:
+                email_address: { type: string }
+      responses:
+        '200':
+          description: Instructions sent when the email is registered (always success-shaped)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+  /v1/me:
+    get:
+      tags: [Session]
+      summary: Current user with engagement counters
+      responses:
+        '200':
+          description: Current user
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [user]
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  unread_conversations: { type: integer }
+                  unread_notifications: { type: integer }
+                  cart_items: { type: integer }
+  /v1/categories:
+    get:
+      tags: [Catalogue]
+      summary: Category tree
+      security: []
+      responses:
+        '200':
+          description: Root categories with children
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  categories:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/Category'
+                        - type: object
+                          properties:
+                            children:
+                              type: array
+                              items:
+                                $ref: '#/components/schemas/Category'
+  /v1/categories/{id}:
+    get:
+      tags: [Catalogue]
+      summary: One category
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Category
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  category:
+                    $ref: '#/components/schemas/Category'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/listings:
+    get:
+      tags: [Catalogue]
+      summary: Browse listings with filters, facets and sort
+      security: []
+      parameters:
+        - { name: q, in: query, schema: { type: string }, description: Full-text search }
+        - { name: category, in: query, schema: { type: string }, description: Category slug }
+        - { name: min_price, in: query, schema: { type: [number, string] }, description: Minimum price in euros, e.g. 500.50 }
+        - { name: max_price, in: query, schema: { type: [number, string] }, description: Maximum price in euros }
+        - { name: 'condition[]', in: query, schema: { type: array, items: { type: string, enum: [brand_new, open_box, used_like_new, used_good, for_parts] } }, description: Condition filter }
+        - { name: 'labels[]', in: query, schema: { type: array, items: { type: string } }, description: Label tags (e.g. rtx, atx) }
+        - { name: 'tags[]', in: query, schema: { type: array, items: { type: string } }, description: Seller tags }
+        - { name: seller, in: query, schema: { type: string }, description: Store slug }
+        - { name: sort, in: query, schema: { type: string, enum: [best_match, newest, price_asc, price_desc, most_favorited] } }
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+        - { name: limit, in: query, schema: { type: integer, maximum: 100 } }
+      responses:
+        '200':
+          description: Listing page
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [listings, meta]
+                properties:
+                  listings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ListingCard'
+                  meta:
+                    type: object
+                    properties:
+                      pagination:
+                        $ref: '#/components/schemas/Pagination'
+                      facets:
+                        type: object
+                        description: 'Facet buckets keyed by attribute (condition, labels, specs.…)'
+                        additionalProperties:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              value: { type: string }
+                              count: { type: integer }
+                      filters:
+                        type: object
+                        description: Echo of the applied filters
+        '304':
+          description: Not modified (ETag match)
+  /v1/listings/{id}:
+    get:
+      tags: [Catalogue]
+      summary: Listing detail (visible listings only; drafts return 404)
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Listing
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  listing:
+                    $ref: '#/components/schemas/ListingFull'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/stores:
+    get:
+      tags: [Catalogue]
+      summary: Visible stores
+      security: []
+      parameters:
+        - { name: q, in: query, schema: { type: string } }
+        - { name: page, in: query, schema: { type: integer } }
+      responses:
+        '200':
+          description: Store page
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stores:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Store'
+                  meta:
+                    type: object
+                    properties:
+                      pagination:
+                        $ref: '#/components/schemas/Pagination'
+  /v1/stores/{id}:
+    get:
+      tags: [Catalogue]
+      summary: One store
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, description: Store slug }
+      responses:
+        '200':
+          description: Store
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  store:
+                    $ref: '#/components/schemas/Store'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/stores/{store_id}/listings:
+    get:
+      tags: [Catalogue]
+      summary: Listings of a store
+      security: []
+      parameters:
+        - name: store_id
+          in: path
+          required: true
+          schema: { type: string }
+        - { name: sort, in: query, schema: { type: string } }
+        - { name: page, in: query, schema: { type: integer } }
+      responses:
+        '200':
+          description: Listing page
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  listings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ListingCard'
+                  meta:
+                    type: object
+                    properties:
+                      pagination:
+                        $ref: '#/components/schemas/Pagination'
+  /v1/stores/{store_id}/reviews:
+    get:
+      tags: [Catalogue]
+      summary: Store reviews
+      security: []
+      parameters:
+        - name: store_id
+          in: path
+          required: true
+          schema: { type: string }
+        - { name: page, in: query, schema: { type: integer } }
+      responses:
+        '200':
+          description: Review page
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reviews:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StoreReview'
+                  meta:
+                    type: object
+                    properties:
+                      pagination:
+                        $ref: '#/components/schemas/Pagination'
+  /v1/stores/{store_id}/follow:
+    post:
+      tags: [Engagement]
+      summary: Follow a store
+      parameters:
+        - name: store_id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Followed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  following: { type: boolean, const: true }
+                  follower_count: { type: integer }
+    delete:
+      tags: [Engagement]
+      summary: Unfollow a store
+      parameters:
+        - name: store_id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Unfollowed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  following: { type: boolean, const: false }
+                  follower_count: { type: integer }
+  /v1/pc_finder:
+    get:
+      tags: [Catalogue]
+      summary: PC Finder metadata (games, resolutions, FPS targets, budget ranges, filter tags, localized labels)
+      security: []
+      responses:
+        '200':
+          description: PC Finder metadata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pc_finder:
+                    type: object
+                    properties:
+                      games:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            slug: { type: string }
+                            name: { type: string }
+                            demand: { type: string }
+                            required_scores:
+                              type: object
+                              description: Required Performance::Scorer score per resolution and FPS target
+                              additionalProperties:
+                                type: object
+                                additionalProperties: { type: integer }
+                      resolutions:
+                        type: array
+                        items: { type: string }
+                      fps_targets:
+                        type: array
+                        items: { type: integer }
+                      budgets:
+                        type: array
+                        items: { type: integer }
+                      filter_tags:
+                        type: array
+                        items: { type: string }
+                      labels:
+                        type: object
+                        description: Localized labels grouped by resolution, fps and budget
+                        additionalProperties:
+                          type: object
+                          additionalProperties: { type: string }
+  /v1/pc_finder_results:
+    get:
+      tags: [Catalogue]
+      summary: PC Finder quiz results (published machines that clear the required performance score)
+      security: []
+      parameters:
+        - { name: game, in: query, schema: { type: string }, description: Game slug }
+        - { name: 'games[]', in: query, schema: { type: array, items: { type: string } }, description: Up to three game slugs }
+        - { name: resolution, in: query, schema: { type: string, enum: [1080p, 1440p, 2160p] } }
+        - { name: fps, in: query, schema: { type: string, enum: ['60', '144', '240'] } }
+        - { name: budget, in: query, schema: { type: string, enum: [under_700, 700_1200, 1200_2000, over_2000] } }
+        - { name: 'tags[]', in: query, schema: { type: array, items: { type: string } }, description: Seller tag slugs (AND-ed) }
+        - { name: page, in: query, schema: { type: integer } }
+      responses:
+        '200':
+          description: Result page ordered by value (best match first)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  listings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ListingCard'
+                  meta:
+                    type: object
+                    properties:
+                      pagination:
+                        $ref: '#/components/schemas/Pagination'
+                      required_score: { type: [integer, 'null'] }
+                      filters:
+                        type: object
+                        properties:
+                          games:
+                            type: array
+                            items: { type: string }
+                          resolution: { type: string }
+                          fps: { type: string }
+                          budget: { type: [string, 'null'] }
+                          tags:
+                            type: array
+                            items: { type: string }
+  /v1/countries:
+    get:
+      tags: [Catalogue]
+      summary: Countries for address forms
+      security: []
+      responses:
+        '200':
+          description: Country list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  countries:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code: { type: string }
+                        name: { type: string }
+  /v1/favorites:
+    get:
+      tags: [Engagement]
+      summary: My favorite listings
+      parameters:
+        - { name: page, in: query, schema: { type: integer } }
+      responses:
+        '200':
+          description: Favorite listings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  favorites:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        favorite_id: { type: integer, description: 'Favorite record id (DELETE /v1/favorites/{id})' }
+                        saved_price_money:
+                          oneOf:
+                            - $ref: '#/components/schemas/Money'
+                            - type: 'null'
+                          description: Price captured when the listing was favorited
+                        price_dropped: { type: boolean }
+                        listing:
+                          $ref: '#/components/schemas/ListingCard'
+                  meta:
+                    type: object
+                    properties:
+                      pagination:
+                        $ref: '#/components/schemas/Pagination'
+    post:
+      tags: [Engagement]
+      summary: Favorite a listing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [listing_id]
+              properties:
+                listing_id: { type: integer }
+      responses:
+        '200':
+          description: Favorited
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  favorited: { type: boolean, const: true }
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/favorites/{id}:
+    delete:
+      tags: [Engagement]
+      summary: Remove a favorite (favorite record id)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, description: Favorite record id (see GET /v1/favorites) }
+      responses:
+        '200':
+          description: Removed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  favorited: { type: boolean, const: false }
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/saved_searches:
+    get:
+      tags: [Engagement]
+      summary: My saved searches
+      responses:
+        '200':
+          description: Saved searches
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  saved_searches:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SavedSearch'
+    post:
+      tags: [Engagement]
+      summary: Save a search (same query params as GET /v1/listings)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                query:
+                  type: object
+                  description: Filter map, e.g. {"q":"rtx","category":"gpus"}
+      responses:
+        '201':
+          description: Saved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  saved_search:
+                    $ref: '#/components/schemas/SavedSearch'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /v1/saved_searches/{id}:
+    delete:
+      tags: [Engagement]
+      summary: Delete a saved search
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/notifications:
+    get:
+      tags: [Engagement]
+      summary: My notifications
+      parameters:
+        - { name: page, in: query, schema: { type: integer } }
+      responses:
+        '200':
+          description: Notification page
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notifications:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Notification'
+                  meta:
+                    type: object
+                    properties:
+                      pagination:
+                        $ref: '#/components/schemas/Pagination'
+  /v1/notifications_read:
+    post:
+      tags: [Engagement]
+      summary: Mark all notifications as read
+      responses:
+        '200':
+          description: Marked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  unread: { type: integer, const: 0 }
+  /v1/conversations:
+    get:
+      tags: [Engagement]
+      summary: My conversations
+      parameters:
+        - { name: page, in: query, schema: { type: integer } }
+      responses:
+        '200':
+          description: Conversation page
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  conversations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Conversation'
+                  meta:
+                    type: object
+                    properties:
+                      pagination:
+                        $ref: '#/components/schemas/Pagination'
+    post:
+      tags: [Engagement]
+      summary: Start a conversation about a listing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [listing_id, body]
+              properties:
+                listing_id: { type: integer }
+                body: { type: string }
+      responses:
+        '201':
+          description: Conversation created (first message included)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  conversation:
+                    $ref: '#/components/schemas/Conversation'
+                  message:
+                    $ref: '#/components/schemas/Message'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /v1/conversations/{id}:
+    get:
+      tags: [Engagement]
+      summary: One conversation (marked as read)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Conversation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  conversation:
+                    $ref: '#/components/schemas/Conversation'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/conversations/{conversation_id}/messages:
+    get:
+      tags: [Engagement]
+      summary: Messages of a conversation (cursor pagination)
+      parameters:
+        - name: conversation_id
+          in: path
+          required: true
+          schema: { type: integer }
+        - { name: before_id, in: query, schema: { type: integer }, description: Return messages older than this message id }
+        - { name: limit, in: query, schema: { type: integer, default: 50, maximum: 100 } }
+      responses:
+        '200':
+          description: Messages in chronological order
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messages:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Message'
+                  meta:
+                    type: object
+                    properties:
+                      before_id: { type: [integer, 'null'] }
+                      has_more: { type: boolean }
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags: [Engagement]
+      summary: Send a message
+      parameters:
+        - name: conversation_id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [body]
+              properties:
+                body: { type: string }
+      responses:
+        '201':
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    $ref: '#/components/schemas/Message'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /v1/offers:
+    get:
+      tags: [Engagement]
+      summary: Offers received (seller) or sent (buyer)
+      parameters:
+        - { name: role, in: query, schema: { type: string, enum: [received, sent], default: received } }
+        - { name: page, in: query, schema: { type: integer } }
+      responses:
+        '200':
+          description: Offer page
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  offers:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Offer'
+                  meta:
+                    type: object
+                    properties:
+                      pagination:
+                        $ref: '#/components/schemas/Pagination'
+  /v1/listings/{listing_id}/offers:
+    post:
+      tags: [Engagement]
+      summary: Make an offer on a listing (path-scoped variant)
+      parameters:
+        - name: listing_id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount_cents]
+              properties:
+                amount_cents: { type: integer }
+      responses:
+        '201':
+          description: Offer created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  offer:
+                    $ref: '#/components/schemas/Offer'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /v1/offers/{offer_id}/acceptance:
+    post:
+      tags: [Engagement]
+      summary: Accept an offer (seller only) — reserves the listing and auto-declines competing offers
+      parameters:
+        - name: offer_id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  offer:
+                    $ref: '#/components/schemas/Offer'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /v1/offers/{offer_id}/decline:
+    post:
+      tags: [Engagement]
+      summary: Decline an offer (seller only)
+      parameters:
+        - name: offer_id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Declined
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  offer:
+                    $ref: '#/components/schemas/Offer'
+  /v1/offers/{offer_id}/withdrawal:
+    post:
+      tags: [Engagement]
+      summary: Withdraw an offer (buyer only)
+      parameters:
+        - name: offer_id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Withdrawn
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  offer:
+                    $ref: '#/components/schemas/Offer'
+  /v1/cart:
+    get:
+      tags: [Commerce]
+      summary: Current cart
+      responses:
+        '200':
+          description: Cart with items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cart:
+                    $ref: '#/components/schemas/Cart'
+    delete:
+      tags: [Commerce]
+      summary: Empty the cart
+      responses:
+        '200':
+          description: Emptied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+  /v1/cart_items:
+    get:
+      tags: [Commerce]
+      summary: Cart items
+      responses:
+        '200':
+          description: Cart items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cart_items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CartItem'
+    post:
+      tags: [Commerce]
+      summary: Add a listing to the cart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [listing_id]
+              properties:
+                listing_id: { type: integer }
+                quantity: { type: integer, minimum: 1, default: 1 }
+      responses:
+        '201':
+          description: Added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cart_item:
+                    $ref: '#/components/schemas/CartItem'
+                  message: { type: string }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /v1/cart_items/{id}:
+    put:
+      tags: [Commerce]
+      summary: Change quantity (PUT alias of PATCH)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200': { description: Same as PATCH. }
+    patch:
+      tags: [Commerce]
+      summary: Change quantity
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [quantity]
+              properties:
+                quantity: { type: integer, minimum: 0, description: 0 removes the item }
+      responses:
+        '200':
+          description: Updated (or removed when quantity is 0)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cart_item:
+                    oneOf:
+                      - $ref: '#/components/schemas/CartItem'
+                      - type: 'null'
+                  message: { type: string }
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+    delete:
+      tags: [Commerce]
+      summary: Remove item
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Removed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+  /v1/checkout:
+    post:
+      tags: [Commerce]
+      summary: Place orders from the cart (direct mode or Stripe Checkout mode)
+      description: >-
+        Mode is chosen server-side (Stripe Checkout when the server is configured
+        for it, direct otherwise). In direct mode each order starts as
+        `pending_payment` and the seller confirms payment through
+        `POST /v1/orders/{order_id}/payment_confirmation`. Replay-safe: send the
+        same `checkout_token` to retrieve the previously created orders.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [address_id]
+              properties:
+                address_id: { type: integer }
+                checkout_token: { type: string, description: Idempotency token; generated when omitted }
+      responses:
+        '201':
+          description: Orders placed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  checkout_token: { type: string }
+                  mode: { type: string, enum: [direct, stripe] }
+                  order_ids:
+                    type: array
+                    items: { type: integer }
+                  conversation_ids:
+                    type: array
+                    items: { type: integer }
+                  redirect_url: { type: [string, 'null'], description: Stripe Checkout URL when mode is stripe }
+                  message: { type: string }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /v1/orders:
+    get:
+      tags: [Commerce]
+      summary: My orders (buyer or seller)
+      parameters:
+        - { name: role, in: query, schema: { type: string, enum: [buyer, seller], default: buyer } }
+        - { name: page, in: query, schema: { type: integer } }
+      responses:
+        '200':
+          description: Order page
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orders:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order'
+                  meta:
+                    type: object
+                    properties:
+                      pagination:
+                        $ref: '#/components/schemas/Pagination'
+  /v1/orders/{id}:
+    get:
+      tags: [Commerce]
+      summary: One order (buyer or seller only)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Order
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order:
+                    $ref: '#/components/schemas/Order'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/orders/{order_id}/payment_confirmation:
+    post:
+      tags: [Commerce]
+      summary: Seller confirms a direct (non-Stripe) payment (pending_payment -> paid)
+      parameters:
+        - $ref: '#/components/parameters/OrderId'
+      responses:
+        '200':
+          description: Transition applied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order:
+                    $ref: '#/components/schemas/Order'
+                  message: { type: string }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /v1/orders/{order_id}/shipment:
+    post:
+      tags: [Commerce]
+      summary: Mark order as shipped (seller only)
+      parameters:
+        - $ref: '#/components/parameters/OrderId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                carrier: { type: string, enum: [Correos, SEUR, MRW, GLS, DHL, UPS, Other] }
+                tracking_number: { type: string }
+      responses:
+        '200':
+          description: Transition applied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order:
+                    $ref: '#/components/schemas/Order'
+                  message: { type: string }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /v1/orders/{order_id}/delivery_confirmation:
+    post:
+      tags: [Commerce]
+      summary: Buyer confirms delivery
+      parameters:
+        - $ref: '#/components/parameters/OrderId'
+      responses:
+        '200':
+          description: Transition applied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order:
+                    $ref: '#/components/schemas/Order'
+                  message: { type: string }
+  /v1/orders/{order_id}/completion:
+    post:
+      tags: [Commerce]
+      summary: Complete the order
+      parameters:
+        - $ref: '#/components/parameters/OrderId'
+      responses:
+        '200':
+          description: Transition applied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order:
+                    $ref: '#/components/schemas/Order'
+                  message: { type: string }
+  /v1/orders/{order_id}/dispute:
+    post:
+      tags: [Commerce]
+      summary: Open a dispute (either party)
+      parameters:
+        - $ref: '#/components/parameters/OrderId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Transition applied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order:
+                    $ref: '#/components/schemas/Order'
+                  message: { type: string }
+  /v1/orders/{order_id}/cancellation:
+    post:
+      tags: [Commerce]
+      summary: Cancel the order (buyer or seller, while cancellable)
+      parameters:
+        - $ref: '#/components/parameters/OrderId'
+      responses:
+        '200':
+          description: Transition applied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order:
+                    $ref: '#/components/schemas/Order'
+                  message: { type: string }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /v1/orders/{order_id}/review:
+    post:
+      tags: [Commerce]
+      summary: Review a completed order (buyer -> seller store review)
+      parameters:
+        - $ref: '#/components/parameters/OrderId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [rating]
+              properties:
+                rating: { type: integer, minimum: 1, maximum: 5 }
+                body: { type: string }
+      responses:
+        '201':
+          description: Review created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  review:
+                    $ref: '#/components/schemas/StoreReview'
+                  message: { type: string }
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /v1/sell/listings:
+    get:
+      tags: [Sell]
+      summary: My listings (any state)
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [draft, pending_review, approved, rejected, sold, archived, reserved] } }
+        - { name: page, in: query, schema: { type: integer } }
+      responses:
+        '200':
+          description: Listing page
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  listings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ListingFull'
+                  meta:
+                    type: object
+                    properties:
+                      pagination:
+                        $ref: '#/components/schemas/Pagination'
+    post:
+      tags: [Sell]
+      summary: Create a listing (draft)
+      description: >-
+        Category is provided as `category_root` (root category slug) and optional
+        `category_child`. Photos are ActiveStorage signed ids from
+        `POST /v1/direct_uploads`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListingForm'
+      responses:
+        '201':
+          description: Draft created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  listing:
+                    $ref: '#/components/schemas/ListingFull'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /v1/sell/listings/{id}:
+    get:
+      tags: [Sell]
+      summary: One of my listings (any state)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Listing
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  listing:
+                    $ref: '#/components/schemas/ListingFull'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Sell]
+      summary: Update a listing (PUT alias of PATCH)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200': { description: Same as PATCH. }
+    patch:
+      tags: [Sell]
+      summary: Update a listing
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListingForm'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  listing:
+                    $ref: '#/components/schemas/ListingFull'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /v1/sell/listings/{listing_id}/submission:
+    post:
+      tags: [Sell]
+      summary: Submit a draft/rejected/archived listing for review
+      parameters:
+        - name: listing_id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Submitted (state becomes pending_review)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  listing:
+                    $ref: '#/components/schemas/ListingFull'
+                  message: { type: string }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /v1/sell/listings/{listing_id}/archival:
+    post:
+      tags: [Sell]
+      summary: Archive a published listing
+      parameters:
+        - name: listing_id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Archived
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  listing:
+                    $ref: '#/components/schemas/ListingFull'
+                  message: { type: string }
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /v1/sell/listings/{listing_id}/sale_mark:
+    post:
+      tags: [Sell]
+      summary: Mark a published listing as sold
+      parameters:
+        - name: listing_id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Marked as sold
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  listing:
+                    $ref: '#/components/schemas/ListingFull'
+                  message: { type: string }
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /v1/sell/dashboard:
+    get:
+      tags: [Sell]
+      summary: Seller dashboard counters
+      responses:
+        '200':
+          description: Counters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  dashboard:
+                    type: object
+                    properties:
+                      listings:
+                        type: object
+                        description: Listing counts keyed by state
+                        additionalProperties: { type: integer }
+                      published_count: { type: integer }
+                      sold_count: { type: integer }
+                      revenue_cents: { type: integer }
+                      revenue_money:
+                        $ref: '#/components/schemas/Money'
+                      orders:
+                        type: object
+                        description: Order counts keyed by status
+                        additionalProperties: { type: integer }
+                      unread_conversations: { type: integer }
+                      offers_received: { type: integer }
+                      store:
+                        oneOf:
+                          - $ref: '#/components/schemas/Store'
+                          - type: 'null'
+  /v1/direct_uploads:
+    post:
+      tags: [Sell]
+      summary: Register a direct upload (ActiveStorage direct-upload protocol)
+      description: >-
+        Same semantics as `ActiveStorage::DirectUploadsController`: send the blob
+        descriptor, get back a `signed_id` plus the signed URL/headers to PUT the
+        bytes to. Use the returned `signed_id` in listing create/update.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [blob]
+              properties:
+                blob:
+                  type: object
+                  required: [filename, byte_size, checksum]
+                  properties:
+                    filename: { type: string }
+                    byte_size: { type: integer }
+                    checksum: { type: string, description: Base64-encoded MD5 of the file }
+                    content_type: { type: string }
+                    metadata: { type: object }
+      responses:
+        '201':
+          description: Blob registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: integer }
+                  signed_id: { type: string }
+                  direct_upload:
+                    type: object
+                    properties:
+                      url: { type: string }
+                      headers: { type: object }
+  /v1/addresses:
+    get:
+      tags: [Account]
+      summary: My addresses
+      responses:
+        '200':
+          description: Addresses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  addresses:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Address'
+    post:
+      tags: [Account]
+      summary: Create an address
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddressForm'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  address:
+                    $ref: '#/components/schemas/Address'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /v1/addresses/{id}:
+    put:
+      tags: [Account]
+      summary: Update an address (PUT alias of PATCH)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200': { description: Same as PATCH. }
+    patch:
+      tags: [Account]
+      summary: Update an address
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddressForm'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  address:
+                    $ref: '#/components/schemas/Address'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Account]
+      summary: Delete an address
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/devices:
+    get:
+      tags: [Account]
+      summary: My registered devices (push tokens; sending is not implemented yet)
+      responses:
+        '200':
+          description: Devices
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  devices:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Device'
+    post:
+      tags: [Account]
+      summary: Register a device push token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [push_token, platform]
+              properties:
+                push_token: { type: string }
+                platform: { type: string, enum: [ios, android] }
+      responses:
+        '201':
+          description: 'Registered (idempotent: an existing token is updated)'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  device:
+                    $ref: '#/components/schemas/Device'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /v1/devices/{id}:
+    delete:
+      tags: [Account]
+      summary: Remove a device
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Removed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/api_tokens:
+    get:
+      tags: [Account]
+      summary: My API tokens (metadata only)
+      responses:
+        '200':
+          description: Tokens
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  api_tokens:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ApiToken'
+  /v1/api_tokens/{id}:
+    delete:
+      tags: [Account]
+      summary: Revoke a token
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Revoked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: >-
+        Token obtained from POST /api/v1/sessions or /api/v1/registration. The same
+        token authenticates the /cable WebSocket via ?token= or an Authorization
+        header.
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema: { type: integer }
+    OrderId:
+      name: order_id
+      in: path
+      required: true
+      schema: { type: integer }
+  responses:
+    Unauthorized:
+      description: Missing or invalid bearer token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Authenticated but not allowed (e.g. banned account)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Record not found or not visible to this user
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: State-machine conflict (stale transition or invalid transition)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unprocessable:
+      description: Validation failed; details carries per-attribute messages
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RateLimited:
+      description: Over 300 requests per minute
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum: [unauthorized, forbidden, not_found, invalid_request, invalid_transition, stale_transition, rate_limited, banned]
+            message: { type: string, description: Localized via Accept-Language }
+            details:
+              type: [object, 'null']
+              description: Extra context (e.g. model validation messages)
+    Money:
+      type: object
+      required: [cents, currency, formatted]
+      properties:
+        cents: { type: integer }
+        currency: { type: string, examples: [EUR] }
+        formatted: { type: string, description: Localized string, e.g. "1.299,00 €" }
+    Photo:
+      type: object
+      properties:
+        card: { type: string, description: Absolute URL, ~400px representation }
+        full: { type: string, description: Absolute URL, ~1200px representation }
+    Pagination:
+      type: object
+      required: [page, per_page, total, total_pages]
+      properties:
+        page: { type: integer }
+        per_page: { type: integer }
+        total: { type: integer }
+        total_pages: { type: integer }
+    User:
+      type: object
+      properties:
+        id: { type: integer }
+        username: { type: string }
+        email_address: { type: string }
+        display_name: { type: string }
+        avatar_url: { type: [string, 'null'] }
+        role: { type: string, enum: [user, admin] }
+        locale: { type: string }
+        country_code: { type: string }
+        created_at: { type: string, format: date-time }
+    Category:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        slug: { type: string }
+        parent_id: { type: [integer, 'null'] }
+        specs:
+          type: array
+          items:
+            type: object
+            properties:
+              key: { type: string }
+              label: { type: string }
+              unit: { type: [string, 'null'] }
+              input_type: { type: string }
+              filterable: { type: boolean }
+    Store:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        slug: { type: string }
+        store_type: { type: string, enum: [individual, business] }
+        verified: { type: boolean }
+        vacation_mode: { type: boolean }
+        city: { type: [string, 'null'] }
+        region: { type: [string, 'null'] }
+        description: { type: [string, 'null'] }
+        logo_url: { type: [string, 'null'] }
+        listings_count: { type: integer }
+        sales_count: { type: integer }
+        rating_average: { type: [number, 'null'] }
+        reviews_count: { type: integer }
+        followers_count: { type: integer }
+        web_url: { type: string }
+    StoreReview:
+      type: object
+      properties:
+        id: { type: integer }
+        rating: { type: integer }
+        body: { type: [string, 'null'] }
+        author:
+          type: object
+          properties:
+            id: { type: integer }
+            display_name: { type: string }
+        created_at: { type: string, format: date-time }
+    ListingCard:
+      type: object
+      properties:
+        id: { type: integer }
+        slug: { type: string }
+        title: { type: string }
+        status: { type: string, enum: [draft, pending_review, approved, rejected, sold, archived, reserved] }
+        condition: { type: string }
+        condition_label: { type: string }
+        price_money:
+          $ref: '#/components/schemas/Money'
+        original_price_money:
+          oneOf:
+            - $ref: '#/components/schemas/Money'
+            - type: 'null'
+        shipping_price_money:
+          oneOf:
+            - $ref: '#/components/schemas/Money'
+            - type: 'null'
+        free_shipping: { type: boolean }
+        local_pickup: { type: boolean }
+        allow_offers: { type: boolean }
+        city: { type: [string, 'null'] }
+        region: { type: [string, 'null'] }
+        quantity: { type: integer }
+        labels:
+          type: array
+          items: { type: string }
+        photo:
+          oneOf:
+            - $ref: '#/components/schemas/Photo'
+            - type: 'null'
+        store:
+          type: object
+          properties:
+            id: { type: integer }
+            name: { type: string }
+            slug: { type: string }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        web_url: { type: string }
+    ListingFull:
+      allOf:
+        - $ref: '#/components/schemas/ListingCard'
+        - type: object
+          properties:
+            description: { type: string }
+            postal_code: { type: [string, 'null'] }
+            specs: { type: object }
+            photos:
+              type: array
+              items:
+                $ref: '#/components/schemas/Photo'
+            seller_tags:
+              type: array
+              items: { type: string }
+            category:
+              oneOf:
+                - $ref: '#/components/schemas/Category'
+                - type: 'null'
+    ListingForm:
+      type: object
+      properties:
+        title: { type: string }
+        description: { type: string }
+        condition: { type: string, enum: [brand_new, open_box, used_like_new, used_good, for_parts] }
+        quantity: { type: integer, minimum: 1 }
+        price: { type: [string, 'null'], description: Price in euros, e.g. "1.299,00" or "1299" }
+        original_price: { type: [string, 'null'], description: Reference price in euros }
+        shipping_price: { type: [string, 'null'], description: Shipping price in euros }
+        shipping_available: { type: boolean }
+        free_shipping: { type: boolean }
+        local_pickup: { type: boolean }
+        allow_offers: { type: boolean }
+        category_root: { type: string, description: Root category slug }
+        category_child: { type: [string, 'null'], description: Optional child category slug }
+        specs: { type: object, description: 'Spec values keyed by category spec key' }
+        city: { type: [string, 'null'] }
+        region: { type: [string, 'null'] }
+        postal_code: { type: [string, 'null'] }
+        photos:
+          type: array
+          items: { type: string }
+          description: Signed ids from POST /v1/direct_uploads
+        remove_photo_ids:
+          type: array
+          items: { type: integer }
+        seller_tag_ids:
+          type: array
+          items: { type: integer }
+    CartItem:
+      type: object
+      properties:
+        id: { type: integer }
+        listing:
+          $ref: '#/components/schemas/ListingCard'
+        quantity: { type: integer }
+        unit_price_money:
+          $ref: '#/components/schemas/Money'
+        total_money:
+          $ref: '#/components/schemas/Money'
+    Cart:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartItem'
+        items_count: { type: integer }
+        total_money:
+          $ref: '#/components/schemas/Money'
+        checkout_available: { type: boolean }
+    OrderItem:
+      type: object
+      properties:
+        id: { type: integer }
+        listing_id: { type: integer }
+        title: { type: string }
+        quantity: { type: integer }
+        unit_price_money:
+          $ref: '#/components/schemas/Money'
+        total_money:
+          $ref: '#/components/schemas/Money'
+    Order:
+      type: object
+      properties:
+        id: { type: integer }
+        number: { type: string }
+        status: { type: string, enum: [pending_payment, paid, shipped, delivered, completed, cancelled, refunded, disputed] }
+        payment_provider: { type: [string, 'null'], enum: [direct, stripe, null] }
+        buyer:
+          type: object
+          properties:
+            id: { type: integer }
+            display_name: { type: string }
+        seller:
+          type: object
+          properties:
+            id: { type: integer }
+            display_name: { type: string }
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        subtotal_money:
+          $ref: '#/components/schemas/Money'
+        shipping_money:
+          oneOf:
+            - $ref: '#/components/schemas/Money'
+            - type: 'null'
+        total_money:
+          $ref: '#/components/schemas/Money'
+        shipping_address:
+          type: object
+          description: Snapshot of the address used at checkout
+        carrier: { type: [string, 'null'] }
+        tracking_number: { type: [string, 'null'] }
+        paid_at: { type: [string, 'null'], format: date-time }
+        shipped_at: { type: [string, 'null'], format: date-time }
+        delivered_at: { type: [string, 'null'], format: date-time }
+        completed_at: { type: [string, 'null'], format: date-time }
+        cancelled_at: { type: [string, 'null'], format: date-time }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    Conversation:
+      type: object
+      properties:
+        id: { type: integer }
+        listing:
+          type: object
+          properties:
+            id: { type: integer }
+            slug: { type: string }
+            title: { type: string }
+        buyer:
+          type: object
+          properties:
+            id: { type: integer }
+            display_name: { type: string }
+        seller:
+          type: object
+          properties:
+            id: { type: integer }
+            display_name: { type: string }
+        last_message_body: { type: [string, 'null'] }
+        unread_for_me: { type: integer }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    Message:
+      type: object
+      properties:
+        id: { type: integer }
+        conversation_id: { type: integer }
+        sender_id: { type: integer }
+        kind: { type: string, enum: [text, offer, system] }
+        body: { type: string }
+        read: { type: boolean }
+        created_at: { type: string, format: date-time }
+    Offer:
+      type: object
+      properties:
+        id: { type: integer }
+        listing:
+          type: object
+          properties:
+            id: { type: integer }
+            slug: { type: string }
+            title: { type: string }
+        buyer:
+          type: object
+          properties:
+            id: { type: integer }
+            display_name: { type: string }
+        seller:
+          type: object
+          properties:
+            id: { type: integer }
+            display_name: { type: string }
+        amount_money:
+          $ref: '#/components/schemas/Money'
+        asking_money:
+          $ref: '#/components/schemas/Money'
+        status: { type: string, enum: [pending, accepted, declined, withdrawn, expired] }
+        expires_at: { type: [string, 'null'], format: date-time }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    Notification:
+      type: object
+      properties:
+        id: { type: integer }
+        kind: { type: string }
+        title: { type: string }
+        body: { type: [string, 'null'] }
+        read: { type: boolean }
+        url: { type: [string, 'null'], description: Absolute web URL of the target }
+        created_at: { type: string, format: date-time }
+    SavedSearch:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        query: { type: [string, 'null'] }
+        filters: { type: object, description: Stored filter map }
+        email_alerts: { type: boolean }
+        results_url: { type: string, description: Absolute web URL of the search }
+        created_at: { type: string, format: date-time }
+    Address:
+      type: object
+      properties:
+        id: { type: integer }
+        full_name: { type: string }
+        line1: { type: string }
+        line2: { type: [string, 'null'] }
+        city: { type: string }
+        region: { type: [string, 'null'] }
+        postal_code: { type: string }
+        country_code: { type: string }
+        phone: { type: [string, 'null'] }
+        default: { type: boolean }
+        created_at: { type: string, format: date-time }
+    AddressForm:
+      type: object
+      required: [full_name, line1, city, postal_code, country_code]
+      properties:
+        full_name: { type: string }
+        line1: { type: string }
+        line2: { type: [string, 'null'] }
+        city: { type: string }
+        region: { type: [string, 'null'] }
+        postal_code: { type: string }
+        country_code: { type: string }
+        phone: { type: [string, 'null'] }
+        default: { type: boolean }
+    Device:
+      type: object
+      properties:
+        id: { type: integer }
+        platform: { type: string, enum: [ios, android] }
+        push_token: { type: string, description: Token truncated for display }
+        created_at: { type: string, format: date-time }
+    ApiToken:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: [string, 'null'] }
+        created_at: { type: string, format: date-time }
+        last_used_at: { type: [string, 'null'], format: date-time }
+        expires_at: { type: [string, 'null'], format: date-time }

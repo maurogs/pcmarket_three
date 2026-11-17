@@ -1,0 +1,9 @@
+json.id user.id
+json.username user.username
+json.email_address user.email_address
+json.display_name user.display_name
+json.avatar_url avatar_json(user)
+json.role user.role
+json.locale user.locale
+json.country_code user.country_code
+json.created_at user.created_at.utc.iso8601

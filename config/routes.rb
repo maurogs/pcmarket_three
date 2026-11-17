@@ -3,6 +3,102 @@ Rails.application.routes.draw do
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
 
+  # JSON API v1 (Phase 8b) — OUTSIDE the locale scope: clients pick their
+  # language with Accept-Language, not the URL. Status changes are modelled
+  # exactly like the web app: nested singular resources whose POST creates
+  # the transition (submission, shipment, acceptance, …). Every verb here is
+  # mirrored in public/api/v1/openapi.yaml (enforced by
+  # test/integration/api/v1/openapi_coverage_test.rb).
+  namespace :api do
+    namespace :v1 do
+      # Docs page (HTML — renders the OpenAPI spec with Redoc) and the spec
+      # itself; both public, both outside the JSON default.
+      get "docs", to: "docs#show", defaults: { format: "html" }
+      get "openapi", to: "docs#openapi", defaults: { format: "yaml" }
+
+      defaults format: :json do
+        # Auth (token-issuing endpoints are public; destroy needs the token).
+        resource :session, only: %i[create destroy]
+        resource :registration, only: :create
+        resource :password_reset, only: :create
+        resource :me, only: :show, controller: "me"
+
+        # Public catalogue.
+        resources :categories, only: %i[index show]
+        resources :listings, only: %i[index show]
+        resources :stores, only: %i[index show] do
+          resources :listings, only: :index
+          resources :reviews, only: :index
+          resource :follow, only: %i[create destroy]
+        end
+        resource :pc_finder, only: :show
+        resources :pc_finder_results, only: :index
+        resources :countries, only: :index
+        resource :config, only: :show, controller: "config"
+
+        # Engagement (token required).
+        resources :favorites, only: %i[index create destroy]
+        resources :saved_searches, only: %i[index create destroy]
+        resources :notifications, only: :index
+        resource :notifications_read, only: :create
+
+        resources :conversations, only: %i[index show create] do
+          resources :messages, only: %i[index create]
+        end
+
+        # Offer lifecycle. Creation is listing-scoped; the transition
+        # resources mirror the web app's names (acceptance / decline /
+        # withdrawal).
+        resources :offers, only: :index do
+          resource :acceptance, only: :create
+          resource :decline, only: :create
+          resource :withdrawal, only: :create
+        end
+        resources :listings, only: [] do
+          resources :offers, only: :create
+        end
+
+        # Cart & checkout.
+        resource :cart, only: %i[show destroy]
+        resources :cart_items, only: %i[index create update destroy]
+        resource :checkout, only: :create
+
+        # Orders. Buyer transitions look the order up through
+        # current_user.orders, seller ones (payment_confirmation, shipment)
+        # through current_user.sales — the wrong role 404s, matching the web.
+        resources :orders, only: %i[index show] do
+          resource :payment_confirmation, only: :create
+          resource :shipment, only: :create
+          resource :delivery_confirmation, only: :create
+          resource :completion, only: :create
+          resource :cancellation, only: :create
+          resource :dispute, only: :create
+          resource :review, only: :create, controller: "order_reviews"
+        end
+
+        # Seller area.
+        namespace :sell do
+          resource :dashboard, only: :show
+          resources :listings, only: %i[index show create update] do
+            resource :submission, only: :create
+            resource :archival, only: :create
+            resource :sale_mark, only: :create
+          end
+        end
+
+        # Account utilities.
+        resources :addresses, only: %i[index create update destroy]
+        resources :devices, only: %i[index create destroy]
+        resources :api_tokens, only: %i[index destroy]
+
+        # Active Storage direct uploads with bearer auth (same request/
+        # response shape as ActiveStorage::DirectUploadsController, which is
+        # cookie+CSRF only and unusable from a native app).
+        post "direct_uploads", to: "direct_uploads#create"
+      end
+    end
+  end
+
   # All user-facing routes are prefixed with an optional locale segment (/es, /en, ...).
   scope "(:locale)", locale: /es|en|fr|de|it|pt/ do
     root "pages#home"

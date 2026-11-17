@@ -31,9 +31,15 @@ class SettingTest < ActiveSupport::TestCase
   end
 
   test "seed_defaults! is idempotent" do
-    assert_difference -> { Setting.count }, Setting::DEFAULTS.size do
+    # Nil defaults mean "unset" (the column is NOT NULL), so they are skipped.
+    assert_difference -> { Setting.count }, Setting::DEFAULTS.values.compact.size do
       2.times { Setting.seed_defaults! }
     end
     assert_equal "PCMarket", Setting.get("site_name")
+  end
+
+  test "seed_defaults! skips nil defaults" do
+    Setting.seed_defaults!
+    assert_nil Setting.find_by(key: "min_app_version_ios")
   end
 end

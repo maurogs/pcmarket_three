@@ -1,0 +1,3 @@
+json.listing do
+  json.partial! "api/v1/partials/listing_full", listing: @listing
+end

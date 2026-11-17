@@ -40,6 +40,7 @@ class User < ApplicationRecord
   has_many :carts, dependent: :destroy
   has_many :addresses, dependent: :destroy
   has_many :api_tokens, dependent: :destroy
+  has_many :devices, dependent: :destroy
   has_many :reviews, foreign_key: "reviewer_id", inverse_of: :reviewer, dependent: :destroy
   has_many :offers, foreign_key: "buyer_id", inverse_of: :buyer, dependent: :destroy
   has_many :conversations_as_buyer, class_name: "Conversation",

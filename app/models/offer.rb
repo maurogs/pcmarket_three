@@ -10,6 +10,11 @@ class Offer < ApplicationRecord
   belongs_to :listing
   belongs_to :buyer, class_name: "User"
 
+  # Convenience read-through: the seller is the listing's owner. Lets API
+  # serializers (and eager loads: `includes(listing: :user)`) treat it as
+  # a regular association.
+  has_one :seller, through: :listing, source: :user, class_name: "User"
+
   # Chat bubbles generated for this offer keep a soft link to it so the
   # thread can re-render the offer card when its status changes.
   has_many :messages, dependent: :nullify

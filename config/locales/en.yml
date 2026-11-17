@@ -3397,3 +3397,97 @@ en:
       subject_line: 'Subject: %{subject}'
       locale_label: 'Written in: %{locale}'
       in_admin: Read it in the admin inbox
+
+  api:
+    errors:
+      unauthorized: Authentication required
+      forbidden: Not allowed
+      not_found: Not found
+      invalid_request: Invalid request
+      invalid_transition: That action is not available right now
+      stale_transition: The state of this order changed; reload and try again
+      rate_limited: Too many requests
+      banned: This account has been suspended
+    registration:
+      created: Account created
+    sessions:
+      banned: This account has been suspended
+      destroyed: Session ended
+    passwords:
+      sent: If that email is registered, we sent instructions
+    notifications:
+      read_all: Notifications marked as read
+    follows:
+      followed: Following this store
+      unfollowed: No longer following
+    favorites:
+      added: Added to favorites
+      removed: Removed from favorites
+    saved_searches:
+      removed: Saved search deleted
+    carts:
+      emptied: Cart emptied
+      placed: Orders placed
+    order_reviews:
+      created: Review published
+    accepts:
+      missing_payment_url: No payment URL was returned; complete the payment in the checkout
+    cart_items:
+      added: Added to cart
+      updated: Cart updated
+      destroyed: Removed from cart
+      update_errors:
+        invalid: Invalid quantity
+        not_purchasable: This item is no longer for sale
+        quantity_exceeded: Only %{count} left
+    checkouts:
+      errors:
+        invalid_token: The checkout token does not match your session
+        invalid_address: The address does not belong to you
+        empty_cart: Your cart is empty
+        own_listing: You cannot buy your own listings
+        vacation: The seller is on vacation and cannot sell right now
+        not_purchasable: This listing can no longer be purchased
+        quantity_exceeded: There are not enough units for the quantity you chose
+      placed: Orders placed
+    order_transitions:
+      confirmed: Payment confirmed
+      shipped: Order shipped
+      delivered: Marked as delivered
+      completed: Order completed
+      cancelled: Order cancelled
+      disputed: Order disputed
+    sells:
+      submitted: Listing submitted for review
+      archived: Listing archived
+      sale_marked: Mark as sold
+    devices:
+      destroyed: Device removed
+    api_tokens:
+      destroyed: Token revoked
+    conversations:
+      errors:
+        self: You cannot start a conversation with yourself
+        blocked: This user does not accept messages from you
+    messages:
+      errors:
+        recipient_not_found: Recipient not found
+        blocked: This user does not accept messages from you
+        rate_limited: You are sending messages too quickly
+    offers:
+      created: Offer sent
+      accepted: Offer accepted
+      declined: Offer declined
+      withdrawn: Offer withdrawn
+      errors:
+        recipient_not_found: Seller not found
+        self_offer: You cannot make an offer on your own listing
+        blocked: This seller does not accept offers from you
+        below_minimum: The offer is below the minimum amount
+        not_owner: You can only manage your own offers
+        not_pending: This offer is no longer pending
+        not_seller: You are not the seller of this offer
+        not_buyer: You are not the buyer of this offer
+    shipments:
+      errors:
+        unknown_carrier: Unknown carrier

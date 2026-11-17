@@ -3444,3 +3444,97 @@ fr:
       subject_line: 'Objet : %{subject}'
       locale_label: 'Rédigé en : %{locale}'
       in_admin: Le lire dans la boîte d'administration
+
+  api:
+    errors:
+      unauthorized: Authentification requise
+      forbidden: Non autorisé
+      not_found: Introuvable
+      invalid_request: Requête invalide
+      invalid_transition: Cette action n'est pas disponible pour le moment
+      stale_transition: L'état de cette commande a changé ; rechargez et réessayez
+      rate_limited: Trop de requêtes
+      banned: Ce compte a été suspendu
+    registration:
+      created: Compte créé
+    sessions:
+      banned: Ce compte a été suspendu
+      destroyed: Session terminée
+    passwords:
+      sent: Si cet e-mail est enregistré, nous avons envoyé les instructions
+    notifications:
+      read_all: Notifications marquées comme lues
+    follows:
+      followed: Vous suivez cette boutique
+      unfollowed: Vous ne suivez plus cette boutique
+    favorites:
+      added: Ajouté aux favoris
+      removed: Retiré des favoris
+    saved_searches:
+      removed: Recherche enregistrée supprimée
+    carts:
+      emptied: Panier vidé
+      placed: Commandes passées
+    order_reviews:
+      created: Avis publié
+    accepts:
+      missing_payment_url: Aucune URL de paiement n'a été renvoyée ; finalisez le paiement dans le paiement en ligne
+    cart_items:
+      added: Ajouté au panier
+      updated: Panier mis à jour
+      destroyed: Retiré du panier
+      update_errors:
+        invalid: Quantité invalide
+        not_purchasable: Cet article n'est plus en vente
+        quantity_exceeded: Il ne reste que %{count}
+    checkouts:
+      errors:
+        invalid_token: Le jeton de commande ne correspond pas à votre session
+        invalid_address: Cette adresse ne vous appartient pas
+        empty_cart: Votre panier est vide
+        own_listing: Vous ne pouvez pas acheter vos propres annonces
+        vacation: Le vendeur est en vacances et ne peut pas vendre pour le moment
+        not_purchasable: Cette annonce n'est plus achetable
+        quantity_exceeded: Il n'y a pas assez d'unités pour la quantité choisie
+      placed: Commandes passées
+    order_transitions:
+      confirmed: Paiement confirmé
+      shipped: Commande expédiée
+      delivered: Marquée comme livrée
+      completed: Commande terminée
+      cancelled: Commande annulée
+      disputed: Commande contestée
+    sells:
+      submitted: Annonce soumise à vérification
+      archived: Annonce archivée
+      sale_marked: Marqué comme vendu
+    devices:
+      destroyed: Appareil supprimé
+    api_tokens:
+      destroyed: Jeton révoqué
+    conversations:
+      errors:
+        self: Vous ne pouvez pas démarrer une conversation avec vous-même
+        blocked: Cet utilisateur n'accepte pas vos messages
+    messages:
+      errors:
+        recipient_not_found: Destinataire introuvable
+        blocked: Cet utilisateur n'accepte pas vos messages
+        rate_limited: Vous envoyez des messages trop rapidement
+    offers:
+      created: Offre envoyée
+      accepted: Offre acceptée
+      declined: Offre refusée
+      withdrawn: Offre retirée
+      errors:
+        recipient_not_found: Vendeur introuvable
+        self_offer: Vous ne pouvez pas faire d'offre sur votre propre annonce
+        blocked: Ce vendeur n'accepte pas vos offres
+        below_minimum: L'offre est inférieure au montant minimum
+        not_owner: Vous ne pouvez gérer que vos propres offres
+        not_pending: Cette offre n'est plus en attente
+        not_seller: Vous n'êtes pas le vendeur de cette offre
+        not_buyer: Vous n'êtes pas l'acheteur de cette offre
+    shipments:
+      errors:
+        unknown_carrier: Transporteur inconnu

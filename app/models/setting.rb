@@ -11,6 +11,10 @@ class Setting < ApplicationRecord
     "min_offer_percent" => 50,
     "support_email" => "soporte@pcmarket.example",
     "min_public_stat" => 50,
+    # Phase 8b: minimum app versions the /api/v1/config endpoint advertises;
+    # a native client below these is told to force-update. Nil disables.
+    "min_app_version_ios" => nil,
+    "min_app_version_android" => nil,
     # Phase 8a: robots.txt / indexing switch. Only production indexes by
     # default; staging copies stay out of search engines.
     "search_engine_indexing" => Rails.env.production?
@@ -66,8 +70,14 @@ class Setting < ApplicationRecord
     setting
   end
 
+  # Nil defaults mean "unset until an admin provides a value" (settings.value
+  # is NOT NULL), so they are documented in DEFAULTS but never written.
   def self.seed_defaults!
-    DEFAULTS.each { |key, value| set(key, value) unless exists?(key: key) }
+    DEFAULTS.each do |key, value|
+      next if value.nil?
+
+      set(key, value) unless exists?(key: key)
+    end
   end
 
   # trade_name defaults to site_name when the admin left it blank.

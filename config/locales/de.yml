@@ -3433,3 +3433,97 @@ de:
       subject_line: 'Betreff: %{subject}'
       locale_label: 'Sprache: %{locale}'
       in_admin: Im Admin-Posteingang lesen
+
+  api:
+    errors:
+      unauthorized: Authentifizierung erforderlich
+      forbidden: Nicht erlaubt
+      not_found: Nicht gefunden
+      invalid_request: Ungültige Anfrage
+      invalid_transition: Diese Aktion ist gerade nicht verfügbar
+      stale_transition: Der Status dieser Bestellung hat sich geändert; neu laden und erneut versuchen
+      rate_limited: Zu viele Anfragen
+      banned: Dieses Konto wurde gesperrt
+    registration:
+      created: Konto erstellt
+    sessions:
+      banned: Dieses Konto wurde gesperrt
+      destroyed: Sitzung beendet
+    passwords:
+      sent: Falls diese E-Mail registriert ist, haben wir Anweisungen gesendet
+    notifications:
+      read_all: Benachrichtigungen als gelesen markiert
+    follows:
+      followed: Du folgst diesem Shop
+      unfollowed: Du folgst diesem Shop nicht mehr
+    favorites:
+      added: Zu Favoriten hinzugefügt
+      removed: Aus Favoriten entfernt
+    saved_searches:
+      removed: Gespeicherte Suche gelöscht
+    carts:
+      emptied: Warenkorb geleert
+      placed: Bestellungen aufgegeben
+    order_reviews:
+      created: Bewertung veröffentlicht
+    accepts:
+      missing_payment_url: Es wurde keine Zahlungs-URL zurückgegeben; schließen Sie die Zahlung im Checkout ab
+    cart_items:
+      added: Zum Warenkorb hinzugefügt
+      updated: Warenkorb aktualisiert
+      destroyed: Aus dem Warenkorb entfernt
+      update_errors:
+        invalid: Ungültige Menge
+        not_purchasable: Dieser Artikel ist nicht mehr verfügbar
+        quantity_exceeded: Nur noch %{count} übrig
+    checkouts:
+      errors:
+        invalid_token: Das Checkout-Token stimmt nicht mit Ihrer Sitzung überein
+        invalid_address: Die Adresse gehört nicht zu Ihnen
+        empty_cart: Ihr Warenkorb ist leer
+        own_listing: Sie können Ihre eigenen Anzeigen nicht kaufen
+        vacation: Der Verkäufer ist im Urlaub und kann derzeit nicht verkaufen
+        not_purchasable: Diese Anzeige kann nicht mehr gekauft werden
+        quantity_exceeded: Es gibt nicht genug Stück für die gewählte Menge
+      placed: Bestellungen aufgegeben
+    order_transitions:
+      confirmed: Zahlung bestätigt
+      shipped: Bestellung versendet
+      delivered: Als zugestellt markiert
+      completed: Bestellung abgeschlossen
+      cancelled: Bestellung storniert
+      disputed: Bestellung beanstandet
+    sells:
+      submitted: Anzeige zur Prüfung übermittelt
+      archived: Anzeige archiviert
+      sale_marked: Als verkauft markiert
+    devices:
+      destroyed: Gerät entfernt
+    api_tokens:
+      destroyed: Token widerrufen
+    conversations:
+      errors:
+        self: Sie können keine Unterhaltung mit sich selbst beginnen
+        blocked: Dieser Nutzer akzeptiert keine Nachrichten von Ihnen
+    messages:
+      errors:
+        recipient_not_found: Empfänger nicht gefunden
+        blocked: Dieser Nutzer akzeptiert keine Nachrichten von Ihnen
+        rate_limited: Sie senden Nachrichten zu schnell
+    offers:
+      created: Angebot gesendet
+      accepted: Angebot angenommen
+      declined: Angebot abgelehnt
+      withdrawn: Angebot zurückgezogen
+      errors:
+        recipient_not_found: Verkäufer nicht gefunden
+        self_offer: Sie können kein Angebot auf Ihre eigene Anzeige machen
+        blocked: Dieser Verkäufer akzeptiert keine Angebote von Ihnen
+        below_minimum: Das Angebot liegt unter dem Mindestbetrag
+        not_owner: Sie können nur Ihre eigenen Angebote verwalten
+        not_pending: Dieses Angebot ist nicht mehr offen
+        not_seller: Sie sind nicht der Verkäufer dieses Angebots
+        not_buyer: Sie sind nicht der Käufer dieses Angebots
+    shipments:
+      errors:
+        unknown_carrier: Unbekannter Versanddienstleister

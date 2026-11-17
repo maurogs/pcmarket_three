@@ -100,3 +100,5 @@ group :test do
 end
 
 gem "commonmarker", "~> 2.10"
+
+gem "rack-cors", "~> 3.0"
