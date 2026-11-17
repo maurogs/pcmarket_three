@@ -10,6 +10,7 @@ module Admin
 
     def index
       @countries = Country.order(enabled: :desc, code: :asc)
+      @published_legal_slugs = Country.published_legal_slugs_by_country(@countries)
     end
 
     def edit; end

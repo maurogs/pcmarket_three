@@ -20,7 +20,7 @@
     </thead>
     <tbody>
       <% @countries.each do |country| %>
-        <% missing = country.missing_legal_slugs %>
+        <% missing = country.missing_legal_slugs(@published_legal_slugs.fetch([ country.code, country.default_locale ], [])) %>
         <tr>
           <td class="font-medium"><%= country.display_name %> <span class="font-mono text-xs text-muted"><%= country.code %></span></td>
           <td><%= country.currency %></td>

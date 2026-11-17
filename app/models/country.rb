@@ -35,10 +35,24 @@ class Country < ApplicationRecord
     I18n.t(name_key, default: code)
   end
 
+  # Published legal page slugs for a set of countries in ONE query, grouped
+  # by [country_code, locale], so batched callers (the admin countries index)
+  # can pass each row's set to missing_legal_slugs instead of one query per
+  # country.
+  def self.published_legal_slugs_by_country(countries)
+    LegalPage.published.where(country_code: countries.map(&:code).uniq)
+              .pluck(:country_code, :locale, :slug)
+              .group_by { |country_code, locale, _slug| [ country_code, locale ] }
+              .transform_values { |rows| rows.map { |_country_code, _locale, slug| slug } }
+  end
+
   # Legal page slugs with no PUBLISHED page in this country's default
-  # locale — empty when the country may legally launch.
-  def missing_legal_slugs
-    published = LegalPage.published.where(country_code: code, locale: default_locale).pluck(:slug)
+  # locale — empty when the country may legally launch. Pass the slugs
+  # precomputed by published_legal_slugs_by_country to skip the query
+  # (the enable validation relies on the nil fallback).
+  def missing_legal_slugs(published_slugs = nil)
+    published = published_slugs ||
+                LegalPage.published.where(country_code: code, locale: default_locale).pluck(:slug)
     LegalPage::SLUGS - published
   end
 
